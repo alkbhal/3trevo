@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Guia Antifalência do Empreendedor Iniciante — Editora Três Trevo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#1a4a2e;--ouro:#c8a84b;--ouro-claro:#e8c96a;--branco:#fdfbf7;--creme:#f5f0e8;--texto:#1c1c1c;--cinza:#6b6b6b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#1c2a1a;min-height:100vh;display:flex;flex-direction:column;color:var(--branco)}
+.topo{background:rgba(0,0,0,0.3);padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
+.topo-marca{font-family:'Playfair Display',serif;color:var(--ouro);font-size:16px;text-decoration:none}
+.topo-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+
+.hero{padding:56px 48px;display:grid;grid-template-columns:240px 1fr;gap:64px;align-items:start;max-width:1100px;margin:0 auto;width:100%;flex:1}
+
+/* CAPA */
+.capa{background:rgba(255,255,255,0.04);border:1px solid rgba(200,168,75,0.25);padding:32px 24px;position:relative;display:flex;flex-direction:column;align-items:center;gap:14px}
+.capa::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ouro),transparent)}
+.capa-serie{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);opacity:.7}
+.capa-emoji{font-size:64px;line-height:1}
+.capa-vol{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:4px}
+.capa-titulo{font-family:'Playfair Display',serif;font-size:17px;text-align:center;line-height:1.3;color:var(--branco)}
+.capa-subtitulo{font-size:11px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.5;font-style:italic}
+.capa-autor{font-size:11px;color:var(--ouro);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.capa-badge{background:var(--ouro);color:var(--verde);font-size:10px;font-weight:500;padding:5px 14px;letter-spacing:1px;text-align:center;width:100%;margin-top:8px}
+
+/* SUMÁRIO VISUAL */
+.sumario{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);padding:20px;margin-top:16px}
+.sumario-titulo{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px}
+.sumario-item{font-size:12px;color:rgba(255,255,255,0.4);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:10px}
+.sumario-item:last-child{border-bottom:none}
+.cap-num{color:var(--ouro);opacity:.6;flex-shrink:0;font-size:11px;width:20px}
+
+/* INFO */
+.info-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);margin-bottom:10px}
+.info-titulo{font-family:'Playfair Display',serif;font-size:clamp(22px,2.8vw,36px);line-height:1.15;margin-bottom:6px}
+.info-serie{font-size:13px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;font-style:italic}
+
+.cotas-info{display:flex;align-items:center;gap:12px;background:rgba(200,168,75,0.08);border:1px solid rgba(200,168,75,0.18);padding:12px 16px;margin-bottom:24px}
+.cotas-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;color:var(--ouro);line-height:1}
+.cotas-txt strong{color:rgba(255,255,255,0.8);display:block;font-size:13px;margin-bottom:2px}
+.cotas-txt span{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.5}
+
+.info-desc{font-size:15px;color:rgba(255,255,255,0.58);line-height:1.8;margin-bottom:24px}
+
+/* DESTAQUES */
+.destaques{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
+.destaque{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:14px 16px}
+.destaque-icone{font-size:20px;margin-bottom:6px}
+.destaque-txt{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5}
+.destaque-txt strong{color:rgba(255,255,255,0.75);display:block;font-size:13px;margin-bottom:2px}
+
+/* PARA QUEM É */
+.para-quem{background:rgba(200,168,75,0.06);border-left:3px solid var(--ouro);padding:16px 20px;margin-bottom:28px}
+.para-quem-titulo{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:12px}
+.para-quem-item{font-size:13px;color:rgba(255,255,255,0.6);padding:4px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.para-quem-item::before{content:'✓';color:var(--ouro);flex-shrink:0;font-size:12px;margin-top:1px}
+
+/* AÇÕES */
+.acoes{display:flex;flex-direction:column;gap:10px}
+.btn-download{display:flex;align-items:center;gap:14px;padding:18px 24px;background:var(--ouro);color:var(--verde);text-decoration:none;font-weight:500;font-size:15px;transition:background .2s;font-family:'DM Sans',sans-serif}
+.btn-download:hover{background:var(--ouro-claro)}
+.btn-download .icone{font-size:22px}
+.btn-download .txt small{display:block;font-size:11px;font-weight:400;opacity:.7;margin-top:1px}
+.btn-mais{display:flex;align-items:center;padding:15px 24px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);text-decoration:none;font-size:14px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-mais:hover{border-color:var(--ouro);color:var(--ouro)}
+
+.reg-aviso{background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.15);border-left:3px solid var(--ouro);padding:14px 18px;margin-top:20px}
+.reg-aviso-titulo{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px}
+.reg-aviso p{font-size:12px;color:rgba(255,255,255,0.42);line-height:1.65}
+.reg-aviso strong{color:rgba(255,255,255,0.7)}
+.reg-aviso a{color:var(--ouro);font-size:11px}
+
+/* PRÓXIMOS VOLUMES */
+.proximos{background:rgba(0,0,0,0.25);padding:40px 48px;border-top:1px solid rgba(255,255,255,0.05)}
+.prox-titulo{font-family:'Playfair Display',serif;font-size:20px;color:var(--branco);margin-bottom:6px}
+.prox-sub{font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.prox-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:1000px}
+.prox-item{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:16px;opacity:.6}
+.prox-item.atual{opacity:1;border-color:rgba(200,168,75,0.3)}
+.prox-vol{font-size:10px;color:var(--ouro);letter-spacing:2px;margin-bottom:6px}
+.prox-nome{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.4}
+.prox-status{font-size:10px;color:rgba(255,255,255,0.25);margin-top:6px}
+.prox-item.atual .prox-status{color:var(--ouro)}
+
+footer{background:rgba(0,0,0,0.3);padding:20px 48px;font-size:11px;color:rgba(255,255,255,0.18);text-align:center;border-top:1px solid rgba(255,255,255,0.05)}
+
+@media(max-width:768px){
+  .topo,footer,.proximos{padding-left:20px;padding-right:20px}
+  .hero{grid-template-columns:1fr;padding:36px 20px;gap:32px}
+  .capa{max-width:200px}
+  .destaques{grid-template-columns:1fr}
+  .prox-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <a href="https://www.3trevo.com.br" class="topo-marca">✦ Editora Três Trevo</a>
+  <span class="topo-tag">Programa Cultural</span>
+</header>
+
+<section class="hero">
+
+  <!-- CAPA + SUMÁRIO -->
+  <div>
+    <div class="capa">
+      <div class="capa-serie">Manuais de Sobrevivência</div>
+      <div class="capa-emoji">📘</div>
+      <div class="capa-vol">Vol. 1</div>
+      <div class="capa-titulo">O Guia Antifalência do Empreendedor Iniciante</div>
+      <div class="capa-subtitulo">A Conta que Ninguém te Obriga a Fazer</div>
+      <div class="capa-autor">Rogerio Dias</div>
+      <div class="capa-badge">3 cotas de participação</div>
+    </div>
+
+    <div class="sumario">
+      <div class="sumario-titulo">Conteúdo</div>
+      <div class="sumario-item"><span class="cap-num">00</span>Por que negócios quebram</div>
+      <div class="sumario-item"><span class="cap-num">01</span>Custo de existir</div>
+      <div class="sumario-item"><span class="cap-num">02</span>Precificação sem suicídio</div>
+      <div class="sumario-item"><span class="cap-num">03</span>Ponto de equilíbrio</div>
+      <div class="sumario-item"><span class="cap-num">04</span>Caixa: o sangue do negócio</div>
+      <div class="sumario-item"><span class="cap-num">05</span>A pirâmide da sobrevivência</div>
+      <div class="sumario-item"><span class="cap-num">06</span>Checklist antifalência</div>
+      <div class="sumario-item"><span class="cap-num">+</span>Calculadora + Vocabulário</div>
+    </div>
+  </div>
+
+  <!-- INFORMAÇÕES -->
+  <div>
+    <div class="info-label">✦ Seu ebook está pronto</div>
+    <h1 class="info-titulo">O Guia Antifalência do Empreendedor Iniciante</h1>
+    <div class="info-serie">Manuais de Sobrevivência para Empreendedores — Vol. 1</div>
+
+    <div class="cotas-info">
+      <div class="cotas-num">3</div>
+      <div class="cotas-txt">
+        <strong>Cotas de participação como brinde</strong>
+        <span>Distribuídas pela editora conforme regulamento do Programa Cultural Três Trevo</span>
+      </div>
+    </div>
+
+    <p class="info-desc">Este não é um livro de motivação. É uma ferramenta de trabalho. Custos reais, precificação correta, ponto de equilíbrio e gestão de caixa — os quatro pilares que separam os negócios que sobrevivem dos que quebram nos primeiros dois anos.</p>
+
+    <div class="destaques">
+      <div class="destaque">
+        <div class="destaque-icone">🧮</div>
+        <div class="destaque-txt"><strong>Calculadora de viabilidade</strong>Modelo prático incluso para calcular seu break-even</div>
+      </div>
+      <div class="destaque">
+        <div class="destaque-icone">📋</div>
+        <div class="destaque-txt"><strong>Checklist antifalência</strong>Lista completa para imprimir e colar na parede</div>
+      </div>
+      <div class="destaque">
+        <div class="destaque-icone">🚨</div>
+        <div class="destaque-txt"><strong>Guia de emergência</strong>O que fazer quando o caixa fica vermelho</div>
+      </div>
+      <div class="destaque">
+        <div class="destaque-icone">📖</div>
+        <div class="destaque-txt"><strong>Vocabulário financeiro</strong>Os termos que todo dono de negócio precisa dominar</div>
+      </div>
+    </div>
+
+    <div class="para-quem">
+      <div class="para-quem-titulo">Para quem é este livro</div>
+      <div class="para-quem-item">Quem está pensando em abrir um negócio e quer fazer do jeito certo</div>
+      <div class="para-quem-item">Quem já abriu, trabalha muito e não vê a cor do dinheiro</div>
+      <div class="para-quem-item">Quem quer entender a matemática real do lucro, sem guru de palco</div>
+      <div class="para-quem-item">Quem tem humildade de separar "saber fazer o produto" de "saber gerir o negócio"</div>
+    </div>
+
+    <div class="acoes">
+      <a href="https://drive.google.com/uc?export=download&id=1Dfv2NVyOiwxtP_nUOu5kvJoFgeuzWPrn" class="btn-download">
+        <span class="icone">📥</span>
+        <span class="txt">Baixar meu ebook<small>Formato PDF · acesso imediato · Vol. 1 completo</small></span>
+      </a>
+      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte" class="btn-mais">← Voltar à campanha</a>
+    </div>
+
+    <div class="reg-aviso">
+      <div class="reg-aviso-titulo">⚖ Lembrete do Programa Cultural</div>
+      <p>Para validar suas <strong>3 cotas</strong>: <strong>escreva um depoimento</strong> sobre o ebook e <strong>siga @3trevo</strong> no Instagram. Participantes que não cumprirem os requisitos serão desclassificados e novo sorteio será realizado.
+      <a href="https://cultural.3trevo.com.br/termos-de-uso"> Ver regulamento →</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- PRÓXIMOS VOLUMES -->
+<section class="proximos">
+  <h2 class="prox-titulo">Coleção completa</h2>
+  <p class="prox-sub">Manuais de Sobrevivência para Empreendedores</p>
+  <div class="prox-grid">
+    <div class="prox-item atual">
+      <div class="prox-vol">Vol. 1</div>
+      <div class="prox-nome">O Guia Antifalência do Empreendedor Iniciante</div>
+      <div class="prox-status">✓ Disponível agora</div>
+    </div>
+    <div class="prox-item">
+      <div class="prox-vol">Vol. 2</div>
+      <div class="prox-nome">Fluxo de Caixa Para Quem Odeia Planilhas</div>
+      <div class="prox-status">Em breve</div>
+    </div>
+    <div class="prox-item">
+      <div class="prox-vol">Vol. 3</div>
+      <div class="prox-nome">Precificação Estratégica Sem Mistério</div>
+      <div class="prox-status">Em breve</div>
+    </div>
+    <div class="prox-item">
+      <div class="prox-vol">Vol. 4</div>
+      <div class="prox-nome">Do Operacional ao Estratégico</div>
+      <div class="prox-status">Em breve</div>
+    </div>
+    <div class="prox-item">
+      <div class="prox-vol">Vol. 5</div>
+      <div class="prox-nome">Marketing com Orçamento Zero</div>
+      <div class="prox-status">Em breve</div>
+    </div>
+  </div>
+</section>
+
+<footer>Editora Três Trevo · CNPJ 18.928.966/0001-59 · Montauri/RS · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="addeccceed9ed9dfc8cfc283cec2c083cfdf">[email&#160;protected]</a></footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const WEBHOOK = 'SEU_WEBHOOK_AQUI';
+const pedido = new URLSearchParams(window.location.search).get('pedido') || 'direto';
+if (WEBHOOK !== 'SEU_WEBHOOK_AQUI') {
+  fetch(WEBHOOK, {
+    meth

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Justiça(mento) para Orelha — Editora Três Trevo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #1a4a2e; --ouro: #c8a84b; --ouro-claro: #e8c96a;
+  --creme: #f5f0e8; --branco: #fdfbf7; --cinza: #6b6b6b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; display: flex; flex-direction: column; }
+
+.topo { background: var(--verde); padding: 0 48px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+.topo-marca { font-family: 'Playfair Display', serif; color: var(--ouro); font-size: 16px; text-decoration: none; }
+.topo-tag { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+.hero {
+  background: #1a3a2a;
+  padding: 64px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  flex: 1;
+}
+.capa {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(200,168,75,0.2);
+  aspect-ratio: 2/3;
+  max-width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+  position: relative;
+}
+.capa::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ouro), transparent);
+}
+.capa-emoji { font-size: 80px; }
+.capa-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: var(--branco);
+  text-align: center;
+  line-height: 1.2;
+}
+.capa-autor { font-size: 12px; color: var(--ouro); letter-spacing: 2px; text-transform: uppercase; }
+
+.info-label { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--ouro); margin-bottom: 12px; }
+.info-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 3vw, 42px);
+  color: var(--branco);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.info-desc { font-size: 16px; color: rgba(255,255,255,0.6); line-height: 1.75; margin-bottom: 32px; }
+
+.acoes { display: flex; flex-direction: column; gap: 12px; }
+.btn-download {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  background: var(--ouro);
+  color: var(--verde);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  transition: background 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-download:hover { background: var(--ouro-claro); }
+.btn-download .icone { font-size: 22px; }
+.btn-download .txt small { display: block; font-size: 11px; font-weight: 400; opacity: 0.7; margin-top: 1px; }
+
+.btn-mais {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 14px;
+  transition: border-color 0.2s, color 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-mais:hover { border-color: var(--ouro); color: var(--ouro); }
+
+.aviso {
+  background: rgba(200,168,75,0.08);
+  border: 1px solid rgba(200,168,75,0.2);
+  padding: 16px 20px;
+  margin-top: 24px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+}
+.aviso strong { color: var(--ouro); }
+
+footer {
+  background: #0e2a1a;
+  padding: 24px 48px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .topo { padding: 0 20px; }
+  .hero { grid-template-columns: 1fr; padding: 40px 20px; gap: 36px; }
+  .capa { max-width: 200px; }
+  footer { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <a href="https://www.3trevo.com.br" class="topo-marca">✦ Editora Três Trevo</a>
+  <span class="topo-tag">Programa Cultural</span>
+</header>
+
+<section class="hero">
+  <div class="capa">
+    <div class="capa-emoji">⚖️</div>
+    <div class="capa-titulo">Justiça(mento) para Orelha</div>
+    <div class="capa-autor">Said Anes</div>
+  </div>
+  <div>
+    <div class="info-label">✦ Seu ebook está pronto</div>
+    <h1 class="info-titulo">Justiça(mento)<br>para Orelha</h1>
+    <p class="info-desc">Nem toda indignação é justiça. Nem toda justiça é verdade. Um ensaio sobre julgamentos precipitados na era da informação — e o que fazer antes de condenar.</p>
+
+    <div class="acoes">
+      <a href="https://drive.google.com/uc?export=download&id=1WSLII_1tWOqWlywSKrG7swbVa3JpQbZu" class="btn-download" id="btn-dl">
+        <span class="icone">📥</span>
+        <span class="txt">
+          Baixar meu ebook
+          <small>Formato PDF · acesso imediato</small>
+        </span>
+      </a>
+      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte" class="btn-mais">
+        ← Voltar e comprar mais cotas
+      </a>
+    </div>
+
+    <div class="aviso">
+      <strong>Lembrete do Programa Cultural:</strong> Após a leitura, você pode deixar seu depoimento na página da campanha e concorrer a prêmios extras. Seu feedback importa.
+    </div>
+  </div>
+</section>
+
+<footer>
+  Editora Três Trevo · CNPJ 18.928.966/0001-59 · Montauri/RS · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="156674765526616770777a3b767a783b7767">[email&#160;protected]</a>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Registrar acesso ao ebook (webhook Make.com)
+const WEBHOOK = 'SEU_WEBHOOK_AQUI';
+const params = new URLSearchParams(window.location.search);
+const pedido = params.get('pedido') || 'direto';
+
+if (WEBHOOK !== 'SEU_WEBHOOK_AQUI') {
+  fetch(WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Typ

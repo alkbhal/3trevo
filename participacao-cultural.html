@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Participar do Programa Cultural — Editora Três Trevo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#1a4a2e;--ouro:#c8a84b;--ouro-claro:#e8c96a;--branco:#fdfbf7;--creme:#f5f0e8;--texto:#1c1c1c}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#1c2a1a;color:#fff;min-height:100vh}
+.topo{background:rgba(0,0,0,0.3);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
+.marca{font-family:'Playfair Display',serif;color:var(--ouro);font-size:15px;text-decoration:none}
+.tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+
+.hero{text-align:center;padding:48px 24px 32px}
+.hero-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);margin-bottom:12px}
+.hero-titulo{font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,40px);margin-bottom:10px}
+.hero-sub{font-size:14px;color:rgba(255,255,255,0.45);max-width:480px;margin:0 auto;line-height:1.7}
+
+/* ETAPAS */
+.etapas{display:flex;justify-content:center;gap:0;max-width:680px;margin:32px auto 0;padding:0 24px}
+.etapa{flex:1;text-align:center;position:relative}
+.etapa::after{content:'';position:absolute;top:18px;right:0;width:100%;height:2px;background:rgba(255,255,255,0.08);z-index:0}
+.etapa:last-child::after{display:none}
+.etapa-num{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:13px;font-weight:500;position:relative;z-index:1;background:#1c2a1a;transition:all .3s}
+.etapa.ativa .etapa-num{border-color:var(--ouro);color:var(--ouro);background:#1c2a1a}
+.etapa.concluida .etapa-num{border-color:var(--ouro);background:var(--ouro);color:var(--verde)}
+.etapa-txt{font-size:11px;color:rgba(255,255,255,0.35)}
+.etapa.ativa .etapa-txt{color:var(--ouro)}
+
+/* CARD */
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2px;max-width:640px;margin:32px auto;padding:36px;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ouro),transparent)}
+
+/* BLOQUEIO D+7 */
+.bloqueio{text-align:center;padding:32px 24px}
+.bloqueio-icone{font-size:48px;margin-bottom:16px}
+.bloqueio-titulo{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:10px;color:var(--ouro)}
+.bloqueio-txt{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.8;max-width:400px;margin:0 auto 20px}
+.bloqueio-contador{background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.2);padding:16px 24px;display:inline-block;margin-bottom:20px}
+.bloqueio-contador strong{font-family:'Playfair Display',serif;font-size:32px;color:var(--ouro);display:block}
+.bloqueio-contador span{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+
+/* FORMULÁRIO */
+.form-secao{margin-bottom:28px}
+.form-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px;display:block}
+.form-label span{color:rgba(255,255,255,0.3);font-size:10px;text-transform:none;letter-spacing:0;margin-left:6px}
+.form-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:12px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s}
+.form-input:focus{border-color:var(--ouro)}
+.form-input[readonly]{opacity:.5;cursor:not-allowed}
+.form-textarea{resize:vertical;min-height:120px;line-height:1.6}
+.form-hint{font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;line-height:1.5}
+.char-count{text-align:right;font-size:11px;color:rgba(255,255,255,0.25);margin-top:4px}
+.char-count.ok{color:var(--ouro)}
+
+/* REQUISITOS */
+.requisitos{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.req{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;cursor:pointer;transition:all .2s;user-select:none}
+.req:hover{border-color:rgba(200,168,75,0.3)}
+.req.concluido{border-color:rgba(200,168,75,0.4);background:rgba(200,168,75,0.06)}
+.req-check{width:24px;height:24px;border:2px solid rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:12px}
+.req.concluido .req-check{background:var(--ouro);border-color:var(--ouro);color:var(--verde)}
+.req-info strong{display:block;font-size:14px;color:rgba(255,255,255,0.85)}
+.req-info span{font-size:12px;color:rgba(255,255,255,0.35);line-height:1.5}
+.req-badge{margin-left:auto;font-size:10px;padding:3px 10px;background:rgba(200,168,75,0.15);color:var(--ouro);letter-spacing:1px;white-space:nowrap}
+.req-badge.bonus{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3)}
+
+/* COTAS */
+.cotas-preview{background:rgba(200,168,75,0.08);border:1px solid rgba(200,168,75,0.2);padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;gap:16px}
+.cotas-num{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--ouro);line-height:1;min-width:60px}
+.cotas-txt strong{color:rgba(255,255,255,0.8);display:block;font-size:14px;margin-bottom:2px}
+.cotas-txt span{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6}
+.cotas-bônus{font-size:12px;color:var(--ouro);margin-top:4px}
+
+/* BTN */
+.btn-enviar{width:100%;padding:18px;background:var(--ouro);color:var(--verde);border:none;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-enviar:hover:not(:disabled){background:var(--ouro-claro)}
+.btn-enviar:disabled{opacity:.4;cursor:not-allowed}
+.btn-enviar .spinner{width:18px;height:18px;border:2px solid rgba(26,74,46,0.3);border-top-color:var(--verde);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.btn-enviar.loading .spinner{display:block}
+.btn-enviar.loading .btn-txt{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SUCESSO */
+.sucesso{text-align:center;padding:24px 0;display:none}
+.sucesso-icone{font-size:56px;margin-bottom:16px}
+.sucesso-titulo{font-family:'Playfair Display',serif;font-size:26px;color:var(--ouro);margin-bottom:10px}
+.sucesso-txt{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.8;margin-bottom:20px}
+.sucesso-cotas{font-family:'Playfair Display',serif;font-size:48px;color:var(--ouro);font-weight:900;display:block;margin:8px 0 4px}
+.sucesso-cotas-txt{font-size:13px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+
+/* AVISO */
+.aviso{background:rgba(200,168,75,0.06);border-left:3px solid var(--ouro);padding:12px 16px;margin-bottom:20px}
+.aviso p{font-size:12px;color:rgba(255,255,255,0.45);line-height:1.65}
+.aviso strong{color:rgba(255,255,255,0.7)}
+
+footer{background:rgba(0,0,0,0.3);padding:20px 32px;font-size:11px;color:rgba(255,255,255,0.18);text-align:center;border-top:1px solid rgba(255,255,255,0.05);margin-top:48px}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <a href="https://www.3trevo.com.br" class="marca">✦ Editora Três Trevo</a>
+  <span class="tag">Programa Cultural</span>
+</header>
+
+<!-- ETAPAS -->
+<div class="hero">
+  <div class="hero-label">✦ Programa Cultural Três Trevo</div>
+  <h1 class="hero-titulo">Valide suas cotas de participação</h1>
+  <p class="hero-sub">Após a leitura, registre seu depoimento e cumpra os requisitos para concorrer ao prêmio.</p>
+</div>
+
+<div class="etapas">
+  <div class="etapa concluida" id="etapa1">
+    <div class="etapa-num">✓</div>
+    <div class="etapa-txt">Comprou</div>
+  </div>
+  <div class="etapa concluida" id="etapa2">
+    <div class="etapa-num">✓</div>
+    <div class="etapa-txt">Recebeu o ebook</div>
+  </div>
+  <div class="etapa ativa" id="etapa3">
+    <div class="etapa-num">3</div>
+    <div class="etapa-txt">Valide agora</div>
+  </div>
+  <div class="etapa" id="etapa4">
+    <div class="etapa-num">4</div>
+    <div class="etapa-txt">Concorrendo</div>
+  </div>
+</div>
+
+<!-- CARD PRINCIPAL -->
+<div class="card" id="cardPrincipal">
+
+  <!-- BLOQUEIO D+7 (mostrado se ainda não passaram 7 dias) -->
+  <div class="bloqueio" id="bloqueioD7" style="display:none">
+    <div class="bloqueio-icone">⏳</div>
+    <h2 class="bloqueio-titulo">Ainda não é hora</h2>
+    <p class="bloqueio-txt">Para garantir que você teve tempo de ler, a participação é liberada 7 dias após a compra. Isso também protege seu direito de arrependimento.</p>
+    <div class="bloqueio-contador">
+      <strong id="diasRestantes">—</strong>
+      <span>DIAS PARA LIBERAR</span>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.3)">Você receberá um lembrete por e-mail e WhatsApp quando a participação for liberada.</p>
+  </div>
+
+  <!-- FORMULÁRIO (mostrado após D+7) -->
+  <div id="formParticipacao">
+
+    <div class="aviso">
+      <p>Este link é exclusivo para você. <strong>CPF e ebook identificados automaticamente</strong> pela sua compra. Não compartilhe este link.</p>
+    </div>
+
+    <!-- DADOS IDENTIFICADOS -->
+    <div class="form-secao">
+      <label class="form-label">Ebook adquirido</label>
+      <input type="text" class="form-input" id="campoEbook" readonly>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-secao">
+        <label class="form-label">CPF <span>(código de participação)</span></label>
+        <input type="text" class="form-input" id="campoCPF" readonly>
+      </div>
+      <div class="form-secao">
+        <label class="form-label">Nome</label>
+        <input type="text" class="form-input" id="campoNome" readonly>
+      </div>
+    </div>
+
+    <!-- CONTATO (editável) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-secao">
+        <label class="form-label">E-mail <span>(para confirmar participação)</span></label>
+        <input type="email" class="form-input" id="campoEmail" placeholder="seu@email.com">
+      </div>
+      <div class="form-secao">
+        <label class="form-label">WhatsApp <span>(com DDD)</span></label>
+        <input type="tel" class="form-input" id="campoWhatsapp" placeholder="(54) 99999-9999">
+      </div>
+    </div>
+
+    <!-- DEPOIMENTO -->
+    <div class="form-secao">
+      <label class="form-label">Seu depoimento sobre o livro <span>(obrigatório — mínimo 80 palavras)</span></label>
+      <textarea class="form-input form-textarea" id="campoDepoimento" placeholder="Conte o que você aprendeu, o que te surpreendeu, como o livro impactou sua vida ou negócio..." oninput="contarPalavras()"></textarea>
+      <div class="char-count" id="contadorPalavras">0 palavras (mínimo 80)</div>
+      <div class="form-hint">Depoimentos genéricos ou claramente não relacionados ao conteúdo do livro serão desclassificados conforme o regulamento.</div>
+    </div>
+
+    <!-- REQUISITOS -->
+    <label class="form-label" style="margin-bottom:14px">Requisitos obrigatórios</label>
+    <div class="requisitos">
+      <div class="req" id="reqInstagram" onclick="toggleReq('instagram')">
+        <div class="req-check" id="checkInstagram"></div>
+        <div class="req-info">
+          <strong>Seguir @3trevo no Instagram</strong>
+          <span>Clique aqui para seguir e marque como concluído</span>
+        </div>
+        <span class="req-badge">OBRIGATÓRIO</span>
+      </div>
+    </div>
+
+    <label class="form-label" style="margin:20px 0 14px">Bônus — cotas extras</label>
+    <div class="requisitos">
+      <div class="req" id="reqWhatsapp" onclick="toggleReq('whatsapp')">
+        <div class="req-check" id="checkWhatsapp"></div>
+        <div class="req-info">
+          <strong>Entrar no grupo WhatsApp</strong>
+          <span>Dobra o número de cotas para o sorteio</span>
+        </div>
+        <span class="req-badge bonus">+BÔNUS</span>
+      </div>
+      <div class="req" id="reqCompartilhar" onclick="toggleReq('compartilhar')">
+        <div class="req-check" id="checkCompartilhar"></div>
+        <div class="req-info">
+          <strong>Compartilhar a campanha</strong>
+          <span>+1 cota extra por compartilhamento confirmado</span>
+        </div>
+        <span class="req-badge bonus">+BÔNUS</span>
+      </div>
+    </div>
+
+    <!-- COTAS CALCULADAS -->
+    <div class="cotas-preview" id="cotasPreview">
+      <div class="cotas-num" id="numCotas">1</div>
+      <div class="cotas-txt">
+        <strong id="txtCotasBase">1 cota de participação</strong>
+        <span id="txtCotasDesc">Cumpra os bônus para aumentar suas chances</span>
+        <div class="cotas-bônus" id="txtBonus" style="display:none"></div>
+      </div>
+    </div>
+
+    <button class="btn-enviar" id="btnEnviar" onclick="enviarParticipacao()" disabled>
+      <div class="spinner"></div>
+      <span class="btn-txt">✦ Confirmar participação</span>
+    </button>
+
+    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:12px;line-height:1.6">
+      Ao confirmar, você declara que leu o material e concorda com o <a href="https://cultural.3trevo.com.br/termos-de-uso" style="color:rgba(200,168,75,0.6)">regulamento do Programa Cultural</a>.
+    </p>
+  </div>
+
+  <!-- SUCESSO -->
+  <div class="sucesso" id="telaSuccesso">
+    <div class="sucesso-icone">🎉</div>
+    <h2 class="sucesso-titulo">Participação confirmada!</h2>
+    <span class="sucesso-cotas" id="sucCotas">3</span>
+    <div class="sucesso-cotas-txt">COTAS NO SORTEIO</div>
+    <p class="sucesso-txt" style="margin-top:16px">Você receberá a confirmação por e-mail e WhatsApp. Boa sorte!</p>
+    <a href="https://www.instagram.com/3trevo" style="display:inline-block;padding:12px 28px;background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.3);color:var(--ouro);text-decoration:none;font-size:13px;margin-top:8px">Acompanhar @3trevo →</a>
+  </div>
+
+</div>
+
+<footer>Editora Três Trevo · CNPJ 18.928.966/0001-59 · Montauri/RS · sac@3trevo.com.br</footer>
+
+<script>
+// ─── CONFIGURAÇÃO ───────────────────────────────────────────
+const WEBHOOK_MAKE = 'SEU_WEBHOOK_AQUI';
+
+// Mapeamento de slugs/ebooks → cotas base
+const COTAS_BASE = {
+  'justicamento':    1,
+  'guia-antifalencia': 3,
+  'vigilante':       10,
+  'terceira-guerra': 10
+};
+
+// ─── INICIALIZAÇÃO ──────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const cpf        = params.get('cpf')    || '';
+const nome       = params.get('nome')   || '';
+const email      = params.get('email')  || '';
+const whatsapp   = params.get('phone')  || '';
+const ebook      = params.get('ebook')  || '';
+const compraData = params.get('data')   || ''; // ISO 8601 da compra (approved_at do Rifei)
+
+// Preencher campos
+document.getElementById('campoCPF').value      = cpf  ? formatarCPF(cpf)  : '—';
+document.getElementById('campoNome').value     = nome || '—';
+document.getElementById('campoEmail').value    = email;
+document.getElementById('campoWhatsapp').value = whatsapp ? formatarPhone(whatsapp) : '';
+document.getElementById('campoEbook').value    = nomeEbook(ebook);
+
+// ─── VERIFICAÇÃO D+7 ────────────────────────────────────────
+let liberado = true;
+if (compraData) {
+  const dataCompra  = new Date(compraData);
+  const dataLibera  = new Date(dataCompra.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const agora       = new Date();
+  const diasRestam  = Math.ceil((dataLibera - agora) / (1000 * 60 * 60 * 24));
+
+  if (agora < dataLibera) {
+    liberado = false;
+    document.getElementById('bloqueioD7').style.display = 'block';
+    document.getElementById('formParticipacao').style.display = 'none';
+    document.getElementById('diasRestantes').textContent = diasRestam;
+  }
+}
+
+// ─── COTAS ──────────────────────────────────────────────────
+let cotasBase = COTAS_BASE[ebook] || 1;
+let bonusWhatsapp    = false;
+let bonusCompartilhar = false;
+let instagramOk      = false;
+
+function calcularCotas() {
+  let total = cotasBase;
+  let bonusTxt = [];
+  if (bonusWhatsapp)    { total *= 2; bonusTxt.push('×2 pelo WhatsApp'); }
+  if (bonusCompartilhar){ total += 1; bonusTxt.push('+1 por compartilhar'); }
+
+  document.getElementById('numCotas').textContent = total;
+  document.getElementById('txtCotasBase').textContent = `${total} cota${total>1?'s':''} de participação`;
+
+  if (bonusTxt.length) {
+    document.getElementById('txtBonus').style.display = 'block';
+    document.getElementById('txtBonus').textContent   = bonusTxt.join(' · ');
+    document.getElementById('txtCotasDesc').textContent = 'Bônus aplicados ✓';
+  } else {
+    document.getElementById('txtBonus').style.display = 'none';
+    document.getElementById('txtCotasDesc').textContent = 'Cumpra os bônus para aumentar suas chances';
+  }
+  verificarBotao();
+}
+
+function toggleReq(tipo) {
+  if (tipo === 'instagram') {
+    instagramOk = !instagramOk;
+    document.getElementById('reqInstagram').classList.toggle('concluido', instagramOk);
+    document.getElementById('checkInstagram').textContent = instagramOk ? '✓' : '';
+    if (instagramOk) window.open('https://www.instagram.com/3trevo', '_blank');
+  }
+  if (tipo === 'whatsapp') {
+    bonusWhatsapp = !bonusWhatsapp;
+    document.getElementById('reqWhatsapp').classList.toggle('concluido', bonusWhatsapp);
+    document.getElementById('checkWhatsapp').textContent = bonusWhatsapp ? '✓' : '';
+    if (bonusWhatsapp) window.open('https://chat.whatsapp.com/SEU_LINK_GRUPO', '_blank');
+  }
+  if (tipo === 'compartilhar') {
+    bonusCompartilhar = !bonusCompartilhar;
+    document.getElementById('reqCompartilhar').classList.toggle('concluido', bonusCompartilhar);
+    document.getElementById('checkCompartilhar').textContent = bonusCompartilhar ? '✓' : '';
+    if (bonusCompartilhar) {
+      if (navigator.share) {
+        navigator.share({ title:'Programa Cultural Três Trevo', url: window.location.origin });
+      }
+    }
+  }
+  calcularCotas();
+}
+
+function contarPalavras() {
+  const txt = document.getElementById('campoDepoimento').value.trim();
+  const palavras = txt ? txt.split(/\s+/).length : 0;
+  const el = document.getElementById('contadorPalavras');
+  el.textContent = `${palavras} palavras (mínimo 80)`;
+  el.classList.toggle('ok', palavras >= 80);
+  verificarBotao();
+}
+
+function verificarBotao() {
+  const depoimento = document.getElementById('campoDepoimento').value.trim();
+  const palavras   = depoimento ? depoimento.split(/\s+/).length : 0;
+  const emailOk    = document.getElementById('campoEmail').value.includes('@');
+  const ok = palavras >= 80 && instagramOk && emailOk && liberado;
+  document.getElementById('btnEnviar').disabled = !ok;
+}
+
+document.getElementById('campoEmail').addEventListener('input', verificarBotao);
+
+// ─── ENVIO ──────────────────────────────────────────────────
+async function enviarParticipacao() {
+  const btn = document.getElementById('btnEnviar');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const totalCotas = parseInt(document.getElementById('numCotas').textContent);
+
+  const payload = {
+    evento:        'participacao_cultural',
+    cpf:           cpf,
+    nome:          nome,
+    email:         document.getElementById('campoEmail').value,
+    whatsapp:      document.getElementById('campoWhatsapp').value,
+    ebook:         ebook,
+    ebook_nome:    nomeEbook(ebook),
+    depoimento:    document.getElementById('campoDepoimento').value.trim(),
+    instagram:     instagramOk,
+    bonus_whatsapp: bonusWhatsapp,
+    bonus_compartilhou: bonusCompartilhar,
+    cotas_total:   totalCotas,
+    data:          new Date().toISOString()
+  };
+
+  try {
+    if (WEBHOOK_MAKE !== 'SEU_WEBHOOK_AQUI') {
+      await fetch(WEBHOOK_MAKE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+    // Mostrar sucesso
+    document.getElementById('formParticipacao').style.display = 'none';
+    document.getElementById('telaSuccesso').style.display = 'block';
+    document.getElementById('sucCotas').textContent = totalCotas;
+    document.getElementById('etapa3').classList.remove('ativa');
+    document.getElementById('etapa3').classList.add('concluida');
+    document.getElementById('etapa3').querySelector('.etapa-num').textContent = '✓';
+    document.getElementById('etapa4').classList.add('ativa');
+  } catch(e) {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    alert('Erro ao enviar. Verifique sua conexão e tente novamente.');
+  }
+}
+
+// ─── UTILITÁRIOS ────────────────────────────────────────────
+function formatarCPF(cpf) {
+  const c = cpf.replace(/\D/g,'');
+  return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+function formatarPhone(p) {
+  return p.replace(/^\+55/, '').replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+}
+function nomeEbook(slug) {
+  const nomes = {
+    'justicamento':      'Justiça(mento) para Orelha',
+    'guia-antifalencia': 'O Guia Antifalência do Empreendedor Iniciante',
+    'vigilante':         'Vigilante',
+    'terceira-guerra':   'O Nascimento Silencioso da 3ª Guerra Mundial'
+  };
+  return nomes[slug] || slug || 'Ebook Três Trevo';
+}
+</script>
+</body>
+</html>
