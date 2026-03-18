@@ -10,84 +10,42 @@
 :root{
   --verde:#0f2d1a;--verde-m:#1a4a2e;--verde-c:#2a6b42;
   --ouro:#c8a84b;--ouro-c:#e8c96a;
-  --branco:#fdfbf7;--creme:#f5f0e8;
-  --texto:#1c1c1c;--cinza:#6b6b6b;
+  --branco:#fdfbf7;
   --borda:rgba(200,168,75,0.2);
   --erro:#c0392b;--ok:#27ae60;
 }
 body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-height:100vh}
 
 /* LOGIN */
-#telaLogin{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(200,168,75,0.06),transparent 60%);
-}
-.login-box{
-  width:100%;max-width:400px;padding:48px;
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--borda);
-  position:relative;
-}
+#telaLogin{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(200,168,75,0.06),transparent 60%)}
+.login-box{width:100%;max-width:400px;padding:48px;background:rgba(255,255,255,0.03);border:1px solid var(--borda);position:relative}
 .login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)}
 .login-marca{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ouro);margin-bottom:8px}
 .login-sub{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
 .login-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);display:block;margin-bottom:8px}
-.login-input{
-  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  padding:12px 14px;color:var(--branco);font-family:'Jost',sans-serif;font-size:15px;
-  outline:none;transition:border .2s;margin-bottom:20px;
-}
+.login-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);padding:12px 14px;color:var(--branco);font-family:'Jost',sans-serif;font-size:15px;outline:none;transition:border .2s;margin-bottom:20px}
 .login-input:focus{border-color:var(--ouro)}
-.login-btn{
-  width:100%;padding:14px;background:var(--ouro);color:var(--verde);
-  border:none;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;
-  cursor:pointer;letter-spacing:1px;transition:background .2s;
-}
+.login-btn{width:100%;padding:14px;background:var(--ouro);color:var(--verde);border:none;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;cursor:pointer;letter-spacing:1px;transition:background .2s}
 .login-btn:hover{background:var(--ouro-c)}
 .login-erro{font-size:12px;color:#e74c3c;margin-top:12px;display:none}
 
 /* PAINEL */
 #painelAdmin{display:none}
-.topbar{
-  position:fixed;top:0;left:0;right:0;height:56px;
-  background:rgba(10,30,18,0.97);border-bottom:1px solid var(--borda);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 32px;z-index:100;
-}
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(10,30,18,0.97);border-bottom:1px solid var(--borda);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100}
 .topbar-marca{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ouro)}
 .topbar-direita{display:flex;align-items:center;gap:16px}
-.btn-salvar{
-  padding:8px 20px;background:var(--ouro);color:var(--verde);
-  border:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;
-  cursor:pointer;transition:background .2s;
-}
+.btn-salvar{padding:8px 20px;background:var(--ouro);color:var(--verde);border:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s}
 .btn-salvar:hover{background:var(--ouro-c)}
-.btn-sair{
-  padding:8px 16px;background:transparent;border:1px solid rgba(255,255,255,.15);
-  color:rgba(255,255,255,.4);font-family:'Jost',sans-serif;font-size:12px;
-  cursor:pointer;transition:all .2s;
-}
+.btn-sair{padding:8px 16px;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);font-family:'Jost',sans-serif;font-size:12px;cursor:pointer;transition:all .2s}
 .btn-sair:hover{border-color:var(--ouro);color:var(--ouro)}
-.status-bar{
-  font-size:12px;padding:4px 12px;
-  border:1px solid;
-  display:none;
-}
+.status-bar{font-size:12px;padding:4px 12px;border:1px solid;display:none}
 .status-bar.ok{color:var(--ok);border-color:var(--ok);background:rgba(39,174,96,.1)}
 .status-bar.erro{color:var(--erro);border-color:var(--erro);background:rgba(192,57,43,.1)}
 
 /* LAYOUT */
 .layout{display:grid;grid-template-columns:200px 1fr;min-height:100vh;padding-top:56px}
-.sidebar{
-  background:rgba(0,0,0,.3);border-right:1px solid var(--borda);
-  padding:24px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;
-}
-.sidebar-item{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 20px;font-size:13px;color:rgba(255,255,255,.4);
-  cursor:pointer;transition:all .2s;border-left:2px solid transparent;
-  text-decoration:none;
-}
+.sidebar{background:rgba(0,0,0,.3);border-right:1px solid var(--borda);padding:24px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;transition:all .2s;border-left:2px solid transparent}
 .sidebar-item:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.03)}
 .sidebar-item.ativo{color:var(--ouro);border-left-color:var(--ouro);background:rgba(200,168,75,.05)}
 .sidebar-icone{font-size:16px;flex-shrink:0}
@@ -96,17 +54,11 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
 /* SEÇÕES */
 .secao{display:none}
 .secao.ativa{display:block}
-.secao-titulo{
-  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;
-  color:var(--branco);margin-bottom:6px;
-}
+.secao-titulo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--branco);margin-bottom:6px}
 .secao-sub{font-size:13px;color:rgba(255,255,255,.35);margin-bottom:32px}
 
-/* CARDS DE EDIÇÃO */
-.edit-card{
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
-  padding:28px;margin-bottom:16px;position:relative;
-}
+/* CARDS */
+.edit-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:28px;margin-bottom:16px;position:relative}
 .edit-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--ouro);opacity:.4}
 .edit-card-titulo{font-size:13px;font-weight:500;color:rgba(255,255,255,.7);margin-bottom:20px;letter-spacing:.5px}
 .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -115,19 +67,9 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
 /* CAMPOS */
 .campo{margin-bottom:16px}
 .campo:last-child{margin-bottom:0}
-.campo-label{
-  font-size:11px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,.35);display:block;margin-bottom:7px;
-}
-.campo-input,.campo-select,.campo-textarea{
-  width:100%;background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.1);
-  padding:10px 12px;color:var(--branco);
-  font-family:'Jost',sans-serif;font-size:14px;
-  outline:none;transition:border .2s;
-}
+.campo-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:7px}
+.campo-input,.campo-select,.campo-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);padding:10px 12px;color:var(--branco);font-family:'Jost',sans-serif;font-size:14px;outline:none;transition:border .2s}
 .campo-input:focus,.campo-select:focus,.campo-textarea:focus{border-color:var(--ouro)}
-.campo-select option{background:#1a4a2e;color:var(--branco)}
 .campo-textarea{resize:vertical;min-height:80px;line-height:1.6}
 .campo-hint{font-size:11px;color:rgba(255,255,255,.2);margin-top:5px}
 
@@ -138,221 +80,126 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
 .toggle-info span{font-size:12px;color:rgba(255,255,255,.3)}
 .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
-.toggle-slider{
-  position:absolute;inset:0;background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.15);cursor:pointer;transition:.3s;
-}
-.toggle-slider::before{
-  content:'';position:absolute;height:16px;width:16px;
-  left:3px;bottom:3px;background:rgba(255,255,255,.4);transition:.3s;
-}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);cursor:pointer;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:rgba(255,255,255,.4);transition:.3s}
 .toggle input:checked + .toggle-slider{background:rgba(200,168,75,.2);border-color:var(--ouro)}
 .toggle input:checked + .toggle-slider::before{transform:translateX(20px);background:var(--ouro)}
 
-/* TÍTULO DE LIVRO */
-.livro-card{
-  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
-  padding:20px;margin-bottom:12px;
-}
+/* LIVROS */
+.livro-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);padding:20px;margin-bottom:12px}
 .livro-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .livro-emoji{font-size:28px}
 .livro-nome{font-family:'Cormorant Garamond',serif;font-size:18px;color:rgba(255,255,255,.8)}
 .livro-faixa{font-size:11px;color:var(--ouro);letter-spacing:2px;text-transform:uppercase}
 
-/* MULTIPLICADORES */
-.mult-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
-.mult-card{
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
-  padding:16px;
-}
-.mult-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
-.mult-valor{display:flex;align-items:center;gap:8px}
-.mult-valor input{
-  width:70px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  padding:8px 10px;color:var(--ouro);font-family:'Jost',sans-serif;
-  font-size:18px;font-weight:500;outline:none;text-align:center;
-  transition:border .2s;
-}
-.mult-valor input:focus{border-color:var(--ouro)}
-.mult-valor span{font-size:13px;color:rgba(255,255,255,.3)}
-
-/* FAQ */
-.faq-item-edit{
-  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
-  padding:20px;margin-bottom:12px;position:relative;
-}
-.faq-remover{
-  position:absolute;top:12px;right:12px;
-  background:transparent;border:1px solid rgba(192,57,43,.3);
-  color:rgba(192,57,43,.6);padding:4px 10px;font-size:11px;
-  cursor:pointer;transition:all .2s;font-family:'Jost',sans-serif;
-}
-.faq-remover:hover{background:rgba(192,57,43,.1);color:#e74c3c;border-color:#e74c3c}
-.btn-adicionar{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 16px;background:transparent;
-  border:1px dashed rgba(200,168,75,.3);color:var(--ouro);
-  font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;
-  transition:all .2s;margin-top:4px;
-}
-.btn-adicionar:hover{background:rgba(200,168,75,.06);border-style:solid}
-
-/* FÓRMULA */
-.formula-box{
-  background:rgba(200,168,75,.06);border:1px solid var(--borda);
-  padding:24px;margin-bottom:20px;
-}
-.formula-titulo{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:16px}
-.formula-linha{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);
-  flex-wrap:wrap;
-}
-.formula-linha:last-child{border-bottom:none}
-.formula-nome{font-size:14px;color:rgba(255,255,255,.7);min-width:120px}
-.formula-val{
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px;font-weight:600;color:var(--ouro);min-width:80px;
-}
-.formula-desc{font-size:12px;color:rgba(255,255,255,.3)}
-.formula-total{
-  background:rgba(200,168,75,.1);padding:16px;margin-top:16px;
-  display:flex;justify-content:space-between;align-items:center;
-}
-.formula-total-txt{font-size:13px;color:rgba(255,255,255,.5)}
-.formula-total-val{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ouro)}
-.aviso-formula{
-  background:rgba(200,168,75,.05);border-left:3px solid var(--ouro);
-  padding:12px 16px;margin-top:16px;
-  font-size:12px;color:rgba(255,255,255,.4);line-height:1.7;
-}
-.aviso-formula strong{color:rgba(255,255,255,.7)}
-.rede-row{
-  display:grid;grid-template-columns:32px 1fr 120px 80px 100px;
-  gap:12px;align-items:center;
-  padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);
-}
+/* REDES */
+.rede-row{display:grid;grid-template-columns:32px 1fr 130px 120px 120px 100px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .rede-row:last-child{border-bottom:none}
 .rede-icone{font-size:20px;text-align:center}
 .rede-nome{font-size:14px;color:rgba(255,255,255,.7);font-weight:500}
 .rede-url{font-size:11px;color:rgba(255,255,255,.25);margin-top:2px}
-.rede-pct input{
-  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  padding:8px 10px;color:var(--ouro);font-family:'Jost',sans-serif;
-  font-size:15px;font-weight:500;outline:none;text-align:center;
-  transition:border .2s;
-}
+.rede-pct input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);padding:8px 10px;color:var(--ouro);font-family:'Jost',sans-serif;font-size:15px;font-weight:500;outline:none;text-align:center;transition:border .2s}
 .rede-pct input:focus{border-color:var(--ouro)}
-.rede-calculado{
-  font-family:'Cormorant Garamond',serif;
-  font-size:18px;color:rgba(255,255,255,.5);text-align:right;
-}
+.rede-calculado{font-family:'Cormorant Garamond',serif;font-size:18px;color:rgba(255,255,255,.5);text-align:right}
 .rede-toggle{display:flex;justify-content:center}
-.pct-total-bar{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:12px 16px;margin-top:12px;
-  background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);
-}
-.pct-total-num{
-  font-family:'Cormorant Garamond',serif;font-size:24px;
-  transition:color .3s;
-}
+.pct-total-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin-top:12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06)}
+.pct-total-num{font-family:'Cormorant Garamond',serif;font-size:24px;transition:color .3s}
 .pct-total-num.ok{color:var(--ouro)}
 .pct-total-num.erro{color:#e74c3c}
 .pct-total-num.aviso{color:#f39c12}
-.download-section{
-  background:rgba(200,168,75,.06);border:1px solid var(--borda);
-  padding:28px;margin-top:32px;
-}
+
+/* FAQ */
+.faq-item-edit{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);padding:20px;margin-bottom:12px;position:relative}
+.faq-remover{position:absolute;top:12px;right:12px;background:transparent;border:1px solid rgba(192,57,43,.3);color:rgba(192,57,43,.6);padding:4px 10px;font-size:11px;cursor:pointer;transition:all .2s;font-family:'Jost',sans-serif}
+.faq-remover:hover{background:rgba(192,57,43,.1);color:#e74c3c;border-color:#e74c3c}
+.btn-adicionar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:transparent;border:1px dashed rgba(200,168,75,.3);color:var(--ouro);font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-adicionar:hover{background:rgba(200,168,75,.06);border-style:solid}
+
+/* TABELA */
+.tabela-prog td,.tabela-prog th{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.tabela-prog th{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-align:left}
+
+/* AVISO */
+.aviso-box{background:rgba(200,168,75,.05);border-left:3px solid var(--ouro);padding:12px 16px;margin-top:16px;font-size:12px;color:rgba(255,255,255,.4);line-height:1.7}
+.aviso-box strong{color:rgba(255,255,255,.7)}
+
+/* EXPORTAR */
+.download-section{background:rgba(200,168,75,.06);border:1px solid var(--borda);padding:28px;margin-top:32px}
 .download-titulo{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px}
 .download-desc{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;margin-bottom:20px}
 .download-btns{display:flex;gap:12px;flex-wrap:wrap}
-.btn-download-cfg{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:12px 20px;background:var(--ouro);color:var(--verde);
-  border:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;
-  cursor:pointer;transition:background .2s;text-decoration:none;
-}
-.btn-download-cfg:hover{background:var(--ouro-c)}
-.btn-copiar-json{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:12px 20px;background:transparent;
-  border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);
-  font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;
-}
-.btn-copiar-json:hover{border-color:var(--ouro);color:var(--ouro)}
+.btn-download{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:var(--ouro);color:var(--verde);border:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s}
+.btn-download:hover{background:var(--ouro-c)}
+.btn-copiar{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-copiar:hover{border-color:var(--ouro);color:var(--ouro)}
+.json-preview{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.07);padding:16px;margin-top:16px;font-family:'Courier New',monospace;font-size:12px;color:rgba(200,168,75,.7);max-height:200px;overflow-y:auto;display:none;white-space:pre}
 
-/* PREVIEW JSON */
-.json-preview{
-  background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.07);
-  padding:16px;margin-top:16px;font-family:'Courier New',monospace;
-  font-size:12px;color:rgba(200,168,75,.7);max-height:200px;overflow-y:auto;
-  display:none;white-space:pre;
-}
+/* SIM */
+.sim-rede-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .2s;font-size:13px;color:rgba(255,255,255,.5);user-select:none}
+.sim-rede-btn.on{background:rgba(200,168,75,.08);border-color:rgba(200,168,75,.3);color:rgba(255,255,255,.8)}
+.sim-box{background:rgba(200,168,75,.06);border:1px solid var(--borda);padding:16px;text-align:center}
+.sim-box-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px}
+.sim-box-val{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ouro)}
 
 @media(max-width:768px){
   .layout{grid-template-columns:1fr}
   .sidebar{display:none}
   .edit-grid,.edit-grid-3{grid-template-columns:1fr}
   .main{padding:16px}
+  .rede-row{grid-template-columns:32px 1fr 80px 80px}
 }
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN ──────────────────────────────────────────────── -->
+<!-- LOGIN -->
 <div id="telaLogin">
   <div class="login-box">
     <div class="login-marca">✦ Editora Três Trevo</div>
     <div class="login-sub">Painel Administrativo</div>
     <label class="login-label">Senha de acesso</label>
-    <input type="password" class="login-input" id="campoSenha" placeholder="••••••••" onkeydown="handleEnter(event)">
+    <input type="password" class="login-input" id="campoSenha" placeholder="••••••••">
     <button class="login-btn" onclick="entrar()">Entrar no painel</button>
     <div class="login-erro" id="loginErro">Senha incorreta.</div>
   </div>
 </div>
 
-<!-- ── PAINEL ──────────────────────────────────────────────── -->
+<!-- PAINEL -->
 <div id="painelAdmin">
-
   <div class="topbar">
     <div class="topbar-marca">✦ Admin — Três Trevo</div>
     <div class="topbar-direita">
       <div class="status-bar" id="statusBar"></div>
-      <button class="btn-salvar" onclick="salvarTudo()">⬇ Baixar config.json</button>
+      <button class="btn-salvar" onclick="baixarConfig()">⬇ Baixar config.json</button>
       <button class="btn-sair" onclick="sair()">Sair</button>
     </div>
   </div>
 
   <div class="layout">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-item ativo" onclick="irPara('premios',this)"><span class="sidebar-icone">🏆</span>Prêmios</div>
       <div class="sidebar-item" onclick="irPara('meta',this)"><span class="sidebar-icone">📊</span>Meta / Barra</div>
       <div class="sidebar-item" onclick="irPara('catalogo',this)"><span class="sidebar-icone">📚</span>Catálogo</div>
-      <div class="sidebar-item" onclick="irPara('formula',this)"><span class="sidebar-icone">⚡</span>Instantâneos</div>
+      <div class="sidebar-item" onclick="irPara('formula',this)"><span class="sidebar-icone">⚡</span>Fórmula</div>
       <div class="sidebar-item" onclick="irPara('requisitos',this)"><span class="sidebar-icone">✅</span>Requisitos</div>
       <div class="sidebar-item" onclick="irPara('textos',this)"><span class="sidebar-icone">✏️</span>Textos</div>
       <div class="sidebar-item" onclick="irPara('faq',this)"><span class="sidebar-icone">❓</span>FAQ</div>
       <div class="sidebar-item" onclick="irPara('exportar',this)"><span class="sidebar-icone">💾</span>Exportar</div>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
 
-      <!-- PRÊMIOS -->
+      <!-- ── PRÊMIOS ── -->
       <div class="secao ativa" id="sec-premios">
         <div class="secao-titulo">Prêmios</div>
-        <div class="secao-sub">Valores do sorteio principal e premiações instantâneas por faixa</div>
-
+        <div class="secao-sub">Valores do sorteio principal. O multiplicador é configurado na aba Fórmula.</div>
         <div class="edit-card">
           <div class="edit-card-titulo">🎯 Sorteio principal</div>
           <div class="edit-grid">
             <div class="campo">
               <label class="campo-label">1º lugar</label>
-              <input class="campo-input" id="premio1" type="text" value="1 salário mínimo">
-              <div class="campo-hint">Ex: R$ 1.412,00 ou "1 salário mínimo"</div>
+              <input class="campo-input" id="premio1" type="text" value="1 salário mínimo nacional">
+              <div class="campo-hint">Ex: "1 salário mínimo nacional" ou "R$ 1.518,00"</div>
             </div>
             <div class="campo">
               <label class="campo-label">2º lugar</label>
@@ -360,55 +207,30 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
             </div>
           </div>
           <div class="campo" style="margin-top:8px">
-            <label class="campo-label">Descrição do método de pagamento</label>
-            <input class="campo-input" id="premioMetodo" type="text" value="Transferência bancária · PIX">
+            <label class="campo-label">Método de pagamento</label>
+            <input class="campo-input" id="premioMetodo" type="text" value="Transferência bancária · PIX · pago em D+7">
           </div>
         </div>
-
-        <div class="edit-card">
-          <div class="edit-card-titulo">⚡ Premiação instantânea — Faixa Intermediária (R$46,04)</div>
-          <div class="campo">
-            <label class="campo-label">Prêmio garantido ao cumprir requisitos (D+7)</label>
-            <input class="campo-input" id="premioInstMedio" type="text" placeholder="Ex: R$ 20,00 via PIX">
-            <div class="campo-hint">Deixe em branco para desativar esta faixa</div>
-          </div>
-          <div class="campo">
-            <label class="campo-label">Descrição exibida ao comprador</label>
-            <input class="campo-input" id="premioInstMedioDesc" type="text" placeholder="Ex: Receba R$20 ao validar seu depoimento">
-          </div>
-        </div>
-
-        <div class="edit-card">
-          <div class="edit-card-titulo">⚡ Premiação instantânea — Faixa Premium (R$76,74)</div>
-          <div class="campo">
-            <label class="campo-label">Prêmio garantido ao cumprir requisitos (D+7)</label>
-            <input class="campo-input" id="premioInstPremium" type="text" placeholder="Ex: R$ 50,00 via PIX">
-            <div class="campo-hint">Deixe em branco para desativar esta faixa</div>
-          </div>
-          <div class="campo">
-            <label class="campo-label">Descrição exibida ao comprador</label>
-            <input class="campo-input" id="premioInstPremiumDesc" type="text" placeholder="Ex: Receba R$50 ao validar seu depoimento">
-          </div>
+        <div class="aviso-box">
+          <strong>Lembrete:</strong> o 1º e 2º prêmio podem dobrar se o vencedor estiver conectado a todas as redes sociais. Esse dobramento é configurado na aba <strong>Fórmula</strong>.
         </div>
       </div>
 
-      <!-- META -->
+      <!-- ── META ── -->
       <div class="secao" id="sec-meta">
         <div class="secao-titulo">Meta / Barra de progresso</div>
         <div class="secao-sub">Controle o progresso exibido na home. A meta total permanece oculta ao visitante.</div>
-
         <div class="edit-card">
           <div class="edit-card-titulo">📊 Progresso atual</div>
           <div class="edit-grid">
             <div class="campo">
               <label class="campo-label">Valor arrecadado atual (R$)</label>
-              <input class="campo-input" id="metaArrecadado" type="number" value="3400" min="0">
+              <input class="campo-input" id="metaArrecadado" type="number" value="3400" min="0" oninput="atualizarPercentual()">
               <div class="campo-hint">Meta total oculta: R$34.000</div>
             </div>
             <div class="campo">
               <label class="campo-label">Percentual calculado</label>
               <input class="campo-input" id="metaPercentual" type="text" readonly style="opacity:.5">
-              <div class="campo-hint">Calculado automaticamente</div>
             </div>
           </div>
           <div class="campo">
@@ -418,276 +240,121 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
         </div>
       </div>
 
-      <!-- CATÁLOGO -->
+      <!-- ── CATÁLOGO ── -->
       <div class="secao" id="sec-catalogo">
         <div class="secao-titulo">Catálogo</div>
-        <div class="secao-sub">Preços, cotas e links de checkout por título</div>
+        <div class="secao-sub">Preços, cotas e quantities de checkout por título</div>
 
-        <div class="livro-card" id="livro-justicamento">
-          <div class="livro-header">
-            <span class="livro-emoji">⚖️</span>
-            <div><div class="livro-nome">Justiça(mento) para Orelha</div><div class="livro-faixa">Entrada</div></div>
-          </div>
+        <div class="livro-card">
+          <div class="livro-header"><span class="livro-emoji">⚖️</span><div><div class="livro-nome">Justiça(mento) para Orelha</div><div class="livro-faixa">Entrada</div></div></div>
           <div class="edit-grid-3">
-            <div class="campo"><label class="campo-label">Preço (R$)</label><input class="campo-input" data-livro="justicamento" data-campo="preco" type="text" value="R$15,35"></div>
+            <div class="campo"><label class="campo-label">Preço</label><input class="campo-input" data-livro="justicamento" data-campo="preco" type="text" value="R$15,35"></div>
             <div class="campo"><label class="campo-label">Cotas</label><input class="campo-input" data-livro="justicamento" data-campo="cotas" type="number" value="1" min="1"></div>
-            <div class="campo"><label class="campo-label">Numbers quantity</label><input class="campo-input" data-livro="justicamento" data-campo="qty" type="number" value="1" min="1"></div>
+            <div class="campo"><label class="campo-label">Qty checkout</label><input class="campo-input" data-livro="justicamento" data-campo="qty" type="number" value="1" min="1"></div>
           </div>
         </div>
 
-        <div class="livro-card" id="livro-antifalencia">
-          <div class="livro-header">
-            <span class="livro-emoji">📘</span>
-            <div><div class="livro-nome">Guia Antifalência Vol.1</div><div class="livro-faixa">Intermediária</div></div>
-          </div>
+        <div class="livro-card">
+          <div class="livro-header"><span class="livro-emoji">📘</span><div><div class="livro-nome">Guia Antifalência Vol.1</div><div class="livro-faixa">Intermediária</div></div></div>
           <div class="edit-grid-3">
-            <div class="campo"><label class="campo-label">Preço (R$)</label><input class="campo-input" data-livro="antifalencia" data-campo="preco" type="text" value="R$46,04"></div>
+            <div class="campo"><label class="campo-label">Preço</label><input class="campo-input" data-livro="antifalencia" data-campo="preco" type="text" value="R$46,04"></div>
             <div class="campo"><label class="campo-label">Cotas</label><input class="campo-input" data-livro="antifalencia" data-campo="cotas" type="number" value="3" min="1"></div>
-            <div class="campo"><label class="campo-label">Numbers quantity</label><input class="campo-input" data-livro="antifalencia" data-campo="qty" type="number" value="3" min="1"></div>
+            <div class="campo"><label class="campo-label">Qty checkout</label><input class="campo-input" data-livro="antifalencia" data-campo="qty" type="number" value="3" min="1"></div>
           </div>
         </div>
 
-        <div class="livro-card" id="livro-vigilante">
-          <div class="livro-header">
-            <span class="livro-emoji">🔍</span>
-            <div><div class="livro-nome">Vigilante</div><div class="livro-faixa">Premium</div></div>
-          </div>
+        <div class="livro-card">
+          <div class="livro-header"><span class="livro-emoji">🔍</span><div><div class="livro-nome">Vigilante</div><div class="livro-faixa">Premium</div></div></div>
           <div class="edit-grid-3">
-            <div class="campo"><label class="campo-label">Preço (R$)</label><input class="campo-input" data-livro="vigilante" data-campo="preco" type="text" value="R$76,74"></div>
+            <div class="campo"><label class="campo-label">Preço</label><input class="campo-input" data-livro="vigilante" data-campo="preco" type="text" value="R$76,74"></div>
             <div class="campo"><label class="campo-label">Cotas</label><input class="campo-input" data-livro="vigilante" data-campo="cotas" type="number" value="10" min="1"></div>
-            <div class="campo"><label class="campo-label">Numbers quantity</label><input class="campo-input" data-livro="vigilante" data-campo="qty" type="number" value="10" min="1"></div>
+            <div class="campo"><label class="campo-label">Qty checkout</label><input class="campo-input" data-livro="vigilante" data-campo="qty" type="number" value="10" min="1"></div>
           </div>
         </div>
 
-        <div class="livro-card" id="livro-terceiraguerra">
-          <div class="livro-header">
-            <span class="livro-emoji">🌐</span>
-            <div><div class="livro-nome">O Nascimento Silencioso da 3ª GM</div><div class="livro-faixa">Premium</div></div>
-          </div>
+        <div class="livro-card">
+          <div class="livro-header"><span class="livro-emoji">🌐</span><div><div class="livro-nome">O Nascimento Silencioso da 3ª GM</div><div class="livro-faixa">Premium</div></div></div>
           <div class="edit-grid-3">
-            <div class="campo"><label class="campo-label">Preço (R$)</label><input class="campo-input" data-livro="terceiraguerra" data-campo="preco" type="text" value="R$76,74"></div>
+            <div class="campo"><label class="campo-label">Preço</label><input class="campo-input" data-livro="terceiraguerra" data-campo="preco" type="text" value="R$76,74"></div>
             <div class="campo"><label class="campo-label">Cotas</label><input class="campo-input" data-livro="terceiraguerra" data-campo="cotas" type="number" value="10" min="1"></div>
-            <div class="campo"><label class="campo-label">Numbers quantity</label><input class="campo-input" data-livro="terceiraguerra" data-campo="qty" type="number" value="10" min="1"></div>
+            <div class="campo"><label class="campo-label">Qty checkout</label><input class="campo-input" data-livro="terceiraguerra" data-campo="qty" type="number" value="10" min="1"></div>
           </div>
         </div>
       </div>
 
-      <!-- FÓRMULA INSTANTÂNEOS -->
-      <div class="secao" id="sec-formula">
-        <div class="secao-titulo">Premiação Instantânea</div>
-        <div class="secao-sub">Defina como o prêmio é dividido entre sorteio e instantâneos por rede social</div>
-
-        <!-- DIVISÃO DO PRÊMIO -->
-        <div class="edit-card">
-          <div class="edit-card-titulo">🎯 Divisão do prêmio base</div>
-          <div class="edit-grid">
-            <div class="campo">
-              <label class="campo-label">Prêmio base (R$)</label>
-              <input class="campo-input" id="premioBase" type="number" value="1412" min="0" oninput="recalcularFormula()">
-              <div class="campo-hint">Valor total disponível para distribuição</div>
-            </div>
-            <div class="campo">
-              <label class="campo-label">% reservado para o sorteio principal</label>
-              <input class="campo-input" id="pctSorteio" type="number" value="60" min="10" max="90" oninput="recalcularFormula()">
-              <div class="campo-hint">O restante vai para o pool de instantâneos</div>
-            </div>
-          </div>
-
-          <!-- PREVIEW DA DIVISÃO -->
-          <div class="formula-box" style="margin-top:16px">
-            <div class="formula-titulo">✦ Como o prêmio fica dividido</div>
-            <div class="formula-linha">
-              <div class="formula-nome">🏆 Sorteio principal</div>
-              <div class="formula-val" id="calcSorteio">R$847</div>
-              <div class="formula-desc">Para o vencedor do sorteio</div>
-            </div>
-            <div class="formula-linha">
-              <div class="formula-nome">⚡ Pool instantâneo</div>
-              <div class="formula-val" id="calcPool">R$565</div>
-              <div class="formula-desc">Distribuído pelas redes sociais</div>
-            </div>
-            <div class="formula-total">
-              <div class="formula-total-txt">Total geral (não ultrapassa o prêmio base)</div>
-              <div class="formula-total-val" id="calcTotal">R$1.412</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- REDES SOCIAIS -->
-        <div class="edit-card">
-          <div class="edit-card-titulo">📱 Percentual de cada rede social (do pool instantâneo)</div>
-          <div class="aviso-formula">
-            <strong>Regra:</strong> a soma dos percentuais das redes ativas deve ser exatamente 100%.
-            O participante recebe a soma dos % das redes que cumpriu, multiplicado pelo pool.
-            Disponível apenas para faixas <strong>Intermediária</strong> e <strong>Premium</strong>.
-          </div>
-
-          <!-- HEADER -->
-          <div style="display:grid;grid-template-columns:32px 1fr 120px 80px 100px;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)">
-            <div></div>
-            <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25)">Rede</div>
-            <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center">% do pool</div>
-            <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:right">Valor</div>
-            <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center">Ativo</div>
-          </div>
-
-          <div class="rede-row">
-            <div class="rede-icone">💬</div>
-            <div><div class="rede-nome">WhatsApp</div><div class="rede-url">Grupo da editora</div></div>
-            <div class="rede-pct"><input type="number" id="pctWhatsapp" value="25" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="valWhatsapp">R$141</div>
-            <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvWhatsapp" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
-          </div>
-
-          <div class="rede-row">
-            <div class="rede-icone">📸</div>
-            <div><div class="rede-nome">Instagram</div><div class="rede-url">@3trevo</div></div>
-            <div class="rede-pct"><input type="number" id="pctInstagram" value="25" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="valInstagram">R$141</div>
-            <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvInstagram" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
-          </div>
-
-          <div class="rede-row">
-            <div class="rede-icone">👥</div>
-            <div><div class="rede-nome">Facebook</div><div class="rede-url">Página da editora</div></div>
-            <div class="rede-pct"><input type="number" id="pctFacebook" value="20" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="valFacebook">R$113</div>
-            <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvFacebook" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
-          </div>
-
-          <div class="rede-row">
-            <div class="rede-icone">🎵</div>
-            <div><div class="rede-nome">TikTok</div><div class="rede-url">@3trevo</div></div>
-            <div class="rede-pct"><input type="number" id="pctTiktok" value="15" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="valTiktok">R$84</div>
-            <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvTiktok" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
-          </div>
-
-          <div class="rede-row">
-            <div class="rede-icone">▶️</div>
-            <div><div class="rede-nome">YouTube</div><div class="rede-url">Canal da editora</div></div>
-            <div class="rede-pct"><input type="number" id="pctYoutube" value="15" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="valYoutube">R$84</div>
-            <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvYoutube" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
-          </div>
-
-          <!-- TOTAL DOS % -->
-          <div class="pct-total-bar">
-            <div style="font-size:13px;color:rgba(255,255,255,.4)">Soma dos percentuais ativos</div>
-            <div>
-              <span class="pct-total-num ok" id="pctTotalNum">100%</span>
-              <span style="font-size:11px;color:rgba(255,255,255,.2);margin-left:8px" id="pctTotalStatus">✓ OK</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- SIMULADOR -->
-        <div class="edit-card">
-          <div class="edit-card-titulo">🧮 Simulador — o que o participante recebe</div>
-          <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:16px">Marque as redes que o participante cumpriu para ver o instantâneo calculado:</p>
-          <div id="simRedes" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:16px;text-align:center">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px">Redes cumpridas</div>
-              <div class="formula-total-val" id="simRedesCnt">0</div>
-            </div>
-            <div style="background:rgba(200,168,75,.06);border:1px solid var(--borda);padding:16px;text-align:center">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px">Instantâneo recebido</div>
-              <div class="formula-total-val" id="simInstantaneo">R$0</div>
-            </div>
-            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:16px;text-align:center">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px">Ainda pode ganhar</div>
-              <div class="formula-total-val" id="simRestante" style="font-size:18px;color:rgba(255,255,255,.4)">R$565</div>
-            </div>
-          </div>
-          <div class="aviso-formula" style="margin-top:16px">
-            Pago em D+7 da compra, de uma vez, após validação dos requisitos cumpridos.
-          </div>
-        </div>
-      </div>
-
-      <!-- FÓRMULA INSTANTÂNEOS -->
+      <!-- ── FÓRMULA (único bloco, sem duplicação) ── -->
       <div class="secao" id="sec-formula">
         <div class="secao-titulo">Fórmula de Premiação</div>
-        <div class="secao-sub">Valor anunciado + bônus por redes sociais. Cumprir tudo dobra o prêmio.</div>
+        <div class="secao-sub">Valores base + pesos das redes. Cumprir todas as redes dobra o prêmio.</div>
 
-        <!-- VALORES BASE -->
         <div class="edit-card">
-          <div class="edit-card-titulo">💰 Valores anunciados (base de cada prêmio)</div>
+          <div class="edit-card-titulo">💰 Valores base anunciados</div>
           <div class="edit-grid">
             <div class="campo">
-              <label class="campo-label">Prêmio principal anunciado (R$)</label>
-              <input class="campo-input" id="premioBasePrincipal" type="number" value="1000" min="0" oninput="recalcularFormula()">
-              <div class="campo-hint">Valor que aparece no site. Se cumprir tudo → dobra.</div>
+              <label class="campo-label">Prêmio base do instantâneo (R$)</label>
+              <input class="campo-input" id="premioBaseInstantaneo" type="number" value="100" min="0" oninput="recalcularFormula()">
+              <div class="campo-hint">Valor mínimo pago. Cumprir todas as redes dobra para R$200.</div>
             </div>
             <div class="campo">
-              <label class="campo-label">Prêmio instantâneo anunciado (R$)</label>
-              <input class="campo-input" id="premioBaseInstantaneo" type="number" value="100" min="0" oninput="recalcularFormula()">
-              <div class="campo-hint">Intermediária e Premium. Mesma fórmula de dobramento.</div>
+              <label class="campo-label">Teto do instantâneo (calculado)</label>
+              <input class="campo-input" id="premioTetoInstantaneo" type="text" readonly style="opacity:.5">
+              <div class="campo-hint">Base × 2 quando todas as redes forem cumpridas</div>
             </div>
           </div>
-          <div class="aviso-formula" style="margin-top:8px">
-            <strong>Regra:</strong> o valor anunciado é a base. Cada rede social cumprida adiciona um bônus proporcional ao seu peso. Cumprir <strong>todas as redes</strong> dobra exatamente o valor anunciado. O participante recebe o valor base + os bônus das redes que cumpriu.
+          <div class="aviso-box">
+            <strong>Regra:</strong> cada rede social cumprida adiciona um bônus proporcional ao seu peso.
+            Cumprir <strong>todas as redes ativas</strong> dobra exatamente o valor base.
+            Os prêmios 1º e 2º do sorteio seguem a mesma lógica de dobramento.
           </div>
         </div>
 
-        <!-- PESOS DAS REDES -->
         <div class="edit-card">
-          <div class="edit-card-titulo">📱 Peso de cada rede social (deve somar 100%)</div>
-          <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:16px">
-            Cada rede recebe um peso conforme seu engajamento e conversão de compradores. Ajuste conforme métricas reais ao longo do tempo.
-          </p>
-
-          <div style="display:grid;grid-template-columns:32px 1fr 130px 120px 120px 100px;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)">
+          <div class="edit-card-titulo">📱 Peso de cada rede (deve somar 100%)</div>
+          <!-- Header da tabela -->
+          <div style="display:grid;grid-template-columns:32px 1fr 130px 120px 100px;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)">
             <div></div>
             <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25)">Rede</div>
             <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center">Peso (%)</div>
-            <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:right">Bônus principal</div>
             <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:right">Bônus instantâneo</div>
             <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center">Ativo</div>
           </div>
 
-          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 120px 100px">
+          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 100px">
             <div class="rede-icone">💬</div>
             <div><div class="rede-nome">WhatsApp</div><div class="rede-url">Grupo da editora</div></div>
             <div class="rede-pct"><input type="number" id="pctWhatsapp" value="25" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="bonusPrincipalWhatsapp">+R$250</div>
             <div class="rede-calculado" id="bonusInstWhatsapp">+R$25</div>
             <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvWhatsapp" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
           </div>
 
-          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 120px 100px">
+          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 100px">
             <div class="rede-icone">📸</div>
             <div><div class="rede-nome">Instagram</div><div class="rede-url">@3trevo</div></div>
             <div class="rede-pct"><input type="number" id="pctInstagram" value="25" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="bonusPrincipalInstagram">+R$250</div>
             <div class="rede-calculado" id="bonusInstInstagram">+R$25</div>
             <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvInstagram" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
           </div>
 
-          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 120px 100px">
+          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 100px">
             <div class="rede-icone">👥</div>
             <div><div class="rede-nome">Facebook</div><div class="rede-url">Página da editora</div></div>
             <div class="rede-pct"><input type="number" id="pctFacebook" value="20" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="bonusPrincipalFacebook">+R$200</div>
             <div class="rede-calculado" id="bonusInstFacebook">+R$20</div>
             <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvFacebook" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
           </div>
 
-          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 120px 100px">
+          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 100px">
             <div class="rede-icone">🎵</div>
             <div><div class="rede-nome">TikTok</div><div class="rede-url">@3trevo</div></div>
             <div class="rede-pct"><input type="number" id="pctTiktok" value="15" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="bonusPrincipalTiktok">+R$150</div>
             <div class="rede-calculado" id="bonusInstTiktok">+R$15</div>
             <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvTiktok" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
           </div>
 
-          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 120px 100px">
+          <div class="rede-row" style="grid-template-columns:32px 1fr 130px 120px 100px">
             <div class="rede-icone">▶️</div>
             <div><div class="rede-nome">YouTube</div><div class="rede-url">Canal da editora</div></div>
             <div class="rede-pct"><input type="number" id="pctYoutube" value="15" min="0" max="100" oninput="recalcularFormula()"></div>
-            <div class="rede-calculado" id="bonusPrincipalYoutube">+R$150</div>
             <div class="rede-calculado" id="bonusInstYoutube">+R$15</div>
             <div class="rede-toggle"><label class="toggle"><input type="checkbox" id="atvYoutube" checked onchange="recalcularFormula()"><span class="toggle-slider"></span></label></div>
           </div>
@@ -703,124 +370,63 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
 
         <!-- TABELA DE PROGRESSÃO -->
         <div class="edit-card">
-          <div class="edit-card-titulo">📈 Tabela de progressão — o que o participante vê</div>
-          <div id="tabelaProgressao"></div>
+          <div class="edit-card-titulo">📈 Tabela de progressão (prévia do que o participante vê)</div>
+          <div id="tabelaProgressao" style="overflow-x:auto"></div>
         </div>
 
         <!-- SIMULADOR -->
         <div class="edit-card">
-          <div class="edit-card-titulo">🧮 Simulador interativo</div>
-          <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:16px">Marque as redes cumpridas para ver o prêmio final:</p>
+          <div class="edit-card-titulo">🧮 Simulador</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:16px">Clique nas redes para simular o prêmio final:</p>
           <div id="simRedes" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
-            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:16px;text-align:center">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px">Redes cumpridas</div>
-              <div class="formula-total-val" id="simRedesCnt" style="font-size:28px">0</div>
-            </div>
-            <div style="background:rgba(200,168,75,.06);border:1px solid var(--borda);padding:16px;text-align:center">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px">Prêmio principal final</div>
-              <div class="formula-total-val" id="simPrincipal">R$1.000</div>
-            </div>
-            <div style="background:rgba(200,168,75,.06);border:1px solid var(--borda);padding:16px;text-align:center">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px">Instantâneo final</div>
-              <div class="formula-total-val" id="simInstantaneo">R$100</div>
-            </div>
-            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:16px;text-align:center">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px">Bônus acumulado</div>
-              <div class="formula-total-val" id="simBonus" style="color:var(--ouro-c)">+R$0</div>
-            </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div class="sim-box"><div class="sim-box-label">Redes cumpridas</div><div class="sim-box-val" id="simRedesCnt">0</div></div>
+            <div class="sim-box"><div class="sim-box-label">Instantâneo final</div><div class="sim-box-val" id="simInstantaneo">R$100</div></div>
+            <div class="sim-box"><div class="sim-box-label">Bônus acumulado</div><div class="sim-box-val" id="simBonus" style="color:var(--ouro-c)">+R$0</div></div>
           </div>
-          <div class="aviso-formula" style="margin-top:16px">
-            Instantâneo pago em D+7. Prêmio principal distribuído no sorteio com o valor final calculado.
-          </div>
+          <div class="aviso-box" style="margin-top:16px">Pago em D+7 da compra, após validação dos requisitos.</div>
         </div>
       </div>
 
-      <!-- REQUISITOS -->
+      <!-- ── REQUISITOS ── -->
       <div class="secao" id="sec-requisitos">
-        <div class="secao-titulo">Requisitos e Multiplicadores</div>
-        <div class="secao-sub">Defina quais redes são obrigatórias e quanto cada bônus multiplica as cotas</div>
-
+        <div class="secao-titulo">Requisitos</div>
+        <div class="secao-sub">Mínimo de palavras e redes obrigatórias para validar a participação</div>
         <div class="edit-card">
-          <div class="edit-card-titulo">✅ Requisitos obrigatórios para validar cotas</div>
+          <div class="edit-card-titulo">✅ Requisitos obrigatórios</div>
           <div class="toggle-row">
-            <div class="toggle-info"><strong>Depoimento escrito</strong><span>Mínimo de palavras para o depoimento ser válido</span></div>
-            <input class="campo-input" id="reqDepoimentoMin" type="number" value="80" min="10" style="width:80px;text-align:center">
+            <div class="toggle-info">
+              <strong>Mínimo de palavras no depoimento</strong>
+              <span>Depoimentos abaixo deste limite são desclassificados</span>
+            </div>
+            <!-- CORREÇÃO: valor corrigido de 80 para 20 -->
+            <input class="campo-input" id="reqDepoimentoMin" type="number" value="20" min="5" style="width:80px;text-align:center">
           </div>
           <div class="toggle-row">
-            <div class="toggle-info"><strong>Seguir Instagram @3trevo</strong><span>Obrigatório para validar participação</span></div>
+            <div class="toggle-info">
+              <strong>Seguir Instagram @3trevo</strong>
+              <span>Obrigatório para validar participação</span>
+            </div>
             <label class="toggle"><input type="checkbox" id="reqInstagram" checked><span class="toggle-slider"></span></label>
           </div>
         </div>
-
-        <div class="edit-card">
-          <div class="edit-card-titulo">🎁 Bônus — multiplicadores de cotas</div>
-          <div class="mult-grid">
-            <div class="mult-card">
-              <div class="mult-label">WhatsApp</div>
-              <div class="toggle-row" style="padding:0;border:none;margin-bottom:10px">
-                <span style="font-size:12px;color:rgba(255,255,255,.3)">Ativo</span>
-                <label class="toggle"><input type="checkbox" id="bonusWhatsappAtivo" checked><span class="toggle-slider"></span></label>
-              </div>
-              <div class="mult-valor">
-                <input type="number" id="bonusWhatsappMult" value="2" min="1" max="10">
-                <span>× cotas</span>
-              </div>
-            </div>
-            <div class="mult-card">
-              <div class="mult-label">Instagram</div>
-              <div class="toggle-row" style="padding:0;border:none;margin-bottom:10px">
-                <span style="font-size:12px;color:rgba(255,255,255,.3)">Ativo</span>
-                <label class="toggle"><input type="checkbox" id="bonusInstagramAtivo" checked><span class="toggle-slider"></span></label>
-              </div>
-              <div class="mult-valor">
-                <input type="number" id="bonusInstagramMult" value="2" min="1" max="10">
-                <span>× cotas</span>
-              </div>
-            </div>
-            <div class="mult-card">
-              <div class="mult-label">TikTok</div>
-              <div class="toggle-row" style="padding:0;border:none;margin-bottom:10px">
-                <span style="font-size:12px;color:rgba(255,255,255,.3)">Ativo</span>
-                <label class="toggle"><input type="checkbox" id="bonusTiktokAtivo"><span class="toggle-slider"></span></label>
-              </div>
-              <div class="mult-valor">
-                <input type="number" id="bonusTiktokMult" value="2" min="1" max="10">
-                <span>× cotas</span>
-              </div>
-            </div>
-            <div class="mult-card">
-              <div class="mult-label">Compartilhar</div>
-              <div class="toggle-row" style="padding:0;border:none;margin-bottom:10px">
-                <span style="font-size:12px;color:rgba(255,255,255,.3)">Ativo</span>
-                <label class="toggle"><input type="checkbox" id="bonusCompartilharAtivo" checked><span class="toggle-slider"></span></label>
-              </div>
-              <div class="mult-valor">
-                <input type="number" id="bonusCompartilharMult" value="1" min="1" max="10">
-                <span>+ cotas extras</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- TEXTOS -->
+      <!-- ── TEXTOS ── -->
       <div class="secao" id="sec-textos">
         <div class="secao-titulo">Textos da home</div>
         <div class="secao-sub">Edite os textos principais exibidos no site</div>
-
         <div class="edit-card">
-          <div class="edit-card-titulo">🏠 Hero — seção inicial</div>
+          <div class="edit-card-titulo">🏠 Hero — descrição principal</div>
           <div class="campo">
-            <label class="campo-label">Descrição principal (PT)</label>
+            <label class="campo-label">Descrição (PT)</label>
             <textarea class="campo-textarea" id="heroDescPT">Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial. E ainda concorra a prêmios em dinheiro pelo Programa Cultural.</textarea>
           </div>
           <div class="campo">
-            <label class="campo-label">Descrição principal (EN)</label>
+            <label class="campo-label">Descrição (EN)</label>
             <textarea class="campo-textarea" id="heroDescEN">We publish ebooks that change perspectives — from geopolitical fiction to business survival guides. Participate in our Cultural Program and compete for cash prizes.</textarea>
           </div>
         </div>
-
         <div class="edit-card">
           <div class="edit-card-titulo">🎯 Programa Cultural — subtítulo</div>
           <div class="edit-grid">
@@ -834,17 +440,16 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
             </div>
           </div>
         </div>
-
         <div class="edit-card">
-          <div class="edit-card-titulo">⚖️ Aviso legal (rodapé do programa)</div>
+          <div class="edit-card-titulo">⚖️ Aviso legal</div>
           <div class="campo">
-            <label class="campo-label">Texto jurídico (PT)</label>
-            <textarea class="campo-textarea" id="avisoLegalPT" style="min-height:100px">Concurso cultural nos termos da legislação vigente. Participação mediante aquisição de ebook e cumprimento dos requisitos de habilidade (depoimento + seguir redes). Regulamento completo disponível na plataforma. Pagamento em D+7 após a compra.</textarea>
+            <label class="campo-label">Texto jurídico</label>
+            <textarea class="campo-textarea" id="avisoLegalPT" style="min-height:100px">Concurso cultural nos termos da legislação vigente. Participação mediante aquisição de ebook e cumprimento dos requisitos de habilidade (depoimento + seguir redes). O multiplicador de prêmio é apurado no momento do sorteio. Regulamento completo disponível na plataforma.</textarea>
           </div>
         </div>
       </div>
 
-      <!-- FAQ -->
+      <!-- ── FAQ ── -->
       <div class="secao" id="sec-faq">
         <div class="secao-titulo">FAQ — Perguntas frequentes</div>
         <div class="secao-sub">Adicione, edite ou remova perguntas e respostas</div>
@@ -852,22 +457,21 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
         <button class="btn-adicionar" onclick="adicionarFaq()">+ Adicionar pergunta</button>
       </div>
 
-      <!-- EXPORTAR -->
+      <!-- ── EXPORTAR ── -->
       <div class="secao" id="sec-exportar">
-        <div class="secao-titulo">Exportar configuração</div>
-        <div class="secao-sub">Salve o config.json e o progresso.json para upload no GitHub</div>
-
+        <div class="secao-titulo">Exportar</div>
+        <div class="secao-sub">Baixe os arquivos e faça upload na raiz do repositório GitHub</div>
         <div class="download-section">
-          <div class="download-titulo">📁 Arquivos para upload no GitHub</div>
+          <div class="download-titulo">📁 Arquivos para o GitHub</div>
           <div class="download-desc">
-            Após editar qualquer seção, exporte os arquivos abaixo e faça upload na raiz do repositório GitHub.
-            O site lerá as configurações automaticamente.<br><br>
-            <strong style="color:rgba(255,255,255,.6)">Fluxo:</strong> Editar aqui → Baixar arquivos → Upload no GitHub → Site atualizado.
+            <strong style="color:rgba(255,255,255,.6)">Fluxo:</strong> Editar aqui → Baixar arquivos → Fazer upload no GitHub → Site atualizado em ~1 minuto.<br><br>
+            O <code style="color:var(--ouro)">config.json</code> atualiza prêmios, preços, cotas, fórmula e textos.<br>
+            O <code style="color:var(--ouro)">progresso.json</code> atualiza a barra de meta na home.
           </div>
           <div class="download-btns">
-            <button class="btn-download-cfg" onclick="baixarConfig()">⬇ Baixar config.json</button>
-            <button class="btn-download-cfg" onclick="baixarProgresso()" style="background:var(--verde-c);color:var(--branco)">⬇ Baixar progresso.json</button>
-            <button class="btn-copiar-json" onclick="copiarJSON()">⎘ Copiar JSON</button>
+            <button class="btn-download" onclick="baixarConfig()">⬇ Baixar config.json</button>
+            <button class="btn-download" onclick="baixarProgresso()" style="background:var(--verde-c);color:var(--branco)">⬇ Baixar progresso.json</button>
+            <button class="btn-copiar" onclick="copiarJSON()">⎘ Copiar JSON</button>
           </div>
           <div class="json-preview" id="jsonPreview"></div>
         </div>
@@ -878,26 +482,29 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
 </div>
 
 <script>
-//  CONFIGURAO 
-const SENHA = '3trevo2026'; // Troque aqui
+// ── CONFIGURAÇÃO ──────────────────────────────────────────
+// ATENÇÃO: para maior segurança, mude esta senha e não publique
+// o admin.html em um repositório público. Use um repositório
+// privado separado ou proteja a pasta com .htaccess.
+const SENHA = '3trevo2026';
 
-var REDES = [
-  { id: 'Whatsapp',  icone: 'WA', nome: 'WhatsApp'  },
-  { id: 'Instagram', icone: 'IG', nome: 'Instagram' },
-  { id: 'Facebook',  icone: 'FB', nome: 'Facebook'  },
-  { id: 'Tiktok',    icone: 'TK', nome: 'TikTok'    },
-  { id: 'Youtube',   icone: 'YT', nome: 'YouTube'   },
+const REDES = [
+  { id: 'Whatsapp',  icone: '💬', nome: 'WhatsApp'  },
+  { id: 'Instagram', icone: '📸', nome: 'Instagram' },
+  { id: 'Facebook',  icone: '👥', nome: 'Facebook'  },
+  { id: 'Tiktok',    icone: '🎵', nome: 'TikTok'    },
+  { id: 'Youtube',   icone: '▶️', nome: 'YouTube'   },
 ];
 
-//  LOGIN 
+// ── LOGIN ─────────────────────────────────────────────────
 function entrar() {
-  var senha = document.getElementById('campoSenha').value;
-  if (senha === SENHA) {
+  if (document.getElementById('campoSenha').value === SENHA) {
     document.getElementById('telaLogin').style.display = 'none';
     document.getElementById('painelAdmin').style.display = 'block';
     iniciarFaq();
     atualizarPercentual();
-    setTimeout(recalcularFormula, 200);
+    recalcularFormula();
+    renderizarSimulador();
   } else {
     var erro = document.getElementById('loginErro');
     erro.style.display = 'block';
@@ -905,13 +512,20 @@ function entrar() {
   }
 }
 
+// Enter no campo de senha
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('campoSenha').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') entrar();
+  });
+});
+
 function sair() {
   document.getElementById('painelAdmin').style.display = 'none';
   document.getElementById('telaLogin').style.display = 'flex';
   document.getElementById('campoSenha').value = '';
 }
 
-//  NAVEGAO 
+// ── NAVEGAÇÃO ─────────────────────────────────────────────
 function irPara(id, el) {
   document.querySelectorAll('.secao').forEach(function(s) { s.classList.remove('ativa'); });
   document.querySelectorAll('.sidebar-item').forEach(function(s) { s.classList.remove('ativo'); });
@@ -919,21 +533,20 @@ function irPara(id, el) {
   el.classList.add('ativo');
 }
 
-//  META 
+// ── META ──────────────────────────────────────────────────
 function atualizarPercentual() {
   var val = parseFloat(document.getElementById('metaArrecadado').value) || 0;
-  var pct = ((val / 34000) * 100).toFixed(1);
-  document.getElementById('metaPercentual').value = pct + '% da meta';
+  document.getElementById('metaPercentual').value = ((val / 34000) * 100).toFixed(1) + '% da meta';
 }
 
-//  FAQ 
+// ── FAQ ───────────────────────────────────────────────────
 var faqPadrao = [
-  { p: 'O que é o Programa Cultural?', r: 'É um concurso cultural onde você adquire um ebook, lê, escreve um depoimento e concorre a prêmios em dinheiro.' },
-  { p: 'Como recebo meu ebook após a compra?', r: 'Após a confirmação do pagamento, você recebe o PDF por e-mail e WhatsApp automaticamente.' },
-  { p: 'Por que preciso esperar 7 dias para participar?', r: 'O prazo garante tempo suficiente para leitura e coincide com o prazo legal de arrependimento do CDC.' },
-  { p: 'Posso participar comprando qualquer título?', r: 'Sim. Todos os títulos participam. Entrada = 1 cota, Intermediário = 3 cotas, Premium = 10 cotas.' },
-  { p: 'O que é um depoimento válido?', r: 'Um texto de pelo menos 80 palavras demonstrando leitura genuína do conteúdo.' },
-  { p: 'Posso pedir reembolso?', r: 'Sim. Nos termos do art. 49 do CDC, você tem 7 dias para solicitar reembolso integral.' },
+  { p: 'O que é o Programa Cultural?', r: 'É um concurso cultural onde você adquire um ebook, lê, escreve um depoimento e concorre a prêmios em dinheiro. Não é sorteio puro — sua participação depende de habilidade (leitura e depoimento genuíno).' },
+  { p: 'Como recebo meu ebook após a compra?', r: 'Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo por e-mail (sac@3trevo.com.br) e também por mensagem de WhatsApp, automaticamente.' },
+  { p: 'Por que preciso esperar 7 dias para participar?', r: 'O prazo garante tempo suficiente para leitura e coincide com o prazo legal de arrependimento do CDC para compras digitais.' },
+  { p: 'Posso participar comprando qualquer título?', r: 'Sim. Todos os títulos participam. Entrada = 1 cota, Intermediário = 3 cotas + Prêmio Imediato, Premium = 10 cotas + Prêmio Imediato com mais chances.' },
+  { p: 'O que é um depoimento válido?', r: 'Um texto de pelo menos 20 palavras demonstrando leitura genuína do conteúdo. Textos genéricos ou copiados são desclassificados.' },
+  { p: 'Posso pedir reembolso?', r: 'Sim. Nos termos do art. 49 do CDC, você tem 7 dias para solicitar reembolso integral. Ao exercer o direito de arrependimento, o participante é automaticamente desclassificado do Programa Cultural.' },
 ];
 
 function iniciarFaq() {
@@ -949,30 +562,26 @@ function adicionarFaqItem(pergunta, resposta) {
   var div = document.createElement('div');
   div.className = 'faq-item-edit';
   div.innerHTML =
-    '<button class="faq-remover" onclick="this.parentElement.remove()">X Remover</button>' +
-    '<div class="campo" style="margin-bottom:12px">' +
-      '<label class="campo-label">Pergunta</label>' +
-      '<input class="campo-input faq-pergunta" type="text" value="">' +
-    '</div>' +
-    '<div class="campo">' +
-      '<label class="campo-label">Resposta</label>' +
-      '<textarea class="campo-textarea faq-resposta"></textarea>' +
-    '</div>';
+    '<button class="faq-remover" onclick="this.parentElement.remove()">✕ Remover</button>' +
+    '<div class="campo" style="margin-bottom:12px"><label class="campo-label">Pergunta</label><input class="campo-input faq-pergunta" type="text"></div>' +
+    '<div class="campo"><label class="campo-label">Resposta</label><textarea class="campo-textarea faq-resposta"></textarea></div>';
   lista.appendChild(div);
-  // Preencher valores aps inserir no DOM
   div.querySelector('.faq-pergunta').value = pergunta;
   div.querySelector('.faq-resposta').value = resposta;
 }
 
-//  FRMULA 
+// ── FÓRMULA ───────────────────────────────────────────────
 function fmt(val) {
   return 'R$' + Math.round(val).toLocaleString('pt-BR');
 }
 
 function recalcularFormula() {
-  var basePrincipal = parseFloat(document.getElementById('premioBasePrincipal') && document.getElementById('premioBasePrincipal').value) || 1000;
-  var baseInst = parseFloat(document.getElementById('premioBaseInstantaneo') && document.getElementById('premioBaseInstantaneo').value) || 100;
+  var baseInst = parseFloat(document.getElementById('premioBaseInstantaneo').value) || 100;
   var somaAtivos = 0;
+
+  // teto calculado
+  var tetoEl = document.getElementById('premioTetoInstantaneo');
+  if (tetoEl) tetoEl.value = fmt(baseInst * 2) + ' (todas as redes)';
 
   REDES.forEach(function(r) {
     var atvEl = document.getElementById('atv' + r.id);
@@ -981,67 +590,51 @@ function recalcularFormula() {
     var atv = atvEl.checked;
     var pct = parseFloat(pctEl.value) || 0;
     if (atv) somaAtivos += pct;
-    var bonusP = basePrincipal * (pct / 100);
     var bonusI = baseInst * (pct / 100);
-    var elP = document.getElementById('bonusPrincipal' + r.id);
     var elI = document.getElementById('bonusInst' + r.id);
-    if (elP) elP.textContent = atv ? '+' + fmt(bonusP) : '-';
-    if (elI) elI.textContent = atv ? '+' + fmt(bonusI) : '-';
+    if (elI) elI.textContent = atv ? '+' + fmt(bonusI) : '—';
   });
 
+  // indicador de soma
   var totalEl = document.getElementById('pctTotalNum');
   var statusEl = document.getElementById('pctTotalStatus');
   if (totalEl) {
     totalEl.textContent = somaAtivos + '%';
     totalEl.className = 'pct-total-num ' + (somaAtivos === 100 ? 'ok' : somaAtivos > 100 ? 'erro' : 'aviso');
-    if (statusEl) statusEl.textContent = somaAtivos === 100 ? 'OK: Dobramento garantido ao cumprir tudo' : somaAtivos > 100 ? 'EXCEDE: 100% - reduza os pesos' : 'AVISO: Soma em ' + somaAtivos + '%';
+    if (statusEl) {
+      if (somaAtivos === 100) statusEl.textContent = '✓ Dobramento garantido ao cumprir tudo';
+      else if (somaAtivos > 100) statusEl.textContent = '✗ EXCEDE 100% — reduza os pesos';
+      else statusEl.textContent = '⚠ Soma em ' + somaAtivos + '% — participante não dobrará';
+    }
   }
 
-  renderizarTabela(basePrincipal, baseInst);
-  renderizarSimulador();
+  renderizarTabela(baseInst);
   calcularSim();
 }
 
-function renderizarTabela(basePrincipal, baseInst) {
+function renderizarTabela(baseInst) {
   var el = document.getElementById('tabelaProgressao');
   if (!el) return;
   var redesAtivas = REDES.filter(function(r) {
     var a = document.getElementById('atv' + r.id);
     return a && a.checked;
   });
-  var html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">';
-  html += '<tr style="background:rgba(26,74,46,0.8)">';
-  ['Redes cumpridas','Bônus acumulado','Prêmio principal','Instantâneo'].forEach(function(h) {
-    html += '<th style="padding:10px 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);text-align:left;border-bottom:1px solid rgba(255,255,255,.1)">' + h + '</th>';
-  });
-  html += '</tr>';
-
-  // Linha base
-  html += '<tr style="background:rgba(255,255,255,.02)">';
-  html += '<td style="padding:10px 12px;font-size:13px;color:rgba(255,255,255,.5)">Nenhuma (base)</td>';
-  html += '<td style="padding:10px 12px;font-size:13px;color:rgba(255,255,255,.3)">+R$0</td>';
-  html += '<td style="padding:10px 12px;font-size:13px;color:rgba(255,255,255,.7)">' + fmt(basePrincipal) + '</td>';
-  html += '<td style="padding:10px 12px;font-size:13px;color:rgba(255,255,255,.7)">' + fmt(baseInst) + '</td>';
-  html += '</tr>';
-
+  var html = '<table class="tabela-prog" style="width:100%;border-collapse:collapse">';
+  html += '<tr style="background:rgba(26,74,46,.8)"><th>Redes cumpridas</th><th>Bônus %</th><th>Instantâneo</th></tr>';
+  html += '<tr><td style="color:rgba(255,255,255,.4)">Nenhuma (base)</td><td>+0%</td><td>' + fmt(baseInst) + '</td></tr>';
   var somaPct = 0;
   redesAtivas.forEach(function(r, i) {
-    var pctEl = document.getElementById('pct' + r.id);
-    var pct = parseFloat(pctEl && pctEl.value) || 0;
+    var pct = parseFloat(document.getElementById('pct' + r.id).value) || 0;
     somaPct += pct;
-    var bonusP = basePrincipal * (somaPct / 100);
-    var bonusI = baseInst * (somaPct / 100);
     var ultimo = i === redesAtivas.length - 1;
-    var bg = ultimo ? 'rgba(200,168,75,.08)' : 'rgba(255,255,255,.02)';
-    var cor = ultimo ? 'var(--ouro)' : 'rgba(255,255,255,.7)';
-    html += '<tr style="background:' + bg + '">';
-    html += '<td style="padding:10px 12px;font-size:13px;color:rgba(255,255,255,.5)">' + r.icone + ' +' + r.nome + '</td>';
-    html += '<td style="padding:10px 12px;font-size:13px;color:' + cor + '">+' + somaPct + '%</td>';
-    html += '<td style="padding:10px 12px;font-size:14px;font-weight:500;color:' + cor + '">' + fmt(basePrincipal + bonusP) + '</td>';
-    html += '<td style="padding:10px 12px;font-size:14px;font-weight:500;color:' + cor + '">' + fmt(baseInst + bonusI) + '</td>';
+    var cor = ultimo ? 'var(--ouro)' : '';
+    html += '<tr style="' + (ultimo ? 'background:rgba(200,168,75,.08)' : '') + '">';
+    html += '<td style="color:' + cor + '">' + r.icone + ' +' + r.nome + '</td>';
+    html += '<td style="color:' + cor + '">+' + somaPct + '%</td>';
+    html += '<td style="font-weight:500;color:' + cor + '">' + fmt(baseInst + baseInst * somaPct / 100) + '</td>';
     html += '</tr>';
   });
-  html += '</table></div>';
+  html += '</table>';
   el.innerHTML = html;
 }
 
@@ -1049,52 +642,48 @@ function renderizarSimulador() {
   var simRedes = document.getElementById('simRedes');
   if (!simRedes || simRedes.children.length > 0) return;
   REDES.forEach(function(r) {
-    var label = document.createElement('label');
-    label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer';
-    label.innerHTML = '<input type="checkbox" id="sim' + r.id + '" onchange="calcularSim()" style="accent-color:var(--ouro)">' + r.icone + ' <span style="font-size:13px;color:rgba(255,255,255,.6)">' + r.nome + '</span>';
-    simRedes.appendChild(label);
+    var btn = document.createElement('div');
+    btn.className = 'sim-rede-btn';
+    btn.dataset.rede = r.id;
+    btn.innerHTML = r.icone + ' ' + r.nome;
+    btn.onclick = function() {
+      btn.classList.toggle('on');
+      calcularSim();
+    };
+    simRedes.appendChild(btn);
   });
 }
 
 function calcularSim() {
-  var basePrincipal = parseFloat(document.getElementById('premioBasePrincipal') && document.getElementById('premioBasePrincipal').value) || 1000;
-  var baseInst = parseFloat(document.getElementById('premioBaseInstantaneo') && document.getElementById('premioBaseInstantaneo').value) || 100;
+  var baseInst = parseFloat(document.getElementById('premioBaseInstantaneo').value) || 100;
   var somaPct = 0;
   var cnt = 0;
-  var totalAtivos = 0;
-  REDES.forEach(function(r) {
-    var atvEl = document.getElementById('atv' + r.id);
-    var simEl = document.getElementById('sim' + r.id);
-    var pctEl = document.getElementById('pct' + r.id);
-    if (atvEl && atvEl.checked) totalAtivos++;
-    if (simEl && simEl.checked && atvEl && atvEl.checked) {
-      somaPct += parseFloat(pctEl && pctEl.value) || 0;
+  document.querySelectorAll('#simRedes .sim-rede-btn.on').forEach(function(btn) {
+    var atvEl = document.getElementById('atv' + btn.dataset.rede);
+    var pctEl = document.getElementById('pct' + btn.dataset.rede);
+    if (atvEl && atvEl.checked && pctEl) {
+      somaPct += parseFloat(pctEl.value) || 0;
       cnt++;
     }
   });
-  var bonusP = basePrincipal * (somaPct / 100);
   var bonusI = baseInst * (somaPct / 100);
-  var scEl = document.getElementById('simRedesCnt');
-  var spEl = document.getElementById('simPrincipal');
-  var siEl = document.getElementById('simInstantaneo');
-  var sbEl = document.getElementById('simBonus');
-  if (scEl) scEl.textContent = cnt + ' / ' + totalAtivos;
-  if (spEl) spEl.textContent = fmt(basePrincipal + bonusP);
-  if (siEl) siEl.textContent = fmt(baseInst + bonusI);
-  if (sbEl) sbEl.textContent = '+' + fmt(bonusP + bonusI);
+  var total = REDES.filter(function(r){ var a=document.getElementById('atv'+r.id); return a&&a.checked; }).length;
+  var sc = document.getElementById('simRedesCnt');
+  var si = document.getElementById('simInstantaneo');
+  var sb = document.getElementById('simBonus');
+  if (sc) sc.textContent = cnt + ' / ' + total;
+  if (si) si.textContent = fmt(baseInst + bonusI);
+  if (sb) sb.textContent = '+' + fmt(bonusI);
 }
 
-//  COLETAR CONFIG 
+// ── COLETAR CONFIG ────────────────────────────────────────
 function coletarConfig() {
   var livros = {};
   ['justicamento','antifalencia','vigilante','terceiraguerra'].forEach(function(id) {
-    var preco = document.querySelector('[data-livro="' + id + '"][data-campo="preco"]');
-    var cotas = document.querySelector('[data-livro="' + id + '"][data-campo="cotas"]');
-    var qty   = document.querySelector('[data-livro="' + id + '"][data-campo="qty"]');
     livros[id] = {
-      preco: preco ? preco.value : '',
-      cotas: cotas ? parseInt(cotas.value) : 1,
-      qty:   qty   ? parseInt(qty.value)   : 1
+      preco: (document.querySelector('[data-livro="'+id+'"][data-campo="preco"]') || {}).value || '',
+      cotas: parseInt((document.querySelector('[data-livro="'+id+'"][data-campo="cotas"]') || {}).value) || 1,
+      qty:   parseInt((document.querySelector('[data-livro="'+id+'"][data-campo="qty"]')   || {}).value) || 1
     };
   });
 
@@ -1102,9 +691,8 @@ function coletarConfig() {
   document.querySelectorAll('.faq-item-edit').forEach(function(item) {
     var p = item.querySelector('.faq-pergunta');
     var r = item.querySelector('.faq-resposta');
-    if (p && r && p.value.trim() && r.value.trim()) {
+    if (p && r && p.value.trim() && r.value.trim())
       faqItems.push({ p: p.value.trim(), r: r.value.trim() });
-    }
   });
 
   var redesConfig = {};
@@ -1113,7 +701,7 @@ function coletarConfig() {
     var pctEl = document.getElementById('pct' + r.id);
     redesConfig[r.id.toLowerCase()] = {
       nome: r.nome,
-      ativo: atvEl ? atvEl.checked : false,
+      ativo: atvEl ? atvEl.checked : true,
       percentual: pctEl ? parseFloat(pctEl.value) || 0 : 0
     };
   });
@@ -1121,47 +709,48 @@ function coletarConfig() {
   return {
     gerado_em: new Date().toISOString(),
     formula: {
-      premio_base_principal: parseFloat(document.getElementById('premioBasePrincipal') && document.getElementById('premioBasePrincipal').value) || 1000,
-      premio_base_instantaneo: parseFloat(document.getElementById('premioBaseInstantaneo') && document.getElementById('premioBaseInstantaneo').value) || 100,
-      faixas_instantaneo: ['intermediaria','premium'],
+      premio_base_instantaneo: parseFloat(document.getElementById('premioBaseInstantaneo').value) || 100,
+      faixas_instantaneo: ['antifalencia','vigilante','terceiraguerra'],
       redes: redesConfig
     },
     premios: {
-      primeiro: document.getElementById('premio1') ? document.getElementById('premio1').value : '',
-      segundo:  document.getElementById('premio2') ? document.getElementById('premio2').value : '',
-      metodo:   document.getElementById('premioMetodo') ? document.getElementById('premioMetodo').value : ''
+      primeiro: document.getElementById('premio1').value,
+      segundo:  document.getElementById('premio2').value,
+      metodo:   document.getElementById('premioMetodo').value
     },
     meta: {
-      arrecadado:    parseFloat(document.getElementById('metaArrecadado') && document.getElementById('metaArrecadado').value) || 0,
-      total_oculto:  34000
+      arrecadado:   parseFloat(document.getElementById('metaArrecadado').value) || 0,
+      total_oculto: 34000
     },
     hero: {
-      leitores:  parseInt(document.getElementById('heroLeitores') && document.getElementById('heroLeitores').value) || 0,
-      desc_pt:   document.getElementById('heroDescPT') ? document.getElementById('heroDescPT').value : '',
-      desc_en:   document.getElementById('heroDescEN') ? document.getElementById('heroDescEN').value : ''
+      leitores: parseInt(document.getElementById('heroLeitores').value) || 247,
+      desc_pt:  document.getElementById('heroDescPT').value,
+      desc_en:  document.getElementById('heroDescEN').value
     },
     catalogo: livros,
     requisitos: {
-      depoimento_min_palavras: parseInt(document.getElementById('reqDepoimentoMin') && document.getElementById('reqDepoimentoMin').value) || 80,
-      instagram: document.getElementById('reqInstagram') ? document.getElementById('reqInstagram').checked : true
+      depoimento_min_palavras: parseInt(document.getElementById('reqDepoimentoMin').value) || 20,
+      instagram: document.getElementById('reqInstagram').checked
     },
     textos: {
-      prog_sub_pt:   document.getElementById('progSubPT') ? document.getElementById('progSubPT').value : '',
-      prog_sub_en:   document.getElementById('progSubEN') ? document.getElementById('progSubEN').value : '',
-      aviso_legal_pt: document.getElementById('avisoLegalPT') ? document.getElementById('avisoLegalPT').value : ''
+      prog_sub_pt:    document.getElementById('progSubPT').value,
+      prog_sub_en:    document.getElementById('progSubEN').value,
+      aviso_legal_pt: document.getElementById('avisoLegalPT').value
     },
     faq: faqItems
   };
 }
 
-//  EXPORTAR 
+// ── EXPORTAR ──────────────────────────────────────────────
 function baixarArquivo(nome, conteudo) {
   var blob = new Blob([conteudo], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = nome;
+  document.body.appendChild(a);
   a.click();
-  mostrarStatus(nome + ' baixado!', 'ok');
+  document.body.removeChild(a);
+  mostrarStatus('✓ ' + nome + ' baixado!', 'ok');
 }
 
 function baixarConfig() {
@@ -1169,20 +758,21 @@ function baixarConfig() {
 }
 
 function baixarProgresso() {
-  var arrecadado = parseFloat(document.getElementById('metaArrecadado') && document.getElementById('metaArrecadado').value) || 0;
-  baixarArquivo('progresso.json', JSON.stringify({ arrecadado: arrecadado, atualizado_em: new Date().toISOString() }, null, 2));
+  var arrecadado = parseFloat(document.getElementById('metaArrecadado').value) || 0;
+  baixarArquivo('progresso.json', JSON.stringify({
+    arrecadado: arrecadado,
+    atualizado_em: new Date().toISOString()
+  }, null, 2));
 }
 
 function copiarJSON() {
   var json = JSON.stringify(coletarConfig(), null, 2);
   navigator.clipboard.writeText(json).then(function() {
-    mostrarStatus('JSON copiado!', 'ok');
+    mostrarStatus('✓ JSON copiado!', 'ok');
     var prev = document.getElementById('jsonPreview');
-    if (prev) { prev.style.display = 'block'; prev.textContent = json.substring(0, 800) + '...'; }
+    if (prev) { prev.style.display = 'block'; prev.textContent = json.substring(0, 1000) + '\n...'; }
   });
 }
-
-function salvarTudo() { baixarConfig(); }
 
 function mostrarStatus(msg, tipo) {
   var bar = document.getElementById('statusBar');
