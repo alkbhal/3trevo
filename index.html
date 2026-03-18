@@ -8,6 +8,10 @@
 <meta property="og:title" content="Editora Três Trevo">
 <meta property="og:description" content="Literatura e conhecimento com propósito. Adquira, leia, concorra.">
 <meta property="og:url" content="https://www.3trevo.com.br">
+<meta property="og:image" content="https://www.3trevo.com.br/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
@@ -261,6 +265,7 @@ h2.sec-titulo em{font-style:italic;color:var(--ouro)}
   transform:scaleX(0);transform-origin:left;
   transition:transform .3s;
 }
+.ebook-card{cursor:pointer}
 .ebook-card:hover{background:rgba(255,255,255,0.03)}
 .ebook-card:hover::after{transform:scaleX(1)}
 .ebook-emoji{font-size:44px;line-height:1}
@@ -272,7 +277,7 @@ h2.sec-titulo em{font-style:italic;color:var(--ouro)}
 }
 .ebook-autor{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:1px}
 .ebook-desc{font-size:13px;color:rgba(255,255,255,.62);line-height:1.7;flex:1}
-.ebook-footer{
+.ebook-footer{position:relative;z-index:2;
   display:flex;align-items:center;justify-content:space-between;
   padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);
   margin-top:auto;
@@ -282,13 +287,14 @@ h2.sec-titulo em{font-style:italic;color:var(--ouro)}
   font-size:24px;font-weight:600;color:var(--ouro);
 }
 .ebook-cotas{font-size:11px;color:rgba(255,255,255,.3)}
-.ebook-btn{
+.ebook-btn{position:relative;z-index:2;
   font-size:11px;letter-spacing:1px;text-transform:uppercase;
   padding:8px 16px;background:transparent;
   border:1px solid var(--borda);color:var(--ouro);
   text-decoration:none;transition:all .2s;
 }
 .ebook-btn:hover{background:var(--ouro);color:var(--verde)}
+.ebook-card-link{position:absolute;inset:0;z-index:1;text-decoration:none;}
 
 /* ── PROGRAMA CULTURAL ──────────────────────────────────── */
 #programa{position:relative;overflow:hidden}
@@ -826,6 +832,7 @@ footer{
   <div class="grid-ebooks" id="gridEbooks">
 
     <div class="ebook-card reveal" data-genero="reflexao" data-categoria="reflexao">
+      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1" class="ebook-card-link" data-cfg-link="justicamento" aria-label="Adquirir Justiça(mento) para Orelha"></a>
       <div class="livro-mockup" data-mockup="justicamento" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ensaio · Entrada" data-en="Essay · Entry">Ensaio · Entrada</div>
       <div class="ebook-titulo" data-pt="Justiça(mento) para Orelha" data-en="Justiça(mento) para Orelha">Justiça(mento) para Orelha</div>
@@ -848,6 +855,7 @@ footer{
     </div>
 
     <div class="ebook-card reveal" data-genero="ficcao" data-categoria="ficcao" style="transition-delay:.1s">
+      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10" class="ebook-card-link" data-cfg-link="vigilante" aria-label="Adquirir Vigilante"></a>
       <div class="livro-mockup" data-mockup="vigilante" data-mockup-cor="#2d1a1a" data-mockup-titulo="Vigilante" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ficção Literária · Premium" data-en="Literary Fiction · Premium">Ficção Literária · Premium</div>
       <div class="ebook-titulo" data-pt="Vigilante" data-en="Vigilante">Vigilante</div>
@@ -870,6 +878,7 @@ footer{
     </div>
 
     <div class="ebook-card reveal" data-genero="ficcao" data-categoria="ficcao" style="transition-delay:.2s">
+      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10" class="ebook-card-link" data-cfg-link="terceiraguerra" aria-label="Adquirir 3ª Guerra Mundial"></a>
       <div class="livro-mockup" data-mockup="terceiraguerra" data-mockup-cor="#0f1f2d" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ficção Documental · Premium" data-en="Documentary Fiction · Premium">Ficção Documental · Premium</div>
       <div class="ebook-titulo" data-pt="O Nascimento Silencioso da 3ª Guerra Mundial" data-en="The Silent Birth of World War III">O Nascimento Silencioso da 3ª Guerra Mundial</div>
@@ -892,6 +901,7 @@ footer{
     </div>
 
     <div class="ebook-card reveal" data-genero="manual" data-categoria="manual" style="transition-delay:.3s">
+      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3" class="ebook-card-link" data-cfg-link="antifalencia" aria-label="Adquirir Guia Antifalência"></a>
       <div class="livro-mockup" data-mockup="antifalencia" data-mockup-cor="#1a3a5c" data-mockup-titulo="O Guia Antifalência" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Manual · Intermediário" data-en="Guide · Intermediate">Manual · Intermediário</div>
       <div class="ebook-titulo" data-pt="O Guia Antifalência do Empreendedor Iniciante" data-en="The Beginner Entrepreneur's Anti-Bankruptcy Guide">O Guia Antifalência do Empreendedor Iniciante</div>
@@ -935,7 +945,7 @@ footer{
           <div class="prog-num">1</div>
           <div class="prog-info">
             <h3 data-pt="Adquira o ebook" data-en="Buy the ebook">Adquira o ebook</h3>
-            <p data-pt="Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo por e-mail (sac@3trevo.com.br) e também por mensagem de WhatsApp, imediatamente." data-en="You are purchasing an ebook — a digital book in PDF format. After payment confirmation, you receive the file by email (sac@3trevo.com.br) and also by WhatsApp message, immediately.">Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo por e-mail (<a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>) e também por mensagem de WhatsApp, imediatamente.</p>
+            <p data-pt="Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo por e-mail (sac@3trevo.com.br) e também por mensagem de WhatsApp, imediatamente." data-en="You are purchasing an ebook — a digital book in PDF format. After payment confirmation, you receive the file by email (sac@3trevo.com.br) and also by WhatsApp message, immediately.">Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo por e-mail (<a href="/cdn-cgi/l/email-protection#d9aab8ba99eaadabbcafb6f7bab6b4f7bbab" style="color:var(--ouro);text-decoration:none"><span class="__cf_email__" data-cfemail="9ae9fbf9daa9eee8ffecf5b4f9f5f7b4f8e8">[email&#160;protected]</span></a>) e também por mensagem de WhatsApp, imediatamente.</p>
           </div>
         </div>
         <div class="prog-passo">
@@ -1230,7 +1240,7 @@ footer{
         <span class="faq-icone">+</span>
       </div>
       <div class="faq-resposta" data-pt="Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo de duas formas: por e-mail (sac@3trevo.com.br) e por mensagem de WhatsApp, automaticamente. Junto com o PDF você também recebe a nota fiscal e seu link exclusivo de participação no Programa Cultural." data-en="You are purchasing an ebook — a digital book in PDF format. After payment confirmation, you receive the file in two ways: by email (sac@3trevo.com.br) and by WhatsApp message, automatically. Along with the PDF you also receive your invoice and exclusive Cultural Program participation link.">
-        Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo de duas formas: por e-mail (<a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>) e por mensagem de WhatsApp, automaticamente. Junto com o PDF você também recebe a nota fiscal e seu link exclusivo de participação no Programa Cultural.
+        Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo de duas formas: por e-mail (<a href="/cdn-cgi/l/email-protection#3a495b597a094e485f4c5514595557145848" style="color:var(--ouro);text-decoration:none"><span class="__cf_email__" data-cfemail="730012103340070116051c5d101c1e5d1101">[email&#160;protected]</span></a>) e por mensagem de WhatsApp, automaticamente. Junto com o PDF você também recebe a nota fiscal e seu link exclusivo de participação no Programa Cultural.
       </div>
     </div>
 
@@ -1276,7 +1286,7 @@ footer{
       <div class="faq-resposta"
         data-pt="Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral, sem necessidade de justificativa. Entre em contato pelo e-mail sac@3trevo.com.br. Atenção: ao exercer o direito de arrependimento, a compra é cancelada e o participante é automaticamente desclassificado do Programa Cultural, pois a participação é exclusiva para compras mantidas após D+7."
         data-en="Yes. Under Brazilian consumer protection law (CDC Art. 49), you have 7 calendar days after purchase to request a full refund, no reason required. Contact us at sac@3trevo.com.br. Note: exercising the right of withdrawal cancels the purchase and automatically disqualifies the participant from the Cultural Program, as participation is exclusive to purchases maintained after D+7.">
-        Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral, sem necessidade de justificativa. Entre em contato pelo e-mail <a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>.<br><br>
+        Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral, sem necessidade de justificativa. Entre em contato pelo e-mail <a href="/cdn-cgi/l/email-protection#6f1c0e0c2f5c1b1d0a1900410c0002410d1d" style="color:var(--ouro);text-decoration:none"><span class="__cf_email__" data-cfemail="631002002350171106150c4d000c0e4d0111">[email&#160;protected]</span></a>.<br><br>
         <strong style="color:rgba(255,255,255,.5)">Atenção:</strong> ao exercer o direito de arrependimento, o participante é automaticamente desclassificado do Programa Cultural. A participação é exclusiva para compras mantidas após D+7.
       </div>
     </div>
@@ -1304,7 +1314,7 @@ footer{
         </p>
         <!-- NOVA SEÇÃO: convite para autores enviarem obras -->
         <p data-pt="<strong>Para autores:</strong> a Editora Três Trevo está aberta à aquisição de direitos autorais. Se você tem um manuscrito e deseja publicar conosco, entre em contato pelo e-mail sac@3trevo.com.br." data-en="<strong>For authors:</strong> Editora Três Trevo is open to acquiring publishing rights. If you have a manuscript and wish to publish with us, contact us at sac@3trevo.com.br.">
-          <strong>Para autores:</strong> a Editora Três Trevo está aberta à aquisição de direitos autorais. Se você tem um manuscrito e deseja publicar conosco, entre em contato pelo e-mail <a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>.
+          <strong>Para autores:</strong> a Editora Três Trevo está aberta à aquisição de direitos autorais. Se você tem um manuscrito e deseja publicar conosco, entre em contato pelo e-mail <a href="/cdn-cgi/l/email-protection#304351537003444255465f1e535f5d1e5242" style="color:var(--ouro);text-decoration:none"><span class="__cf_email__" data-cfemail="ea998b89aad99e988f9c85c4898587c48898">[email&#160;protected]</span></a>.
         </p>
       </div>
       <div class="sobre-obras">
@@ -1357,9 +1367,9 @@ footer{
       <h4 data-pt="Contato" data-en="Contact">Contato</h4>
       <div class="footer-contatos">
         <!-- CORREÇÃO: mailto: em vez de link que causava 404 no GitHub Pages -->
-        <a href="mailto:sac@3trevo.com.br" class="footer-contato">
+        <a href="/cdn-cgi/l/email-protection#790a181a394a0d0b1c0f16571a1614571b0b" class="footer-contato">
           <span class="footer-contato-icone">✉</span>
-          <span>sac@3trevo.com.br</span>
+          <span><span class="__cf_email__" data-cfemail="ddaebcbe9deea9afb8abb2f3beb2b0f3bfaf">[email&#160;protected]</span></span>
         </a>
         <a href="https://wa.me/5554999467085" class="footer-contato" target="_blank" rel="noopener noreferrer">
           <span class="footer-contato-icone">✆</span>
@@ -1384,7 +1394,7 @@ footer{
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── GERADOR DE MOCKUP 3D ─────────────────────────────────
 function gerarMockup(cor, titulo, imgSrc, w, h) {
   cor = cor || '#1a4a2e';
@@ -1773,28 +1783,4 @@ function aplicarConfig() {
 async function carregarProgresso() {
   try {
     const r = await fetch('/progresso.json?t=' + Date.now());
-    if (r.ok) {
-      const dados = await r.json();
-      // se config.json trouxe meta.arrecadado, usa ele; senão usa progresso.json
-      const val = (CFG && CFG.meta && CFG.meta.arrecadado) ? CFG.meta.arrecadado : (dados.arrecadado || 0);
-      renderizarMeta(val);
-    } else {
-      renderizarMeta((CFG && CFG.meta && CFG.meta.arrecadado) || ARRECADADO_FALLBACK);
-    }
-  } catch(e) {
-    renderizarMeta((CFG && CFG.meta && CFG.meta.arrecadado) || ARRECADADO_FALLBACK);
-  }
-}
-
-let metaAtivada = false;
-async function ativarMeta() {
-  if (metaAtivada) return;
-  metaAtivada = true;
-  await carregarProgresso();
-}
-
-// Carregar config assim que o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => { carregarConfig(); });
-</script>
-</body>
-</html>
+    if (
