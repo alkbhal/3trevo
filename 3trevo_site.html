@@ -677,7 +677,14 @@ footer{
 }
 .nav-mobile a:hover{color:var(--ouro)}
 
-/* ── ANIMAÇÕES ──────────────────────────────────────────── */
+/* ── MOCKUP 3D LIVRO ────────────────────────────────────── */
+.livro-mockup{
+  width:80px;height:110px;
+  flex-shrink:0;
+  transition:transform .3s;
+  cursor:default;
+}
+.ebook-card:hover .livro-mockup{transform:translateY(-4px) rotate(-1deg)}
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
 .reveal.visivel{opacity:1;transform:translateY(0)}
 
@@ -778,19 +785,19 @@ footer{
   <div class="hero-direita reveal" style="transition-delay:.15s">
     <div class="capas-vitrine">
       <div class="capa-card">
-        <div class="capa-emoji">⚖️</div>
+        <div style="width:120px;height:165px" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="120" data-mockup-h="165"></div>
         <div class="capa-faixa" data-pt="Ensaio" data-en="Essay">Ensaio</div>
         <div class="capa-nome" data-pt="Justiça(mento) para Orelha" data-en="Justiça(mento) para Orelha">Justiça(mento) para Orelha</div>
         <div class="capa-preco">R$15,35</div>
       </div>
       <div class="capa-card">
-        <div class="capa-emoji">🌐</div>
+        <div style="width:120px;height:165px" data-mockup-cor="#0f1f2d" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="120" data-mockup-h="165"></div>
         <div class="capa-faixa" data-pt="Ficção Documental" data-en="Documentary Fiction">Ficção Documental</div>
         <div class="capa-nome" data-pt="O Nascimento Silencioso da 3ª GM" data-en="The Silent Birth of WWIII">O Nascimento Silencioso da 3ª GM</div>
         <div class="capa-preco">R$76,74</div>
       </div>
       <div class="capa-card">
-        <div class="capa-emoji">📘</div>
+        <div style="width:120px;height:165px" data-mockup-cor="#1a3a5c" data-mockup-titulo="O Guia Antifalência" data-mockup-w="120" data-mockup-h="165"></div>
         <div class="capa-faixa" data-pt="Manual Vol.1" data-en="Manual Vol.1">Manual Vol.1</div>
         <div class="capa-nome" data-pt="Guia Antifalência" data-en="Anti-Bankruptcy Guide">Guia Antifalência</div>
         <div class="capa-preco">R$46,04</div>
@@ -819,7 +826,7 @@ footer{
   <div class="grid-ebooks" id="gridEbooks">
 
     <div class="ebook-card reveal" data-genero="reflexao" data-categoria="reflexao">
-      <div class="ebook-emoji">⚖️</div>
+      <div class="livro-mockup" data-mockup="justicamento" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ensaio · Entrada" data-en="Essay · Entry">Ensaio · Entrada</div>
       <div class="ebook-titulo" data-pt="Justiça(mento) para Orelha" data-en="Justiça(mento) para Orelha">Justiça(mento) para Orelha</div>
       <div class="ebook-autor">Said Anes</div>
@@ -841,7 +848,7 @@ footer{
     </div>
 
     <div class="ebook-card reveal" data-genero="ficcao" data-categoria="ficcao" style="transition-delay:.1s">
-      <div class="ebook-emoji">🔍</div>
+      <div class="livro-mockup" data-mockup="vigilante" data-mockup-cor="#2d1a1a" data-mockup-titulo="Vigilante" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ficção Literária · Premium" data-en="Literary Fiction · Premium">Ficção Literária · Premium</div>
       <div class="ebook-titulo" data-pt="Vigilante" data-en="Vigilante">Vigilante</div>
       <div class="ebook-autor">Said Anes</div>
@@ -863,7 +870,7 @@ footer{
     </div>
 
     <div class="ebook-card reveal" data-genero="ficcao" data-categoria="ficcao" style="transition-delay:.2s">
-      <div class="ebook-emoji">🌐</div>
+      <div class="livro-mockup" data-mockup="terceiraguerra" data-mockup-cor="#0f1f2d" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ficção Documental · Premium" data-en="Documentary Fiction · Premium">Ficção Documental · Premium</div>
       <div class="ebook-titulo" data-pt="O Nascimento Silencioso da 3ª Guerra Mundial" data-en="The Silent Birth of World War III">O Nascimento Silencioso da 3ª Guerra Mundial</div>
       <div class="ebook-autor">Said Anes</div>
@@ -885,7 +892,7 @@ footer{
     </div>
 
     <div class="ebook-card reveal" data-genero="manual" data-categoria="manual" style="transition-delay:.3s">
-      <div class="ebook-emoji">📘</div>
+      <div class="livro-mockup" data-mockup="antifalencia" data-mockup-cor="#1a3a5c" data-mockup-titulo="O Guia Antifalência" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Manual · Intermediário" data-en="Guide · Intermediate">Manual · Intermediário</div>
       <div class="ebook-titulo" data-pt="O Guia Antifalência do Empreendedor Iniciante" data-en="The Beginner Entrepreneur's Anti-Bankruptcy Guide">O Guia Antifalência do Empreendedor Iniciante</div>
       <div class="ebook-autor">Rogerio Dias</div>
@@ -1378,7 +1385,53 @@ footer{
 </footer>
 
 <script>
-// ── IDIOMA ────────────────────────────────────────────────
+// ── GERADOR DE MOCKUP 3D ─────────────────────────────────
+function gerarMockup(cor, titulo, imgSrc, w, h) {
+  cor = cor || '#1a4a2e';
+  titulo = titulo || '';
+  var r=parseInt(cor.slice(1,3),16), g=parseInt(cor.slice(3,5),16), b=parseInt(cor.slice(5,7),16);
+  var shadow='rgb('+Math.max(0,r-60)+','+Math.max(0,g-60)+','+Math.max(0,b-60)+')';
+  var lombada='rgb('+Math.max(0,r-30)+','+Math.max(0,g-30)+','+Math.max(0,b-30)+')';
+  var destaque='rgb('+Math.min(255,r+40)+','+Math.min(255,g+40)+','+Math.min(255,b+40)+')';
+  var cw=w*0.72, ch=h*0.88, lw=w*0.18, depth=h*0.04;
+  var cx=lw, cy=depth, lx=0, ly=depth;
+  var palavras=titulo.split(' '), linhas=[], linha='';
+  palavras.forEach(function(p){
+    if((linha+' '+p).trim().length>14){if(linha)linhas.push(linha);linha=p;}
+    else linha=(linha+' '+p).trim();
+  });
+  if(linha)linhas.push(linha);
+  linhas=linhas.slice(0,4);
+  var fs=Math.max(6,Math.round(cw*0.13));
+  var midY=cy+ch/2-(linhas.length-1)*fs*0.65;
+  var esc=function(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
+  var textLines=imgSrc?'':linhas.map(function(l,i){
+    return '<text x="'+(cx+cw/2)+'" y="'+(midY+i*fs*1.3)+'" text-anchor="middle" font-family="serif" font-size="'+fs+'" font-weight="bold" fill="#fff" fill-opacity="0.92">'+esc(l)+'</text>';
+  }).join('');
+  var imgEl=imgSrc?'<image href="'+imgSrc+'" x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#cc)"/>':'';
+  return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'+
+    '<defs><clipPath id="cc"><rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'"/></clipPath></defs>'+
+    '<ellipse cx="'+(cx+cw*.55)+'" cy="'+(cy+ch+4)+'" rx="'+(cw*.45)+'" ry="4" fill="rgba(0,0,0,.35)"/>'+
+    '<polygon points="'+lw+',0 '+(lw+cw)+',0 '+(cx+cw)+','+cy+' '+cx+','+cy+'" fill="'+destaque+'"/>'+
+    '<rect x="'+lx+'" y="'+ly+'" width="'+lw+'" height="'+ch+'" fill="'+lombada+'"/>'+
+    '<line x1="'+(lw*.5)+'" y1="'+ly+'" x2="'+(lw*.5)+'" y2="'+(ly+ch)+'" stroke="rgba(255,255,255,.1)" stroke-width=".5"/>'+
+    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="'+cor+'"/>'+
+    imgEl+
+    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+(ch*.18)+'" fill="rgba(255,255,255,.06)"/>'+
+    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="none" stroke="rgba(0,0,0,.25)" stroke-width=".5"/>'+
+    textLines+
+    '<line x1="'+(cx+cw*.15)+'" y1="'+(cy+ch*.78)+'" x2="'+(cx+cw*.85)+'" y2="'+(cy+ch*.78)+'" stroke="rgba(200,168,75,.6)" stroke-width=".8"/>'+
+  '</svg>';
+}
+
+function aplicarMockupsDoConfig() {
+  if (!CFG || !CFG.obras) return;
+  CFG.obras.forEach(function(o) {
+    document.querySelectorAll('[data-mockup="'+o.id+'"]').forEach(function(el) {
+      el.innerHTML = gerarMockup(o.cor || '#1a4a2e', o.titulo, o.imagem ? o.imagem : '', 80, 110);
+    });
+  });
+}
 let idioma = 'pt';
 function alternarIdioma() {
   idioma = idioma === 'pt' ? 'en' : 'pt';
@@ -1530,6 +1583,15 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     document.querySelectorAll('#inicio .reveal').forEach(el => el.classList.add('visivel'));
   }, 100);
+
+  // ── INICIALIZAR MOCKUPS 3D ────────────────────────────────
+  document.querySelectorAll('[data-mockup-cor]').forEach(el => {
+    const cor   = el.dataset.mockupCor   || '#1a4a2e';
+    const titulo= el.dataset.mockupTitulo|| '';
+    const w     = parseInt(el.dataset.mockupW) || 80;
+    const h     = parseInt(el.dataset.mockupH) || 110;
+    el.innerHTML = gerarMockup(cor, titulo, '', w, h);
+  });
 
 });
 
@@ -1702,6 +1764,9 @@ function aplicarConfig() {
       });
     }
   }
+
+  // ── OBRAS: mockups dinâmicos via config.obras ─────────────
+  aplicarMockupsDoConfig();
 }
 
 // ── PROGRESSO (barra de meta) ─────────────────────────────

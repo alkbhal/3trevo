@@ -141,6 +141,18 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
 .sim-box-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px}
 .sim-box-val{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ouro)}
 
+/* OBRAS */
+.obra-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);padding:24px;margin-bottom:16px;position:relative}
+.obra-card-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;justify-content:space-between}
+.obra-card-titulo{font-family:'Cormorant Garamond',serif;font-size:18px;color:rgba(255,255,255,.8)}
+.obra-remover{background:transparent;border:1px solid rgba(192,57,43,.3);color:rgba(192,57,43,.6);padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;font-family:'Jost',sans-serif}
+.obra-remover:hover{background:rgba(192,57,43,.1);color:#e74c3c;border-color:#e74c3c}
+.capa-upload-area{border:1px dashed rgba(200,168,75,.3);padding:12px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(200,168,75,.03)}
+.capa-upload-area:hover{background:rgba(200,168,75,.06);border-style:solid}
+.capa-upload-area input[type=file]{display:none}
+.capa-upload-label{font-size:11px;color:rgba(255,255,255,.3);margin-top:4px}
+.mockup-mini{width:56px;height:78px;flex-shrink:0}
+
 @media(max-width:768px){
   .layout{grid-template-columns:1fr}
   .sidebar{display:none}
@@ -178,6 +190,7 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
   <div class="layout">
     <aside class="sidebar">
       <div class="sidebar-item ativo" onclick="irPara('premios',this)"><span class="sidebar-icone">🏆</span>Prêmios</div>
+      <div class="sidebar-item" onclick="irPara('obras',this)"><span class="sidebar-icone">📖</span>Obras</div>
       <div class="sidebar-item" onclick="irPara('meta',this)"><span class="sidebar-icone">📊</span>Meta / Barra</div>
       <div class="sidebar-item" onclick="irPara('catalogo',this)"><span class="sidebar-icone">📚</span>Catálogo</div>
       <div class="sidebar-item" onclick="irPara('formula',this)"><span class="sidebar-icone">⚡</span>Fórmula</div>
@@ -213,6 +226,18 @@ body{font-family:'Jost',sans-serif;background:#0a1f10;color:var(--branco);min-he
         </div>
         <div class="aviso-box">
           <strong>Lembrete:</strong> o 1º e 2º prêmio podem dobrar se o vencedor estiver conectado a todas as redes sociais. Esse dobramento é configurado na aba <strong>Fórmula</strong>.
+        </div>
+      </div>
+
+      <!-- ── OBRAS ── -->
+      <div class="secao" id="sec-obras">
+        <div class="secao-titulo">Obras</div>
+        <div class="secao-sub">Adicione, edite ou remova títulos do catálogo. Cada obra gera automaticamente um mockup 3D de livro impresso.</div>
+        <div id="obrasLista"></div>
+        <button class="btn-adicionar" onclick="adicionarObra()">+ Adicionar obra</button>
+        <div class="aviso-box" style="margin-top:16px">
+          Após salvar, exporte o <strong>config.json</strong> e faça upload no GitHub. O site atualiza em ~1 minuto.
+          Se a obra tiver imagem de capa, a imagem deve ser colocada na pasta <code style="color:var(--ouro)">/capas/</code> do repositório com o nome indicado.
         </div>
       </div>
 
@@ -497,21 +522,6 @@ const REDES = [
 ];
 
 // ── LOGIN ─────────────────────────────────────────────────
-function entrar() {
-  if (document.getElementById('campoSenha').value === SENHA) {
-    document.getElementById('telaLogin').style.display = 'none';
-    document.getElementById('painelAdmin').style.display = 'block';
-    iniciarFaq();
-    atualizarPercentual();
-    recalcularFormula();
-    renderizarSimulador();
-  } else {
-    var erro = document.getElementById('loginErro');
-    erro.style.display = 'block';
-    setTimeout(function() { erro.style.display = 'none'; }, 3000);
-  }
-}
-
 // Enter no campo de senha
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('campoSenha').addEventListener('keydown', function(e) {
@@ -782,6 +792,268 @@ function mostrarStatus(msg, tipo) {
   bar.style.display = 'block';
   setTimeout(function() { bar.style.display = 'none'; }, 3000);
 }
+
+// ── OBRAS ─────────────────────────────────────────────────
+var obrasPadrao = [
+  { id:'justicamento',   emoji:'⚖️', titulo:'Justiça(mento) para Orelha',              autor:'Said Anes',   genero:'Ensaio',             faixa:'entrada',       descricao:'Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.', preco:'R$15,35', cotas:1,  qty:1,  cor:'#1a4a2e', imagem:'' },
+  { id:'antifalencia',   emoji:'📘', titulo:'O Guia Antifalência do Empreendedor',      autor:'Rogerio Dias',genero:'Manual',             faixa:'intermediario', descricao:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado.', preco:'R$46,04', cotas:3,  qty:3,  cor:'#1a3a5c', imagem:'' },
+  { id:'vigilante',      emoji:'🔍', titulo:'Vigilante',                                autor:'Said Anes',   genero:'Ficção Literária',   faixa:'premium',       descricao:'Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência.', preco:'R$76,74', cotas:10, qty:10, cor:'#2d1a1a', imagem:'' },
+  { id:'terceiraguerra', emoji:'🌐', titulo:'O Nascimento Silencioso da 3ª Guerra Mundial', autor:'Said Anes', genero:'Ficção Documental', faixa:'premium',     descricao:'Como guerras modernas acontecem sem disparos — no campo da informação, economia e política.', preco:'R$76,74', cotas:10, qty:10, cor:'#0f1f2d', imagem:'' },
+];
+
+function iniciarObras() {
+  var lista = document.getElementById('obrasLista');
+  lista.innerHTML = '';
+  obrasPadrao.forEach(function(o) { adicionarObraItem(o); });
+}
+
+function adicionarObra() {
+  adicionarObraItem({ id:'obra_'+Date.now(), emoji:'📗', titulo:'', autor:'Said Anes', genero:'', faixa:'entrada', descricao:'', preco:'R$15,35', cotas:1, qty:1, cor:'#1a4a2e', imagem:'' });
+}
+
+function adicionarObraItem(o) {
+  var lista = document.getElementById('obrasLista');
+  var div = document.createElement('div');
+  div.className = 'obra-card';
+  div.dataset.id = o.id;
+
+  // Mockup SVG 3D inline
+  var svgMockup = gerarMockupSVG(o.cor, o.titulo, o.imagem, 56, 78);
+
+  div.innerHTML =
+    '<div class="obra-card-header">' +
+      '<div style="display:flex;align-items:center;gap:12px">' +
+        '<div class="mockup-mini obra-mockup-preview">' + svgMockup + '</div>' +
+        '<div class="obra-card-titulo obra-titulo-preview">' + (o.titulo || 'Nova obra') + '</div>' +
+      '</div>' +
+      '<button class="obra-remover" onclick="this.closest(\'.obra-card\').remove()">✕ Remover</button>' +
+    '</div>' +
+    '<div class="edit-grid" style="margin-bottom:12px">' +
+      '<div class="campo"><label class="campo-label">Título</label><input class="campo-input obra-campo-titulo" type="text" value="'+escHtml(o.titulo)+'" oninput="atualizarPreviewObra(this)"></div>' +
+      '<div class="campo"><label class="campo-label">Autor</label><input class="campo-input" data-obra="autor" type="text" value="'+escHtml(o.autor)+'"></div>' +
+    '</div>' +
+    '<div class="edit-grid-3" style="margin-bottom:12px">' +
+      '<div class="campo"><label class="campo-label">Gênero</label><input class="campo-input" data-obra="genero" type="text" value="'+escHtml(o.genero)+'"></div>' +
+      '<div class="campo"><label class="campo-label">Faixa</label>' +
+        '<select class="campo-select" data-obra="faixa">' +
+          '<option value="entrada"'+(o.faixa==='entrada'?' selected':'')+'>Entrada</option>' +
+          '<option value="intermediario"'+(o.faixa==='intermediario'?' selected':'')+'>Intermediário</option>' +
+          '<option value="premium"'+(o.faixa==='premium'?' selected':'')+'>Premium</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="campo"><label class="campo-label">Emoji ícone</label><input class="campo-input" data-obra="emoji" type="text" value="'+escHtml(o.emoji)+'" maxlength="4" style="font-size:20px;text-align:center"></div>' +
+    '</div>' +
+    '<div class="campo" style="margin-bottom:12px"><label class="campo-label">Descrição</label><textarea class="campo-textarea" data-obra="descricao" style="min-height:60px">'+escHtml(o.descricao)+'</textarea></div>' +
+    '<div class="edit-grid-3" style="margin-bottom:16px">' +
+      '<div class="campo"><label class="campo-label">Preço</label><input class="campo-input" data-obra="preco" type="text" value="'+escHtml(o.preco)+'"></div>' +
+      '<div class="campo"><label class="campo-label">Cotas</label><input class="campo-input" data-obra="cotas" type="number" value="'+o.cotas+'" min="1"></div>' +
+      '<div class="campo"><label class="campo-label">Qty checkout</label><input class="campo-input" data-obra="qty" type="number" value="'+o.qty+'" min="1"></div>' +
+    '</div>' +
+    '<div class="edit-grid">' +
+      // Capa: upload ou cor
+      '<div class="campo">' +
+        '<label class="campo-label">Imagem da capa (opcional)</label>' +
+        '<label class="capa-upload-area">' +
+          '<input type="file" accept="image/*" onchange="carregarImagem(this)">' +
+          '<div class="capa-img-preview" style="display:none"><img class="capa-preview-img" src=""></div>' +
+          '<div class="capa-upload-label" id="upload-hint-'+o.id+'">Clique para enviar JPG/PNG<br>Recomendado: 300×420px</div>' +
+        '</label>' +
+        '<div class="campo-hint">Arquivo será salvo em <code style="color:var(--ouro)">/capas/'+o.id+'.jpg</code></div>' +
+      '</div>' +
+      // Cor de fallback + preview do mockup
+      '<div class="campo">' +
+        '<label class="campo-label">Cor da capa (fallback sem imagem)</label>' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
+          '<input type="color" class="campo-input obra-cor" data-obra="cor" value="'+o.cor+'" style="width:60px;height:40px;padding:2px;cursor:pointer" oninput="atualizarMockupCor(this)">' +
+          '<span style="font-size:13px;color:rgba(255,255,255,.4)">Cor de fundo quando não há imagem</span>' +
+        '</div>' +
+        '<label class="campo-label" style="margin-bottom:8px">Preview do mockup 3D</label>' +
+        '<div class="obra-mockup-grande" style="width:100px;height:140px">' + gerarMockupSVG(o.cor, o.titulo, o.imagem, 100, 140) + '</div>' +
+      '</div>' +
+    '</div>';
+
+  lista.appendChild(div);
+}
+
+function escHtml(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function atualizarPreviewObra(input) {
+  var card = input.closest('.obra-card');
+  var preview = card.querySelector('.obra-titulo-preview');
+  if (preview) preview.textContent = input.value || 'Nova obra';
+  // atualiza mockup preview com novo título
+  var cor = (card.querySelector('.obra-cor') || {}).value || '#1a4a2e';
+  var svgMini = card.querySelector('.obra-mockup-preview');
+  var svgGrande = card.querySelector('.obra-mockup-grande');
+  if (svgMini) svgMini.innerHTML = gerarMockupSVG(cor, input.value, '', 56, 78);
+  if (svgGrande) svgGrande.innerHTML = gerarMockupSVG(cor, input.value, '', 100, 140);
+}
+
+function atualizarMockupCor(input) {
+  var card = input.closest('.obra-card');
+  var titulo = (card.querySelector('.obra-campo-titulo') || {}).value || '';
+  var svgMini = card.querySelector('.obra-mockup-preview');
+  var svgGrande = card.querySelector('.obra-mockup-grande');
+  if (svgMini) svgMini.innerHTML = gerarMockupSVG(input.value, titulo, '', 56, 78);
+  if (svgGrande) svgGrande.innerHTML = gerarMockupSVG(input.value, titulo, '', 100, 140);
+}
+
+function carregarImagem(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var label = input.closest('label');
+    var preview = label.querySelector('.capa-img-preview');
+    var hint = label.querySelector('.capa-upload-label') || label.parentElement.querySelector('.capa-upload-label');
+    if (preview) {
+      preview.style.display = 'block';
+      var img = preview.querySelector('img');
+      if (img) img.src = e.target.result;
+    }
+    // atualiza mockups com a imagem
+    var card = input.closest('.obra-card');
+    var titulo = (card.querySelector('.obra-campo-titulo') || {}).value || '';
+    var cor = (card.querySelector('.obra-cor') || {}).value || '#1a4a2e';
+    var svgMini = card.querySelector('.obra-mockup-preview');
+    var svgGrande = card.querySelector('.obra-mockup-grande');
+    if (svgMini) svgMini.innerHTML = gerarMockupSVG(cor, titulo, e.target.result, 56, 78);
+    if (svgGrande) svgGrande.innerHTML = gerarMockupSVG(cor, titulo, e.target.result, 100, 140);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ── GERADOR DE MOCKUP 3D ─────────────────────────────────
+function gerarMockupSVG(cor, titulo, imgSrc, w, h) {
+  cor = cor || '#1a4a2e';
+  titulo = titulo || '';
+  var r = parseInt(cor.slice(1,3),16);
+  var g = parseInt(cor.slice(3,5),16);
+  var b = parseInt(cor.slice(5,7),16);
+  // sombra = cor escurecida
+  var rs = Math.max(0,r-60), gs = Math.max(0,g-60), bs = Math.max(0,b-60);
+  var shadow = 'rgb('+rs+','+gs+','+bs+')';
+  // lombada = cor um pouco mais escura
+  var rl = Math.max(0,r-30), gl = Math.max(0,g-30), bl = Math.max(0,b-30);
+  var lombada = 'rgb('+rl+','+gl+','+bl+')';
+  // destaque = cor mais clara (topo do livro)
+  var rh = Math.min(255,r+40), gh = Math.min(255,g+40), bh = Math.min(255,b+40);
+  var destaque = 'rgb('+rh+','+gh+','+bh+')';
+
+  // Proporções 3D em perspectiva
+  var cw = w * 0.72;   // largura da capa frontal
+  var ch = h * 0.88;   // altura da capa frontal
+  var lw = w * 0.18;   // largura da lombada
+  var depth = h * 0.04; // profundidade do topo
+
+  var cx = lw;          // x da capa
+  var cy = depth;       // y da capa
+  var lx = 0;           // x da lombada
+  var ly = depth;       // y da lombada
+  var tx = lw + 1;      // x do topo
+  var ty = 0;           // y do topo
+
+  // Texto truncado para a capa
+  var palavras = titulo.split(' ');
+  var linhas = [];
+  var linha = '';
+  palavras.forEach(function(p) {
+    if ((linha+' '+p).trim().length > 14) { if(linha) linhas.push(linha); linha = p; }
+    else linha = (linha+' '+p).trim();
+  });
+  if (linha) linhas.push(linha);
+  linhas = linhas.slice(0,4);
+
+  var imgEl = '';
+  if (imgSrc) {
+    imgEl = '<image href="'+imgSrc+'" x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipCapa)"/>';
+  }
+
+  var fs = Math.max(6, Math.round(cw * 0.13));
+  var midY = cy + ch/2 - (linhas.length-1)*fs*0.65;
+
+  var textLines = linhas.map(function(l,i) {
+    return '<text x="'+(cx+cw/2)+'" y="'+(midY + i*fs*1.3)+'" text-anchor="middle" font-family="serif" font-size="'+fs+'" font-weight="bold" fill="#fff" fill-opacity="0.92">'+escHtml(l)+'</text>';
+  }).join('');
+
+  return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">' +
+    '<defs>' +
+      '<clipPath id="clipCapa"><rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'"/></clipPath>' +
+    '</defs>' +
+    // Sombra projetada
+    '<ellipse cx="'+(cx+cw*0.55)+'" cy="'+(cy+ch+4)+'" rx="'+(cw*0.45)+'" ry="4" fill="rgba(0,0,0,0.35)"/>' +
+    // Topo do livro (perspectiva)
+    '<polygon points="'+tx+','+ty+' '+(tx+cw)+','+ty+' '+(cx+cw)+','+cy+' '+cx+','+cy+'" fill="'+destaque+'"/>' +
+    // Lombada
+    '<rect x="'+lx+'" y="'+ly+'" width="'+lw+'" height="'+ch+'" fill="'+lombada+'"/>' +
+    // Linha de detalhe na lombada
+    '<line x1="'+(lw*0.5)+'" y1="'+ly+'" x2="'+(lw*0.5)+'" y2="'+(ly+ch)+'" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>' +
+    // Capa frontal
+    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="'+cor+'"/>' +
+    imgEl +
+    // Reflexo na capa (faixa clara no topo)
+    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+(ch*0.18)+'" fill="rgba(255,255,255,0.06)"/>' +
+    // Borda da capa
+    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"/>' +
+    // Título na capa (só se não houver imagem)
+    (imgSrc ? '' : textLines) +
+    // Linha dourada decorativa na capa
+    '<line x1="'+(cx+cw*0.15)+'" y1="'+(cy+ch*0.78)+'" x2="'+(cx+cw*0.85)+'" y2="'+(cy+ch*0.78)+'" stroke="rgba(200,168,75,0.6)" stroke-width="0.8"/>' +
+  '</svg>';
+}
+
+// Iniciar obras após login
+var _iniciarOriginal = entrar;
+function entrar() {
+  if (document.getElementById('campoSenha').value === SENHA) {
+    document.getElementById('telaLogin').style.display = 'none';
+    document.getElementById('painelAdmin').style.display = 'block';
+    iniciarFaq();
+    iniciarObras();
+    atualizarPercentual();
+    recalcularFormula();
+    renderizarSimulador();
+  } else {
+    var erro = document.getElementById('loginErro');
+    erro.style.display = 'block';
+    setTimeout(function() { erro.style.display = 'none'; }, 3000);
+  }
+}
+
+// Incluir obras no config exportado
+var _coletarOriginal = coletarConfig;
+coletarConfig = function() {
+  var cfg = _coletarOriginal();
+  // Coletar obras da lista
+  var obras = [];
+  document.querySelectorAll('.obra-card').forEach(function(card) {
+    var get = function(sel) { var el = card.querySelector('[data-obra="'+sel+'"]'); return el ? el.value : ''; };
+    var img = card.querySelector('.capa-preview-img');
+    obras.push({
+      id:       card.dataset.id || '',
+      titulo:   (card.querySelector('.obra-campo-titulo') || {}).value || '',
+      autor:    get('autor'),
+      genero:   get('genero'),
+      faixa:    get('faixa'),
+      emoji:    get('emoji'),
+      descricao:get('descricao'),
+      preco:    get('preco'),
+      cotas:    parseInt(get('cotas')) || 1,
+      qty:      parseInt(get('qty')) || 1,
+      cor:      get('cor'),
+      imagem:   (img && img.style.display !== 'none') ? ('/capas/'+card.dataset.id+'.jpg') : ''
+    });
+  });
+  cfg.obras = obras;
+  // Sincronizar com catálogo para compatibilidade
+  var catalogo = {};
+  obras.forEach(function(o) {
+    catalogo[o.id] = { preco: o.preco, cotas: o.cotas, qty: o.qty };
+  });
+  cfg.catalogo = catalogo;
+  return cfg;
+};
 </script>
 </body>
 </html>

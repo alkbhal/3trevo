@@ -16,28 +16,19 @@
     "segundo": "R$ 500,00",
     "metodo": "Transferência bancária · PIX · pago em D+7"
   },
-  "meta": {
-    "arrecadado": 3400,
-    "total_oculto": 34000
-  },
-  "hero": {
-    "leitores": 247,
-    "desc_pt": "Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial. E ainda concorra a prêmios em dinheiro pelo Programa Cultural.",
-    "desc_en": "We publish ebooks that change perspectives — from geopolitical fiction to business survival guides. Participate in our Cultural Program and compete for cash prizes."
-  },
+  "meta": { "arrecadado": 3400, "total_oculto": 34000 },
+  "hero": { "leitores": 247 },
+  "obras": [
+    { "id": "justicamento",   "titulo": "Justiça(mento) para Orelha",               "autor": "Said Anes",    "genero": "Ensaio",           "faixa": "entrada",       "emoji": "⚖️", "descricao": "Um ensaio sobre justiça, linguagem e poder.", "preco": "R$15,35", "cotas": 1,  "qty": 1,  "cor": "#1a4a2e", "imagem": "" },
+    { "id": "antifalencia",   "titulo": "O Guia Antifalência do Empreendedor",      "autor": "Rogerio Dias", "genero": "Manual",           "faixa": "intermediario", "emoji": "📘", "descricao": "A conta que ninguém te obriga a fazer.",        "preco": "R$46,04", "cotas": 3,  "qty": 3,  "cor": "#1a3a5c", "imagem": "" },
+    { "id": "vigilante",      "titulo": "Vigilante",                                "autor": "Said Anes",    "genero": "Ficção Literária", "faixa": "premium",       "emoji": "🔍", "descricao": "O limite entre justiça e vingança.",           "preco": "R$76,74", "cotas": 10, "qty": 10, "cor": "#2d1a1a", "imagem": "" },
+    { "id": "terceiraguerra", "titulo": "O Nascimento Silencioso da 3ª Guerra Mundial", "autor": "Said Anes", "genero": "Ficção Documental", "faixa": "premium",    "emoji": "🌐", "descricao": "Como guerras modernas acontecem sem disparos.", "preco": "R$76,74", "cotas": 10, "qty": 10, "cor": "#0f1f2d", "imagem": "" }
+  ],
   "catalogo": {
     "justicamento":   { "preco": "R$15,35", "cotas": 1,  "qty": 1  },
     "antifalencia":   { "preco": "R$46,04", "cotas": 3,  "qty": 3  },
     "vigilante":      { "preco": "R$76,74", "cotas": 10, "qty": 10 },
     "terceiraguerra": { "preco": "R$76,74", "cotas": 10, "qty": 10 }
   },
-  "requisitos": {
-    "depoimento_min_palavras": 20,
-    "instagram": true
-  },
-  "textos": {
-    "prog_sub_pt": "Adquira um ebook, leia, escreva seu depoimento e concorra a prêmios em dinheiro. Simples assim.",
-    "prog_sub_en": "Buy an ebook, read it, write your review, and compete for cash prizes. Simple as that.",
-    "aviso_legal_pt": "Concurso cultural nos termos da legislação vigente. Participação mediante aquisição de ebook e cumprimento dos requisitos de habilidade (depoimento + seguir redes). O multiplicador de prêmio é apurado no momento do sorteio. Regulamento completo disponível na plataforma."
-  }
+  "requisitos": { "depoimento_min_palavras": 20, "instagram": true }
 }
