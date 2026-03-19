@@ -1,34 +1,177 @@
 {
-  "gerado_em": "2026-03-17T00:00:00.000Z",
+  "gerado_em": "2026-03-19T03:10:58.840Z",
   "formula": {
     "premio_base_instantaneo": 100,
-    "faixas_instantaneo": ["antifalencia","vigilante","terceiraguerra"],
+    "faixas_instantaneo": [
+      "antifalencia",
+      "vigilante",
+      "terceiraguerra"
+    ],
     "redes": {
-      "whatsapp":  { "nome": "WhatsApp",  "ativo": true, "percentual": 25 },
-      "instagram": { "nome": "Instagram", "ativo": true, "percentual": 25 },
-      "facebook":  { "nome": "Facebook",  "ativo": true, "percentual": 20 },
-      "tiktok":    { "nome": "TikTok",    "ativo": true, "percentual": 15 },
-      "youtube":   { "nome": "YouTube",   "ativo": true, "percentual": 15 }
+      "whatsapp": {
+        "nome": "WhatsApp",
+        "ativo": true,
+        "percentual": 25
+      },
+      "instagram": {
+        "nome": "Instagram",
+        "ativo": true,
+        "percentual": 25
+      },
+      "facebook": {
+        "nome": "Facebook",
+        "ativo": true,
+        "percentual": 20
+      },
+      "tiktok": {
+        "nome": "TikTok",
+        "ativo": true,
+        "percentual": 15
+      },
+      "youtube": {
+        "nome": "YouTube",
+        "ativo": true,
+        "percentual": 15
+      }
     }
   },
   "premios": {
+    "lista": [
+      {
+        "posicao": "1°",
+        "valor": "1 salário mínimo nacional"
+      },
+      {
+        "posicao": "2°",
+        "valor": "R$ 500,00"
+      }
+    ],
     "primeiro": "1 salário mínimo nacional",
     "segundo": "R$ 500,00",
     "metodo": "Transferência bancária · PIX · pago em D+7"
   },
-  "meta": { "arrecadado": 3400, "total_oculto": 34000 },
-  "hero": { "leitores": 247 },
-  "obras": [
-    { "id": "justicamento",   "titulo": "Justiça(mento) para Orelha",               "autor": "Said Anes",    "genero": "Ensaio",           "faixa": "entrada",       "emoji": "⚖️", "descricao": "Um ensaio sobre justiça, linguagem e poder.", "preco": "R$15,35", "cotas": 1,  "qty": 1,  "cor": "#1a4a2e", "imagem": "" },
-    { "id": "antifalencia",   "titulo": "O Guia Antifalência do Empreendedor",      "autor": "Rogerio Dias", "genero": "Manual",           "faixa": "intermediario", "emoji": "📘", "descricao": "A conta que ninguém te obriga a fazer.",        "preco": "R$46,04", "cotas": 3,  "qty": 3,  "cor": "#1a3a5c", "imagem": "" },
-    { "id": "vigilante",      "titulo": "Vigilante",                                "autor": "Said Anes",    "genero": "Ficção Literária", "faixa": "premium",       "emoji": "🔍", "descricao": "O limite entre justiça e vingança.",           "preco": "R$76,74", "cotas": 10, "qty": 10, "cor": "#2d1a1a", "imagem": "" },
-    { "id": "terceiraguerra", "titulo": "O Nascimento Silencioso da 3ª Guerra Mundial", "autor": "Said Anes", "genero": "Ficção Documental", "faixa": "premium",    "emoji": "🌐", "descricao": "Como guerras modernas acontecem sem disparos.", "preco": "R$76,74", "cotas": 10, "qty": 10, "cor": "#0f1f2d", "imagem": "" }
-  ],
-  "catalogo": {
-    "justicamento":   { "preco": "R$15,35", "cotas": 1,  "qty": 1  },
-    "antifalencia":   { "preco": "R$46,04", "cotas": 3,  "qty": 3  },
-    "vigilante":      { "preco": "R$76,74", "cotas": 10, "qty": 10 },
-    "terceiraguerra": { "preco": "R$76,74", "cotas": 10, "qty": 10 }
+  "meta": {
+    "arrecadado": 3400,
+    "total_oculto": 34000
   },
-  "requisitos": { "depoimento_min_palavras": 20, "instagram": true }
+  "hero": {
+    "leitores": 247,
+    "desc_pt": "Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial. E ainda concorra a prêmios em dinheiro pelo Programa Cultural.",
+    "desc_en": "We publish ebooks that change perspectives — from geopolitical fiction to business survival guides. Participate in our Cultural Program and compete for cash prizes."
+  },
+  "catalogo": {
+    "justicamento": {
+      "preco": "R$15,35",
+      "cotas": 1,
+      "qty": 1
+    },
+    "antifalencia": {
+      "preco": "R$46,04",
+      "cotas": 3,
+      "qty": 3
+    },
+    "vigilante": {
+      "preco": "R$76,74",
+      "cotas": 10,
+      "qty": 10
+    },
+    "terceiraguerra": {
+      "preco": "R$76,74",
+      "cotas": 10,
+      "qty": 10
+    }
+  },
+  "requisitos": {
+    "depoimento_min_palavras": 20,
+    "instagram": false
+  },
+  "textos": {
+    "prog_sub_pt": "Adquira um ebook, leia, escreva seu depoimento e concorra a prêmios em dinheiro. Simples assim.",
+    "prog_sub_en": "Buy an ebook, read it, write your review, and compete for cash prizes. Simple as that.",
+    "aviso_legal_pt": "Concurso cultural nos termos da legislação vigente. Participação mediante aquisição de ebook e cumprimento dos requisitos de habilidade (depoimento + seguir redes). O multiplicador de prêmio é apurado no momento do sorteio. Regulamento completo disponível na plataforma."
+  },
+  "faq": [
+    {
+      "p": "O que é o Programa Cultural?",
+      "r": "É um concurso cultural onde você adquire um ebook, lê, escreve um depoimento e concorre a prêmios em dinheiro. Não é sorteio puro — sua participação depende de habilidade (leitura e depoimento genuíno)."
+    },
+    {
+      "p": "Como recebo meu ebook após a compra?",
+      "r": "Você está comprando um ebook — um livro digital em formato PDF. Após a confirmação do pagamento, você recebe o arquivo por e-mail (sac@3trevo.com.br) e também por mensagem de WhatsApp, automaticamente."
+    },
+    {
+      "p": "Por que preciso esperar 7 dias para participar?",
+      "r": "O prazo garante tempo suficiente para leitura e coincide com o prazo legal de arrependimento do CDC para compras digitais."
+    },
+    {
+      "p": "Posso participar comprando qualquer título?",
+      "r": "Sim. Todos os títulos participam. Entrada = 1 cota, Intermediário = 3 cotas + Prêmio Imediato, Premium = 10 cotas + Prêmio Imediato com mais chances."
+    },
+    {
+      "p": "O que é um depoimento válido?",
+      "r": "Um texto de pelo menos 20 palavras demonstrando leitura genuína do conteúdo. Textos genéricos ou copiados são desclassificados."
+    },
+    {
+      "p": "Posso pedir reembolso?",
+      "r": "Sim. Nos termos do art. 49 do CDC, você tem 7 dias para solicitar reembolso integral. Ao exercer o direito de arrependimento, o participante é automaticamente desclassificado do Programa Cultural."
+    }
+  ],
+  "obras": [
+    {
+      "id": "justicamento",
+      "titulo": "Justiça(mento) para Orelha",
+      "autor": "Said Anes",
+      "genero": "Ensaio",
+      "faixa": "entrada",
+      "emoji": "⚖️",
+      "descricao": "Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.",
+      "preco": "R$15,35",
+      "cotas": 1,
+      "qty": 1,
+      "cor": "#1a4a2e",
+      "imagem": "/capas/justicamento.jpg"
+    },
+    {
+      "id": "antifalencia",
+      "titulo": "O Guia Antifalência do Empreendedor",
+      "autor": "Rogerio Dias",
+      "genero": "Manual",
+      "faixa": "intermediario",
+      "emoji": "📘",
+      "descricao": "A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado.",
+      "preco": "R$46,04",
+      "cotas": 3,
+      "qty": 3,
+      "cor": "#1a3a5c",
+      "imagem": "/capas/antifalencia.jpg"
+    },
+    {
+      "id": "vigilante",
+      "titulo": "Vigilante",
+      "autor": "Said Anes",
+      "genero": "Ficção Literária",
+      "faixa": "premium",
+      "emoji": "🔍",
+      "descricao": "Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência.",
+      "preco": "R$76,74",
+      "cotas": 10,
+      "qty": 10,
+      "cor": "#2d1a1a",
+      "imagem": "/capas/vigilante.jpg"
+    },
+    {
+      "id": "terceiraguerra",
+      "titulo": "O Nascimento Silencioso da 3ª Guerra Mundial",
+      "autor": "Said Anes",
+      "genero": "Ficção Documental",
+      "faixa": "premium",
+      "emoji": "🌐",
+      "descricao": "Como guerras modernas acontecem sem disparos — no campo da informação, economia e política.",
+      "preco": "R$76,74",
+      "cotas": 10,
+      "qty": 10,
+      "cor": "#0f1f2d",
+      "imagem": "/capas/terceiraguerra.jpg"
+    }
+  ]
 }
