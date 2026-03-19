@@ -778,7 +778,7 @@ footer{
         <div class="stat-txt" data-pt="leitores" data-en="readers">leitores</div>
       </div>
       <div>
-        <span class="stat-num">4</span>
+        <span class="stat-num" id="statTitulos">4</span>
         <div class="stat-txt" data-pt="títulos" data-en="titles">títulos</div>
       </div>
       <div>
@@ -789,25 +789,8 @@ footer{
   </div>
 
   <div class="hero-direita reveal" style="transition-delay:.15s">
-    <div class="capas-vitrine">
-      <div class="capa-card">
-        <div style="width:120px;height:165px" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="120" data-mockup-h="165"></div>
-        <div class="capa-faixa" data-pt="Ensaio" data-en="Essay">Ensaio</div>
-        <div class="capa-nome" data-pt="Justiça(mento) para Orelha" data-en="Justiça(mento) para Orelha">Justiça(mento) para Orelha</div>
-        <div class="capa-preco">R$15,35</div>
-      </div>
-      <div class="capa-card">
-        <div style="width:120px;height:165px" data-mockup-cor="#0f1f2d" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="120" data-mockup-h="165"></div>
-        <div class="capa-faixa" data-pt="Ficção Documental" data-en="Documentary Fiction">Ficção Documental</div>
-        <div class="capa-nome" data-pt="O Nascimento Silencioso da 3ª GM" data-en="The Silent Birth of WWIII">O Nascimento Silencioso da 3ª GM</div>
-        <div class="capa-preco">R$76,74</div>
-      </div>
-      <div class="capa-card">
-        <div style="width:120px;height:165px" data-mockup-cor="#1a3a5c" data-mockup-titulo="O Guia Antifalência" data-mockup-w="120" data-mockup-h="165"></div>
-        <div class="capa-faixa" data-pt="Manual Vol.1" data-en="Manual Vol.1">Manual Vol.1</div>
-        <div class="capa-nome" data-pt="Guia Antifalência" data-en="Anti-Bankruptcy Guide">Guia Antifalência</div>
-        <div class="capa-preco">R$46,04</div>
-      </div>
+    <div class="capas-vitrine" id="capasVitrine">
+      <!-- Capas geradas dinamicamente pelo aplicarConfig() -->
     </div>
   </div>
 </section>
@@ -830,99 +813,8 @@ footer{
   </div>
 
   <div class="grid-ebooks" id="gridEbooks">
-
-    <div class="ebook-card reveal" data-genero="reflexao" data-categoria="reflexao">
-      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1" class="ebook-card-link" data-cfg-link="justicamento" aria-label="Adquirir Justiça(mento) para Orelha"></a>
-      <div class="livro-mockup" data-mockup="justicamento" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Ensaio · Entrada" data-en="Essay · Entry">Ensaio · Entrada</div>
-      <div class="ebook-titulo" data-pt="Justiça(mento) para Orelha" data-en="Justiça(mento) para Orelha">Justiça(mento) para Orelha</div>
-      <div class="ebook-autor">Said Anes</div>
-      <p class="ebook-desc" data-pt="Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir." data-en="An essay on justice, language and power. For those who question what they hear before repeating it.">
-        Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.
-      </p>
-      <div style="font-size:11px;color:rgba(255,255,255,.3);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:8px 12px;line-height:1.6"
-        data-pt="✦ Sorteio principal · Participação garantida após D+7"
-        data-en="✦ Main draw · Participation confirmed after D+7">
-        ✦ Sorteio principal · Participação garantida após D+7
-      </div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco" data-cfg-preco="justicamento">R$15,35</div>
-          <div class="ebook-cotas" data-cfg-cotas="justicamento" data-pt="1 cota inclusa" data-en="1 ticket included">1 cota inclusa</div>
-        </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1" data-cfg-link="justicamento" class="ebook-btn" data-pt="Adquirir" data-en="Get">Adquirir</a>
-      </div>
-    </div>
-
-    <div class="ebook-card reveal" data-genero="ficcao" data-categoria="ficcao" style="transition-delay:.1s">
-      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10" class="ebook-card-link" data-cfg-link="vigilante" aria-label="Adquirir Vigilante"></a>
-      <div class="livro-mockup" data-mockup="vigilante" data-mockup-cor="#2d1a1a" data-mockup-titulo="Vigilante" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Ficção Literária · Premium" data-en="Literary Fiction · Premium">Ficção Literária · Premium</div>
-      <div class="ebook-titulo" data-pt="Vigilante" data-en="Vigilante">Vigilante</div>
-      <div class="ebook-autor">Said Anes</div>
-      <p class="ebook-desc" data-pt="Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão." data-en="A narrative about the boundary between justice and revenge, between law and conscience. High-tension literary fiction.">
-        Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão.
-      </p>
-      <div style="font-size:11px;color:var(--ouro);background:rgba(200,168,75,.07);border:1px solid rgba(200,168,75,.2);padding:8px 12px;line-height:1.6"
-        data-pt="✦ Prêmio Imediato R$100–R$500 (até R$1.000 conectado) · 10 cotas = mais chances · pago após D+7"
-        data-en="✦ Immediate Prize R$100–R$500 (up to R$1,000 if connected) · 10 tickets = more chances · paid after D+7">
-        ✦ Prêmio Imediato R$100–R$500 · até R$1.000 conectado · pago após D+7
-      </div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco" data-cfg-preco="vigilante">R$76,74</div>
-          <div class="ebook-cotas" data-cfg-cotas="vigilante" data-pt="10 cotas inclusas" data-en="10 tickets included">10 cotas inclusas</div>
-        </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10" data-cfg-link="vigilante" class="ebook-btn" data-pt="Adquirir" data-en="Get">Adquirir</a>
-      </div>
-    </div>
-
-    <div class="ebook-card reveal" data-genero="ficcao" data-categoria="ficcao" style="transition-delay:.2s">
-      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10" class="ebook-card-link" data-cfg-link="terceiraguerra" aria-label="Adquirir 3a Guerra Mundial"></a>
-      <div class="livro-mockup" data-mockup="terceiraguerra" data-mockup-cor="#0f1f2d" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Ficção Documental · Premium" data-en="Documentary Fiction · Premium">Ficção Documental · Premium</div>
-      <div class="ebook-titulo" data-pt="O Nascimento Silencioso da 3ª Guerra Mundial" data-en="The Silent Birth of World War III">O Nascimento Silencioso da 3ª Guerra Mundial</div>
-      <div class="ebook-autor">Said Anes</div>
-      <p class="ebook-desc" data-pt="Como guerras modernas acontecem sem disparos — no campo da informação, economia e política. Assustadoramente atual." data-en="How modern wars happen without gunfire — in the fields of information, economy, and politics. Frighteningly current.">
-        Como guerras modernas acontecem sem disparos — no campo da informação, economia e política. Assustadoramente atual.
-      </p>
-      <div style="font-size:11px;color:var(--ouro);background:rgba(200,168,75,.07);border:1px solid rgba(200,168,75,.2);padding:8px 12px;line-height:1.6"
-        data-pt="✦ Prêmio Imediato R$100–R$500 (até R$1.000 conectado) · 10 cotas = mais chances · pago após D+7"
-        data-en="✦ Immediate Prize R$100–R$500 (up to R$1,000 if connected) · 10 tickets = more chances · paid after D+7">
-        ✦ Prêmio Imediato R$100–R$500 · até R$1.000 conectado · pago após D+7
-      </div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco" data-cfg-preco="terceiraguerra">R$76,74</div>
-          <div class="ebook-cotas" data-cfg-cotas="terceiraguerra" data-pt="10 cotas inclusas" data-en="10 tickets included">10 cotas inclusas</div>
-        </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10" data-cfg-link="terceiraguerra" class="ebook-btn" data-pt="Adquirir" data-en="Get">Adquirir</a>
-      </div>
-    </div>
-
-    <div class="ebook-card reveal" data-genero="manual" data-categoria="manual" style="transition-delay:.3s">
-      <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3" class="ebook-card-link" data-cfg-link="antifalencia" aria-label="Adquirir Guia Antifalencia"></a>
-      <div class="livro-mockup" data-mockup="antifalencia" data-mockup-cor="#1a3a5c" data-mockup-titulo="O Guia Antifalência" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Manual · Intermediário" data-en="Guide · Intermediate">Manual · Intermediário</div>
-      <div class="ebook-titulo" data-pt="O Guia Antifalência do Empreendedor Iniciante" data-en="The Beginner Entrepreneur's Anti-Bankruptcy Guide">O Guia Antifalência do Empreendedor Iniciante</div>
-      <div class="ebook-autor">Rogerio Dias</div>
-      <p class="ebook-desc" data-pt="A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado." data-en="The math nobody forces you to do. Costs, pricing, and break-even for entrepreneurs who want to survive.">
-        A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado.
-      </p>
-      <div style="font-size:11px;color:var(--ouro-claro);background:rgba(200,168,75,.07);border:1px solid rgba(200,168,75,.2);padding:8px 12px;line-height:1.6"
-        data-pt="✦ Prêmio Imediato R$100–R$500 (até R$1.000 conectado) · pago após D+7"
-        data-en="✦ Immediate Prize R$100–R$500 (up to R$1,000 if connected) · paid after D+7">
-        ✦ Prêmio Imediato R$100–R$500 · até R$1.000 conectado · pago após D+7
-      </div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco" data-cfg-preco="antifalencia">R$46,04</div>
-          <div class="ebook-cotas" data-cfg-cotas="antifalencia" data-pt="3 cotas inclusas" data-en="3 tickets included">3 cotas inclusas</div>
-        </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3" data-cfg-link="antifalencia" class="ebook-btn" data-pt="Adquirir" data-en="Get">Adquirir</a>
-      </div>
-    </div>
-
+    <!-- Cards gerados dinamicamente pelo aplicarConfig() a partir do config.json -->
+    <div id="ebookCardsPlaceholder" style="display:none"></div>
   </div>
 </section>
 
@@ -1666,52 +1558,150 @@ function renderizarMeta(arrecadado) {
 let CFG = null; // configuração global
 
 async function carregarConfig() {
+  const grid = document.getElementById('gridEbooks');
   try {
     const r = await fetch('/config.json?t=' + Date.now());
     if (r.ok) {
       CFG = await r.json();
       aplicarConfig();
+    } else {
+      // config.json não encontrado — mostra aviso no grid
+      if (grid) grid.innerHTML = '<div style="padding:48px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;width:100%">Catálogo não configurado.<br>Baixe e faça upload do config.json pelo painel admin.</div>';
     }
-  } catch(e) { /* sem config.json, usa valores do HTML */ }
+  } catch(e) {
+    if (grid) grid.innerHTML = '<div style="padding:48px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;width:100%">Catálogo não configurado.<br>Baixe e faça upload do config.json pelo painel admin.</div>';
+  }
 }
 
 function aplicarConfig() {
   if (!CFG) return;
 
-  // ── HERO: número de leitores ──────────────────────────────
+  // ── HERO: número de leitores e títulos ──────────────────────
   if (CFG.hero && CFG.hero.leitores) {
     const el = document.getElementById('statLeitores');
     if (el) el.textContent = CFG.hero.leitores;
   }
-
-  // ── CATÁLOGO: preços, cotas e links ──────────────────────
+  // Contador de títulos dinâmico
   if (CFG.catalogo) {
-    const mapa = {
-      justicamento:   { qty: 1 },
-      antifalencia:   { qty: 3 },
-      vigilante:      { qty: 10 },
-      terceiraguerra: { qty: 10 }
-    };
-    Object.keys(CFG.catalogo).forEach(id => {
-      const dados = CFG.catalogo[id];
-      // preço
-      document.querySelectorAll('[data-cfg-preco="' + id + '"]').forEach(el => {
-        el.textContent = dados.preco;
+    const elT = document.getElementById('statTitulos');
+    if (elT) elT.textContent = Object.keys(CFG.catalogo).length;
+  }
+
+  // ── CATÁLOGO: geração dinâmica de cards a partir do config.json ──────
+  if (CFG.catalogo) {
+    const grid = document.getElementById('gridEbooks');
+    if (grid) {
+      grid.innerHTML = '';
+      const ids = Object.keys(CFG.catalogo);
+      ids.forEach((id, idx) => {
+        const d = CFG.catalogo[id];
+        if (!d || !d.titulo) return;
+
+        // Faixa → categoria para filtros
+        const faixaMap = { entrada: 'reflexao', intermediario: 'manual', premium: 'ficcao' };
+        const categoria = d.categoria || faixaMap[d.faixa] || 'reflexao';
+
+        // Badge de prêmio conforme faixa
+        const faixaLabel = { entrada: 'Sorteio principal', intermediario: 'Intermediário', premium: 'Premium' };
+        const badgeLabel = d.faixa === 'entrada'
+          ? '✦ Sorteio principal · Participação garantida após D+7'
+          : '✦ Prêmio Imediato R$100–R$500 · até R$1.000 conectado · pago após D+7';
+        const badgeStyle = d.faixa === 'entrada'
+          ? 'font-size:11px;color:rgba(255,255,255,.3);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:8px 12px;line-height:1.6'
+          : 'font-size:11px;color:var(--ouro);background:rgba(200,168,75,.07);border:1px solid rgba(200,168,75,.2);padding:8px 12px;line-height:1.6';
+
+        // Cotas texto
+        const cotasTxt = d.cotas === 1 ? '1 cota inclusa' : d.cotas + ' cotas inclusas';
+        const cotasEn  = d.cotas === 1 ? '1 ticket included' : d.cotas + ' tickets included';
+
+        // Genero display
+        const generoDisplay = d.genero || (faixaLabel[d.faixa] || 'Ebook');
+
+        // Link checkout com utm_content
+        const link = 'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=' + (d.qty || d.cotas || 1) + '&utm_source=3trevo&utm_content=' + id;
+
+        // Delay de animação escalonado
+        const delay = idx * 0.1;
+
+        const card = document.createElement('div');
+        card.className = 'ebook-card reveal';
+        card.dataset.genero = categoria;
+        card.dataset.categoria = categoria;
+        card.style.transitionDelay = delay + 's';
+
+        card.innerHTML =
+          '<a href="' + link + '" class="ebook-card-link" data-cfg-link="' + id + '" aria-label="Adquirir ' + (d.titulo||'').replace(/"/g,'&quot;') + '"></a>' +
+          '<div class="livro-mockup" data-mockup="' + id + '" data-mockup-cor="' + (d.cor||'#1a4a2e') + '" data-mockup-titulo="' + (d.titulo||'').replace(/"/g,'&quot;') + '" data-mockup-w="80" data-mockup-h="110"></div>' +
+          '<div class="ebook-genero">' + generoDisplay + '</div>' +
+          '<div class="ebook-titulo">' + (d.titulo||'') + '</div>' +
+          '<div class="ebook-autor">' + (d.autor||'') + '</div>' +
+          '<p class="ebook-desc">' + (d.descricao||'') + '</p>' +
+          '<div style="' + badgeStyle + '">' + badgeLabel + '</div>' +
+          '<div class="ebook-footer">' +
+            '<div>' +
+              '<div class="ebook-preco" data-cfg-preco="' + id + '">' + (d.preco||'') + '</div>' +
+              '<div class="ebook-cotas" data-cfg-cotas="' + id + '" data-pt="' + cotasTxt + '" data-en="' + cotasEn + '">' + cotasTxt + '</div>' +
+            '</div>' +
+            '<a href="' + link + '" data-cfg-link="' + id + '" class="ebook-btn" data-pt="Adquirir" data-en="Get">Adquirir</a>' +
+          '</div>';
+
+        grid.appendChild(card);
+
+        // Inicializar mockup 3D do card recém-criado
+        card.querySelectorAll('[data-mockup-cor]').forEach(el => {
+          const cor    = el.dataset.mockupCor    || '#1a4a2e';
+          const titulo = el.dataset.mockupTitulo || '';
+          const w      = parseInt(el.dataset.mockupW) || 80;
+          const h      = parseInt(el.dataset.mockupH) || 110;
+          el.innerHTML = gerarMockup(cor, titulo, '', w, h);
+        });
+
+        // Imagem de capa se existir
+        if (d.imagem) {
+          card.querySelectorAll('[data-mockup-cor]').forEach(el => {
+            el.innerHTML = gerarMockup(d.cor||'#1a4a2e', d.titulo||'', d.imagem, parseInt(el.dataset.mockupW)||80, parseInt(el.dataset.mockupH)||110);
+          });
+        }
+
+        // Ativar reveal
+        setTimeout(() => card.classList.add('visivel'), 100 + idx * 80);
       });
-      // cotas
-      document.querySelectorAll('[data-cfg-cotas="' + id + '"]').forEach(el => {
-        const txt = dados.cotas === 1 ? '1 cota inclusa' : dados.cotas + ' cotas inclusas';
-        const txtEn = dados.cotas === 1 ? '1 ticket included' : dados.cotas + ' tickets included';
-        el.setAttribute('data-pt', txt);
-        el.setAttribute('data-en', txtEn);
-        el.textContent = idioma === 'pt' ? txt : txtEn;
-      });
-      // links de checkout
-      const qty = dados.qty || mapa[id]?.qty || 1;
-      document.querySelectorAll('[data-cfg-link="' + id + '"]').forEach(el => {
-        el.href = 'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=' + qty;
-      });
-    });
+
+      // Filtros: atualizar categorias disponíveis
+      const cats = [...new Set(ids.map(id => {
+        const d = CFG.catalogo[id];
+        const faixaMap = { entrada: 'reflexao', intermediario: 'manual', premium: 'ficcao' };
+        return d.categoria || faixaMap[d.faixa] || 'reflexao';
+      }))];
+
+      // Reaticar filtro ativo
+      const filtroAtivo = document.querySelector('.filtro.ativo');
+      if (filtroAtivo) filtrar(filtroAtivo.dataset.categoria || 'todos', filtroAtivo);
+
+      // ── VITRINE DO HERO: mostra até 3 capas em destaque ──────────
+      const vitrine = document.getElementById('capasVitrine');
+      if (vitrine) {
+        vitrine.innerHTML = '';
+        const rotacoes = ['-3deg', '2deg', '-1deg'];
+        const tops     = ['top:0;left:0', 'top:60px;right:0', 'bottom:0;left:40px'];
+        ids.slice(0, 3).forEach((id, i) => {
+          const d = CFG.catalogo[id];
+          if (!d) return;
+          const card = document.createElement('div');
+          card.className = 'capa-card';
+          card.style.cssText = tops[i] + ';transform:rotate(' + rotacoes[i] + ')';
+          card.innerHTML =
+            '<div style="width:120px;height:165px" data-mockup-cor="' + (d.cor||'#1a4a2e') + '" data-mockup-titulo="' + (d.titulo||'').replace(/"/g,'&quot;') + '" data-mockup-w="120" data-mockup-h="165"></div>' +
+            '<div class="capa-faixa">' + (d.genero||'') + '</div>' +
+            '<div class="capa-nome">' + (d.titulo||'') + '</div>' +
+            '<div class="capa-preco">' + (d.preco||'') + '</div>';
+          vitrine.appendChild(card);
+          card.querySelectorAll('[data-mockup-cor]').forEach(el => {
+            el.innerHTML = gerarMockup(d.cor||'#1a4a2e', d.titulo||'', d.imagem||'', 120, 165);
+          });
+        });
+      }
+    }
   }
 
   // ── PRÊMIOS: sorteio principal ────────────────────────────
