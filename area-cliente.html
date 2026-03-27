@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área do Cliente — Editora Três Trevo</title>
+<meta name="description" content="Acesse sua biblioteca de ebooks e bônus exclusivos da Editora Três Trevo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --verde:#0f2d1a;--verde-medio:#1a4a2e;--verde-claro:#2a6b42;
+  --ouro:#c8a84b;--ouro-claro:#e8c96a;--ouro-escuro:#8a6f28;
+  --creme:#f5f0e8;--branco:#fdfbf7;--texto:#1c1c1c;
+  --borda:rgba(200,168,75,0.15);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--verde);color:var(--branco);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1000;opacity:.4}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--verde)}::-webkit-scrollbar-thumb{background:var(--ouro-escuro)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(15,45,26,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--borda)}
+.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
+  color:var(--ouro);text-decoration:none;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+.nav-marca::before{content:'✦';font-size:14px;opacity:.7}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-user{font-size:13px;color:rgba(255,255,255,.5)}
+.btn-sair{font-size:12px;letter-spacing:1px;padding:7px 16px;
+  border:1px solid var(--borda);color:var(--ouro);background:transparent;
+  cursor:pointer;font-family:'Jost',sans-serif;transition:all .2s}
+.btn-sair:hover{background:rgba(200,168,75,.1)}
+
+/* TELAS */
+.tela{display:none;min-height:100vh;padding-top:64px}
+.tela.ativa{display:block}
+
+/* ── LOGIN ── */
+#tela-login{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{
+  width:100%;max-width:420px;padding:48px 40px;
+  background:rgba(255,255,255,.03);border:1px solid var(--borda);
+  position:relative;
+}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent)}
+.login-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;
+  color:var(--ouro);margin-bottom:8px;text-align:center}
+.login-sub{font-size:13px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:36px;line-height:1.6}
+.campo-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.35);margin-bottom:8px;display:block}
+.campo-input{width:100%;padding:12px 16px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);color:var(--branco);font-family:'Jost',sans-serif;
+  font-size:14px;outline:none;transition:border-color .2s;margin-bottom:20px}
+.campo-input:focus{border-color:var(--ouro)}
+.campo-input::placeholder{color:rgba(255,255,255,.2)}
+.btn-primario{width:100%;padding:14px;background:var(--ouro);color:var(--verde);
+  border:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;
+  letter-spacing:.5px;cursor:pointer;transition:background .2s;margin-top:4px}
+.btn-primario:hover{background:var(--ouro-claro)}
+.btn-primario:disabled{opacity:.5;cursor:not-allowed}
+.login-msg{font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-top:20px;line-height:1.7;min-height:40px}
+.login-msg.sucesso{color:var(--ouro-claro)}
+.login-msg.erro{color:#e88;}
+.login-voltar{margin-top:16px;text-align:center}
+.login-voltar a{font-size:12px;color:rgba(255,255,255,.3);text-decoration:none;
+  transition:color .2s}
+.login-voltar a:hover{color:var(--ouro)}
+.tabs-login{display:flex;gap:0;margin-bottom:32px;border:1px solid var(--borda)}
+.tab-login{flex:1;padding:10px;background:transparent;border:none;color:rgba(255,255,255,.35);
+  font-family:'Jost',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s}
+.tab-login.ativa{background:rgba(200,168,75,.1);color:var(--ouro)}
+
+/* ── DASHBOARD ── */
+#tela-dashboard{padding:64px 0 0}
+.dash-header{padding:40px 48px 32px;border-bottom:1px solid var(--borda)}
+.dash-saudacao{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.dash-saudacao::before{content:'✦';opacity:.6}
+.dash-titulo{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;line-height:1.1}
+.dash-titulo em{font-style:italic;color:var(--ouro)}
+
+.dash-corpo{padding:40px 48px;display:grid;grid-template-columns:1fr 320px;gap:40px}
+
+/* Cards de stats */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+.stat-card{padding:20px 24px;background:rgba(255,255,255,.03);border:1px solid var(--borda);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent);transform:scaleX(0);
+  transform-origin:left;transition:transform .3s}
+.stat-card:hover::after{transform:scaleX(1)}
+.stat-card-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--ouro);line-height:1}
+.stat-card-txt{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px}
+
+/* Seção títulos */
+.sec-titulo-dash{font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--ouro);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.sec-titulo-dash::before{content:'';width:24px;height:1px;background:var(--ouro)}
+
+/* Biblioteca */
+.biblioteca{display:flex;flex-direction:column;gap:1px;background:var(--borda);border:1px solid var(--borda)}
+.livro-item{background:var(--verde);padding:24px 28px;display:grid;
+  grid-template-columns:auto 1fr auto;gap:20px;align-items:center;
+  transition:background .2s;position:relative;overflow:hidden}
+.livro-item::after{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;
+  background:var(--ouro);transform:scaleY(0);transform-origin:top;transition:transform .3s}
+.livro-item:hover{background:rgba(255,255,255,.03)}
+.livro-item:hover::after{transform:scaleY(1)}
+.livro-emoji-grande{font-size:32px;line-height:1}
+.livro-info{}
+.livro-genero{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);opacity:.6;margin-bottom:4px}
+.livro-titulo{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:2px}
+.livro-autor{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:.5px}
+.livro-acoes{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.btn-download{font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  padding:8px 16px;background:var(--ouro);color:var(--verde);border:none;
+  cursor:pointer;font-family:'Jost',sans-serif;font-weight:500;transition:background .2s;
+  text-decoration:none;display:inline-block;white-space:nowrap}
+.btn-download:hover{background:var(--ouro-claro)}
+.btn-download.expirado{background:transparent;border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.25);cursor:default}
+.livro-cotas{font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.5px}
+
+/* Painel lateral */
+.painel-lateral{display:flex;flex-direction:column;gap:20px}
+.painel-card{background:rgba(255,255,255,.03);border:1px solid var(--borda);padding:28px;position:relative}
+.painel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent)}
+.painel-titulo{font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(255,255,255,.25);margin-bottom:16px}
+
+/* Bonus */
+.bonus-item{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:12px;align-items:flex-start}
+.bonus-item:last-child{border-bottom:none;padding-bottom:0}
+.bonus-icone{font-size:16px;margin-top:2px}
+.bonus-nome{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:2px}
+.bonus-desc{font-size:11px;color:rgba(255,255,255,.3)}
+
+/* Programa Cultural */
+.prog-status{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.prog-ponto{width:8px;height:8px;border-radius:50%;background:var(--ouro-claro);flex-shrink:0}
+.prog-ponto.inativo{background:rgba(255,255,255,.15)}
+.prog-texto{font-size:13px;color:rgba(255,255,255,.6)}
+.btn-programa{width:100%;padding:12px;border:1px solid var(--borda);background:transparent;
+  color:var(--ouro);font-family:'Jost',sans-serif;font-size:12px;letter-spacing:1px;
+  text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-programa:hover{background:rgba(200,168,75,.1)}
+
+/* vazio */
+.vazio{padding:48px 28px;text-align:center}
+.vazio-emoji{font-size:40px;margin-bottom:16px;opacity:.4}
+.vazio-texto{font-size:14px;color:rgba(255,255,255,.3);line-height:1.7}
+.vazio-link{display:inline-block;margin-top:16px;padding:10px 24px;
+  background:var(--ouro);color:var(--verde);text-decoration:none;
+  font-size:12px;font-weight:500;transition:background .2s}
+.vazio-link:hover{background:var(--ouro-claro)}
+
+/* loading */
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;
+  flex-direction:column;gap:16px}
+.loading-spinner{width:32px;height:32px;border:2px solid rgba(200,168,75,.2);
+  border-top-color:var(--ouro);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;
+  background:var(--verde-medio);border:1px solid var(--ouro);
+  color:var(--ouro);font-size:13px;z-index:2000;
+  transform:translateY(80px);opacity:0;transition:all .4s}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:960px){
+  nav{padding:0 24px}
+  .dash-header,.dash-corpo{padding-left:24px;padding-right:24px}
+  .dash-corpo{grid-template-columns:1fr}
+  .painel-lateral{order:-1}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .login-box{padding:32px 24px}
+  .stats-row{grid-template-columns:1fr}
+  .livro-item{grid-template-columns:auto 1fr;gap:12px}
+  .livro-acoes{grid-column:1/-1;flex-direction:row;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-marca">Editora Três Trevo</a>
+  <div class="nav-right" id="navRight" style="display:none">
+    <span class="nav-user" id="navEmail"></span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</nav>
+
+<!-- ── TELA: LOGIN ── -->
+<div id="tela-login" class="tela ativa">
+  <div class="login-box">
+    <div class="login-logo">✦ Três Trevo</div>
+    <p class="login-sub">Sua biblioteca pessoal de ebooks</p>
+
+    <div class="tabs-login">
+      <button class="tab-login ativa" id="tabEntrar" onclick="mudarTab('entrar')">Entrar</button>
+      <button class="tab-login" id="tabCadastro" onclick="mudarTab('cadastro')">Cadastrar</button>
+    </div>
+
+    <!-- Entrar com magic link -->
+    <div id="formEntrar">
+      <label class="campo-label">Seu e-mail</label>
+      <input type="email" id="emailLogin" class="campo-input" placeholder="seu@email.com" autocomplete="email">
+      <button class="btn-primario" id="btnLogin" onclick="enviarMagicLink()">Receber link de acesso</button>
+      <p class="login-msg" id="msgLogin">Digite o e-mail usado na compra e enviaremos um link de acesso seguro.</p>
+    </div>
+
+    <!-- Cadastro (caso cliente novo queira criar conta) -->
+    <div id="formCadastro" style="display:none">
+      <label class="campo-label">Nome completo</label>
+      <input type="text" id="nomeNovo" class="campo-input" placeholder="Seu nome">
+      <label class="campo-label">E-mail</label>
+      <input type="email" id="emailNovo" class="campo-input" placeholder="seu@email.com" autocomplete="email">
+      <button class="btn-primario" id="btnCadastro" onclick="cadastrar()">Criar conta e entrar</button>
+      <p class="login-msg" id="msgCadastro">Use o mesmo e-mail da sua compra para ver seus ebooks.</p>
+    </div>
+
+    <div class="login-voltar">
+      <a href="/">← Voltar ao site</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── TELA: DASHBOARD ── -->
+<div id="tela-dashboard" class="tela" style="display:none">
+  <div class="dash-header">
+    <div class="dash-saudacao">Área do cliente</div>
+    <h1 class="dash-titulo">Sua <em>biblioteca</em></h1>
+  </div>
+
+  <div class="dash-corpo">
+    <!-- Coluna principal -->
+    <div>
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card">
+          <div class="stat-card-num" id="statLivros">—</div>
+          <div class="stat-card-txt">Ebooks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statCotas">—</div>
+          <div class="stat-card-txt">Cotas no programa</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statBonus">—</div>
+          <div class="stat-card-txt">Bônus disponíveis</div>
+        </div>
+      </div>
+
+      <!-- Biblioteca -->
+      <div class="sec-titulo-dash">Meus ebooks</div>
+      <div id="biblioteca">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <span class="loading-txt">Carregando sua biblioteca</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel lateral -->
+    <div class="painel-lateral">
+
+      <!-- Programa Cultural -->
+      <div class="painel-card" id="painelPrograma">
+        <div class="painel-titulo">Programa Cultural</div>
+        <div id="statusPrograma">
+          <div class="prog-status">
+            <div class="prog-ponto inativo" id="pontoDep"></div>
+            <span class="prog-texto" id="textoDep">Depoimento pendente</span>
+          </div>
+          <div class="prog-status">
+            <div class="prog-ponto inativo" id="pontoInsta"></div>
+            <span class="prog-texto">Seguir @3trevo no Instagram</span>
+          </div>
+        </div>
+        <button class="btn-programa" onclick="abrirPrograma()">Validar minha participação →</button>
+      </div>
+
+      <!-- Bônus -->
+      <div class="painel-card">
+        <div class="painel-titulo">Meus bônus</div>
+        <div id="listaBonus">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suporte -->
+      <div class="painel-card">
+        <div class="painel-titulo">Precisa de ajuda?</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;margin-bottom:16px">
+          Problemas com download, reembolso ou dúvidas sobre o Programa Cultural.
+        </p>
+        <a href="mailto:sac@3trevo.com.br" style="display:block;font-size:13px;color:var(--ouro);text-decoration:none;padding:12px 0;border-top:1px solid var(--borda)">
+          ✉ sac@3trevo.com.br
+        </a>
+        <a href="https://www.3trevo.com.br#faq" style="display:block;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;padding:12px 0;border-top:1px solid rgba(255,255,255,.05)" target="_blank">
+          → Perguntas frequentes
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIGURAÇÃO — substitua pelos seus valores do Supabase
+// Settings > API > Project URL e anon key
+// ============================================================
+const SUPABASE_URL  = 'https://xfkepekffdyrtcgagwqo.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
+
+// Catálogo local (espelha o config.json)
+const CATALOGO = {
+  justicamento:   { titulo: 'Justiça(mento) para Orelha',              autor: 'Said Anes',    genero: 'Ensaio',            emoji: '⚖️' },
+  vigilante:      { titulo: 'Vigilante',                               autor: 'Said Anes',    genero: 'Ficção Literária',  emoji: '🔍' },
+  terceiraguerra: { titulo: 'O Nascimento Silencioso da 3ª Guerra Mundial', autor: 'Said Anes', genero: 'Ficção Documental', emoji: '🌐' },
+  antifalencia:   { titulo: 'O Guia Antifalência do Empreendedor Iniciante', autor: 'Rogerio Dias', genero: 'Manual',       emoji: '📘' },
+};
+
+// ============================================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+let usuarioAtual = null;
+
+// ── INIT ──────────────────────────────────────────────────
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    usuarioAtual = session.user;
+    mostrarDashboard();
+  }
+  // Escuta mudanças de auth (magic link callback)
+  sb.auth.onAuthStateChange((_e, session) => {
+    if (session && !usuarioAtual) {
+      usuarioAtual = session.user;
+      mostrarDashboard();
+    }
+  });
+}
+
+// ── TABS LOGIN ────────────────────────────────────────────
+function mudarTab(aba) {
+  document.getElementById('formEntrar').style.display  = aba === 'entrar'   ? '' : 'none';
+  document.getElementById('formCadastro').style.display = aba === 'cadastro' ? '' : 'none';
+  document.getElementById('tabEntrar').classList.toggle('ativa', aba === 'entrar');
+  document.getElementById('tabCadastro').classList.toggle('ativa', aba === 'cadastro');
+}
+
+// ── MAGIC LINK ────────────────────────────────────────────
+async function enviarMagicLink() {
+  const email = document.getElementById('emailLogin').value.trim();
+  const btn   = document.getElementById('btnLogin');
+  const msg   = document.getElementById('msgLogin');
+  if (!email) { msg.textContent = 'Digite seu e-mail.'; msg.className = 'login-msg erro'; return; }
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+  btn.disabled = false; btn.textContent = 'Receber link de acesso';
+  if (error) {
+    msg.textContent = 'Erro: ' + error.message;
+    msg.className = 'login-msg erro';
+  } else {
+    msg.innerHTML = '✦ Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style="opacity:.6">Pode levar até 2 minutos.</small>';
+    msg.className = 'login-msg sucesso';
+  }
+}
+
+// ── CADASTRO ──────────────────────────────────────────────
+async function cadastrar() {
+  const email = document.getElementById('emailNovo').value.trim();
+  const btn   = document.getElementById('btnCadastro');
+  const msg   = document.getElementById('msgCadastro');
+  if (!email) { msg.textContent = 'Digite seu e-mail.'; msg.className = 'login-msg erro'; return; }
+  btn.disabled = true; btn.textContent = 'Criando conta…';
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+  btn.disabled = false; btn.textContent = 'Criar conta e entrar';
+  if (error) {
+    msg.textContent = 'Erro: ' + error.message;
+    msg.className = 'login-msg erro';
+  } else {
+    msg.innerHTML = '✦ Enviamos um link para ' + email + '.<br>Clique nele para acessar sua biblioteca.';
+    msg.className = 'login-msg sucesso';
+  }
+}
+
+// ── SAIR ──────────────────────────────────────────────────
+async function sair() {
+  await sb.auth.signOut();
+  usuarioAtual = null;
+  document.getElementById('tela-dashboard').style.display = 'none';
+  document.getElementById('tela-login').className = 'tela ativa';
+  document.getElementById('navRight').style.display = 'none';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function mostrarDashboard() {
+  document.getElementById('tela-login').style.display = 'none';
+  document.getElementById('tela-dashboard').style.display = 'block';
+  document.getElementById('navRight').style.display = 'flex';
+  document.getElementById('navEmail').textContent = usuarioAtual.email;
+  carregarBiblioteca();
+  carregarBonus();
+}
+
+// ── BIBLIOTECA ────────────────────────────────────────────
+async function carregarBiblioteca() {
+  const cont = document.getElementById('biblioteca');
+
+  // Busca pedidos do cliente
+  const { data: pedidos, error } = await sb
+    .from('pedidos')
+    .select('*, downloads(*)')
+    .order('criado_em', { ascending: false });
+
+  if (error) {
+    cont.innerHTML = '<div class="vazio"><p class="vazio-texto">Erro ao carregar. Tente recarregar a página.</p></div>';
+    return;
+  }
+
+  // Atualiza stats
+  const totalCotas = pedidos.reduce((s, p) => s + (p.cotas || 0), 0);
+  document.getElementById('statLivros').textContent = pedidos.length;
+  document.getElementById('statCotas').textContent  = totalCotas;
+
+  if (pedidos.length === 0) {
+    cont.innerHTML = `
+      <div class="biblioteca">
+        <div class="vazio">
+          <div class="vazio-emoji">📚</div>
+          <p class="vazio-texto">Você ainda não tem ebooks.<br>Adquira um título e ele aparece aqui.</p>
+          <a href="https://www.3trevo.com.br#catalogo" class="vazio-link">Ver catálogo →</a>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const html = pedidos.map(p => {
+    const meta   = CATALOGO[p.ebook_slug] || { titulo: p.ebook_titulo, autor: '', genero: 'Ebook', emoji: '📖' };
+    const dl     = p.downloads?.[0];
+    const expirou = dl && new Date(dl.expira_em) < new Date();
+    const btnHtml = dl && !expirou
+      ? `<a href="/download?token=${dl.token}" class="btn-download" target="_blank">⬇ Baixar PDF</a>`
+      : dl && expirou
+        ? `<a href="#" class="btn-download expirado" onclick="renovarLink('${p.id}');return false">Link expirado — renovar</a>`
+        : `<button class="btn-download" onclick="solicitarDownload('${p.id}')">Gerar link</button>`;
+    return `
+      <div class="livro-item">
+        <div class="livro-emoji-grande">${meta.emoji}</div>
+        <div class="livro-info">
+          <div class="livro-genero">${meta.genero}</div>
+          <div class="livro-titulo">${meta.titulo}</div>
+          <div class="livro-autor">${meta.autor}</div>
+        </div>
+        <div class="livro-acoes">
+          ${btnHtml}
+          <div class="livro-cotas">${p.cotas} cota${p.cotas > 1 ? 's' : ''}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  cont.innerHTML = `<div class="biblioteca">${html}</div>`;
+}
+
+// ── BONUS ─────────────────────────────────────────────────
+async function carregarBonus() {
+  const cont = document.getElementById('listaBonus');
+  const { data: bonus } = await sb.from('bonus').select('*').eq('ativo', true);
+  document.getElementById('statBonus').textContent = bonus?.length || 0;
+  if (!bonus || bonus.length === 0) {
+    cont.innerHTML = '<p style="font-size:13px;color:rgba(255,255,255,.25);line-height:1.6">Bônus exclusivos serão liberados conforme você avança no Programa Cultural.</p>';
+    return;
+  }
+  cont.innerHTML = bonus.map(b => `
+    <div class="bonus-item">
+      <div class="bonus-icone">✦</div>
+      <div>
+        <div class="bonus-nome">${b.titulo}</div>
+        <div class="bonus-desc">${b.descricao || ''}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── DOWNLOAD / RENOVAR ────────────────────────────────────
+async function solicitarDownload(pedidoId) {
+  toast('Gerando seu link de download…');
+  // O Make ou uma Edge Function renova o token e envia por e-mail
+  // Por ora abre suporte
+  window.location.href = 'mailto:sac@3trevo.com.br?subject=Link de download&body=Pedido: ' + pedidoId;
+}
+
+async function renovarLink(pedidoId) {
+  toast('Solicitando renovação — você receberá um e-mail em instantes.');
+  window.location.href = 'mailto:sac@3trevo.com.br?subject=Renovar link de download&body=Pedido: ' + pedidoId;
+}
+
+function abrirPrograma() {
+  window.open('https://cultural.3trevo.com.br', '_blank');
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+init();
+</script>
+</body>
+</html>
