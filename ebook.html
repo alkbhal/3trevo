@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seu ebook — Editora Três Trevo</title>
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#0f2d1a;min-height:100vh;display:flex;flex-direction:column;color:#fdfbf7;transition:background .4s}
+.topo{background:rgba(0,0,0,.3);padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,168,75,.12);position:sticky;top:0;z-index:100}
+.topo-marca{font-family:'Playfair Display',serif;color:#c8a84b;font-size:16px;text-decoration:none}
+.topo-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.hero{padding:64px 48px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;flex:1;max-width:1100px;margin:0 auto;width:100%}
+.capa{aspect-ratio:2/3;max-width:260px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:32px;position:relative;background:rgba(255,255,255,.04);border:1px solid rgba(200,168,75,.2)}
+.capa::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#c8a84b,transparent)}
+.capa-emoji{font-size:80px;line-height:1}
+.capa-titulo{font-family:'Playfair Display',serif;font-size:20px;text-align:center;line-height:1.2;color:rgba(255,255,255,.9)}
+.capa-autor{font-size:11px;color:#c8a84b;letter-spacing:2px;text-transform:uppercase}
+.info-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#c8a84b;margin-bottom:12px}
+.info-titulo{font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,48px);line-height:1.1;margin-bottom:8px}
+.info-genero{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:16px}
+.cotas-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.2);font-size:12px;color:#c8a84b;letter-spacing:1px;margin-bottom:24px}
+.info-desc{font-size:16px;color:rgba(255,255,255,.6);line-height:1.75;margin-bottom:32px}
+.btn-download{display:flex;align-items:center;gap:14px;padding:18px 24px;background:#c8a84b;color:#1a4a2e;text-decoration:none;font-weight:500;font-size:15px;transition:background .2s;margin-bottom:12px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;width:100%}
+.btn-download:hover{background:#e8c96a}
+.btn-download .icone{font-size:22px;flex-shrink:0}
+.btn-download .txt{flex:1}
+.btn-download .txt small{display:block;font-size:11px;font-weight:400;opacity:.7;margin-top:1px}
+.btn-mais{display:flex;align-items:center;gap:8px;padding:16px 24px;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;transition:all .2s}
+.btn-mais:hover{border-color:#c8a84b;color:#c8a84b}
+.aviso{background:rgba(200,168,75,.07);border:1px solid rgba(200,168,75,.2);padding:16px 20px;margin-top:24px;font-size:13px;color:rgba(255,255,255,.45);line-height:1.6}
+.aviso strong{color:#c8a84b}
+.aviso-expirando{background:rgba(200,80,40,.1);border:1px solid rgba(200,80,40,.3);padding:12px 20px;font-size:13px;color:rgba(255,180,150,.75);line-height:1.6;display:none}
+.aviso-expirando a{color:#c8a84b}
+footer{background:rgba(0,0,0,.3);padding:20px 48px;font-size:11px;color:rgba(255,255,255,.2);text-align:center;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}
+
+/* ── OVERLAY PIRATA ─────────────────────────────────── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(5,15,10,.97);z-index:9999;padding:32px;overflow-y:auto}
+.overlay.show{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;min-height:100vh}
+.ov-emoji{font-size:52px;margin-bottom:28px;opacity:.55;line-height:1}
+.ov-titulo{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,40px);font-weight:400;color:#fdfbf7;margin-bottom:16px;line-height:1.2;max-width:540px}
+.ov-titulo em{color:#c8a84b;font-style:italic}
+.ov-desc{font-size:15px;color:rgba(255,255,255,.5);line-height:1.85;max-width:500px;margin:0 auto 40px}
+.ov-desc strong{color:rgba(255,255,255,.8)}
+.ov-acoes{display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px}
+.btn-ov-cta{padding:16px 32px;background:#c8a84b;color:#1a4a2e;text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.5px;transition:background .2s;display:block;text-align:center}
+.btn-ov-cta:hover{background:#e8c96a}
+.btn-ov-login{padding:14px 32px;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;transition:all .2s;display:block;text-align:center}
+.btn-ov-login:hover{border-color:#c8a84b;color:#c8a84b}
+.ov-programa{margin-top:28px;padding:18px 24px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.18);max-width:360px;font-size:13px;color:rgba(255,255,255,.4);line-height:1.65}
+.ov-programa strong{color:#c8a84b}
+
+/* loading state */
+.loading-tela{display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:16px}
+.spinner{width:32px;height:32px;border:2px solid rgba(200,168,75,.2);border-top-color:#c8a84b;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase}
+
+@media(max-width:768px){
+  .topo,.hero,footer{padding-left:20px;padding-right:20px}
+  .hero{grid-template-columns:1fr;gap:36px;padding-top:40px}
+  .capa{max-width:160px}
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <a href="https://www.3trevo.com.br" class="topo-marca">✦ Editora Três Trevo</a>
+  <span class="topo-tag">Programa Cultural</span>
+</header>
+
+<div class="aviso-expirando" id="avisoExpirando">
+  ⚠ Seu link de download expira em breve. <a href="/area-cliente">Acesse sua biblioteca</a> para gerar um novo link.
+</div>
+
+<!-- Conteúdo renderizado via JS -->
+<main id="main">
+  <div class="loading-tela">
+    <div class="spinner"></div>
+    <span class="loading-txt">Verificando seu acesso</span>
+  </div>
+</main>
+
+<footer>Editora Três Trevo · CNPJ 18.928.966/0001-59 · Montauri/RS · sac@3trevo.com.br</footer>
+
+<!-- Overlay pirata (aparece sem token válido) -->
+<div class="overlay" id="overlay">
+  <div class="ov-emoji" id="ovEmoji">📖</div>
+  <h2 class="ov-titulo">Você achou um ebook da <em>Três Trevo</em></h2>
+  <p class="ov-desc" id="ovDesc">
+    Este arquivo circula fora dos canais oficiais. Para acessar o conteúdo completo, participar do Programa Cultural e concorrer a prêmios, você precisa de uma cópia própria.<br><br>
+    <strong>A boa notícia:</strong> você pode adquirir agora, acumular cotas e concorrer a <strong style="color:#c8a84b">até 2 salários mínimos</strong>.
+  </p>
+  <div class="ov-acoes">
+    <a href="#" class="btn-ov-cta" id="ovBtnComprar">Ver o catálogo e adquirir →</a>
+    <a href="/area-cliente" class="btn-ov-login">Já sou cliente — fazer login</a>
+  </div>
+  <div class="ov-programa" id="ovPrograma">
+    <strong>✦ Programa Cultural:</strong> compre, leia, escreva seu depoimento e concorra a prêmios em dinheiro.
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIGURAÇÃO — preencha após criar o projeto Supabase
+// ═══════════════════════════════════════════════════════════
+const CFG = {
+  supabaseUrl:  'https://xfkepekffdyrtcgagwqo.supabase.co',
+  supabaseAnon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI',
+  webhookPirata: 'https://hook.us2.make.com/itjax3gmav10kq0a573tnlwd4a3qbbjj',
+
+  // Base URL dos PDFs — use Supabase Storage ou Google Drive público
+  // Exemplo: 'https://xyzxyz.supabase.co/storage/v1/object/public/ebooks/'
+  pdfBase: 'https://xfkepekffdyrtcgagwqo.supabase.co/storage/v1/object/public/ebooks/',
+
+  // Catálogo — espelha o config.json
+  // rifeiUrl: link para a página de compra no Rifei com a quantidade de cotas
+  catalogo: {
+    justicamento: {
+      titulo:  'Justiça(mento) para Orelha',
+      autor:   'Said Anes',
+      genero:  'Ensaio · Entrada',
+      emoji:   '⚖️',
+      cotas:   '1 cota inclusa',
+      bg:      '#1a2e1a',
+      pdf:     'justicamento.pdf',
+      rifeiUrl:'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1',
+      desc:    'Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir — e não aceita a narrativa pronta.',
+    },
+    vigilante: {
+      titulo:  'Vigilante',
+      autor:   'Said Anes',
+      genero:  'Ficção Literária · Premium',
+      emoji:   '🔦',
+      cotas:   '10 cotas inclusas',
+      bg:      '#1a2a3a',
+      pdf:     'vigilante.pdf',
+      rifeiUrl:'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10',
+      desc:    'Entre o dever e a consciência — um thriller sobre os limites da lei quando o sistema falha. Uma narrativa que questiona até onde a justiça pode ir quando as instituições ficam para trás.',
+    },
+    terceiraguerra: {
+      titulo:  'O Nascimento Silencioso da 3ª Guerra Mundial',
+      autor:   'Said Anes',
+      genero:  'Ficção Documental · Premium',
+      emoji:   '🌐',
+      cotas:   '10 cotas inclusas',
+      bg:      '#0f1f2d',
+      pdf:     'terceiraguerra.pdf',
+      rifeiUrl:'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10',
+      desc:    'Como guerras modernas acontecem sem disparos — no campo da informação, economia e política. Assustadoramente atual, aterrorizantemente próximo.',
+    },
+    antifalencia: {
+      titulo:  'O Guia Antifalência do Empreendedor Iniciante',
+      autor:   'Rogerio Dias',
+      genero:  'Manual · Intermediário',
+      emoji:   '📘',
+      cotas:   '3 cotas inclusas',
+      bg:      '#1a2a3c',
+      pdf:     'antifalencia.pdf',
+      rifeiUrl:'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3',
+      desc:    'A conta que ninguém te obriga a fazer — mas que decide se seu negócio sobrevive. Custos, precificação e ponto de equilíbrio explicados sem rodeios.',
+    },
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+const sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnon);
+const p  = new URLSearchParams(window.location.search);
+const token = p.get('t') || p.get('token') || '';
+const slug  = p.get('slug') || p.get('s') || '';
+const pedidoId = p.get('p') || '';
+
+async function init() {
+  const ebook = CFG.catalogo[slug];
+
+  // ── Slug inexistente → overlay genérico
+  if (!slug || !ebook) {
+    await registrar('slug_invalido');
+    mostrarOverlay(null);
+    return;
+  }
+
+  // Aplica a cor de fundo do título imediatamente
+  document.body.style.background = ebook.bg;
+
+  // ── Sem token → pirata
+  if (!token) {
+    await registrar('sem_token');
+    mostrarOverlay(ebook);
+    return;
+  }
+
+  // ── Valida token no Supabase
+  let dl = null;
+  try {
+    const { data, error } = await sb
+      .from('downloads')
+      .select('*')
+      .eq('token', token)
+      .single();
+    if (error || !data) throw new Error('não encontrado');
+    dl = data;
+  } catch {
+    await registrar('token_invalido');
+    mostrarOverlay(ebook);
+    return;
+  }
+
+  // ── Token é de outro ebook?
+  if (dl.ebook_slug !== slug) {
+    await registrar('slug_errado');
+    mostrarOverlay(ebook);
+    return;
+  }
+
+  // ── Token expirado?
+  if (new Date(dl.expira_em) < new Date()) {
+    await registrar('expirado');
+    mostrarOverlay(ebook);
+    return;
+  }
+
+  // ── Acesso legítimo: registra e renderiza
+  await sb.from('downloads')
+    .update({ acessado: true, acessado_em: new Date().toISOString() })
+    .eq('token', token);
+
+  // Avisa se restam < 6 horas
+  const horas = (new Date(dl.expira_em) - new Date()) / 3_600_000;
+  if (horas < 6) document.getElementById('avisoExpirando').style.display = 'block';
+
+  renderizarEbook(ebook);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDERIZA A PÁGINA DO EBOOK (acesso legítimo)
+// ═══════════════════════════════════════════════════════════
+function renderizarEbook(e) {
+  document.title = `${e.titulo} — Editora Três Trevo`;
+  const pdfUrl = CFG.pdfBase + e.pdf + '?t=' + token;
+
+  document.getElementById('main').innerHTML = `
+    <section class="hero">
+      <div class="capa">
+        <div class="capa-emoji">${e.emoji}</div>
+        <div class="capa-titulo">${e.titulo}</div>
+        <div class="capa-autor">${e.autor}</div>
+      </div>
+      <div>
+        <div class="info-label">✦ Seu ebook está pronto</div>
+        <h1 class="info-titulo">${e.titulo}</h1>
+        <div class="info-genero">${e.genero}</div>
+        <div class="cotas-badge">✦ ${e.cotas} no Programa Cultural</div>
+        <p class="info-desc">${e.desc}</p>
+        <button class="btn-download" id="btnDl" onclick="baixar('${pdfUrl}')">
+          <span class="icone">📥</span>
+          <span class="txt" id="btnTxt">Baixar meu ebook<small>Formato PDF · acesso imediato</small></span>
+        </button>
+        <a href="${e.rifeiUrl}" class="btn-mais">← Comprar mais cotas e aumentar suas chances</a>
+        <div class="aviso">
+          <strong>Lembrete:</strong> Após a leitura, deixe seu depoimento na página da campanha.
+          Seu link de participação é liberado 7 dias após a compra.
+        </div>
+      </div>
+    </section>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// OVERLAY — pirataria / sem acesso
+// ═══════════════════════════════════════════════════════════
+function mostrarOverlay(ebook) {
+  const ov = document.getElementById('overlay');
+  if (ebook) {
+    // Personaliza com o ebook detectado pela URL
+    document.getElementById('ovEmoji').textContent = ebook.emoji;
+    document.getElementById('ovBtnComprar').href = ebook.rifeiUrl;
+    document.getElementById('ovPrograma').innerHTML =
+      `<strong>✦ Programa Cultural:</strong> adquira <em>${ebook.titulo}</em>, leia, escreva seu depoimento e concorra. ${ebook.cotas}.`;
+  } else {
+    document.getElementById('ovBtnComprar').href = 'https://www.3trevo.com.br#catalogo';
+  }
+  // Esconde o spinner e mostra o overlay
+  document.getElementById('main').innerHTML = '';
+  ov.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DOWNLOAD
+// ═══════════════════════════════════════════════════════════
+function baixar(pdfUrl) {
+  if (!token) { mostrarOverlay(CFG.catalogo[slug]); return; }
+  const txt = document.getElementById('btnTxt');
+  txt.innerHTML = 'Abrindo PDF…<small>pode levar alguns segundos</small>';
+  window.open(pdfUrl, '_blank');
+  setTimeout(() => { txt.innerHTML = 'Baixar novamente<small>mesmo arquivo PDF</small>'; }, 4000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RASTREIO SILENCIOSO
+// ═══════════════════════════════════════════════════════════
+async function registrar(motivo) {
+  const payload = {
+    evento:   'acesso_suspeito',
+    ebook:    slug || 'desconhecido',
+    motivo,
+    token:    token || null,
+    pedido:   pedidoId || null,
+    referrer: document.referrer || null,
+    ua:       navigator.userAgent,
+    url:      window.location.href,
+    data:     new Date().toISOString(),
+  };
+  // Supabase (silencioso)
+  try { await sb.from('acessos_suspeitos').insert([payload]); } catch {}
+  // Webhook Make (silencioso)
+  try {
+    if (CFG.webhookPirata && !CFG.webhookPirata.includes('SEU-WEBHOOK'))
+      fetch(CFG.webhookPirata, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+  } catch {}
+}
+
+init();
+</script>
+</body>
+</html>
