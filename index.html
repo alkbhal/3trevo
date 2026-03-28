@@ -786,7 +786,7 @@ footer{
 
 
 /* ══ PATCH v2 ══ */
-</style>
+404: Not Found</style>
 </head>
 <body>
 
@@ -964,7 +964,7 @@ footer{
       <div class="livro-mockup" data-mockup="antifalencia" data-mockup-cor="#1a3a5c" data-mockup-titulo="O Guia Antifalência" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Manual · Intermediário" data-en="Guide · Intermediate">Manual · Intermediário</div>
       <div class="ebook-titulo" data-pt="O Guia Antifalência do Empreendedor Iniciante" data-en="The Beginner Entrepreneur's Anti-Bankruptcy Guide">O Guia Antifalência do Empreendedor Iniciante</div>
-      <div class="ebook-autor">Rogerio Dias</div>
+      <div class="ebook-autor">Said Anes</div>
       <p class="ebook-desc" data-pt="A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado." data-en="The math nobody forces you to do. Costs, pricing, and break-even for entrepreneurs who want to survive.">
         A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado.
       </p>
@@ -1127,10 +1127,10 @@ footer{
       <!-- MULTIPLICADOR DE PRÊMIO -->
       <div class="mult-premio reveal" style="transition-delay:.25s" id="multPremio">
         <div class="mult-header">
-          <div class="mult-tag" data-pt="✦ Multiplique seu prêmio" data-en="✦ Multiply your prize">✦ Multiplique seu prêmio</div>
+          <div class="mult-tag" data-pt="✦ Multiplique suas cotas" data-en="✦ Multiply your tickets">✦ Multiplique suas cotas</div>
           <div class="mult-titulo">
             <span data-pt="Conecte-se à editora." data-en="Connect with the publisher.">Conecte-se à editora.</span><br>
-            <em data-pt="Dobre o que você ganhou." data-en="Double what you earned.">Dobre o que você ganhou.</em>
+            <em data-pt="Multiplique suas cotas." data-en="Multiply your tickets.">Multiplique suas cotas.</em>
           </div>
         </div>
 
@@ -1184,8 +1184,8 @@ footer{
           </div>
           <div class="mult-resultado">
             <div>
-              <div class="mult-resultado-label" data-pt="SEU PRÊMIO ESTIMADO" data-en="YOUR ESTIMATED PRIZE">SEU PRÊMIO ESTIMADO</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.2);margin-top:2px" data-pt="base R$100 + bônus por redes · pago em D+7" data-en="base R$100 + network bonus · paid at D+7">base R$100 + bônus por redes · pago em D+7</div>
+              <div class="mult-resultado-label" data-pt="SUAS COTAS ESTIMADAS" data-en="YOUR ESTIMATED TICKETS">SUAS COTAS ESTIMADAS</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.2);margin-top:2px" data-pt="base 1 cota + bônus por redes · pago em D+7" data-en="base 1 ticket + network bonus · paid at D+7">base 1 cota + bônus por redes · pago em D+7</div>
             </div>
             <div class="mult-resultado-val" id="simResultadoHome">R$100</div>
           </div>
@@ -1374,10 +1374,10 @@ footer{
       </div>
       <div class="sobre-obras">
         <div class="obras-label" data-pt="Catálogo atual" data-en="Current catalog">Catálogo atual</div>
-        <div class="obra-item"><span class="obra-emoji">⚖️</span><span data-pt="Justiça(mento) para Orelha — Said Anes" data-en="Justiça(mento) para Orelha — Said Anes">Justiça(mento) para Orelha — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-emoji">🔍</span><span data-pt="Vigilante — Said Anes" data-en="Vigilante — Said Anes">Vigilante — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-emoji">🌐</span><span data-pt="O Nascimento Silencioso da 3ª GM — Said Anes" data-en="The Silent Birth of WWIII — Said Anes">O Nascimento Silencioso da 3ª GM — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-emoji">📘</span><span data-pt="Guia Antifalência Vol.1 — Rogerio Dias" data-en="Anti-Bankruptcy Guide Vol.1 — Rogerio Dias">Guia Antifalência Vol.1 — Rogerio Dias</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="font-size:14px;color:#7a5c1e">—</span><span data-pt="Justiça(mento) para Orelha — Said Anes" data-en="Justiça(mento) para Orelha — Said Anes">Justiça(mento) para Orelha — Said Anes</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="font-size:14px;color:#7a5c1e">—</span><span data-pt="Vigilante — Said Anes" data-en="Vigilante — Said Anes">Vigilante — Said Anes</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="font-size:14px;color:#7a5c1e">—</span><span data-pt="O Nascimento Silencioso da 3ª GM — Said Anes" data-en="The Silent Birth of WWIII — Said Anes">O Nascimento Silencioso da 3ª GM — Said Anes</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="font-size:14px;color:#7a5c1e">—</span><span data-pt="Guia Antifalência Vol.1 — Said Anes" data-en="Anti-Bankruptcy Guide Vol.1 — Said Anes">Guia Antifalência Vol.1 — Said Anes</span></div>
       </div>
     </div>
 
@@ -1888,15 +1888,41 @@ document.addEventListener('DOMContentLoaded', () => { carregarConfig(); });
   "></span>
 </a>
 <style>
-@keyframes waPulse{
+@keyframes waPulse_disabled{
   0%{transform:scale(1);opacity:.5}
   70%{transform:scale(1.6);opacity:0}
   100%{transform:scale(1.6);opacity:0}
 }
-
-/* PATCH-FINAL */
-:root{--verde:#f4efe5;--verde-medio:#ece6d6;--verde-claro:#e0d9c8;--branco:#1a1a16;--texto:#3d3c35;--cinza:#6b6860;--ouro:#7a5c1e;--ouro-claro:#8a6c2e;--ouro-escuro:#5a4010;--creme:#f4efe5;--creme-escuro:#ece6d6;--borda:rgba(26,74,46,0.12)}body{background:#f4efe5;color:#1a1a16}body::before{opacity:.08}#navbar{background:rgba(15,45,26,.98)!important}#navbar .nav-marca{color:#c8a84b!important}#navbar .nav-links a{color:rgba(255,255,255,.7)!important}#navbar .nav-lang{color:#e8c96a!important}#navbar .nav-cta{background:#c8a84b!important;color:#0f2d1a!important}.nav-mobile{background:rgba(10,30,18,.98)!important}.nav-mobile a{color:rgba(255,255,255,.6)!important}#inicio{background:#f4efe5!important}h1.hero-titulo{color:#1a1a16!important}h1.hero-titulo em{color:#1a4a2e!important}.hero-subtitulo{color:#6b6860!important}.hero-desc{color:#3d3c35!important;font-size:16px!important;line-height:1.9!important}.hero-tag{color:#7a5c1e!important}.hero-tag::before{background:#7a5c1e!important}.stat-num{color:#1a4a2e!important}.stat-txt{color:#9a9790!important}.btn-primario{background:#1a4a2e!important;color:#fff!important}.btn-secundario{border:1px solid rgba(26,74,46,.2)!important;color:#3d3c35!important}.capa-card{background:#fff!important;border:1px solid rgba(200,168,75,.25)!important}.capa-faixa{color:#7a5c1e!important;opacity:1!important}.capa-nome{color:#1a1a16!important}.capa-preco{color:#1a4a2e!important}.divisor{background:linear-gradient(90deg,transparent,rgba(200,168,75,.3),transparent)!important;opacity:1!important}.sec-label{color:#7a5c1e!important}.sec-label::before{background:#7a5c1e!important}h2.sec-titulo{color:#1a1a16!important}h2.sec-titulo em{color:#1a4a2e!important}.sec-sub{color:#3d3c35!important;font-size:16px!important}#catalogo{background:#ece6d6!important}.filtro{background:#fff!important;border:1px solid rgba(26,74,46,.15)!important;color:#3d3c35!important}.filtro.ativo,.filtro:hover{border-color:#1a4a2e!important;color:#1a4a2e!important}.grid-ebooks{background:rgba(200,168,75,.2)!important;border:1px solid rgba(200,168,75,.2)!important}.ebook-card{background:#fff!important;color:#1a1a16!important}.ebook-card:hover{background:#fdfaf3!important}.ebook-genero{color:#7a5c1e!important;opacity:1!important}.ebook-titulo{color:#1a1a16!important;font-size:22px!important}.ebook-autor{color:#9a9790!important}.ebook-desc{color:#3d3c35!important;font-size:14px!important;line-height:1.75!important}.ebook-footer{border-top:1px solid rgba(26,74,46,.1)!important}.ebook-preco{color:#1a4a2e!important}.ebook-cotas{color:#9a9790!important}.ebook-btn{border:1px solid #1a4a2e!important;color:#1a4a2e!important}.ebook-btn:hover{background:#1a4a2e!important;color:#fff!important}#programa{background:#f4efe5!important}.prog-num{border:1.5px solid #1a4a2e!important;color:#1a4a2e!important}.prog-info h3{color:#1a1a16!important;font-size:16px!important}.prog-info p{color:#3d3c35!important;font-size:15px!important;line-height:1.8!important}.prog-premio{background:#fff!important;border:1px solid rgba(200,168,75,.3)!important}.prog-premio::before{background:linear-gradient(90deg,#1a4a2e,transparent)!important}.premio-label{color:#7a5c1e!important}.premio-pos{color:#1a4a2e!important}.premio-val{color:#1a1a16!important}.premio-desc{color:#6b6860!important}.prog-aviso{color:#9a9790!important;border-color:rgba(26,74,46,.1)!important}.mult-premio{background:#fff!important;border:1px solid rgba(200,168,75,.3)!important}.mult-tag{color:#7a5c1e!important}.mult-titulo{color:#1a1a16!important}.mult-titulo em{color:#1a4a2e!important}.mult-dot{background:#1a4a2e!important;color:#fff!important;border-color:#1a4a2e!important}.mult-degrau.destaque .mult-dot{background:#c8a84b!important;color:#0f2d1a!important}.mult-degrau-txt{color:#3d3c35!important}.mult-degrau-val{color:#1a4a2e!important;font-weight:600!important}.mult-degrau.destaque .mult-degrau-val{color:#7a5c1e!important;font-size:16px!important}.mult-sim{background:#ece6d6!important;border:1px solid rgba(26,74,46,.12)!important}.mult-sim-titulo{color:#6b6860!important}.mult-sim-rede{background:#fff!important;border:1px solid rgba(26,74,46,.12)!important;color:#3d3c35!important}.mult-sim-rede.on{background:rgba(26,74,46,.08)!important;border-color:#1a4a2e!important;color:#1a4a2e!important}.mult-resultado{background:#1a4a2e!important;border:none!important}.mult-resultado-label{color:rgba(255,255,255,.65)!important}.mult-resultado-val{color:#fff!important;font-size:28px!important}.mult-rodape{color:#6b6860!important;background:rgba(26,74,46,.04)!important}.mult-rodape strong{color:#3d3c35!important}#contador{background:#ece6d6!important}.meta-frase-topo{color:#7a5c1e!important}.meta-frase-principal{color:#1a1a16!important}.meta-frase-principal em{color:#1a4a2e!important}.meta-frase-sub{color:#3d3c35!important;font-size:15px!important}.barra-trilho{background:rgba(26,74,46,.1)!important}.barra-progresso{background:linear-gradient(90deg,#0f2d1a,#1a4a2e,#2d7a52)!important}.barra-marca{color:#9a9790!important}.barra-marca.ativa{color:#1a4a2e!important}.degrau{color:#9a9790!important;border-color:rgba(26,74,46,.12)!important}.degrau.ativo{color:#1a4a2e!important;border-color:#1a4a2e!important;background:rgba(26,74,46,.06)!important}.degrau.concluido{color:rgba(26,74,46,.5)!important}.meta-cta a{background:#1a4a2e!important;color:#fff!important}#depoimentos{background:#f4efe5!important}.dep-card{background:#fff!important;border:1px solid rgba(26,74,46,.12)!important}.dep-aspas{color:#1a4a2e!important;opacity:.15!important}.dep-texto{color:#3d3c35!important;font-size:16px!important;line-height:1.9!important}.dep-autor{color:#1a1a16!important}.dep-livro{color:#7a5c1e!important;opacity:1!important}#faq{background:#ece6d6!important}.faq-item{background:#fff!important}.faq-pergunta{color:#1a1a16!important}.faq-icone{color:#1a4a2e!important}.faq-item.aberto .faq-pergunta{color:#1a4a2e!important}.faq-resposta{color:#3d3c35!important;font-size:14px!important;line-height:1.8!important}.faq-resposta a{color:#1a4a2e!important}#sobre{background:#f4efe5!important}.sobre-texto p{color:#3d3c35!important;font-size:15px!important;line-height:1.9!important}.sobre-texto p strong{color:#1a1a16!important}.sobre-autor{background:#fff!important;border:1px solid rgba(200,168,75,.3)!important}.sobre-autor::before{background:#1a4a2e!important}.autor-label{color:#7a5c1e!important}.autor-nome{color:#1a1a16!important}.autor-papel{color:#6b6860!important}.autor-bio{color:#3d3c35!important;font-size:15px!important;line-height:1.9!important}.obras-label{color:#7a5c1e!important}.obra-item{color:#3d3c35!important;border-color:rgba(26,74,46,.1)!important}footer{background:rgba(10,25,15,.95)!important}.footer-marca{color:#c8a84b!important}.footer-desc{color:rgba(255,255,255,.4)!important;font-size:14px!important}footer h4{color:rgba(255,255,255,.45)!important}.footer-col a{color:rgba(255,255,255,.4)!important}.footer-col a:hover{color:#c8a84b!important}.footer-contato{color:rgba(255,255,255,.4)!important}.footer-contato:hover{color:#e8c96a!important}.footer-legal{color:rgba(255,255,255,.2)!important}.footer-selo{color:rgba(200,168,75,.4)!important;border-color:rgba(200,168,75,.15)!important}
 </style>
 
+
+<script>
+(function(){
+  var cardLinks = {
+    'justicamento': 'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1',
+    'vigilante':    'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10',
+    'terceiraguerra': 'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10',
+    'antifalencia': 'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3'
+  };
+  document.querySelectorAll('.ebook-card').forEach(function(card) {
+    var slug = card.getAttribute('data-slug') || card.getAttribute('data-genero') || '';
+    var titulo = (card.querySelector('.ebook-titulo') || {}).textContent || '';
+    var url = '';
+    titulo = titulo.toLowerCase();
+    if (titulo.includes('justiça') || titulo.includes('orelha')) url = cardLinks.justicamento;
+    else if (titulo.includes('vigilante')) url = cardLinks.vigilante;
+    else if (titulo.includes('guerra') || titulo.includes('nascimento')) url = cardLinks.terceiraguerra;
+    else if (titulo.includes('guia') || titulo.includes('antifalência') || titulo.includes('empreendedor')) url = cardLinks.antifalencia;
+    if (url) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function(e) {
+        if (!e.target.closest('.ebook-btn') && !e.target.closest('a')) {
+          window.open(url, '_blank');
+        }
+      });
+    }
+  });
+})();
+</script>
 </body>
 </html>
