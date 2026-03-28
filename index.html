@@ -1521,11 +1521,13 @@ function toggleRedeHome(el, rede) {
   atualizarEscada();
 }
 
-function calcularSimHome() {
-  var pctTotal = 0;
-  Object.keys(redesSelecionadas).forEach(function(r) {
-    if (redesSelecionadas[r] && PESOS_HOME[r]) pctTotal += PESOS_HOME[r];
-  });
+function calcularSimHome(){
+  var pct=0;
+  Object.keys(redesSelecionadas).forEach(function(r){if(redesSelecionadas[r]&&PESOS_HOME[r])pct+=PESOS_HOME[r];});
+  var mult=parseFloat((1+pct/50).toFixed(1));if(mult>3)mult=3;
+  var el=document.getElementById('simResultadoHome');
+  if(el){el.textContent=mult+'× cotas';el.style.color='#fff';}
+});
   var mult = 1 + (pctTotal / 100) * 2;
   mult = Math.min(mult, 3);
   var el = document.getElementById('simResultadoHome');
@@ -1594,10 +1596,11 @@ document.addEventListener('DOMContentLoaded', () => {
       el.textContent = 'R$' + Math.round(val);
     }
   });
-  var base = document.getElementById('degrauBase'); if(base) base.textContent='1× cotas';;
-  var teto = document.getElementById('degrauSim5');
-  if (base) base.textContent = 'R$' + BASE_PREMIO_HOME;
-  if (teto) teto.textContent = 'R$' + (BASE_PREMIO_HOME * 2);
+  var degrauLabels=['1×','1.5×','2×','2.5×','3×'];
+  ['degrauBase','degrauSim1','degrauSim2','degrauSim3','degrauSim4'].forEach(function(id,i){
+    var el=document.getElementById(id);if(el)el.textContent=degrauLabels[i]+' cotas';
+  });
+  var teto=document.getElementById('degrauSim5');if(teto)teto.textContent='3× cotas';
 
   // NAV SCROLL
   const navbar = document.getElementById('navbar');
