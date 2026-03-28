@@ -783,7 +783,10 @@ footer{
   .hero-stats{gap:20px}
   .footer-bottom{flex-direction:column;align-items:flex-start}
 }
-</style>
+
+
+/* ══ PATCH v2 ══ */
+404: Not Found</style>
 </head>
 <body>
 
