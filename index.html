@@ -1926,3 +1926,39 @@ document.addEventListener('DOMContentLoaded', () => { carregarConfig(); });
 </script>
 </body>
 </html>
+<script>
+// Sobrescreve cálculo de dinheiro por cotas
+document.addEventListener('DOMContentLoaded', function() {
+  // Escada de cotas — fixo
+  var cotas = ['1×','1.5×','2×','2.5×','3×','3×'];
+  var degraus = document.querySelectorAll('.mult-degrau');
+  degraus.forEach(function(d, i) {
+    var val = d.querySelector('.mult-degrau-val');
+    if (val) val.textContent = (cotas[i] || '3×') + ' cotas';
+  });
+
+  // Simulador — resultado em cotas
+  var BASE = 1;
+  var PESOS = {whatsapp:0.5,instagram:0.5,facebook:0.4,tiktok:0.3,youtube:0.3};
+  window.toggleRedeHome = function(el, rede) {
+    if (!window.redesSelecionadas) window.redesSelecionadas = {};
+    window.redesSelecionadas[rede] = !window.redesSelecionadas[rede];
+    el.classList.toggle('on', window.redesSelecionadas[rede]);
+    var mult = BASE;
+    Object.keys(window.redesSelecionadas).forEach(function(r) {
+      if (window.redesSelecionadas[r] && PESOS[r]) mult += PESOS[r];
+    });
+    mult = Math.min(mult, 3);
+    var res = document.getElementById('simResultadoHome');
+    if (res) res.textContent = mult.toFixed(1).replace('.0','') + '× cotas';
+    var lbl = document.querySelector('.mult-resultado-label');
+    if (lbl) lbl.textContent = 'SUAS COTAS ESTIMADAS';
+  };
+
+  // Inicializar display
+  var res = document.getElementById('simResultadoHome');
+  if (res) res.textContent = '1× cotas';
+  var lbl = document.querySelector('.mult-resultado-label');
+  if (lbl) lbl.textContent = 'SUAS COTAS ESTIMADAS';
+});
+</script>
