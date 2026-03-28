@@ -1526,6 +1526,13 @@ function calcularSimHome() {
   Object.keys(redesSelecionadas).forEach(function(r) {
     if (redesSelecionadas[r] && PESOS_HOME[r]) pctTotal += PESOS_HOME[r];
   });
+  var mult = 1 + (pctTotal / 100) * 2;
+  mult = Math.min(mult, 3);
+  var el = document.getElementById('simResultadoHome');
+  if (el) el.textContent = mult.toFixed(1).replace('.0','') + '× cotas';
+  var lbl = document.querySelector('.mult-resultado-label');
+  if (lbl) lbl.textContent = 'SUAS COTAS ESTIMADAS';
+});
   var bonus = BASE_PREMIO_HOME * (pctTotal / 100);
   var total = BASE_PREMIO_HOME + bonus;
   var el = document.getElementById('simResultadoHome');
@@ -1537,11 +1544,13 @@ function calcularSimHome() {
 
 function atualizarEscada() {
   var qtd = Object.values(redesSelecionadas).filter(Boolean).length;
-  var degraus = document.querySelectorAll('#multPremio .mult-degrau');
-  degraus.forEach(function(d, i) {
-    d.classList.remove('ativo');
-    if (i <= qtd) d.classList.add('ativo');
+  var cotas = ['1×','1.5×','2×','2.5×','3×','3×'];
+  document.querySelectorAll('#multPremio .mult-degrau').forEach(function(d,i) {
+    d.classList.toggle('ativo', i <= qtd);
+    var v = d.querySelector('.mult-degrau-val');
+    if (v) v.textContent = cotas[i] + ' cotas';
   });
+});
 }
 
 // ── FAQ ───────────────────────────────────────────────────
@@ -1585,7 +1594,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.textContent = 'R$' + Math.round(val);
     }
   });
-  var base = document.getElementById('degrauBase');
+  var base = document.getElementById('degrauBase'); if(base) base.textContent='1× cotas';;
   var teto = document.getElementById('degrauSim5');
   if (base) base.textContent = 'R$' + BASE_PREMIO_HOME;
   if (teto) teto.textContent = 'R$' + (BASE_PREMIO_HOME * 2);
