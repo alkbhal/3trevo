@@ -82,17 +82,18 @@
 /* ── RESET & TOKENS ─────────────────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
+  --tinta:#1a1a16;--tinta2:#3d3c35;--verde-nav:#0f2d1a;--verde-acento:#1a4a2e;--ouro-texto:#7a5c1e;--card:#ffffff;
   --verde:#f4efe5;
   --verde-medio:#ece6d6;
-  --verde-claro:#2a6b42;
+  --verde-claro:#ddd6c4;
   --ouro:#c8a84b;
   --ouro-claro:#e8c96a;
   --ouro-escuro:#8a6f28;
   --creme:#f5f0e8;
   --creme-escuro:#e8dfc8;
   --branco:#1a1a16;
-  --texto:#1a1a16;
-  --cinza:#6b6860;
+  --texto:#1c1c1c;
+  --cinza:#6b6b6b;
   --borda:rgba(200,168,75,0.15);
 }
 html{scroll-behavior:smooth}
@@ -114,8 +115,8 @@ body::before{
 
 /* ── NAV ────────────────────────────────────────────────── */
 nav{
-  background:rgba(15,45,26,.98)!important;
   position:fixed;top:0;left:0;right:0;z-index:900;
+  background:rgba(15,45,26,.98)!important;
   padding:0 48px;height:64px;
   display:flex;align-items:center;justify-content:space-between;
   background:rgba(15,45,26,0.92);
@@ -368,7 +369,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 .prog-passo{
   display:flex;gap:24px;align-items:flex-start;
   padding:24px 0;
-  border-bottom:1px solid rgba(26,74,46,0.08);
+  border-bottom:1px solid rgba(26,74,46,.08);
   position:relative;
 }
 .prog-passo:last-child{border-bottom:none}
@@ -397,7 +398,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 .premio-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#7a5c1e;margin-bottom:20px}
 .premio-item{
   display:flex;align-items:center;gap:16px;
-  padding:16px 0;border-bottom:1px solid rgba(26,74,46,0.08);
+  padding:16px 0;border-bottom:1px solid rgba(26,74,46,.08);
 }
 .premio-item:last-child{border-bottom:none}
 .premio-pos{
@@ -411,7 +412,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
   margin-top:24px;
   font-size:11px;color:#9a9890;
   line-height:1.7;
-  border-top:1px solid rgba(26,74,46,0.08);
+  border-top:1px solid rgba(26,74,46,.08);
   padding-top:16px;
 }
 
@@ -428,7 +429,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 }
 .mult-header{
   padding:20px 24px 16px;
-  border-bottom:1px solid rgba(26,74,46,0.08);
+  border-bottom:1px solid rgba(26,74,46,.08);
 }
 .mult-tag{
   font-size:9px;letter-spacing:4px;text-transform:uppercase;
@@ -444,7 +445,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 .mult-degrau{
   display:flex;align-items:center;gap:12px;
   padding:10px 0;
-  border-bottom:1px solid rgba(26,74,46,0.06);
+  border-bottom:1px solid rgba(26,74,46,.06);
   position:relative;
 }
 .mult-degrau:last-child{border-bottom:none}
@@ -468,7 +469,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
   background:var(--ouro);border-color:#7a5c1e;
   color:var(--verde);font-weight:700;
 }
-.mult-degrau-txt{flex:1;font-size:13px;color:#5a5a52}
+.mult-degrau-txt{flex:1;font-size:13px;color:#5a5952}
 .mult-degrau.ativo .mult-degrau-txt{color:#2a2a24}
 .mult-degrau-val{
   font-family:'Cormorant Garamond',serif;
@@ -489,13 +490,13 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 .mult-rodape{
   padding:14px 24px;
   background:rgba(200,168,75,.05);
-  border-top:1px solid rgba(26,74,46,0.08);
+  border-top:1px solid rgba(26,74,46,.08);
   font-size:11px;color:#8a8880;
   line-height:1.6;
 }
 .mult-rodape strong{color:rgba(255,255,255,.55)}
 .mult-sim{
-  padding:16px 24px;border-top:1px solid rgba(26,74,46,0.08);
+  padding:16px 24px;border-top:1px solid rgba(26,74,46,.08);
 }
 .mult-sim-titulo{
   font-size:10px;letter-spacing:3px;text-transform:uppercase;
@@ -519,7 +520,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 16px;
   background:#ece6d6;
-  border:1px solid rgba(26,74,46,0.1);
+  border:1px solid rgba(26,74,46,.1);
 }
 .mult-resultado-label{font-size:11px;color:#8a8880;letter-spacing:1px}
 .mult-resultado-val{
@@ -563,8 +564,8 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 .barra-marca.ativa{color:#7a5c1e;opacity:.7}
 .degraus{display:flex;justify-content:space-between;margin-top:32px;gap:8px}
 .degrau{
-  flex:1;padding:14px 8px;border:1px solid rgba(26,74,46,0.08);
-  background:rgba(255,255,255,.02);font-size:11px;color:#aaa8a0;
+  flex:1;padding:14px 8px;border:1px solid rgba(26,74,46,.08);
+  background:rgba(255,255,255,.02);font-size:11px;color:#aaa;
   letter-spacing:1px;text-transform:uppercase;transition:all .4s;position:relative;
 }
 .degrau.ativo{border-color:rgba(200,168,75,.3);background:rgba(200,168,75,.06);color:#7a5c1e}
@@ -596,7 +597,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 .dep-texto{
   font-family:'Cormorant Garamond',serif;
   font-size:17px;font-style:italic;
-  color:#2a2a24;
+  color:#1a1a16;
   line-height:1.7;margin-bottom:20px;
 }
 .dep-autor{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#8a8880}
@@ -617,7 +618,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 }
 .faq-pergunta{
   display:flex;justify-content:space-between;align-items:center;gap:16px;
-  font-size:15px;color:#3d3c35;
+  font-size:15px;color:#2a2a24;
   font-weight:400;
 }
 .faq-icone{
@@ -663,7 +664,7 @@ h2.sec-titulo em{font-style:italic;color:#7a5c1e}
 .obra-item{
   display:flex;gap:12px;align-items:center;
   padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);
-  font-size:13px;color:#5a5a52;
+  font-size:13px;color:#5a5952;
 }
 .obra-item:last-child{border-bottom:none}
 .obra-emoji{font-size:16px}
@@ -702,7 +703,7 @@ footer{
 .footer-contato:hover{color:#7a5c1e}
 .footer-contato-icone{font-size:16px}
 .footer-bottom{
-  border-top:1px solid rgba(26,74,46,0.08);
+  border-top:1px solid rgba(26,74,46,.08);
   padding-top:24px;
   display:flex;justify-content:space-between;align-items:center;
   flex-wrap:wrap;gap:12px;
@@ -738,8 +739,8 @@ footer{
 }
 .nav-mobile a{
   font-size:15px;letter-spacing:2px;text-transform:uppercase;
-  color:#4a4a42;text-decoration:none;
-  padding:14px 0;border-bottom:1px solid rgba(26,74,46,0.08);
+  color:#4a4942;text-decoration:none;
+  padding:14px 0;border-bottom:1px solid rgba(26,74,46,.08);
   transition:color .2s;
 }
 .nav-mobile a:hover{color:#7a5c1e}
@@ -903,7 +904,7 @@ footer{
       <p class="ebook-desc" data-pt="Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir." data-en="An essay on justice, language and power. For those who question what they hear before repeating it.">
         Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.
       </p>
-      <div style="font-size:11px;color:#8a8880;background:rgba(26,74,46,.03);border:1px solid rgba(26,74,46,0.1);padding:8px 12px;line-height:1.6"
+      <div style="font-size:11px;color:#8a8880;background:rgba(26,74,46,.03);border:1px solid rgba(26,74,46,.1);padding:8px 12px;line-height:1.6"
         data-pt="✦ Sorteio principal · Participação garantida após D+7"
         data-en="✦ Main draw · Participation confirmed after D+7">
         ✦ Sorteio principal · Participação garantida após D+7
@@ -1044,7 +1045,7 @@ footer{
               <div class="premio-desc" data-pt="Transferência bancária · PIX · pago em D+7" data-en="Bank transfer · PIX · paid at D+7">Transferência bancária · PIX · pago em D+7</div>
             </div>
             <div style="text-align:right">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa8a0;margin-bottom:4px" data-pt="conectado a todas as redes" data-en="connected to all networks">conectado a todas as redes</div>
+              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-bottom:4px" data-pt="conectado a todas as redes" data-en="connected to all networks">conectado a todas as redes</div>
               <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:#8a6c2e;font-weight:600" data-pt="até 2 salários mínimos" data-en="up to 2 minimum wages">até 2 salários mínimos</div>
             </div>
           </div>
@@ -1062,7 +1063,7 @@ footer{
               <div class="premio-desc" data-pt="Transferência bancária · PIX · pago em D+7" data-en="Bank transfer · PIX · paid at D+7">Transferência bancária · PIX · pago em D+7</div>
             </div>
             <div style="text-align:right">
-              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa8a0;margin-bottom:4px" data-pt="conectado a todas as redes" data-en="connected to all networks">conectado a todas as redes</div>
+              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-bottom:4px" data-pt="conectado a todas as redes" data-en="connected to all networks">conectado a todas as redes</div>
               <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:#8a6c2e;font-weight:600">R$ 1.000,00</div>
             </div>
           </div>
@@ -1084,21 +1085,21 @@ footer{
           data-en="Tickets and prizes by tier">Cotas e prêmios por faixa</div>
 
         <!-- cabeçalho -->
-        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa8a0;padding-bottom:8px;border-bottom:1px solid rgba(26,74,46,0.1);margin-bottom:4px">
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa;padding-bottom:8px;border-bottom:1px solid rgba(26,74,46,.1);margin-bottom:4px">
           <span data-pt="Faixa" data-en="Tier">Faixa</span>
           <span style="text-align:center" data-pt="Cotas" data-en="Tickets">Cotas</span>
           <span style="text-align:right" data-pt="Prêmio Imediato" data-en="Immediate Prize">Prêmio Imediato</span>
         </div>
 
         <!-- Entrada -->
-        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-size:13px;color:#5a5a52;padding:10px 0;border-bottom:1px solid rgba(26,74,46,0.06)">
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-size:13px;color:#5a5952;padding:10px 0;border-bottom:1px solid rgba(26,74,46,.06)">
           <span data-pt="Entrada · R$15,35" data-en="Entry · R$15.35">Entrada · R$15,35</span>
           <span style="color:#7a5c1e;text-align:center" data-pt="1 cota" data-en="1 ticket">1</span>
-          <span style="text-align:right;font-size:11px;color:#aaa8a0" data-pt="— apenas sorteio" data-en="— draw only">— apenas sorteio</span>
+          <span style="text-align:right;font-size:11px;color:#aaa" data-pt="— apenas sorteio" data-en="— draw only">— apenas sorteio</span>
         </div>
 
         <!-- Intermediário -->
-        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-size:13px;color:#4a4a42;padding:10px 0;border-bottom:1px solid rgba(26,74,46,0.06)">
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-size:13px;color:#4a4942;padding:10px 0;border-bottom:1px solid rgba(26,74,46,.06)">
           <span data-pt="Intermediário · R$46,04" data-en="Intermediate · R$46.04">Intermediário · R$46,04</span>
           <span style="color:#7a5c1e;text-align:center">3</span>
           <div style="text-align:right">
@@ -1186,7 +1187,7 @@ footer{
           <div class="mult-resultado">
             <div>
               <div class="mult-resultado-label" data-pt="SUAS COTAS ESTIMADAS" data-en="YOUR ESTIMATED TICKETS">SUAS COTAS ESTIMADAS</div>
-              <div style="font-size:11px;color:#aaa8a0;margin-top:2px" data-pt="base 1× cota · mais cotas por redes seguidas" data-en="base R$100 + network bonus · paid at D+7">base 1× cota · mais cotas por redes seguidas</div>
+              <div style="font-size:11px;color:#aaa;margin-top:2px" data-pt="1× cota base · mais cotas por redes seguidas" data-en="base R$100 + network bonus · paid at D+7">1× cota base · mais cotas por redes seguidas</div>
             </div>
             <div class="mult-resultado-val" id="simResultadoHome">R$100</div>
           </div>
@@ -1343,7 +1344,7 @@ footer{
         data-pt="Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral, sem necessidade de justificativa. Entre em contato pelo e-mail sac@3trevo.com.br. Atenção: ao exercer o direito de arrependimento, a compra é cancelada e o participante é automaticamente desclassificado do Programa Cultural, pois a participação é exclusiva para compras mantidas após D+7."
         data-en="Yes. Under Brazilian consumer protection law (CDC Art. 49), you have 7 calendar days after purchase to request a full refund, no reason required. Contact us at sac@3trevo.com.br. Note: exercising the right of withdrawal cancels the purchase and automatically disqualifies the participant from the Cultural Program, as participation is exclusive to purchases maintained after D+7.">
         Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral, sem necessidade de justificativa. Entre em contato pelo e-mail <a href="mailto:sac@3trevo.com.br" style="color:#7a5c1e;text-decoration:none">sac@3trevo.com.br</a>.<br><br>
-        <strong style="color:#5a5a52">Atenção:</strong> ao exercer o direito de arrependimento, o participante é automaticamente desclassificado do Programa Cultural. A participação é exclusiva para compras mantidas após D+7.
+        <strong style="color:#5a5952">Atenção:</strong> ao exercer o direito de arrependimento, o participante é automaticamente desclassificado do Programa Cultural. A participação é exclusiva para compras mantidas após D+7.
       </div>
     </div>
 
@@ -1375,10 +1376,10 @@ footer{
       </div>
       <div class="sobre-obras">
         <div class="obras-label" data-pt="Catálogo atual" data-en="Current catalog">Catálogo atual</div>
-        <div class="obra-item"><span class="obra-emoji">⚖️</span><span data-pt="Justiça(mento) para Orelha — Said Anes" data-en="Justiça(mento) para Orelha — Said Anes">Justiça(mento) para Orelha — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-emoji">🔍</span><span data-pt="Vigilante — Said Anes" data-en="Vigilante — Said Anes">Vigilante — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-emoji">🌐</span><span data-pt="O Nascimento Silencioso da 3ª GM — Said Anes" data-en="The Silent Birth of WWIII — Said Anes">O Nascimento Silencioso da 3ª GM — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-emoji">📘</span><span data-pt="Guia Antifalência Vol.1 — Said Anes" data-en="Anti-Bankruptcy Guide Vol.1 — Said Anes">Guia Antifalência Vol.1 — Said Anes</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="color:#7a5c1e">—</span><span data-pt="Justiça(mento) para Orelha — Said Anes" data-en="Justiça(mento) para Orelha — Said Anes">Justiça(mento) para Orelha — Said Anes</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="color:#7a5c1e">—</span><span data-pt="Vigilante — Said Anes" data-en="Vigilante — Said Anes">Vigilante — Said Anes</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="color:#7a5c1e">—</span><span data-pt="O Nascimento Silencioso da 3ª GM — Said Anes" data-en="The Silent Birth of WWIII — Said Anes">O Nascimento Silencioso da 3ª GM — Said Anes</span></div>
+        <div class="obra-item"><span class="obra-emoji" style="color:#7a5c1e">—</span><span data-pt="Guia Antifalência Vol.1 — Said Anes" data-en="Anti-Bankruptcy Guide Vol.1 — Said Anes">Guia Antifalência Vol.1 — Said Anes</span></div>
       </div>
     </div>
 
@@ -1405,7 +1406,7 @@ footer{
       <p class="footer-desc" data-pt="Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê." data-en="Literature and applied knowledge. We publish what matters, for those who truly read.">
         Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.
       </p>
-      <div style="margin-top:20px;font-size:11px;color:#aaa8a0">
+      <div style="margin-top:20px;font-size:11px;color:#aaa">
         CNPJ 18.928.966/0001-59<br>Montauri/RS · Brasil
       </div>
     </div>
@@ -1481,7 +1482,7 @@ function gerarMockup(cor, titulo, imgSrc, w, h) {
     '<line x1="'+(lw*.5)+'" y1="'+ly+'" x2="'+(lw*.5)+'" y2="'+(ly+ch)+'" stroke="rgba(255,255,255,.1)" stroke-width=".5"/>'+
     '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="'+cor+'"/>'+
     imgEl+
-    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+(ch*.18)+'" fill="rgba(26,74,46,0.1)"/>'+
+    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+(ch*.18)+'" fill="rgba(26,74,46,.1)"/>'+
     '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="none" stroke="rgba(0,0,0,.25)" stroke-width=".5"/>'+
     textLines+
     '<line x1="'+(cx+cw*.15)+'" y1="'+(cy+ch*.78)+'" x2="'+(cx+cw*.85)+'" y2="'+(cy+ch*.78)+'" stroke="rgba(200,168,75,.6)" stroke-width=".8"/>'+
@@ -1896,37 +1897,6 @@ document.addEventListener('DOMContentLoaded', () => { carregarConfig(); });
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded',function(){
-  var links={'justicamento':'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1','vigilante':'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10','terceiraguerra':'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10','antifalencia':'https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3'};
-  document.querySelectorAll('.ebook-card').forEach(function(c){
-    var t=(c.querySelector('.ebook-titulo')||{}).textContent||'';
-    var u='';
-    if(t.includes('Justiça')||t.includes('Orelha'))u=links.justicamento;
-    else if(t.includes('Vigilante'))u=links.vigilante;
-    else if(t.includes('Guerra')||t.includes('Nascimento'))u=links.terceiraguerra;
-    else if(t.includes('Guia')||t.includes('Antifalência'))u=links.antifalencia;
-    if(u){c.style.cursor='pointer';c.addEventListener('click',function(e){if(!e.target.closest('a')&&!e.target.closest('.ebook-btn'))window.open(u,'_blank');});}
-  });
-  // Escada em cotas
-  var cotas=['1×','1.5×','2×','2.5×','3×','3×'];
-  document.querySelectorAll('.mult-degrau').forEach(function(d,i){
-    var v=d.querySelector('.mult-degrau-val');
-    if(v)v.textContent=cotas[i]+' cotas';
-  });
-  var res=document.getElementById('simResultadoHome');
-  if(res)res.textContent='1× cotas';
-  var lbl=document.querySelector('.mult-resultado-label');
-  if(lbl)lbl.textContent='SUAS COTAS ESTIMADAS';
-  // Override calcular
-  window.calcularSimHome=function(){
-    var pct=0;
-    if(window.redesSelecionadas)Object.keys(window.redesSelecionadas).forEach(function(r){if(window.redesSelecionadas[r]&&window.PESOS_HOME&&window.PESOS_HOME[r])pct+=window.PESOS_HOME[r];});
-    var mult=Math.min(1+(pct/50),3);
-    var el=document.getElementById('simResultadoHome');
-    if(el)el.textContent=mult.toFixed(1).replace('.0','')+'× cotas';
-  };
-});
-</script>
+<script>(function(){var L={"justicamento":"https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1","vigilante":"https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10","terceiraguerra":"https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10","antifalencia":"https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3"};function iC(){document.querySelectorAll(".ebook-card").forEach(function(c){var t=((c.querySelector(".ebook-titulo")||{}).textContent||"").toLowerCase();var u="";if(t.includes("justiça")||t.includes("orelha"))u=L.justicamento;else if(t.includes("vigilante"))u=L.vigilante;else if(t.includes("guerra")||t.includes("nascimento"))u=L.terceiraguerra;else if(t.includes("guia")||t.includes("antifalência")||t.includes("empreendedor"))u=L.antifalencia;if(u){c.style.cursor="pointer";c.addEventListener("click",function(e){if(!e.target.closest("a")&&!e.target.closest(".ebook-btn"))window.open(u,"_blank","noopener");});}});}function iQ(){var lbs=["1×","1.5×","2×","2.5×","3×","3×"];document.querySelectorAll(".mult-degrau").forEach(function(d,i){var v=d.querySelector(".mult-degrau-val");if(v)v.textContent=(lbs[i]||"3×")+" cotas";});var res=document.getElementById("simResultadoHome");if(res)res.textContent="1× cotas";var lbl=document.querySelector(".mult-resultado-label");if(lbl)lbl.textContent="SUAS COTAS ESTIMADAS";window.calcularSimHome=function(){var p=0;if(window.redesSelecionadas&&window.PESOS_HOME)Object.keys(window.redesSelecionadas).forEach(function(r){if(window.redesSelecionadas[r]&&window.PESOS_HOME[r])p+=window.PESOS_HOME[r];});var m=Math.min(1+(p/50),3);var el=document.getElementById("simResultadoHome");if(el)el.textContent=m.toFixed(1).replace(/\.0$/,"")+"\u00d7 cotas";};}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",function(){iC();iQ();}):( iC(),iQ());})();</script>
 </body>
 </html>
