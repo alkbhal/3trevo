@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
-Sitemap: https://3trevo.com.br/sitemap.xml
+Disallow: /admin.html
+Disallow: /admin
+Disallow: /area-cliente.html
+
+# Sitemap
+Sitemap: https://www.3trevo.com.br/sitemap.xml

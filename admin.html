@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Editora Três Trevo</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f4efe5;--bg2:#ece6d6;--card:#fff;--verde:#1a4a2e;--vnav:#0f2d1a;--v2:#256640;--ouro:#c8a84b;--ot:#7a5c1e;--tinta:#1a1a16;--t2:#3d3c35;--t3:#6b6860;--t4:#9a9790;--b:rgba(26,74,46,.12);--bo:rgba(200,168,75,.25);--red:#c0392b;--rbg:#fdecea;--green:#1a6a3a;--gbg:#eaf7ee}
+body{font-family:'Jost',sans-serif;background:var(--bg2);color:var(--tinta);font-size:15px;line-height:1.5;min-height:100vh}
+button,input,select,textarea{font-family:'Jost',sans-serif}
+/* LOGIN */
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--vnav)}
+.lbox{background:var(--card);padding:48px;width:340px;border-top:3px solid var(--ouro)}
+.lm{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--verde);margin-bottom:4px}
+.lm::before{content:'✦ ';color:var(--ot)}
+.ls{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--t3);margin-bottom:28px}
+.ll{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;display:block}
+.li{width:100%;padding:11px 13px;border:1px solid var(--b);background:var(--bg);font-size:15px;color:var(--tinta);margin-bottom:18px}
+.li:focus{outline:none;border-color:var(--verde)}
+.lb{width:100%;padding:12px;background:var(--verde);color:#fff;border:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.lb:hover{background:var(--v2)}
+.le{font-size:13px;color:var(--red);margin-top:10px;text-align:center;display:none}
+/* ADMIN */
+#admin{display:none}
+.anav{background:var(--vnav);padding:0 26px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(200,168,75,.2)}
+.am{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--ouro)}
+.am::before{content:'✦ ';font-size:12px;opacity:.7}
+.anr{display:flex;gap:8px}
+.ab{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 13px;border:1px solid rgba(200,168,75,.3);background:transparent;color:rgba(255,255,255,.6);cursor:pointer;transition:all .2s}
+.ab:hover{border-color:var(--ouro);color:var(--ouro)}
+.ab.pub{background:var(--ouro);color:var(--vnav);border-color:var(--ouro)}
+.ab.pub:hover{background:#d4b452}
+.al{display:grid;grid-template-columns:190px 1fr;min-height:calc(100vh - 54px)}
+/* SIDEBAR */
+.side{background:var(--card);border-right:1px solid var(--b);padding:16px 0}
+.slbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--t4);padding:14px 16px 6px}
+.si{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:13px;color:var(--t2);cursor:pointer;transition:all .2s;border-left:2px solid transparent}
+.si:hover{background:var(--bg);color:var(--verde)}
+.si.on{background:rgba(26,74,46,.06);color:var(--verde);border-left-color:var(--verde);font-weight:500}
+/* MAIN */
+.amain{padding:24px;background:var(--bg2)}
+.panel{display:none}.panel.on{display:block}
+.ph{margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.pt{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--tinta);font-weight:400}
+.psb{font-size:13px;color:var(--t3);margin-top:2px}
+/* STATUS */
+.sb{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--card);border:1px solid var(--b);margin-bottom:18px;font-size:13px}
+.sd{width:7px;height:7px;border-radius:50%;background:#27ae60;flex-shrink:0}
+.sd.w{background:var(--ouro)}.sd.e{background:var(--red)}
+.sm{margin-left:auto}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--b);padding:18px;margin-bottom:12px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--b)}
+.ct{font-size:13px;font-weight:500;color:var(--tinta)}
+/* BUTTONS */
+.btn{font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 13px;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+.bp{background:var(--verde);color:#fff}.bp:hover{background:var(--v2)}
+.bs{background:transparent;border:1px solid var(--b);color:var(--t2)}.bs:hover{border-color:var(--verde);color:var(--verde)}
+.bd{background:transparent;border:1px solid rgba(192,57,43,.25);color:var(--red)}.bd:hover{background:var(--rbg)}
+.bsm{padding:4px 8px;font-size:10px}
+/* FORMS */
+.fg{margin-bottom:12px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+.fl{font-size:11px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;display:block}
+.fi,.fsel,.fta{width:100%;padding:8px 10px;border:1px solid var(--b);background:var(--bg);font-size:14px;color:var(--tinta);transition:border .2s}
+.fi:focus,.fsel:focus,.fta:focus{outline:none;border-color:var(--verde)}
+.fta{resize:vertical;min-height:64px}
+.fsel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%236b6860'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px}
+.fh{font-size:11px;color:var(--t4);margin-top:3px}
+/* ITEMS */
+.ai{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--b);background:var(--card);margin-bottom:6px;transition:border .2s}
+.ai:hover{border-color:rgba(26,74,46,.25)}
+.ac{width:44px;height:58px;display:flex;align-items:center;justify-content:center;font-size:7px;color:rgba(255,255,255,.5);text-align:center;padding:3px;line-height:1.3}
+.ain h4{font-size:13px;font-weight:500;color:var(--tinta);margin-bottom:2px}
+.ain p{font-size:11px;color:var(--t3)}
+.am2{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.aa{display:flex;gap:5px}
+.pi{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--b);background:var(--card);margin-bottom:6px}
+.pi:hover{border-color:rgba(26,74,46,.25)}
+.pp{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--verde);line-height:1;text-align:center}
+.pin h4{font-size:13px;font-weight:500;color:var(--tinta);margin-bottom:1px}
+.pin p{font-size:11px;color:var(--t3)}
+.pa{display:flex;gap:5px}
+/* BADGE */
+.bdg{display:inline-block;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px}
+.bg{background:var(--gbg);color:var(--green)}
+.bgr{background:var(--bg2);color:var(--t3)}
+.bgo{background:rgba(200,168,75,.15);color:var(--ot)}
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.on{opacity:1;pointer-events:all}
+.modal{background:var(--card);width:100%;max-width:620px;max-height:90vh;overflow-y:auto;border-top:3px solid var(--verde);transform:translateY(10px);transition:transform .2s}
+.mo.on .modal{transform:translateY(0)}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--card);z-index:1}
+.mt{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--tinta)}
+.mc{background:none;border:none;font-size:18px;cursor:pointer;color:var(--t3);padding:3px}
+.mb{padding:20px}
+.mf{padding:12px 20px;border-top:1px solid var(--b);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--card)}
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--b);margin-bottom:16px}
+.tab{padding:8px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;transition:all .2s}
+.tab.on{color:var(--verde);border-bottom-color:var(--verde)}
+.tp{display:none}.tp.on{display:block}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);padding:8px 10px;text-align:left;border-bottom:1px solid var(--b);background:var(--bg);font-weight:400}
+.tbl td{padding:10px;border-bottom:1px solid var(--b);font-size:13px;color:var(--t2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg)}
+/* COLOR PICKER */
+.cp{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.cs{width:26px;height:26px;cursor:pointer;border:2px solid transparent;transition:border .15s}
+.cs.on,.cs:hover{border-color:var(--tinta)}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:3000;padding:12px 16px;background:var(--verde);color:#fff;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.2);transform:translateY(50px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.on{transform:translateY(0);opacity:1}
+.toast.e{background:var(--red)}
+.empty{text-align:center;padding:36px;color:var(--t3);font-size:14px}
+@media(max-width:820px){.al{grid-template-columns:1fr}.side{display:none}.f2,.f3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lbox">
+    <div class="lm">Editora Três Trevo</div>
+    <div class="ls">Painel Administrativo</div>
+    <label class="ll">Senha</label>
+    <input type="password" class="li" id="ls" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    <button class="lb" onclick="login()">Entrar</button>
+    <div class="le" id="le">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin">
+  <nav class="anav">
+    <div class="am">Admin · Três Trevo</div>
+    <div class="anr">
+      <button class="ab" onclick="window.open('https://3trevo.com.br','_blank','noopener')">Ver site ↗</button>
+      <button class="ab pub" id="btnPub" onclick="publicar()">Publicar alterações</button>
+      <button class="ab" onclick="sair()">Sair</button>
+    </div>
+  </nav>
+  <div class="al">
+    <aside class="side">
+      <div class="slbl">Conteúdo</div>
+      <div class="si on" onclick="ir('acervo',this)">◈ &nbsp;Acervo de Títulos</div>
+      <div class="si" onclick="ir('premios',this)">◆ &nbsp;Prêmios</div>
+      <div class="si" onclick="ir('dep',this)">″ &nbsp;Depoimentos</div>
+      <div class="slbl">Configurações</div>
+      <div class="si" onclick="ir('meta',this)">◉ &nbsp;Meta / Progresso</div>
+      <div class="si" onclick="ir('cfg',this)">◎ &nbsp;Config geral</div>
+    </aside>
+    <main class="amain">
+      <div class="sb"><span class="sd" id="sd"></span><span id="st">Carregando...</span><div class="sm"><button class="btn bs bsm" onclick="load()">↺</button></div></div>
+
+      <!-- ACERVO -->
+      <div class="panel on" id="panel-acervo">
+        <div class="ph">
+          <div><div class="pt">Acervo</div><div class="psb">Adicione, edite ou remova títulos do catálogo.</div></div>
+          <button class="btn bp" onclick="openBook(null)">+ Novo título</button>
+        </div>
+        <div id="la"></div>
+      </div>
+
+      <!-- PRÊMIOS -->
+      <div class="panel" id="panel-premios">
+        <div class="ph">
+          <div><div class="pt">Prêmios</div><div class="psb">Qualquer número — 1, 5, 10 prêmios. Adicione, edite, remova.</div></div>
+          <button class="btn bp" onclick="openPrize(null)">+ Novo prêmio</button>
+        </div>
+        <div id="lp"></div>
+      </div>
+
+      <!-- DEPOIMENTOS -->
+      <div class="panel" id="panel-dep">
+        <div class="ph"><div><div class="pt">Depoimentos</div><div class="psb">Aprovar ou remover depoimentos.</div></div></div>
+        <div id="ld"></div>
+      </div>
+
+      <!-- META -->
+      <div class="panel" id="panel-meta">
+        <div class="ph"><div><div class="pt">Meta / Progresso</div></div></div>
+        <div class="card">
+          <div class="f2">
+            <div class="fg"><label class="fl">Meta total (R$)</label><input type="number" class="fi" id="mt" placeholder="34000"></div>
+            <div class="fg"><label class="fl">Arrecadado atual (R$)</label><input type="number" class="fi" id="ma" placeholder="0"></div>
+            <div class="fg"><label class="fl">Leitores (hero)</label><input type="number" class="fi" id="ml" placeholder="247"></div>
+            <div class="fg"><label class="fl">Cotas base (sem redes)</label><input type="number" class="fi" id="mb" step="0.1" placeholder="1"></div>
+          </div>
+          <div style="margin:12px 0 8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--t3)">Pesos das redes (%)</div>
+          <div class="f3">
+            <div class="fg"><label class="fl">WhatsApp</label><input type="number" class="fi" id="pw" value="25"></div>
+            <div class="fg"><label class="fl">Instagram</label><input type="number" class="fi" id="pi" value="25"></div>
+            <div class="fg"><label class="fl">Facebook</label><input type="number" class="fi" id="pf" value="20"></div>
+            <div class="fg"><label class="fl">TikTok</label><input type="number" class="fi" id="pt2" value="15"></div>
+            <div class="fg"><label class="fl">YouTube</label><input type="number" class="fi" id="py" value="15"></div>
+          </div>
+          <button class="btn bp" onclick="saveMeta()" style="margin-top:8px">Salvar</button>
+        </div>
+      </div>
+
+      <!-- CONFIG -->
+      <div class="panel" id="panel-cfg">
+        <div class="ph"><div><div class="pt">Config geral</div></div></div>
+        <div class="card">
+          <div class="ch"><span class="ct">Alterar senha</span></div>
+          <div class="f2">
+            <div class="fg"><label class="fl">Nova senha</label><input type="password" class="fi" id="ns" placeholder="••••••••"></div>
+            <div class="fg"><label class="fl">Confirmar</label><input type="password" class="fi" id="cs" placeholder="••••••••"></div>
+          </div>
+          <button class="btn bp" onclick="changePwd()">Alterar senha</button>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ct">Aviso legal do programa</span></div>
+          <div class="fg"><textarea class="fta" id="av" rows="3" placeholder="Os prêmios são pagos após D+7..."></textarea></div>
+          <button class="btn bp" onclick="saveAviso()">Salvar</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL EBOOK -->
+<div class="mo" id="me">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="me-t">Novo Título</div><button class="mc" onclick="close('me')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="e-orig">
+      <div class="tabs">
+        <div class="tab on" onclick="stab(this,'ep-pt')">PT</div>
+        <div class="tab" onclick="stab(this,'ep-en')">EN</div>
+        <div class="tab" onclick="stab(this,'ep-es')">ES</div>
+        <div class="tab" onclick="stab(this,'ep-dados')">Dados</div>
+      </div>
+      <div id="ep-pt" class="tp on">
+        <div class="fg"><label class="fl">Título (PT)</label><input type="text" class="fi" id="et-pt"></div>
+        <div class="fg"><label class="fl">Gênero/Tier (PT)</label><input type="text" class="fi" id="eg-pt" placeholder="ex: Ficção Literária · Premium"></div>
+        <div class="fg"><label class="fl">Descrição (PT)</label><textarea class="fta" id="ed-pt" rows="2"></textarea></div>
+      </div>
+      <div id="ep-en" class="tp">
+        <div class="fg"><label class="fl">Title (EN)</label><input type="text" class="fi" id="et-en"></div>
+        <div class="fg"><label class="fl">Genre/Tier (EN)</label><input type="text" class="fi" id="eg-en"></div>
+        <div class="fg"><label class="fl">Description (EN)</label><textarea class="fta" id="ed-en" rows="2"></textarea></div>
+      </div>
+      <div id="ep-es" class="tp">
+        <div class="fg"><label class="fl">Título (ES)</label><input type="text" class="fi" id="et-es"></div>
+        <div class="fg"><label class="fl">Género (ES)</label><input type="text" class="fi" id="eg-es"></div>
+        <div class="fg"><label class="fl">Descripción (ES)</label><textarea class="fta" id="ed-es" rows="2"></textarea></div>
+      </div>
+      <div id="ep-dados" class="tp">
+        <div class="f2">
+          <div class="fg"><label class="fl">Slug (ID único)</label><input type="text" class="fi" id="esl" placeholder="ex: vigilante"><div class="fh">Minúsculas, sem espaços</div></div>
+          <div class="fg"><label class="fl">Autor</label><input type="text" class="fi" id="eau" value="Said Anes"></div>
+          <div class="fg"><label class="fl">Preço (R$)</label><input type="number" class="fi" id="epr" step="0.01"></div>
+          <div class="fg"><label class="fl">Cotas inclusas</label><input type="number" class="fi" id="eco" min="1"></div>
+          <div class="fg full"><label class="fl">URL Rifei (checkout)</label><input type="text" class="fi" id="erf" placeholder="https://cultural.3trevo.com.br/..."></div>
+          <div class="fg"><label class="fl">UTM Campaign</label><input type="text" class="fi" id="eutm"></div>
+          <div class="fg"><label class="fl">Categoria filtro</label>
+            <select class="fsel" id="ecat">
+              <option value="reflexao">Reflexão</option>
+              <option value="ficcao">Ficção</option>
+              <option value="manuais">Manuais</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Ordem</label><input type="number" class="fi" id="eord" min="1"></div>
+        </div>
+        <div class="fg">
+          <label class="fl">Cor da capa</label>
+          <div class="cp" id="ecp">
+            <div class="cs" style="background:#1a4a2e" data-c="#1a4a2e" onclick="pickColor(this)"></div>
+            <div class="cs" style="background:#2a1a1a" data-c="#2a1a1a" onclick="pickColor(this)"></div>
+            <div class="cs" style="background:#1a1a2e" data-c="#1a1a2e" onclick="pickColor(this)"></div>
+            <div class="cs" style="background:#1a2a3e" data-c="#1a2a3e" onclick="pickColor(this)"></div>
+            <div class="cs" style="background:#2e1a1a" data-c="#2e1a1a" onclick="pickColor(this)"></div>
+            <div class="cs" style="background:#1e3020" data-c="#1e3020" onclick="pickColor(this)"></div>
+            <div class="cs" style="background:#2e2a1a" data-c="#2e2a1a" onclick="pickColor(this)"></div>
+          </div>
+          <input type="text" class="fi" id="ecor" placeholder="#1a4a2e" style="margin-top:6px;width:110px">
+        </div>
+        <div class="fg">
+          <label class="fl">Status</label>
+          <select class="fsel" id="eativo">
+            <option value="true">Ativo — visível no site</option>
+            <option value="false">Rascunho — oculto</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn bs" onclick="close('me')">Cancelar</button>
+      <button class="btn bp" onclick="saveBook()">Salvar título</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRÊMIO -->
+<div class="mo" id="mp">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="mp-t">Novo Prêmio</div><button class="mc" onclick="close('mp')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="pid">
+      <div class="f2">
+        <div class="fg"><label class="fl">Posição (1º, 2º, 3º...)</label><input type="number" class="fi" id="ppos" min="1" placeholder="1"><div class="fh">Número ordinal do lugar</div></div>
+        <div class="fg"><label class="fl">Ordem de exibição</label><input type="number" class="fi" id="pord" min="0" placeholder="0"></div>
+      </div>
+      <div class="tabs">
+        <div class="tab on" onclick="stab(this,'pp-pt')">PT</div>
+        <div class="tab" onclick="stab(this,'pp-en')">EN</div>
+        <div class="tab" onclick="stab(this,'pp-es')">ES</div>
+      </div>
+      <div id="pp-pt" class="tp on">
+        <div class="fg"><label class="fl">Descrição do prêmio (PT)</label><input type="text" class="fi" id="pd-pt" placeholder="ex: 1 salário mínimo nacional"><div class="fh">Texto principal exibido no site</div></div>
+        <div class="fg"><label class="fl">Bônus — conectado a todas as redes (PT)</label><input type="text" class="fi" id="pc-pt" placeholder="ex: até 2 salários mínimos"><div class="fh">Deixe vazio para não exibir este bônus</div></div>
+      </div>
+      <div id="pp-en" class="tp">
+        <div class="fg"><label class="fl">Prize description (EN)</label><input type="text" class="fi" id="pd-en"></div>
+        <div class="fg"><label class="fl">Connected bonus (EN)</label><input type="text" class="fi" id="pc-en"></div>
+      </div>
+      <div id="pp-es" class="tp">
+        <div class="fg"><label class="fl">Descripción del premio (ES)</label><input type="text" class="fi" id="pd-es"></div>
+        <div class="fg"><label class="fl">Bono conectado (ES)</label><input type="text" class="fi" id="pc-es"></div>
+      </div>
+      <div class="fg" style="margin-top:6px">
+        <label class="fl">Status</label>
+        <select class="fsel" id="pativo">
+          <option value="true">Ativo — visível no site</option>
+          <option value="false">Inativo — oculto</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn bs" onclick="close('mp')">Cancelar</button>
+      <button class="btn bp" onclick="savePrize()">Salvar prêmio</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR -->
+<div class="mo" id="mconf">
+  <div class="modal" style="max-width:380px">
+    <div class="mh"><div class="mt">Confirmar exclusão</div><button class="mc" onclick="close('mconf')">✕</button></div>
+    <div class="mb">
+      <p style="font-size:14px;color:var(--t2);margin-bottom:6px" id="mconf-txt"></p>
+      <p style="font-size:12px;color:var(--red)">Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="mf">
+      <button class="btn bs" onclick="close('mconf')">Cancelar</button>
+      <button class="btn bd" id="mconf-btn">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="tst"></div>
+
+<script>
+// ── API via Cloudflare Worker (seguro — sem anon key exposta) ──
+// Substitua pela URL do seu Worker após deploy:
+// ex: https://tres-trevo-api.SEU-USUARIO.workers.dev
+const WORKER_URL = 'https://tres-trevo-api.alkbhal.workers.dev';
+const LS_TOKEN = 'tt_session_token';
+
+let books=[], prizes=[], deps=[], cfg={};
+let sessionToken = sessionStorage.getItem(LS_TOKEN) || '';
+
+// Cliente do Worker — usa X-Session-Token para autenticação
+async function api(path, opts={}) {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (sessionToken) headers['X-Session-Token'] = sessionToken;
+
+  const r = await fetch(WORKER_URL + path, {
+    method: opts.method || 'GET',
+    headers,
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+
+  if (r.status === 401) {
+    // Sessão expirada — voltar ao login
+    sessionToken = '';
+    sessionStorage.removeItem(LS_TOKEN);
+    sair();
+    throw new Error('Sessão expirada. Faça login novamente.');
+  }
+
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({ error: r.statusText }));
+    throw new Error(err.error || r.statusText);
+  }
+
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
+
+async function login() {
+  const s = document.getElementById('ls').value;
+  if (!s) return;
+  try {
+    const res = await fetch(WORKER_URL + '/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ senha: s })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.token) {
+      document.getElementById('le').style.display = 'block';
+      return;
+    }
+    sessionToken = data.token;
+    sessionStorage.setItem(LS_TOKEN, sessionToken);
+    showAdmin();
+  } catch(e) {
+    document.getElementById('le').textContent = 'Erro de conexão. Verifique o Worker.';
+    document.getElementById('le').style.display = 'block';
+  }
+}
+
+function showAdmin() {
+  document.getElementById('login').style.display='none';
+  document.getElementById('admin').style.display='block';
+  load();
+}
+function sair() {
+  // Notificar o Worker para invalidar a sessão
+  if (sessionToken) {
+    fetch(WORKER_URL + '/api/admin/logout', {
+      method: 'POST',
+      headers: { 'X-Session-Token': sessionToken }
+    }).catch(() => {});
+  }
+  sessionToken = '';
+  sessionStorage.removeItem(LS_TOKEN);
+  document.getElementById('login').style.display='flex';
+  document.getElementById('admin').style.display='none';
+  document.getElementById('ls').value='';
+  document.getElementById('le').style.display='none';
+}
+
+async function load() {
+  status('w','Carregando...');
+  try {
+    [books, prizes, deps] = await Promise.all([
+      api('/api/admin/catalogo'),
+      api('/api/admin/premios'),
+      api('/api/admin/depoimentos')
+    ]);
+    const cfgRows = await api('/api/admin/config');
+    cfg={};
+    (cfgRows||[]).forEach(r => cfg[r.chave] = r.valor);
+    renderBooks(); renderPrizes(); renderDeps(); renderMeta(); renderCfg();
+    status('ok',`${books.length} títulos · ${prizes.length} prêmios carregados`);
+  } catch(e) { status('e','Erro: '+e.message); }
+}
+
+function status(t,txt) {
+  document.getElementById('sd').className='sd'+(t==='w'?' w':t==='e'?' e':'');
+  document.getElementById('st').textContent=txt;
+}
+
+// ── BOOKS ──────────────────────────────────────
+function renderBooks() {
+  const el=document.getElementById('la');
+  if (!books.length){el.innerHTML='<div class="empty">Nenhum título. Clique em "+ Novo título".</div>';return;}
+  el.innerHTML=books.map(b=>`
+    <div class="ai">
+      <div class="ac" style="background:${b.bg_color||'#1a4a2e'}">${(b.titulo||'').split(' ').slice(0,2).join(' ')}</div>
+      <div class="ain">
+        <h4>${b.titulo||'—'}</h4>
+        <p>${b.autor||'—'} · R$${parseFloat(b.preco||0).toFixed(2).replace('.',',')} · ${b.cotas||1} cota${b.cotas!=1?'s':''}</p>
+        <div class="am2">
+          <span class="bdg ${b.ativo?'bg':'bgr'}">${b.ativo?'Ativo':'Rascunho'}</span>
+          <span class="bdg bgo">${b.genero_pt||b.genero||'—'}</span>
+        </div>
+      </div>
+      <div class="aa">
+        <button class="btn bs bsm" onclick="openBook('${b.slug}')">Editar</button>
+        <button class="btn bd bsm" onclick="confirmDel('Excluir "${b.titulo}"?',()=>delBook('${b.slug}'))">Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function openBook(slug) {
+  const b = slug ? books.find(x=>x.slug===slug) : null;
+  document.getElementById('me-t').textContent = b?'Editar Título':'Novo Título';
+  s('e-orig', b?.slug||'');
+  s('esl', b?.slug||''); s('et-pt', b?.titulo||''); s('et-en', b?.titulo_en||''); s('et-es', b?.titulo_es||'');
+  s('eg-pt', b?.genero_pt||b?.genero||''); s('eg-en', b?.genero_en||''); s('eg-es', b?.genero_es||'');
+  s('ed-pt', b?.descricao||''); s('ed-en', b?.descricao_en||''); s('ed-es', b?.descricao_es||'');
+  s('eau', b?.autor||'Said Anes'); s('epr', b?.preco||''); s('eco', b?.cotas||'');
+  s('erf', b?.rifei_url||''); s('eutm', b?.utm_campaign||''); s('eord', b?.ordem||(books.length+1));
+  s('ecor', b?.bg_color||'#1a4a2e');
+  document.getElementById('ecat').value = b?.genero||'ficcao';
+  document.getElementById('eativo').value = String(b?b.ativo!==false:true);
+  resetTabs('ep-pt'); open('me');
+}
+
+async function saveBook() {
+  const orig=g('e-orig'), slug=g('esl').trim().toLowerCase().replace(/\s+/g,'-');
+  if (!slug||!g('et-pt')){toast('Preencha slug e título.',true);return;}
+  const d={slug,titulo:g('et-pt'),titulo_en:g('et-en'),titulo_es:g('et-es'),
+    genero_pt:g('eg-pt'),genero_en:g('eg-en'),genero_es:g('eg-es'),
+    genero:document.getElementById('ecat').value,
+    descricao:g('ed-pt'),descricao_en:g('ed-en'),descricao_es:g('ed-es'),
+    autor:g('eau')||'Said Anes',preco:parseFloat(g('epr'))||0,cotas:parseInt(g('eco'))||1,
+    rifei_url:g('erf'),utm_campaign:g('eutm'),ordem:parseInt(g('eord'))||1,
+    bg_color:g('ecor')||'#1a4a2e',ativo:document.getElementById('eativo').value==='true'};
+  try {
+    if (orig) await api('/api/admin/catalogo/'+orig,{method:'PUT',body:d});
+    else await api('/api/admin/catalogo',{method:'POST',body:d});
+    toast(orig?'Título atualizado.':'Título criado.');
+    close('me'); load();
+  } catch(e){toast('Erro: '+e.message,true);}
+}
+
+async function delBook(slug) {
+  try { await api('/api/admin/catalogo/'+slug,{method:'DELETE'}); toast('Título excluído.'); load(); }
+  catch(e){toast('Erro: '+e.message,true);}
+}
+
+// ── PRIZES ─────────────────────────────────────
+function renderPrizes() {
+  const el=document.getElementById('lp');
+  if (!prizes.length){el.innerHTML='<div class="empty">Nenhum prêmio. Clique em "+ Novo prêmio" para adicionar quantos quiser.</div>';return;}
+  el.innerHTML=prizes.map(p=>`
+    <div class="pi">
+      <div class="pp">${p.posicao}°</div>
+      <div class="pin">
+        <h4>${p.descricao_pt||'—'}</h4>
+        <p>${p.conectado_pt?'✦ Conectado: '+p.conectado_pt:'Sem bônus de conexão'}</p>
+        <div class="am2"><span class="bdg ${p.ativo?'bg':'bgr'}">${p.ativo?'Ativo':'Inativo'}</span></div>
+      </div>
+      <div class="pa">
+        <button class="btn bs bsm" onclick="openPrize(${p.id})">Editar</button>
+        <button class="btn bd bsm" onclick="confirmDel('Excluir ${p.posicao}° lugar?',()=>delPrize(${p.id}))">Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function openPrize(id) {
+  const p = id ? prizes.find(x=>x.id===id) : null;
+  document.getElementById('mp-t').textContent = p?'Editar Prêmio':'Novo Prêmio';
+  s('pid', p?.id||''); s('ppos', p?.posicao||(prizes.length+1)); s('pord', p?.ordem||0);
+  s('pd-pt',p?.descricao_pt||''); s('pd-en',p?.descricao_en||''); s('pd-es',p?.descricao_es||'');
+  s('pc-pt',p?.conectado_pt||''); s('pc-en',p?.conectado_en||''); s('pc-es',p?.conectado_es||'');
+  document.getElementById('pativo').value = String(p?p.ativo!==false:true);
+  resetTabs('pp-pt'); open('mp');
+}
+
+async function savePrize() {
+  const id=g('pid'), pos=parseInt(g('ppos'));
+  if (!pos||!g('pd-pt')){toast('Preencha posição e descrição.',true);return;}
+  const d={posicao:pos,ordem:parseInt(g('pord'))||pos,
+    descricao_pt:g('pd-pt'),descricao_en:g('pd-en'),descricao_es:g('pd-es'),
+    conectado_pt:g('pc-pt'),conectado_en:g('pc-en'),conectado_es:g('pc-es'),
+    ativo:document.getElementById('pativo').value==='true'};
+  try {
+    if (id) await api('/api/admin/premios/'+id,{method:'PUT',body:d});
+    else await api('/api/admin/premios',{method:'POST',body:d});
+    toast(id?'Prêmio atualizado.':'Prêmio criado.');
+    close('mp'); load();
+  } catch(e){toast('Erro: '+e.message,true);}
+}
+
+async function delPrize(id) {
+  try { await api('/api/admin/premios/'+id,{method:'DELETE'}); toast('Prêmio excluído.'); load(); }
+  catch(e){toast('Erro: '+e.message,true);}
+}
+
+// ── DEPS ───────────────────────────────────────
+function renderDeps() {
+  const el=document.getElementById('ld');
+  if (!deps.length){el.innerHTML='<div class="empty">Nenhum depoimento recebido.</div>';return;}
+  el.innerHTML=`<div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>Autor</th><th>Ebook</th><th>Palavras</th><th>Status</th><th>Aprovado</th><th>Ações</th></tr></thead>
+    <tbody>${deps.map(d=>`<tr>
+      <td><strong>${d.nome_autor||'—'}</strong></td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.ebook_titulo||d.ebook_slug||'—'}</td>
+      <td>${d.palavras||0}</td>
+      <td><span class="bdg ${d.status==='aprovado'?'bg':'bgr'}">${d.status||'pendente'}</span></td>
+      <td><span class="bdg ${d.aprovado?'bg':'bgr'}">${d.aprovado?'Sim':'Não'}</span></td>
+      <td style="display:flex;gap:4px">
+        <button class="btn bs bsm" onclick="toggleDep('${d.id}',${d.aprovado})">${d.aprovado?'Desaprovar':'Aprovar'}</button>
+        <button class="btn bd bsm" onclick="confirmDel('Excluir este depoimento?',()=>delDep('${d.id}'))">✕</button>
+      </td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+async function toggleDep(id,cur) {
+  try { await api('/api/admin/depoimentos/'+id,{method:'PATCH',body:{aprovado:!cur,status:!cur?'aprovado':'pendente'}}); toast(!cur?'Aprovado.':'Desaprovado.'); load(); }
+  catch(e){toast('Erro.',true);}
+}
+async function delDep(id) {
+  try { await api('/api/admin/depoimentos/'+id,{method:'DELETE'}); toast('Excluído.'); load(); }
+  catch(e){toast('Erro.',true);}
+}
+
+// ── META ───────────────────────────────────────
+function renderMeta() {
+  const m=cfg.meta||{}, h=cfg.hero||{}, f=cfg.formula||{}, r=f.redes||{};
+  s('mt',m.total||34000); s('ma',m.arrecadado||0); s('ml',h.leitores||247); s('mb',f.premio_base_cotas||1);
+  s('pw',r.whatsapp?.percentual||25); s('pi',r.instagram?.percentual||25);
+  s('pf',r.facebook?.percentual||20); s('pt2',r.tiktok?.percentual||15); s('py',r.youtube?.percentual||15);
+}
+function renderCfg() { s('av',cfg.textos?.aviso_legal_pt||''); }
+
+async function saveMeta() {
+  try {
+    await Promise.all([
+      upsert('meta',{total:+g('mt')||34000,arrecadado:+g('ma')||0}),
+      upsert('hero',{...(cfg.hero||{}),leitores:+g('ml')||247}),
+      upsert('formula',{premio_base_cotas:+g('mb')||1,redes:{
+        whatsapp:{percentual:+g('pw')||25,ativo:true},
+        instagram:{percentual:+g('pi')||25,ativo:true},
+        facebook:{percentual:+g('pf')||20,ativo:true},
+        tiktok:{percentual:+g('pt2')||15,ativo:true},
+        youtube:{percentual:+g('py')||15,ativo:true}
+      }})
+    ]);
+    toast('Configurações salvas.');
+  } catch(e){toast('Erro: '+e.message,true);}
+}
+
+async function saveAviso() {
+  try { await upsert('textos',{...(cfg.textos||{}),aviso_legal_pt:g('av')}); toast('Aviso salvo.'); }
+  catch(e){toast('Erro.',true);}
+}
+
+async function changePwd() {
+  const n=g('ns'),c=g('cs');
+  if (!n){toast('Digite a nova senha.',true);return;}
+  if (n!==c){toast('Senhas não coincidem.',true);return;}
+  try { await api('/api/admin/config',{method:'POST',body:{chave:'admin_senha',valor:n}}); s('ns',''); s('cs',''); toast('Senha alterada. Novo login necessário.'); }
+  catch(e){toast('Erro.',true);}
+}
+
+async function upsert(k,v) {
+  return api('/api/admin/config',{method:'POST',body:{chave:k,valor:v}});
+}
+
+// ── PUBLICAR ───────────────────────────────────
+async function publicar() {
+  const btn=document.getElementById('btnPub');
+  btn.textContent='Publicando...'; btn.disabled=true;
+  try {
+    const pub={
+      gerado_em:new Date().toISOString(),
+      catalogo:Object.fromEntries(books.filter(b=>b.ativo).map(b=>[b.slug,{
+        preco:'R$'+parseFloat(b.preco).toFixed(2).replace('.',','),
+        cotas:b.cotas, rifei_url:b.rifei_url, utm:b.utm_campaign
+      }])),
+      premios:prizes.filter(p=>p.ativo).map(p=>({
+        posicao:p.posicao,descricao_pt:p.descricao_pt,descricao_en:p.descricao_en,
+        descricao_es:p.descricao_es,conectado_pt:p.conectado_pt,
+        conectado_en:p.conectado_en,conectado_es:p.conectado_es
+      })),
+      ...cfg
+    };
+    await upsert('publicado',pub);
+    toast('Publicado! Alterações ativas no site.');
+    status('ok','Publicado em '+new Date().toLocaleTimeString('pt-BR'));
+  } catch(e){toast('Erro ao publicar: '+e.message,true);}
+  finally{btn.textContent='Publicar alterações';btn.disabled=false;}
+}
+
+// ── UI HELPERS ──────────────────────────────────
+function g(id){const e=document.getElementById(id);return e?e.value:'';}
+function s(id,v){const e=document.getElementById(id);if(e)e.value=v??'';}
+function ir(panel,item){
+  document.querySelectorAll('.si').forEach(i=>i.classList.remove('on'));
+  item.classList.add('on');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-'+panel).classList.add('on');
+}
+function open(id){document.getElementById(id).classList.add('on');}
+function close(id){document.getElementById(id).classList.remove('on');}
+function stab(btn,panelId) {
+  const par=btn.closest('.mo, .amain');
+  par.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  par.querySelectorAll('.tp').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(panelId).classList.add('on');
+}
+function resetTabs(defaultId) {
+  setTimeout(()=>{
+    ['ep-pt','ep-en','ep-es','ep-dados','pp-pt','pp-en','pp-es'].forEach(id=>{
+      const e=document.getElementById(id);if(e)e.classList.remove('on');
+    });
+    const d=document.getElementById(defaultId);if(d)d.classList.add('on');
+  },10);
+}
+function toast(msg,err=false){
+  const t=document.getElementById('tst');
+  t.textContent=msg; t.className='toast'+(err?' e':'')+' on';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),3200);
+}
+function pickColor(el){
+  document.querySelectorAll('.cs').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); s('ecor',el.dataset.c);
+}
+function confirmDel(msg,fn){
+  document.getElementById('mconf-txt').innerHTML=msg;
+  const btn=document.getElementById('mconf-btn');
+  btn.onclick=()=>{close('mconf');fn();};
+  open('mconf');
+}
+
+document.addEventListener('DOMContentLoaded',()=>document.getElementById('ls').focus());
+</script>
+</body>
+</html>
