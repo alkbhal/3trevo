@@ -1,8 +1,14 @@
 User-agent: *
-Allow: /
 Disallow: /admin.html
-Disallow: /admin
-Disallow: /area-cliente.html
+Disallow: /3trevo_site.html
+Disallow: /config.json
+Disallow: /progresso.json
 
-# Sitemap
-Sitemap: https://www.3trevo.com.br/sitemap.xml
+Allow: /
+Allow: /ebook-guia-antifalencia.html
+Allow: /ebook-vigilante.html
+Allow: /ebook-terceira-guerra.html
+Allow: /ebook-justicamento.html
+Allow: /participacao-cultural.html
+
+Sitemap: https://3trevo.com.br/sitemap.xml
