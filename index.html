@@ -488,6 +488,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
     <li><a href="#catalogo" data-pt="Catálogo" data-en="Catalog" data-es="Catálogo">Catálogo</a></li>
     <li><a href="#programa" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a></li>
     <li><a href="#sobre" data-pt="Sobre" data-en="About" data-es="Acerca">Sobre</a></li>
+    <li><a href="/area-cliente.html" data-pt="Minha Biblioteca" data-en="My Library" data-es="Mi Biblioteca">Minha Biblioteca</a></li>
   </ul>
   <div class="nav-right">
     <button class="nav-lang" id="btnLang" onclick="alternarIdioma()" aria-label="Mudar idioma">PT</button>
@@ -503,6 +504,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   <a href="#programa" onclick="toggleMenu()" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a>
   <a href="#sobre" onclick="toggleMenu()" data-pt="Sobre" data-en="About" data-es="Acerca">Sobre</a>
   <a href="#faq" onclick="toggleMenu()" data-pt="Perguntas frequentes" data-en="FAQ" data-es="Preguntas">Perguntas frequentes</a>
+  <a href="/area-cliente.html" onclick="toggleMenu()" data-pt="Minha Biblioteca" data-en="My Library" data-es="Mi Biblioteca">Minha Biblioteca</a>
   <a href="#catalogo" class="nav-cta" style="text-align:center;margin-top:8px" data-pt="Adquirir ebook" data-en="Get ebook" data-es="Obtener ebook">Adquirir ebook</a>
 </div>
 
@@ -578,7 +580,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 
     <!-- Card 1 -->
     <article class="ebook-card reveal" role="listitem" data-genero="reflexao"
-      onclick="window.open('https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1&utm_source=3trevo&utm_medium=site&utm_campaign=justicamento','_blank','noopener')">
+      onclick="location.href='/checkout.html?slug=justicamento'">
       <div class="livro-mockup" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ensaio · Entrada" data-en="Essay · Entry" data-es="Ensayo · Entrada">Ensaio · Entrada</div>
       <h3 class="ebook-titulo">Justiça(mento) para Orelha</h3>
@@ -590,8 +592,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           <div class="ebook-preco">R$15,35</div>
           <div class="ebook-cotas" data-pt="1 cota inclusa" data-en="1 ticket included" data-es="1 cuota incluida">1 cota inclusa</div>
         </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=1&utm_source=3trevo&utm_medium=site&utm_campaign=justicamento"
-           target="_blank" rel="noopener noreferrer"
+        <a href="/checkout.html?slug=justicamento"
            class="ebook-btn" onclick="event.stopPropagation()"
            data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
       </div>
@@ -599,7 +600,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 
     <!-- Card 2 -->
     <article class="ebook-card reveal" role="listitem" data-genero="ficcao" style="transition-delay:.1s"
-      onclick="window.open('https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10&utm_source=3trevo&utm_medium=site&utm_campaign=vigilante','_blank','noopener')">
+      onclick="location.href='/checkout.html?slug=vigilante'">
       <div class="livro-mockup" data-mockup-cor="#2a1a1a" data-mockup-titulo="Vigilante" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ficção Literária · Premium" data-en="Literary Fiction · Premium" data-es="Ficción Literaria · Premium">Ficção Literária · Premium</div>
       <h3 class="ebook-titulo">Vigilante</h3>
@@ -611,8 +612,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           <div class="ebook-preco">R$76,74</div>
           <div class="ebook-cotas" data-pt="10 cotas inclusas" data-en="10 tickets included" data-es="10 cuotas incluidas">10 cotas inclusas</div>
         </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10&utm_source=3trevo&utm_medium=site&utm_campaign=vigilante"
-           target="_blank" rel="noopener noreferrer"
+        <a href="/checkout.html?slug=vigilante"
            class="ebook-btn" onclick="event.stopPropagation()"
            data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
       </div>
@@ -620,7 +620,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 
     <!-- Card 3 -->
     <article class="ebook-card reveal" role="listitem" data-genero="ficcao" style="transition-delay:.2s"
-      onclick="window.open('https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10&utm_source=3trevo&utm_medium=site&utm_campaign=terceiraguerra','_blank','noopener')">
+      onclick="location.href='/checkout.html?slug=terceiraguerra'">
       <div class="livro-mockup" data-mockup-cor="#1a1a2e" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Ficção Documental · Premium" data-en="Documentary Fiction · Premium" data-es="Ficción Documental · Premium">Ficção Documental · Premium</div>
       <h3 class="ebook-titulo">O Nascimento Silencioso da 3ª Guerra Mundial</h3>
@@ -632,8 +632,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           <div class="ebook-preco">R$76,74</div>
           <div class="ebook-cotas" data-pt="10 cotas inclusas" data-en="10 tickets included" data-es="10 cuotas incluidas">10 cotas inclusas</div>
         </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=10&utm_source=3trevo&utm_medium=site&utm_campaign=terceiraguerra"
-           target="_blank" rel="noopener noreferrer"
+        <a href="/checkout.html?slug=terceiraguerra"
            class="ebook-btn" onclick="event.stopPropagation()"
            data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
       </div>
@@ -641,7 +640,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 
     <!-- Card 4 -->
     <article class="ebook-card reveal" role="listitem" data-genero="manuais" style="transition-delay:.3s"
-      onclick="window.open('https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3&utm_source=3trevo&utm_medium=site&utm_campaign=antifalencia','_blank','noopener')">
+      onclick="location.href='/checkout.html?slug=antifalencia'">
       <div class="livro-mockup" data-mockup-cor="#1a2a3e" data-mockup-titulo="Guia Antifalência do Empreendedor" data-mockup-w="80" data-mockup-h="110"></div>
       <div class="ebook-genero" data-pt="Manual · Intermediário" data-en="Guide · Intermediate" data-es="Manual · Intermedio">Manual · Intermediário</div>
       <h3 class="ebook-titulo">O Guia Antifalência do Empreendedor Iniciante</h3>
@@ -653,8 +652,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           <div class="ebook-preco">R$46,04</div>
           <div class="ebook-cotas" data-pt="3 cotas inclusas" data-en="3 tickets included" data-es="3 cuotas incluidas">3 cotas inclusas</div>
         </div>
-        <a href="https://cultural.3trevo.com.br/o-melhor-da-sorte/checkout?numbers_quantity=3&utm_source=3trevo&utm_medium=site&utm_campaign=antifalencia"
-           target="_blank" rel="noopener noreferrer"
+        <a href="/checkout.html?slug=antifalencia"
            class="ebook-btn" onclick="event.stopPropagation()"
            data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
       </div>
@@ -973,7 +971,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
       <a href="#programa" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a>
       <a href="#faq" data-pt="Perguntas frequentes" data-en="FAQ" data-es="Preguntas">Perguntas frequentes</a>
       <a href="#sobre" data-pt="Sobre a editora" data-en="About" data-es="Acerca">Sobre a editora</a>
-      <a href="https://cultural.3trevo.com.br/termos-de-uso" target="_blank" rel="noopener noreferrer" data-pt="Regulamento" data-en="Rules" data-es="Reglamento">Regulamento</a>
+      <a href="/regras-programa-cultural.html" data-pt="Regulamento" data-en="Rules" data-es="Reglamento">Regulamento</a>
     </div>
     <div class="footer-col">
       <h4 data-pt="Contato" data-en="Contact" data-es="Contacto">Contato</h4>
@@ -1101,8 +1099,10 @@ function atualizarEscada(){
 }
 
 // ── META / PROGRESSO ──
-var META_TOTAL=34000;
-var ARRECADADO_FALLBACK=3400;
+// META_TOTAL é lido do banco (draws.meta_valor) em carregarProgresso()
+// O valor aqui é apenas fallback visual temporário enquanto a API carrega
+var META_TOTAL=0;  // será sobrescrito pela API
+var ARRECADADO_FALLBACK=0;
 var FRASES={
   pt:[
     {frase:'A comunidade está <em>se formando.</em>',sub:'Cada leitor que chega nos aproxima do sorteio. Faça parte agora.'},
@@ -1303,35 +1303,33 @@ document.addEventListener('DOMContentLoaded',function(){
   // ── Carregar catálogo dinamicamente ───────────────────────
   async function carregarCatalogoBanco() {
     try {
-      var r = await fetch(SB+'/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero_pt,genero,autor,preco,cotas,rifei_url,utm_campaign,bg_color', {headers: HDR});
+      var r = await fetch(SB+'/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,preco,cotas', {headers: HDR});
       var livros = await r.json();
       if (!livros || !livros.length) return;
 
-      // Atualizar links dos botões ADQUIRIR com URLs corretas do banco
+      // Atualizar preços e cotas dos cards com dados do banco
       livros.forEach(function(livro) {
-        if (!livro.rifei_url) return;
-        var url = livro.rifei_url +
-          (livro.utm_campaign ? '&utm_source=3trevo&utm_medium=site&utm_campaign='+livro.utm_campaign : '');
+        if (!livro.slug) return;
+        var url = '/checkout.html?slug=' + livro.slug;
 
-        // Encontrar o card pelo slug/título e atualizar o onclick e href
+        // Encontrar o card pelo link existente e atualizar
         document.querySelectorAll('.ebook-card').forEach(function(card) {
-          var titulo = (card.querySelector('.ebook-titulo')||{}).textContent || '';
-          if (titulo.includes(livro.titulo && livro.titulo.split(' ')[0])) {
-            // Atualizar onclick do card
-            card.onclick = function(e) {
-              if (!e.target.closest('a') && !e.target.closest('.ebook-btn'))
-                window.open(url, '_blank', 'noopener');
-            };
-            // Atualizar botão adquirir
-            var btn = card.querySelector('.ebook-btn');
-            if (btn) { btn.href = url; btn.target = '_blank'; btn.rel = 'noopener noreferrer'; }
-            // Atualizar preço
-            var preco = card.querySelector('.ebook-preco');
-            if (preco && livro.preco) preco.textContent = 'R$'+parseFloat(livro.preco).toFixed(2).replace('.',',');
-            // Atualizar cotas
-            var cotas = card.querySelector('.ebook-cotas');
-            if (cotas && livro.cotas) cotas.textContent = livro.cotas + (livro.cotas==1?' cota inclusa':' cotas inclusas');
-          }
+          var btn = card.querySelector('.ebook-btn');
+          if (!btn || !btn.href || !btn.href.includes('slug='+livro.slug)) return;
+
+          // Atualizar onclick do card para checkout interno
+          card.onclick = function(e) {
+            if (!e.target.closest('a') && !e.target.closest('.ebook-btn'))
+              location.href = url;
+          };
+          // Atualizar botão adquirir
+          btn.href = url; btn.removeAttribute('target'); btn.removeAttribute('rel');
+          // Atualizar preço
+          var preco = card.querySelector('.ebook-preco');
+          if (preco && livro.preco) preco.textContent = 'R$'+parseFloat(livro.preco).toFixed(2).replace('.',',');
+          // Atualizar cotas
+          var cotas = card.querySelector('.ebook-cotas');
+          if (cotas && livro.cotas) cotas.textContent = livro.cotas + (livro.cotas==1?' cota inclusa':' cotas inclusas');
         });
       });
     } catch(e) { console.warn('Catálogo banco:', e); }

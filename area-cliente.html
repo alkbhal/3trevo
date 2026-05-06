@@ -3,203 +3,689 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Área do Cliente — Editora Três Trevo</title>
-<meta name="description" content="Acesse sua biblioteca de ebooks e bônus exclusivos da Editora Três Trevo.">
+<title>Minha Biblioteca — Editora Três Trevo</title>
+<meta name="description" content="Acesse sua biblioteca de ebooks, músicas e acompanhe o Programa Cultural da Editora Três Trevo.">
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
+/* ══════════════════════════════════════════════════════════
+   RESET & TOKENS
+══════════════════════════════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --verde:#0f2d1a;--verde-medio:#1a4a2e;--verde-claro:#2a6b42;
   --ouro:#c8a84b;--ouro-claro:#e8c96a;--ouro-escuro:#8a6f28;
   --creme:#f5f0e8;--branco:#fdfbf7;--texto:#1c1c1c;
-  --borda:rgba(200,168,75,0.15);
+  --borda:rgba(200,168,75,0.15);--borda2:rgba(255,255,255,.07);
+  --player-h:76px;
+  --ease-out:cubic-bezier(0.22,1,0.36,1);
 }
 html{scroll-behavior:smooth}
-body{font-family:'Jost',sans-serif;background:var(--verde);color:var(--branco);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+body{
+  font-family:'Jost',sans-serif;background:var(--verde);
+  color:var(--branco);min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:1000;opacity:.4}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--verde)}::-webkit-scrollbar-thumb{background:var(--ouro-escuro)}
+  pointer-events:none;z-index:1000;opacity:.4;
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--verde)}
+::-webkit-scrollbar-thumb{background:var(--ouro-escuro);border-radius:2px}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
+/* ══ NAV ══ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  padding:0 48px;height:64px;
   display:flex;align-items:center;justify-content:space-between;
-  background:rgba(15,45,26,0.92);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--borda)}
-.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
-  color:var(--ouro);text-decoration:none;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+  background:rgba(15,45,26,0.97);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--borda);
+}
+.nav-marca{
+  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
+  color:var(--ouro);text-decoration:none;letter-spacing:.5px;
+  display:flex;align-items:center;gap:10px;
+}
 .nav-marca::before{content:'✦';font-size:14px;opacity:.7}
 .nav-right{display:flex;align-items:center;gap:16px}
-.nav-user{font-size:13px;color:rgba(255,255,255,.5)}
-.btn-sair{font-size:12px;letter-spacing:1px;padding:7px 16px;
+.nav-user{font-size:13px;color:rgba(255,255,255,.4);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-sair{
+  font-size:12px;letter-spacing:1px;padding:7px 16px;
   border:1px solid var(--borda);color:var(--ouro);background:transparent;
-  cursor:pointer;font-family:'Jost',sans-serif;transition:all .2s}
+  cursor:pointer;font-family:'Jost',sans-serif;transition:all .2s;
+}
 .btn-sair:hover{background:rgba(200,168,75,.1)}
 
-/* TELAS */
-.tela{display:none;min-height:100vh;padding-top:64px}
+/* ══ TELAS ══ */
+.tela{display:none;min-height:100vh}
 .tela.ativa{display:block}
 
-/* ── LOGIN ── */
+/* ══════════════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════════════ */
 #tela-login{display:flex;align-items:center;justify-content:center;min-height:100vh}
 .login-box{
   width:100%;max-width:420px;padding:48px 40px;
   background:rgba(255,255,255,.03);border:1px solid var(--borda);
   position:relative;
+  animation:fadeUp .5s var(--ease-out) both;
 }
-.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--ouro),transparent)}
-.login-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;
-  color:var(--ouro);margin-bottom:8px;text-align:center}
+.login-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent);
+}
+.login-logo{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;
+  color:var(--ouro);margin-bottom:8px;text-align:center;
+}
 .login-sub{font-size:13px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:36px;line-height:1.6}
-.campo-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,.35);margin-bottom:8px;display:block}
-.campo-input{width:100%;padding:12px 16px;background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.1);color:var(--branco);font-family:'Jost',sans-serif;
-  font-size:14px;outline:none;transition:border-color .2s;margin-bottom:20px}
+.campo-label{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.35);margin-bottom:8px;display:block;
+}
+.campo-input{
+  width:100%;padding:12px 16px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);color:var(--branco);
+  font-family:'Jost',sans-serif;font-size:14px;outline:none;
+  transition:border-color .2s;margin-bottom:20px;border-radius:0;
+}
 .campo-input:focus{border-color:var(--ouro)}
 .campo-input::placeholder{color:rgba(255,255,255,.2)}
-.btn-primario{width:100%;padding:14px;background:var(--ouro);color:var(--verde);
+.btn-primario{
+  width:100%;padding:14px;background:var(--ouro);color:var(--verde);
   border:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;
-  letter-spacing:.5px;cursor:pointer;transition:background .2s;margin-top:4px}
+  letter-spacing:.5px;cursor:pointer;transition:background .2s;margin-top:4px;
+}
 .btn-primario:hover{background:var(--ouro-claro)}
 .btn-primario:disabled{opacity:.5;cursor:not-allowed}
-.login-msg{font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-top:20px;line-height:1.7;min-height:40px}
+.login-msg{
+  font-size:13px;color:rgba(255,255,255,.4);text-align:center;
+  margin-top:20px;line-height:1.7;min-height:40px;
+}
 .login-msg.sucesso{color:var(--ouro-claro)}
-.login-msg.erro{color:#e88;}
+.login-msg.erro{color:#e88}
 .login-voltar{margin-top:16px;text-align:center}
-.login-voltar a{font-size:12px;color:rgba(255,255,255,.3);text-decoration:none;
-  transition:color .2s}
+.login-voltar a{font-size:12px;color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}
 .login-voltar a:hover{color:var(--ouro)}
-.tabs-login{display:flex;gap:0;margin-bottom:32px;border:1px solid var(--borda)}
-.tab-login{flex:1;padding:10px;background:transparent;border:none;color:rgba(255,255,255,.35);
-  font-family:'Jost',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
-  cursor:pointer;transition:all .2s}
-.tab-login.ativa{background:rgba(200,168,75,.1);color:var(--ouro)}
 
-/* ── DASHBOARD ── */
-#tela-dashboard{padding:64px 0 0}
-.dash-header{padding:40px 48px 32px;border-bottom:1px solid var(--borda)}
-.dash-saudacao{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════ */
+#tela-dashboard{padding-top:64px}
+
+.dash-header{padding:36px 48px 28px;border-bottom:1px solid var(--borda)}
+.dash-saudacao{
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ouro);margin-bottom:6px;display:flex;align-items:center;gap:8px;
+}
 .dash-saudacao::before{content:'✦';opacity:.6}
-.dash-titulo{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;line-height:1.1}
+.dash-titulo{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;line-height:1.1}
 .dash-titulo em{font-style:italic;color:var(--ouro)}
 
-.dash-corpo{padding:40px 48px;display:grid;grid-template-columns:1fr 320px;gap:40px}
-
-/* Cards de stats */
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
-.stat-card{padding:20px 24px;background:rgba(255,255,255,.03);border:1px solid var(--borda);position:relative;overflow:hidden}
-.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--ouro),transparent);transform:scaleX(0);
-  transform-origin:left;transition:transform .3s}
-.stat-card:hover::after{transform:scaleX(1)}
-.stat-card-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--ouro);line-height:1}
-.stat-card-txt{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px}
-
-/* Seção títulos */
-.sec-titulo-dash{font-size:10px;letter-spacing:4px;text-transform:uppercase;
-  color:var(--ouro);margin-bottom:20px;display:flex;align-items:center;gap:12px}
-.sec-titulo-dash::before{content:'';width:24px;height:1px;background:var(--ouro)}
-
-/* Biblioteca */
-.biblioteca{display:flex;flex-direction:column;gap:1px;background:var(--borda);border:1px solid var(--borda)}
-.livro-item{background:var(--verde);padding:24px 28px;display:grid;
-  grid-template-columns:auto 1fr auto;gap:20px;align-items:center;
-  transition:background .2s;position:relative;overflow:hidden}
-.livro-item::after{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;
-  background:var(--ouro);transform:scaleY(0);transform-origin:top;transition:transform .3s}
-.livro-item:hover{background:rgba(255,255,255,.03)}
-.livro-item:hover::after{transform:scaleY(1)}
-.livro-emoji-grande{font-size:32px;line-height:1}
-.livro-info{}
-.livro-genero{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);opacity:.6;margin-bottom:4px}
-.livro-titulo{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:2px}
-.livro-autor{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:.5px}
-.livro-acoes{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-.btn-download{font-size:11px;letter-spacing:1px;text-transform:uppercase;
-  padding:8px 16px;background:var(--ouro);color:var(--verde);border:none;
-  cursor:pointer;font-family:'Jost',sans-serif;font-weight:500;transition:background .2s;
-  text-decoration:none;display:inline-block;white-space:nowrap}
-.btn-download:hover{background:var(--ouro-claro)}
-.btn-download.expirado{background:transparent;border:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.25);cursor:default}
-.livro-cotas{font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.5px}
-
-/* Painel lateral */
-.painel-lateral{display:flex;flex-direction:column;gap:20px}
-.painel-card{background:rgba(255,255,255,.03);border:1px solid var(--borda);padding:28px;position:relative}
-.painel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--ouro),transparent)}
-.painel-titulo{font-size:10px;letter-spacing:3px;text-transform:uppercase;
-  color:rgba(255,255,255,.25);margin-bottom:16px}
-
-/* Bonus */
-.bonus-item{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:12px;align-items:flex-start}
-.bonus-item:last-child{border-bottom:none;padding-bottom:0}
-.bonus-icone{font-size:16px;margin-top:2px}
-.bonus-nome{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:2px}
-.bonus-desc{font-size:11px;color:rgba(255,255,255,.3)}
-
-/* Programa Cultural */
-.prog-status{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.prog-ponto{width:8px;height:8px;border-radius:50%;background:var(--ouro-claro);flex-shrink:0}
-.prog-ponto.inativo{background:rgba(255,255,255,.15)}
-.prog-texto{font-size:13px;color:rgba(255,255,255,.6)}
-.btn-programa{width:100%;padding:12px;border:1px solid var(--borda);background:transparent;
-  color:var(--ouro);font-family:'Jost',sans-serif;font-size:12px;letter-spacing:1px;
-  text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:4px}
-.btn-programa:hover{background:rgba(200,168,75,.1)}
-
-/* vazio */
-.vazio{padding:48px 28px;text-align:center}
-.vazio-emoji{font-size:40px;margin-bottom:16px;opacity:.4}
-.vazio-texto{font-size:14px;color:rgba(255,255,255,.3);line-height:1.7}
-.vazio-link{display:inline-block;margin-top:16px;padding:10px 24px;
-  background:var(--ouro);color:var(--verde);text-decoration:none;
-  font-size:12px;font-weight:500;transition:background .2s}
-.vazio-link:hover{background:var(--ouro-claro)}
-
-/* loading */
-.loading{display:flex;align-items:center;justify-content:center;padding:60px;
-  flex-direction:column;gap:16px}
-.loading-spinner{width:32px;height:32px;border:2px solid rgba(200,168,75,.2);
-  border-top-color:var(--ouro);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-txt{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase}
-
-/* toast */
-.toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;
-  background:var(--verde-medio);border:1px solid var(--ouro);
-  color:var(--ouro);font-size:13px;z-index:2000;
-  transform:translateY(80px);opacity:0;transition:all .4s}
-.toast.show{transform:translateY(0);opacity:1}
-
-@media(max-width:960px){
-  nav{padding:0 24px}
-  .dash-header,.dash-corpo{padding-left:24px;padding-right:24px}
-  .dash-corpo{grid-template-columns:1fr}
-  .painel-lateral{order:-1}
-  .stats-row{grid-template-columns:1fr 1fr}
+/* Stats row */
+.stats-row{
+  display:flex;gap:0;border-bottom:1px solid var(--borda);
+  background:rgba(255,255,255,.01);
 }
-@media(max-width:480px){
-  .login-box{padding:32px 24px}
-  .stats-row{grid-template-columns:1fr}
-  .livro-item{grid-template-columns:auto 1fr;gap:12px}
-  .livro-acoes{grid-column:1/-1;flex-direction:row;align-items:center}
+.stat-item{flex:1;padding:20px 28px;border-right:1px solid var(--borda)}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  color:var(--ouro);line-height:1;
+}
+.stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px}
+
+/* ══ ABAS ══ */
+.abas{
+  display:flex;gap:0;border-bottom:1px solid var(--borda);
+  padding:0 48px;background:rgba(255,255,255,.01);overflow-x:auto;
+}
+.abas::-webkit-scrollbar{height:0}
+.aba{
+  padding:14px 20px;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.35);cursor:pointer;background:none;
+  border:none;border-bottom:2px solid transparent;
+  font-family:'Jost',sans-serif;transition:all .2s;margin-bottom:-1px;
+  white-space:nowrap;flex-shrink:0;
+}
+.aba:hover{color:rgba(255,255,255,.65)}
+.aba.ativa{color:var(--ouro);border-bottom-color:var(--ouro)}
+
+/* ══ CONTEÚDO DAS ABAS ══ */
+.aba-conteudo{
+  display:none;
+  padding:40px 48px;
+  padding-bottom:calc(40px + var(--player-h) + 20px);
+  animation:fadeUp .3s var(--ease-out) both;
+}
+.aba-conteudo.ativa{display:block}
+
+.sec-titulo{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--ouro);margin-bottom:24px;display:flex;align-items:center;gap:12px;
+}
+.sec-titulo::before{content:'';width:20px;height:1px;background:var(--ouro)}
+
+/* ══════════════════════════════════════════════════════════
+   SKELETON LOADER
+══════════════════════════════════════════════════════════ */
+@keyframes shimmer{
+  0%{background-position:-400px 0}
+  100%{background-position:400px 0}
+}
+.skeleton{
+  background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%);
+  background-size:800px 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:2px;
+}
+.sk-card{
+  background:rgba(255,255,255,.02);border:1px solid var(--borda2);
+  padding:20px 24px;display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center;
+  margin-bottom:1px;
+}
+.sk-cover{width:56px;height:80px;border-radius:2px}
+.sk-line{height:12px;margin-bottom:8px;border-radius:2px}
+.sk-line.s{width:60%}
+.sk-line.m{width:80%}
+.sk-line.l{width:100%}
+.sk-btn{width:90px;height:32px;border-radius:2px}
+
+/* ══════════════════════════════════════════════════════════
+   BIBLIOTECA — CARDS NETFLIX
+══════════════════════════════════════════════════════════ */
+.biblioteca-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:16px;
+}
+.ebook-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--borda2);
+  cursor:pointer;transition:transform .25s var(--ease-out),box-shadow .25s,border-color .25s;
+  position:relative;overflow:hidden;
+}
+.ebook-card:hover{
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px var(--ouro);
+  border-color:var(--ouro);
+  z-index:2;
+}
+.ebook-capa{
+  aspect-ratio:2/3;
+  background:var(--verde-medio);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.ebook-capa-img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .4s var(--ease-out);
+}
+.ebook-card:hover .ebook-capa-img{transform:scale(1.05)}
+.ebook-capa-emoji{font-size:56px;opacity:.5;line-height:1}
+.ebook-capa-grad{
+  position:absolute;bottom:0;left:0;right:0;height:60%;
+  background:linear-gradient(to top,rgba(15,45,26,.95),transparent);
+}
+.ebook-capa-genero{
+  position:absolute;top:10px;left:10px;
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  background:var(--ouro);color:var(--verde);padding:3px 8px;font-weight:500;
+}
+.ebook-body{padding:14px}
+.ebook-titulo{
+  font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:400;
+  line-height:1.3;margin-bottom:4px;
+}
+.ebook-autor{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.5px;margin-bottom:12px}
+.ebook-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.ebook-cotas{font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.5px}
+.btn-dl{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:7px 14px;background:var(--ouro);color:var(--verde);border:none;
+  cursor:pointer;font-family:'Jost',sans-serif;font-weight:500;
+  transition:background .2s;text-decoration:none;display:inline-flex;
+  align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;
+}
+.btn-dl:hover{background:var(--ouro-claro)}
+.btn-dl:disabled,.btn-dl.carregando{opacity:.5;cursor:wait;pointer-events:none}
+.btn-dl svg{flex-shrink:0}
+
+/* ══ CARROSSEL SECAO ══ */
+.secao-wrapper{margin-bottom:40px}
+.secao-header{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:16px;
+}
+.secao-nome{
+  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;
+  color:rgba(255,255,255,.7);
+}
+.secao-ver-todos{
+  font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.3);
+  text-decoration:none;cursor:pointer;transition:color .2s;background:none;border:none;
+}
+.secao-ver-todos:hover{color:var(--ouro)}
+.carrossel-wrap{position:relative}
+.carrossel{
+  display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+}
+.carrossel::-webkit-scrollbar{height:2px}
+.carrossel::-webkit-scrollbar-track{background:rgba(255,255,255,.05)}
+.carrossel::-webkit-scrollbar-thumb{background:var(--ouro-escuro);border-radius:1px}
+.carrossel .ebook-card{
+  flex:0 0 180px;scroll-snap-align:start;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MÚSICAS — LISTA + PLAYER
+══════════════════════════════════════════════════════════ */
+.musicas-lista{
+  background:rgba(255,255,255,.015);
+  border:1px solid var(--borda2);
+}
+.musica-row{
+  display:grid;grid-template-columns:44px 36px 1fr auto;
+  gap:0 16px;align-items:center;padding:14px 20px;
+  border-bottom:1px solid var(--borda2);
+  cursor:pointer;transition:background .15s;position:relative;
+}
+.musica-row:last-child{border-bottom:none}
+.musica-row:hover,.musica-row.tocando{background:rgba(255,255,255,.04)}
+.musica-row.tocando{border-left:2px solid var(--ouro)}
+.musica-num{
+  font-size:12px;color:rgba(255,255,255,.25);text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.musica-row.tocando .musica-num{display:none}
+.musica-row.tocando .musica-equalizador{display:flex}
+.musica-equalizador{
+  display:none;align-items:flex-end;justify-content:center;gap:2px;height:16px;
+}
+.musica-equalizador span{
+  width:3px;border-radius:1px;background:var(--ouro);
+  animation:eq-bar .8s ease-in-out infinite alternate;
+}
+.musica-equalizador span:nth-child(2){animation-delay:.2s;height:60%}
+.musica-equalizador span:nth-child(3){animation-delay:.4s;height:80%}
+.musica-equalizador span:nth-child(1){height:100%}
+@keyframes eq-bar{from{opacity:.5;transform:scaleY(.5)}to{opacity:1;transform:scaleY(1)}}
+.musica-btn-play{
+  width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .2s;background:none;cursor:pointer;
+}
+.musica-btn-play svg{width:12px;height:12px;fill:rgba(255,255,255,.5);margin-left:2px}
+.musica-row:hover .musica-btn-play{border-color:var(--ouro)}
+.musica-row:hover .musica-btn-play svg{fill:var(--ouro)}
+.musica-row.tocando .musica-btn-play{background:var(--ouro);border-color:var(--ouro)}
+.musica-row.tocando .musica-btn-play svg{fill:var(--verde);margin-left:0}
+.musica-nome{font-size:14px;color:rgba(255,255,255,.8);margin-bottom:2px;line-height:1.3}
+.musica-sub{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px}
+.musica-dur{font-size:12px;color:rgba(255,255,255,.3);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ══ PAUSED indicator ══ */
+.musica-row.pausado .musica-equalizador span{animation-play-state:paused}
+
+/* ══════════════════════════════════════════════════════════
+   PLAYER FIXO — SPOTIFY STYLE
+══════════════════════════════════════════════════════════ */
+.player-fixo{
+  position:fixed;bottom:0;left:0;right:0;z-index:800;
+  background:rgba(10,24,16,0.98);backdrop-filter:blur(20px);
+  border-top:1px solid var(--borda);
+  height:var(--player-h);
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;padding:0 24px;gap:16px;
+  transform:translateY(100%);
+  transition:transform .35s var(--ease-out);
+}
+.player-fixo.show{transform:translateY(0)}
+
+.player-info{
+  display:flex;align-items:center;gap:14px;min-width:0;
+}
+.player-thumb{
+  width:44px;height:44px;background:var(--verde-medio);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;border:1px solid var(--borda);
+}
+.player-meta{min-width:0}
+.player-nome{
+  font-size:13px;color:rgba(255,255,255,.85);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:200px;
+}
+.player-artista{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
+
+.player-centro{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  min-width:280px;
+}
+.player-controles{display:flex;align-items:center;gap:16px}
+.player-btn{
+  background:none;border:none;cursor:pointer;
+  color:rgba(255,255,255,.45);padding:4px;
+  transition:color .2s;display:flex;align-items:center;
+}
+.player-btn:hover{color:rgba(255,255,255,.9)}
+.player-btn.btn-play{
+  width:38px;height:38px;border-radius:50%;border:1.5px solid var(--ouro);
+  justify-content:center;color:var(--ouro);transition:all .2s;
+}
+.player-btn.btn-play:hover{background:var(--ouro);color:var(--verde)}
+.player-barra{
+  display:flex;align-items:center;gap:10px;width:100%;
+}
+.player-tempo{
+  font-size:11px;color:rgba(255,255,255,.3);
+  font-variant-numeric:tabular-nums;min-width:34px;text-align:center;
+}
+.player-progress{
+  flex:1;height:4px;background:rgba(255,255,255,.12);
+  position:relative;cursor:pointer;border-radius:2px;
+  transition:height .1s;
+}
+.player-progress:hover{height:6px}
+.player-progress-fill{
+  height:100%;background:var(--ouro);border-radius:inherit;
+  pointer-events:none;transition:width .1s linear;
+}
+.player-progress::after{
+  content:'';position:absolute;right:calc(100% - var(--pct,0%) );
+  top:50%;transform:translate(50%,-50%);
+  width:12px;height:12px;border-radius:50%;background:var(--ouro);
+  opacity:0;transition:opacity .15s;
+}
+.player-progress:hover::after{opacity:1}
+
+.player-direita{
+  display:flex;align-items:center;justify-content:flex-end;gap:12px;
+}
+.player-vol-wrap{display:flex;align-items:center;gap:8px}
+.player-vol{
+  width:80px;height:4px;background:rgba(255,255,255,.12);
+  position:relative;cursor:pointer;border-radius:2px;
+}
+.player-vol:hover{height:6px;transition:height .1s}
+.player-vol-fill{
+  height:100%;background:rgba(255,255,255,.45);border-radius:inherit;
+  pointer-events:none;
+}
+.btn-fechar-player{
+  background:none;border:none;cursor:pointer;
+  color:rgba(255,255,255,.25);padding:4px;transition:color .2s;
+}
+.btn-fechar-player:hover{color:rgba(255,255,255,.7)}
+
+/* ══════════════════════════════════════════════════════════
+   SORTEIOS
+══════════════════════════════════════════════════════════ */
+.sorteio-card{
+  background:rgba(255,255,255,.025);border:1px solid var(--borda);
+  padding:28px;position:relative;margin-bottom:20px;
+}
+.sorteio-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent);
+}
+.sorteio-status{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ouro-claro);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.sorteio-status::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--ouro-claro);flex-shrink:0;
+  animation:pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.sorteio-titulo{
+  font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:4px;
+}
+.sorteio-premios{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:24px;line-height:1.6}
+.cotas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.cota-item{
+  padding:16px;background:rgba(255,255,255,.03);border:1px solid var(--borda);
+  text-align:center;
+}
+.cota-num{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  color:var(--ouro);line-height:1;
+}
+.cota-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px}
+.entry-linha{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--borda2);font-size:13px;
+}
+.entry-linha:last-of-type{border-bottom:none}
+.entry-chave{color:rgba(255,255,255,.4)}
+.entry-val{color:rgba(255,255,255,.75)}
+.entry-val.ok{color:#6fcf97}
+.entry-val.pendente{color:var(--ouro)}
+.btn-validar{
+  padding:12px 24px;background:var(--ouro);color:var(--verde);border:none;
+  font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:.5px;
+  cursor:pointer;transition:background .2s;margin-top:16px;
+}
+.btn-validar:hover{background:var(--ouro-claro)}
+.btn-validar:disabled{opacity:.4;cursor:not-allowed}
+.dep-form{display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--borda)}
+.dep-form.show{display:block;animation:fadeUp .25s var(--ease-out)}
+.dep-textarea{
+  width:100%;padding:12px 14px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);color:var(--branco);
+  font-family:'Jost',sans-serif;font-size:14px;outline:none;
+  resize:vertical;min-height:100px;line-height:1.7;
+  transition:border-color .2s;margin-bottom:12px;
+}
+.dep-textarea:focus{border-color:var(--ouro)}
+.redes-check{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.rede-btn{
+  padding:7px 14px;border:1px solid var(--borda);background:transparent;
+  color:rgba(255,255,255,.4);font-family:'Jost',sans-serif;font-size:11px;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;user-select:none;
+}
+.rede-btn.on{border-color:var(--ouro);color:var(--ouro);background:rgba(200,168,75,.06)}
+.contador-palavras{font-size:11px;color:rgba(255,255,255,.3);margin-bottom:12px}
+
+/* Histórico de vencedores */
+.vencedores-lista{margin-top:24px}
+.vencedor-row{
+  display:flex;align-items:center;gap:16px;padding:14px 0;
+  border-bottom:1px solid var(--borda2);
+}
+.vencedor-pos{
+  width:28px;height:28px;border:1px solid var(--ouro);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--ouro);flex-shrink:0;
+}
+.vencedor-info{flex:1;min-width:0}
+.vencedor-nome{font-size:14px;color:rgba(255,255,255,.75)}
+.vencedor-data{font-size:11px;color:rgba(255,255,255,.3)}
+.vencedor-premio{font-size:12px;color:var(--ouro);text-align:right;flex-shrink:0}
+
+/* ══════════════════════════════════════════════════════════
+   EXTRATO
+══════════════════════════════════════════════════════════ */
+.extrato-tabela{border:1px solid var(--borda2)}
+.extrato-linha{
+  display:grid;grid-template-columns:1fr auto auto;gap:20px;align-items:center;
+  padding:16px 20px;border-bottom:1px solid var(--borda2);
+  transition:background .15s;
+}
+.extrato-linha:last-child{border-bottom:none}
+.extrato-linha:hover{background:rgba(255,255,255,.02)}
+.extrato-produto{font-size:14px;color:rgba(255,255,255,.75);margin-bottom:3px}
+.extrato-data{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px}
+.extrato-metodo{
+  font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  padding:4px 10px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);
+}
+.extrato-valor{
+  font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;
+  color:var(--ouro);text-align:right;
+}
+.extrato-detalhe{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.badge-status{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border:1px solid}
+.badge-status.approved{border-color:rgba(111,207,151,.4);color:#6fcf97}
+.badge-status.pending{border-color:rgba(200,168,75,.4);color:var(--ouro)}
+.badge-status.rejected{border-color:rgba(232,100,100,.4);color:#e86464}
+.badge-status.refunded,.badge-status.cancelled{border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.35)}
+.extrato-resumo{
+  margin-top:20px;padding:16px 20px;
+  border:1px solid var(--borda2);background:rgba(255,255,255,.01);
+  display:flex;gap:32px;flex-wrap:wrap;
+}
+.resumo-item{}
+.resumo-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.resumo-val{
+  font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ouro);margin-top:4px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ASSINATURA
+══════════════════════════════════════════════════════════ */
+.plano-card{
+  background:rgba(255,255,255,.025);border:1px solid var(--borda);
+  padding:32px;position:relative;
+}
+.plano-card::before{
+  content:'';display:block;width:40px;height:2px;background:var(--ouro);margin-bottom:24px;
+}
+.plano-nome{
+  font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;
+  margin-bottom:4px;
+}
+.plano-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 12px;border:1px solid;margin-bottom:24px;
+}
+.plano-badge.ativo{border-color:rgba(111,207,151,.4);color:#6fcf97}
+.plano-badge.pausado{border-color:rgba(200,168,75,.4);color:var(--ouro)}
+.plano-badge.cancelado{border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.35)}
+.plano-badge.sem-plano{border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.35)}
+.plano-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.plano-detalhes{margin-top:20px;border-top:1px solid var(--borda)}
+.plano-beneficios{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;
+}
+.beneficio-item{
+  padding:14px;background:rgba(255,255,255,.02);border:1px solid var(--borda2);
+  font-size:13px;color:rgba(255,255,255,.55);line-height:1.5;
+}
+.beneficio-item strong{color:rgba(255,255,255,.75);display:block;margin-bottom:4px;font-size:12px;letter-spacing:.5px}
+.plano-acao{
+  display:inline-flex;align-items:center;gap:8px;margin-top:8px;
+  padding:12px 24px;background:var(--ouro);color:var(--verde);
+  text-decoration:none;font-size:12px;font-weight:500;letter-spacing:.5px;
+  transition:background .2s;
+}
+.plano-acao:hover{background:var(--ouro-claro)}
+
+/* ══════════════════════════════════════════════════════════
+   UTILITÁRIOS
+══════════════════════════════════════════════════════════ */
+.vazio{padding:60px 28px;text-align:center}
+.vazio-icone{
+  width:64px;height:64px;border:1px solid var(--borda);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:28px;opacity:.4;
+}
+.vazio-titulo{
+  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;
+  color:rgba(255,255,255,.5);margin-bottom:8px;
+}
+.vazio-texto{font-size:13px;color:rgba(255,255,255,.3);line-height:1.7}
+.vazio-link{
+  display:inline-block;margin-top:20px;padding:10px 24px;
+  background:var(--ouro);color:var(--verde);text-decoration:none;
+  font-size:12px;font-weight:500;transition:background .2s;letter-spacing:.5px;
+}
+.vazio-link:hover{background:var(--ouro-claro)}
+.loading{
+  display:flex;align-items:center;justify-content:center;
+  padding:60px;flex-direction:column;gap:16px;
+}
+.loading-spinner{
+  width:28px;height:28px;border:2px solid rgba(200,168,75,.2);
+  border-top-color:var(--ouro);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:calc(var(--player-h) + 16px);right:24px;
+  padding:13px 22px;background:rgba(20,50,30,.98);
+  border:1px solid var(--ouro);color:rgba(255,255,255,.85);font-size:13px;
+  z-index:2000;border-radius:2px;max-width:340px;
+  transform:translateY(20px);opacity:0;transition:all .35s var(--ease-out);
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.erro{border-color:rgba(232,100,100,.6);color:#e88}
+
+/* ══════════════════════════════════════════════════════════
+   ANIMAÇÕES
+══════════════════════════════════════════════════════════ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.fade-in{animation:fadeUp .4s var(--ease-out) both}
+.fade-in:nth-child(1){animation-delay:.03s}
+.fade-in:nth-child(2){animation-delay:.07s}
+.fade-in:nth-child(3){animation-delay:.11s}
+.fade-in:nth-child(4){animation-delay:.15s}
+.fade-in:nth-child(5){animation-delay:.19s}
+.fade-in:nth-child(6){animation-delay:.23s}
+.fade-in:nth-child(7){animation-delay:.27s}
+.fade-in:nth-child(8){animation-delay:.31s}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+@media(max-width:960px){
+  nav{padding:0 20px}
+  .dash-header,.abas,.aba-conteudo{padding-left:20px;padding-right:20px}
+  .stats-row{flex-wrap:wrap}
+  .stat-item{min-width:50%}
+  .biblioteca-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+  .player-fixo{padding:0 16px;grid-template-columns:1fr auto}
+  .player-info{min-width:0}
+  .player-centro{min-width:0;flex:1}
+  .player-direita{display:none}
+  .cotas-grid{grid-template-columns:1fr 1fr}
+  .plano-beneficios{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .abas{padding:0 12px}
+  .aba{font-size:10px;padding:12px 14px;letter-spacing:1.5px}
+  .aba-conteudo{padding:24px 16px}
+  .dash-header{padding:24px 16px}
+  .stats-row .stat-item{min-width:100%}
+  .cotas-grid{grid-template-columns:1fr 1fr}
+  .biblioteca-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .player-nome{max-width:140px}
+  .musica-row{grid-template-columns:36px 30px 1fr auto;gap:0 10px;padding:12px 14px}
+  .extrato-linha{grid-template-columns:1fr auto}
+  .extrato-valor{grid-column:1/-1;text-align:left}
+}
+@media(max-width:380px){
+  .biblioteca-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .dash-titulo{font-size:24px}
 }
 </style>
-  <meta name="description" content="Ebooks de empreendedorismo e financas com concurso cultural de leitura.">
-  <meta name="theme-color" content="#1e5c3a">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Editora Tres Trevo">
-  <meta property="og:image" content="https://3trevo.com.br/assets/og-default.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta property="og:title" content="Área do Cliente — Editora Três Trevo">
-  <meta property="og:url" content="https://3trevo.com.br/area-cliente.html">
 </head>
 <body>
 
@@ -212,218 +698,273 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
   </div>
 </nav>
 
-<!-- ── TELA: LOGIN ── -->
+<!-- ══ TELA: LOGIN ══ -->
 <div id="tela-login" class="tela ativa">
   <div class="login-box">
     <div class="login-logo">✦ Três Trevo</div>
-    <p class="login-sub">Sua biblioteca pessoal de ebooks</p>
-
-    <div class="tabs-login">
-      <button class="tab-login ativa" id="tabEntrar" onclick="mudarTab('entrar')">Entrar</button>
-      <button class="tab-login" id="tabCadastro" onclick="mudarTab('cadastro')">Cadastrar</button>
-    </div>
-
-    <!-- Entrar com magic link -->
-    <div id="formEntrar">
-      <label class="campo-label">Seu e-mail</label>
-      <input type="email" id="emailLogin" class="campo-input" placeholder="seu@email.com" autocomplete="email">
-      <button class="btn-primario" id="btnLogin" onclick="enviarMagicLink()">Receber link de acesso</button>
-      <p class="login-msg" id="msgLogin">Digite o e-mail usado na compra e enviaremos um link de acesso seguro.</p>
-    </div>
-
-    <!-- Cadastro (caso cliente novo queira criar conta) -->
-    <div id="formCadastro" style="display:none">
-      <label class="campo-label">Nome completo</label>
-      <input type="text" id="nomeNovo" class="campo-input" placeholder="Seu nome">
-      <label class="campo-label">E-mail</label>
-      <input type="email" id="emailNovo" class="campo-input" placeholder="seu@email.com" autocomplete="email">
-      <button class="btn-primario" id="btnCadastro" onclick="cadastrar()">Criar conta e entrar</button>
-      <p class="login-msg" id="msgCadastro">Use o mesmo e-mail da sua compra para ver seus ebooks.</p>
-    </div>
-
-    <div class="login-voltar">
-      <a href="/">← Voltar ao site</a>
-    </div>
+    <p class="login-sub">Acesse sua biblioteca pessoal</p>
+    <label class="campo-label" for="emailLogin">Seu e-mail</label>
+    <input type="email" id="emailLogin" class="campo-input" placeholder="seu@email.com"
+      autocomplete="email" onkeydown="if(event.key==='Enter')enviarMagicLink()">
+    <button class="btn-primario" id="btnLogin" onclick="enviarMagicLink()">Receber link de acesso</button>
+    <p class="login-msg" id="msgLogin">Digite o e-mail usado na compra e enviaremos um link de acesso seguro.</p>
+    <div class="login-voltar"><a href="/">← Voltar ao site</a></div>
   </div>
 </div>
 
-<!-- ── TELA: DASHBOARD ── -->
+<!-- ══ TELA: DASHBOARD ══ -->
 <div id="tela-dashboard" class="tela" style="display:none">
+
+  <!-- Header -->
   <div class="dash-header">
-    <div class="dash-saudacao">Área do cliente</div>
-    <h1 class="dash-titulo">Sua <em>biblioteca</em></h1>
+    <div class="dash-saudacao">Minha conta</div>
+    <h1 class="dash-titulo">Minha <em>biblioteca</em></h1>
   </div>
 
-  <div class="dash-corpo">
-    <!-- Coluna principal -->
-    <div>
-      <!-- Stats -->
-      <div class="stats-row" id="statsRow">
-        <div class="stat-card">
-          <div class="stat-card-num" id="statLivros">—</div>
-          <div class="stat-card-txt">Ebooks</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-num" id="statCotas">—</div>
-          <div class="stat-card-txt">Cotas no programa</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-num" id="statBonus">—</div>
-          <div class="stat-card-txt">Bônus disponíveis</div>
-        </div>
-      </div>
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-item">
+      <div class="stat-num" id="statEbooks">—</div>
+      <div class="stat-label">Ebooks</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statMusicas">—</div>
+      <div class="stat-label">Músicas</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statCotas">—</div>
+      <div class="stat-label">Cotas no Programa</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statStatus">—</div>
+      <div class="stat-label">Assinatura</div>
+    </div>
+  </div>
 
-      <!-- Biblioteca -->
-      <div class="sec-titulo-dash">Meus ebooks</div>
-      <div id="biblioteca">
-        <div class="loading">
-          <div class="loading-spinner"></div>
-          <span class="loading-txt">Carregando sua biblioteca</span>
+  <!-- Abas -->
+  <div class="abas" role="tablist">
+    <button class="aba ativa" onclick="trocarAba('biblioteca',this)" role="tab" aria-selected="true">Biblioteca</button>
+    <button class="aba" onclick="trocarAba('musicas',this)" role="tab">Músicas</button>
+    <button class="aba" onclick="trocarAba('sorteios',this)" role="tab">Sorteios</button>
+    <button class="aba" onclick="trocarAba('extrato',this)" role="tab">Extrato</button>
+    <button class="aba" onclick="trocarAba('assinatura',this)" role="tab">Assinatura</button>
+  </div>
+
+  <!-- ── ABA: BIBLIOTECA ── -->
+  <div id="aba-biblioteca" class="aba-conteudo ativa" role="tabpanel">
+    <div class="sec-titulo">Meus ebooks</div>
+    <div id="listaEbooks">
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+    </div>
+  </div>
+
+  <!-- ── ABA: MÚSICAS ── -->
+  <div id="aba-musicas" class="aba-conteudo" role="tabpanel">
+    <div class="sec-titulo">Minhas músicas</div>
+    <div id="listaMusicas">
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+    </div>
+  </div>
+
+  <!-- ── ABA: SORTEIOS ── -->
+  <div id="aba-sorteios" class="aba-conteudo" role="tabpanel">
+    <div class="sec-titulo">Programa Cultural — Sorteios</div>
+    <!-- Meus números na rodada atual -->
+    <div id="meus-numeros-wrap" style="display:none;margin-bottom:24px">
+      <div style="background:rgba(200,168,75,.05);border:1px solid rgba(200,168,75,.18);padding:20px;position:relative">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
+        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">Meus Números — Rodada Atual</div>
+        <div id="meus-numeros-lista" style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--branco);line-height:1.8;margin-bottom:12px">—</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.35)">Cada número representa uma chance de ser sorteado</div>
+      </div>
+      <!-- Barra de progresso da meta -->
+      <div style="margin-top:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3)">Progresso da meta</div>
+          <div style="font-size:12px;color:var(--ouro)" id="meta-progresso-txt">—</div>
         </div>
+        <div style="height:4px;background:rgba(255,255,255,.06);overflow:hidden">
+          <div id="meta-progresso-bar" style="height:100%;background:linear-gradient(90deg,var(--ouro),var(--ouro-c));transition:width .5s ease;width:0%"></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.25)" id="meta-faltam">—</div>
       </div>
     </div>
+    <div id="listaSorteios">
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+    </div>
+  </div>
 
-    <!-- Painel lateral -->
-    <div class="painel-lateral">
+  <!-- ── ABA: EXTRATO ── -->
+  <div id="aba-extrato" class="aba-conteudo" role="tabpanel">
+    <div class="sec-titulo">Histórico de pagamentos</div>
+    <div id="listaExtrato">
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+    </div>
+  </div>
 
-      <!-- Programa Cultural -->
-      <div class="painel-card" id="painelPrograma">
-        <div class="painel-titulo">Programa Cultural</div>
-        <div id="statusPrograma">
-          <div class="prog-status">
-            <div class="prog-ponto inativo" id="pontoDep"></div>
-            <span class="prog-texto" id="textoDep">Depoimento pendente</span>
-          </div>
-          <div class="prog-status">
-            <div class="prog-ponto inativo" id="pontoInsta"></div>
-            <span class="prog-texto">Seguir @3trevo no Instagram</span>
-          </div>
-        </div>
-        <button class="btn-programa" onclick="abrirPrograma()">Validar minha participação →</button>
+  <!-- ── ABA: ASSINATURA ── -->
+  <div id="aba-assinatura" class="aba-conteudo" role="tabpanel">
+    <div class="sec-titulo">Minha assinatura</div>
+    <div id="conteudoAssinatura">
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+    </div>
+  </div>
+
+</div><!-- /tela-dashboard -->
+
+<!-- ══ PLAYER FIXO ══ -->
+<div class="player-fixo" id="playerFixo" role="complementary" aria-label="Player de músicas">
+  <!-- Coluna esquerda: info da faixa -->
+  <div class="player-info">
+    <div class="player-thumb" id="playerThumb">🎵</div>
+    <div class="player-meta">
+      <div class="player-nome" id="playerNome">—</div>
+      <div class="player-artista" id="playerArtista">Três Trevo</div>
+    </div>
+  </div>
+
+  <!-- Centro: controles + barra de progresso -->
+  <div class="player-centro">
+    <div class="player-controles">
+      <button class="player-btn" id="btnAnterior" onclick="faixaAnterior()" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
+        </svg>
+      </button>
+      <button class="player-btn btn-play" id="playerBtnPlay" onclick="togglePlay()" aria-label="Play/Pause">
+        <svg id="playIconSvg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <polygon id="playIcon" points="5,3 19,12 5,21"/>
+        </svg>
+      </button>
+      <button class="player-btn" id="btnProxima" onclick="faixaProxima()" aria-label="Próxima">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 3.9V8.1L8.5 12zM16 6h2v12h-2z"/>
+        </svg>
+      </button>
+    </div>
+    <div class="player-barra">
+      <span class="player-tempo" id="playerTempoAtual">0:00</span>
+      <div class="player-progress" id="playerProgress" onclick="buscarAudio(event)" role="slider"
+           aria-label="Progresso da música" aria-valuemin="0" aria-valuemax="100">
+        <div class="player-progress-fill" id="playerFill" style="width:0%"></div>
       </div>
+      <span class="player-tempo" id="playerTempoDuracao">0:00</span>
+    </div>
+  </div>
 
-      <!-- Bônus -->
-      <div class="painel-card">
-        <div class="painel-titulo">Meus bônus</div>
-        <div id="listaBonus">
-          <div class="loading">
-            <div class="loading-spinner"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Suporte -->
-      <div class="painel-card">
-        <div class="painel-titulo">Precisa de ajuda?</div>
-        <p style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;margin-bottom:16px">
-          Problemas com download, reembolso ou dúvidas sobre o Programa Cultural.
-        </p>
-        <a href="mailto:sac@3trevo.com.br" style="display:block;font-size:13px;color:var(--ouro);text-decoration:none;padding:12px 0;border-top:1px solid var(--borda)">
-          ✉ sac@3trevo.com.br
-        </a>
-        <a href="https://www.3trevo.com.br#faq" style="display:block;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;padding:12px 0;border-top:1px solid rgba(255,255,255,.05)" target="_blank">
-          → Perguntas frequentes
-        </a>
+  <!-- Direita: volume + fechar -->
+  <div class="player-direita">
+    <div class="player-vol-wrap" title="Volume">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="rgba(255,255,255,0.4)">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+      </svg>
+      <div class="player-vol" id="playerVol" onclick="ajustarVolume(event)">
+        <div class="player-vol-fill" id="playerVolFill" style="width:75%"></div>
       </div>
     </div>
+    <button class="btn-fechar-player" onclick="fecharPlayer()" aria-label="Fechar player">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
   </div>
 </div>
+
+<!-- Audio element (hidden) -->
+<audio id="audioEl" preload="none"></audio>
 
 <!-- Toast -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="alert"></div>
 
+<script src="/js/supabase-client.js"></script>
 <script>
 // ============================================================
-// CONFIGURAÇÃO — substitua pelos seus valores do Supabase
-// Settings > API > Project URL e anon key
+// ÁREA DO CLIENTE — Editora Três Trevo
+// v4.0 — Production-ready
 // ============================================================
-const SUPABASE_URL  = 'https://xfkepekffdyrtcgagwqo.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
 
-// Catálogo local (espelha o config.json)
-const CATALOGO = {
-  justicamento:   { titulo: 'Justiça(mento) para Orelha',              autor: 'Said Anes',    genero: 'Ensaio',            emoji: '⚖️' },
-  vigilante:      { titulo: 'Vigilante',                               autor: 'Said Anes',    genero: 'Ficção Literária',  emoji: '🔍' },
-  terceiraguerra: { titulo: 'O Nascimento Silencioso da 3ª Guerra Mundial', autor: 'Said Anes', genero: 'Ficção Documental', emoji: '🌐' },
-  antifalencia:   { titulo: 'O Guia Antifalência do Empreendedor Iniciante', autor: 'Rogerio Dias', genero: 'Manual',       emoji: '📘' },
-};
-
-// ============================================================
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-let usuarioAtual = null;
+let usuarioAtual   = null;
+let abasCarregadas = {};
+let audioEl        = null;
+let playlist       = [];   // [{titulo, artista, url, emoji}]
+let faixaAtual     = -1;
+let toastTimer     = null;
 
 // ── INIT ──────────────────────────────────────────────────
 async function init() {
+  audioEl = document.getElementById('audioEl');
+  audioEl.volume = 0.75;
+
+  audioEl.addEventListener('timeupdate', atualizarProgresso);
+  audioEl.addEventListener('loadedmetadata', () => {
+    document.getElementById('playerTempoDuracao').textContent = fmtTempo(audioEl.duration);
+  });
+  audioEl.addEventListener('ended', () => {
+    faixaProxima();
+  });
+  audioEl.addEventListener('error', () => {
+    toast('Erro ao carregar áudio.', 'erro');
+    setPlayIcon(false);
+  });
+
+  // Volume bar drag
+  const volEl = document.getElementById('playerVol');
+  volEl.addEventListener('click', ajustarVolume);
+
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     usuarioAtual = session.user;
     mostrarDashboard();
   }
-  // Escuta mudanças de auth (magic link callback)
+
   sb.auth.onAuthStateChange((_e, session) => {
     if (session && !usuarioAtual) {
       usuarioAtual = session.user;
       mostrarDashboard();
+    } else if (!session && usuarioAtual) {
+      usuarioAtual = null;
+      location.reload();
     }
   });
 }
 
-// ── TABS LOGIN ────────────────────────────────────────────
-function mudarTab(aba) {
-  document.getElementById('formEntrar').style.display  = aba === 'entrar'   ? '' : 'none';
-  document.getElementById('formCadastro').style.display = aba === 'cadastro' ? '' : 'none';
-  document.getElementById('tabEntrar').classList.toggle('ativa', aba === 'entrar');
-  document.getElementById('tabCadastro').classList.toggle('ativa', aba === 'cadastro');
-}
-
-// ── MAGIC LINK ────────────────────────────────────────────
+// ── LOGIN ─────────────────────────────────────────────────
 async function enviarMagicLink() {
   const email = document.getElementById('emailLogin').value.trim();
   const btn   = document.getElementById('btnLogin');
   const msg   = document.getElementById('msgLogin');
-  if (!email) { msg.textContent = 'Digite seu e-mail.'; msg.className = 'login-msg erro'; return; }
-  btn.disabled = true; btn.textContent = 'Enviando…';
+  if (!email || !email.includes('@')) {
+    msg.textContent = 'Digite um e-mail válido.';
+    msg.className = 'login-msg erro';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: window.location.href }
   });
-  btn.disabled = false; btn.textContent = 'Receber link de acesso';
+  btn.disabled = false;
+  btn.textContent = 'Receber link de acesso';
   if (error) {
     msg.textContent = 'Erro: ' + error.message;
     msg.className = 'login-msg erro';
   } else {
-    msg.innerHTML = '✦ Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style="opacity:.6">Pode levar até 2 minutos.</small>';
+    msg.innerHTML = '✦ Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style="opacity:.6">Pode levar até 2 minutos. Cheque o spam.</small>';
     msg.className = 'login-msg sucesso';
   }
 }
 
-// ── CADASTRO ──────────────────────────────────────────────
-async function cadastrar() {
-  const email = document.getElementById('emailNovo').value.trim();
-  const btn   = document.getElementById('btnCadastro');
-  const msg   = document.getElementById('msgCadastro');
-  if (!email) { msg.textContent = 'Digite seu e-mail.'; msg.className = 'login-msg erro'; return; }
-  btn.disabled = true; btn.textContent = 'Criando conta…';
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.href }
-  });
-  btn.disabled = false; btn.textContent = 'Criar conta e entrar';
-  if (error) {
-    msg.textContent = 'Erro: ' + error.message;
-    msg.className = 'login-msg erro';
-  } else {
-    msg.innerHTML = '✦ Enviamos um link para ' + email + '.<br>Clique nele para acessar sua biblioteca.';
-    msg.className = 'login-msg sucesso';
-  }
-}
-
-// ── SAIR ──────────────────────────────────────────────────
 async function sair() {
+  fecharPlayer();
   await sb.auth.signOut();
   usuarioAtual = null;
+  abasCarregadas = {};
+  playlist = [];
+  faixaAtual = -1;
   document.getElementById('tela-dashboard').style.display = 'none';
   document.getElementById('tela-login').className = 'tela ativa';
+  document.getElementById('tela-login').style.display = '';
   document.getElementById('navRight').style.display = 'none';
 }
 
@@ -434,112 +975,806 @@ function mostrarDashboard() {
   document.getElementById('navRight').style.display = 'flex';
   document.getElementById('navEmail').textContent = usuarioAtual.email;
   carregarBiblioteca();
-  carregarBonus();
+  carregarStats();
 }
 
-// ── BIBLIOTECA ────────────────────────────────────────────
-async function carregarBiblioteca() {
-  const cont = document.getElementById('biblioteca');
+// ── ABAS ──────────────────────────────────────────────────
+function trocarAba(id, btn) {
+  document.querySelectorAll('.aba').forEach(b => {
+    b.classList.remove('ativa');
+    b.setAttribute('aria-selected', 'false');
+  });
+  document.querySelectorAll('.aba-conteudo').forEach(c => c.classList.remove('ativa'));
+  btn.classList.add('ativa');
+  btn.setAttribute('aria-selected', 'true');
+  const painel = document.getElementById('aba-' + id);
+  painel.classList.add('ativa');
 
-  // Busca pedidos do cliente
-  const { data: pedidos, error } = await sb
-    .from('pedidos')
-    .select('*, downloads(*)')
-    .order('criado_em', { ascending: false });
+  if (!abasCarregadas[id]) {
+    abasCarregadas[id] = true;
+    if (id === 'musicas')    carregarMusicas();
+    if (id === 'sorteios')   carregarSorteios();
+    if (id === 'extrato')    carregarExtrato();
+    if (id === 'assinatura') carregarAssinatura();
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────────
+async function carregarStats() {
+  const [libRes, cotasRes, subRes] = await Promise.all([
+    sb.from('user_library')
+      .select('id, product_id, produto:product_id(tipo)')
+      .eq('user_id', usuarioAtual.id),
+    sb.from('draw_entries')
+      .select('cotas_base, cotas_bonus')
+      .eq('user_id', usuarioAtual.id),
+    sb.from('subscriptions')
+      .select('status')
+      .eq('user_id', usuarioAtual.id)
+      .eq('status', 'active')
+      .limit(1),
+  ]);
+
+  const lib     = libRes.data  || [];
+  const ebooks  = lib.filter(l => l.produto?.tipo !== 'musica').length;
+  const musicas = lib.filter(l => l.produto?.tipo === 'musica').length;
+  const cotas   = (cotasRes.data || []).reduce((s, e) => s + (e.cotas_base || 0) + (e.cotas_bonus || 0), 0);
+  const hasSub  = (subRes.data  || []).length > 0;
+
+  animarNum('statEbooks',  ebooks);
+  animarNum('statMusicas', musicas);
+  animarNum('statCotas',   cotas);
+  document.getElementById('statStatus').textContent = hasSub ? 'Ativa' : 'Sem plano';
+}
+
+function animarNum(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let cur = 0;
+  const step = Math.max(1, Math.ceil(target / 20));
+  const t = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur;
+    if (cur >= target) clearInterval(t);
+  }, 40);
+}
+
+// ══════════════════════════════════════════════════════════
+// BIBLIOTECA (EBOOKS)
+// ══════════════════════════════════════════════════════════
+async function carregarBiblioteca() {
+  const cont = document.getElementById('listaEbooks');
+  cont.innerHTML = skeletonCards(4);
+
+  const { data: lib, error } = await sb
+    .from('user_library')
+    .select('id, liberado_em, produto:product_id(id, slug, tipo, titulo, autor, genero, cotas, capa_url)')
+    .eq('user_id', usuarioAtual.id)
+    .order('liberado_em', { ascending: false });
 
   if (error) {
-    cont.innerHTML = '<div class="vazio"><p class="vazio-texto">Erro ao carregar. Tente recarregar a página.</p></div>';
+    cont.innerHTML = vazioCont('⚠', 'Erro ao carregar', 'Recarregue a página.');
     return;
   }
 
-  // Atualiza stats
-  const totalCotas = pedidos.reduce((s, p) => s + (p.cotas || 0), 0);
-  document.getElementById('statLivros').textContent = pedidos.length;
-  document.getElementById('statCotas').textContent  = totalCotas;
+  const ebooks = (lib || []).filter(l => l.produto?.tipo !== 'musica');
 
-  if (pedidos.length === 0) {
-    cont.innerHTML = `
-      <div class="biblioteca">
-        <div class="vazio">
-          <div class="vazio-emoji">📚</div>
-          <p class="vazio-texto">Você ainda não tem ebooks.<br>Adquira um título e ele aparece aqui.</p>
-          <a href="https://www.3trevo.com.br#catalogo" class="vazio-link">Ver catálogo →</a>
-        </div>
-      </div>`;
+  if (ebooks.length === 0) {
+    cont.innerHTML = `<div class="vazio">
+      <div class="vazio-icone">📚</div>
+      <div class="vazio-titulo">Biblioteca vazia</div>
+      <p class="vazio-texto">Você ainda não tem ebooks.<br>Adquira um título e ele aparecerá aqui.</p>
+      <a href="/#catalogo" class="vazio-link">Ver catálogo →</a>
+    </div>`;
     return;
   }
 
-  const html = pedidos.map(p => {
-    const meta   = CATALOGO[p.ebook_slug] || { titulo: p.ebook_titulo, autor: '', genero: 'Ebook', emoji: '📖' };
-    const dl     = p.downloads?.[0];
-    const expirou = dl && new Date(dl.expira_em) < new Date();
-    const btnHtml = dl && !expirou
-      ? `<a href="/download?token=${dl.token}" class="btn-download" target="_blank">⬇ Baixar PDF</a>`
-      : dl && expirou
-        ? `<a href="#" class="btn-download expirado" onclick="renovarLink('${p.id}');return false">Link expirado — renovar</a>`
-        : `<button class="btn-download" onclick="solicitarDownload('${p.id}')">Gerar link</button>`;
-    return `
-      <div class="livro-item">
-        <div class="livro-emoji-grande">${meta.emoji}</div>
-        <div class="livro-info">
-          <div class="livro-genero">${meta.genero}</div>
-          <div class="livro-titulo">${meta.titulo}</div>
-          <div class="livro-autor">${meta.autor}</div>
-        </div>
-        <div class="livro-acoes">
-          ${btnHtml}
-          <div class="livro-cotas">${p.cotas} cota${p.cotas > 1 ? 's' : ''}</div>
-        </div>
-      </div>`;
-  }).join('');
+  // Agrupar por gênero para carrossel
+  const porGenero = {};
+  ebooks.forEach(l => {
+    const p   = l.produto || {};
+    const meta = CATALOGO[p.slug] || {};
+    const gen  = p.genero || meta.genero || 'Ebooks';
+    if (!porGenero[gen]) porGenero[gen] = [];
+    porGenero[gen].push({ l, p, meta });
+  });
 
-  cont.innerHTML = `<div class="biblioteca">${html}</div>`;
-}
+  const generos = Object.keys(porGenero);
 
-// ── BONUS ─────────────────────────────────────────────────
-async function carregarBonus() {
-  const cont = document.getElementById('listaBonus');
-  const { data: bonus } = await sb.from('bonus').select('*').eq('ativo', true);
-  document.getElementById('statBonus').textContent = bonus?.length || 0;
-  if (!bonus || bonus.length === 0) {
-    cont.innerHTML = '<p style="font-size:13px;color:rgba(255,255,255,.25);line-height:1.6">Bônus exclusivos serão liberados conforme você avança no Programa Cultural.</p>';
+  // Se só um gênero ou poucos itens, usar grid direto
+  if (ebooks.length <= 6) {
+    cont.innerHTML = `<div class="biblioteca-grid">${ebooks.map(({ l, p, meta }, i) => cardEbook(p, meta, i)).join('')}</div>`;
     return;
   }
-  cont.innerHTML = bonus.map(b => `
-    <div class="bonus-item">
-      <div class="bonus-icone">✦</div>
-      <div>
-        <div class="bonus-nome">${b.titulo}</div>
-        <div class="bonus-desc">${b.descricao || ''}</div>
+
+  // Com carrossel por gênero
+  cont.innerHTML = generos.map(gen => {
+    const items = porGenero[gen];
+    return `<div class="secao-wrapper">
+      <div class="secao-header">
+        <div class="secao-nome">${gen}</div>
       </div>
-    </div>`).join('');
+      ${items.length > 4
+        ? `<div class="carrossel-wrap"><div class="carrossel">${items.map(({ p, meta }, i) => cardEbook(p, meta, i)).join('')}</div></div>`
+        : `<div class="biblioteca-grid">${items.map(({ p, meta }, i) => cardEbook(p, meta, i)).join('')}</div>`
+      }
+    </div>`;
+  }).join('');
 }
 
-// ── DOWNLOAD / RENOVAR ────────────────────────────────────
-async function solicitarDownload(pedidoId) {
-  toast('Gerando seu link de download…');
-  // O Make ou uma Edge Function renova o token e envia por e-mail
-  // Por ora abre suporte
-  window.location.href = 'mailto:sac@3trevo.com.br?subject=Link de download&body=Pedido: ' + pedidoId;
+function cardEbook(p, meta, i) {
+  const emoji  = meta.emoji || '📖';
+  const titulo = p.titulo || meta.titulo || 'Ebook';
+  const autor  = p.autor  || meta.autor  || '';
+  const genero = p.genero || meta.genero || '';
+  const cotas  = p.cotas  || meta.cotas  || 0;
+  const imgSrc = p.capa_url || '';
+
+  return `<div class="ebook-card fade-in" style="animation-delay:${i * 0.05}s">
+    <div class="ebook-capa">
+      ${imgSrc
+        ? `<img class="ebook-capa-img" src="${imgSrc}" alt="${titulo}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : ''
+      }
+      <div class="ebook-capa-emoji" style="${imgSrc ? 'display:none' : ''}">${emoji}</div>
+      <div class="ebook-capa-grad"></div>
+      ${genero ? `<span class="ebook-capa-genero">${genero}</span>` : ''}
+    </div>
+    <div class="ebook-body">
+      <div class="ebook-titulo">${titulo}</div>
+      <div class="ebook-autor">${autor}</div>
+      <div class="ebook-footer">
+        <span class="ebook-cotas">${cotas} cota${cotas !== 1 ? 's' : ''}</span>
+        <button class="btn-dl" id="dl-${p.id}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}')">
+          <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg>
+          PDF
+        </button>
+      </div>
+    </div>
+  </div>`;
 }
 
-async function renovarLink(pedidoId) {
-  toast('Solicitando renovação — você receberá um e-mail em instantes.');
-  window.location.href = 'mailto:sac@3trevo.com.br?subject=Renovar link de download&body=Pedido: ' + pedidoId;
+async function baixar(productId, titulo) {
+  const btn = document.getElementById('dl-' + productId);
+  if (btn) { btn.classList.add('carregando'); btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/><path d="M12 2v4a6 6 0 010 12v4a10 10 0 000-20z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".8s" repeatCount="indefinite"/></path></svg> Gerando…'; }
+
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(`${EDGE_BASE}/get-download`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ product_id: productId }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      toast(data.error || 'Erro ao gerar link de download.', 'erro');
+    } else {
+      window.open(data.download_url, '_blank');
+      toast(`✦ Link de "${titulo}" gerado! Expira em 72h.`);
+    }
+  } catch {
+    toast('Erro de conexão. Tente novamente.', 'erro');
+  } finally {
+    if (btn) {
+      btn.classList.remove('carregando');
+      btn.innerHTML = '<svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg> PDF';
+    }
+  }
 }
 
-function abrirPrograma() {
-  window.open('https://cultural.3trevo.com.br', '_blank');
+// ══════════════════════════════════════════════════════════
+// MÚSICAS
+// ══════════════════════════════════════════════════════════
+async function carregarMusicas() {
+  const cont = document.getElementById('listaMusicas');
+  cont.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>`;
+
+  const { data: lib } = await sb
+    .from('user_library')
+    .select('id, produto:product_id(id, titulo, autor, arquivo_url, duracao_seg, capa_url)')
+    .eq('user_id', usuarioAtual.id)
+    .eq('produto.tipo', 'musica');
+
+  const musicas = (lib || []).filter(l => l.produto?.id);
+
+  playlist = musicas
+    .filter(l => l.produto?.arquivo_url)
+    .map(l => ({
+      titulo:  l.produto.titulo   || 'Faixa',
+      artista: l.produto.autor    || 'Três Trevo',
+      url:     l.produto.arquivo_url,
+      emoji:   '🎵',
+      dur:     l.produto.duracao_seg || 0,
+    }));
+
+  if (musicas.length === 0) {
+    cont.innerHTML = `<div class="vazio">
+      <div class="vazio-icone">🎵</div>
+      <div class="vazio-titulo">Nenhuma música ainda</div>
+      <p class="vazio-texto">Músicas são liberadas com assinatura ativa<br>ou adquiridas individualmente.</p>
+    </div>`;
+    return;
+  }
+
+  cont.innerHTML = `<div class="musicas-lista">${musicas.map((l, i) => {
+    const p = l.produto;
+    const semAudio = !p.arquivo_url;
+    return `<div class="musica-row${faixaAtual === i ? ' tocando' : ''}" id="mrow-${i}"
+      onclick="${semAudio ? '' : `tocarFaixa(${i})`}"
+      style="${semAudio ? 'opacity:.4;cursor:default' : ''}">
+      <div class="musica-num">${i + 1}</div>
+      <div class="musica-equalizador" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <button class="musica-btn-play" aria-label="${semAudio ? 'Indisponível' : 'Tocar ' + p.titulo}" ${semAudio ? 'disabled' : ''}>
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </button>
+      <div>
+        <div class="musica-nome">${p.titulo || 'Faixa'}</div>
+        <div class="musica-sub">${p.autor || 'Três Trevo'}${semAudio ? ' · indisponível' : ''}</div>
+      </div>
+      <div class="musica-dur">${p.duracao_seg ? fmtTempo(p.duracao_seg) : '—'}</div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
-// ── TOAST ─────────────────────────────────────────────────
-function toast(msg) {
+function tocarFaixa(idx) {
+  if (idx < 0 || idx >= playlist.length) return;
+  faixaAtual = idx;
+  const faixa = playlist[idx];
+
+  // Reset rows
+  document.querySelectorAll('.musica-row').forEach(r => r.classList.remove('tocando', 'pausado'));
+  const row = document.getElementById('mrow-' + idx);
+  if (row) row.classList.add('tocando');
+
+  audioEl.src = faixa.url;
+  audioEl.play().catch(() => toast('Erro ao reproduzir.', 'erro'));
+
+  document.getElementById('playerNome').textContent    = faixa.titulo;
+  document.getElementById('playerArtista').textContent = faixa.artista;
+  document.getElementById('playerThumb').textContent   = faixa.emoji;
+  document.getElementById('playerFixo').classList.add('show');
+  setPlayIcon(true);
+}
+
+function faixaProxima() {
+  if (playlist.length === 0) return;
+  tocarFaixa((faixaAtual + 1) % playlist.length);
+}
+
+function faixaAnterior() {
+  if (playlist.length === 0) return;
+  // Se passou menos de 3s, vai para anterior; senão volta ao início
+  if (audioEl.currentTime > 3) {
+    audioEl.currentTime = 0;
+  } else {
+    tocarFaixa((faixaAtual - 1 + playlist.length) % playlist.length);
+  }
+}
+
+function togglePlay() {
+  if (!audioEl.src || audioEl.src === window.location.href) return;
+  if (audioEl.paused) {
+    audioEl.play().catch(() => toast('Erro ao reproduzir.', 'erro'));
+    setPlayIcon(true);
+    const row = document.getElementById('mrow-' + faixaAtual);
+    if (row) { row.classList.remove('pausado'); row.classList.add('tocando'); }
+  } else {
+    audioEl.pause();
+    setPlayIcon(false);
+    const row = document.getElementById('mrow-' + faixaAtual);
+    if (row) { row.classList.add('pausado'); }
+  }
+}
+
+function setPlayIcon(playing) {
+  const el = document.getElementById('playIcon');
+  if (!el) return;
+  if (playing) {
+    el.outerHTML = '<g id="playIcon"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></g>';
+  } else {
+    el.outerHTML = '<polygon id="playIcon" points="5,3 19,12 5,21"/>';
+  }
+}
+
+function fecharPlayer() {
+  audioEl.pause();
+  audioEl.src = '';
+  faixaAtual = -1;
+  document.getElementById('playerFixo').classList.remove('show');
+  document.querySelectorAll('.musica-row').forEach(r => r.classList.remove('tocando', 'pausado'));
+  document.getElementById('playerFill').style.width = '0%';
+  document.getElementById('playerTempoAtual').textContent = '0:00';
+  document.getElementById('playerTempoDuracao').textContent = '0:00';
+}
+
+function atualizarProgresso() {
+  if (!audioEl.duration || isNaN(audioEl.duration)) return;
+  const pct = (audioEl.currentTime / audioEl.duration) * 100;
+  const fill = document.getElementById('playerFill');
+  fill.style.width = pct + '%';
+  document.getElementById('playerProgress').style.setProperty('--pct', pct + '%');
+  document.getElementById('playerTempoAtual').textContent = fmtTempo(audioEl.currentTime);
+}
+
+function buscarAudio(e) {
+  if (!audioEl.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  audioEl.currentTime = pct * audioEl.duration;
+}
+
+function ajustarVolume(e) {
+  const rect = document.getElementById('playerVol').getBoundingClientRect();
+  const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  audioEl.volume = pct;
+  document.getElementById('playerVolFill').style.width = (pct * 100) + '%';
+}
+
+function fmtTempo(seg) {
+  if (!seg || isNaN(seg)) return '0:00';
+  const m = Math.floor(seg / 60);
+  const s = Math.floor(seg % 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+// ══════════════════════════════════════════════════════════
+// SORTEIOS
+// ══════════════════════════════════════════════════════════
+async function carregarSorteios() {
+  const cont = document.getElementById('listaSorteios');
+
+  const [drawsRes, purchasesRes] = await Promise.all([
+    sb.from('draws')
+      .select('*')
+      .in('status', ['open', 'aguardando_qualificacao'])
+      .order('criado_em', { ascending: false })
+      .limit(5),
+    sb.from('purchases')
+      .select('id, product_id, cotas, criado_em, produto:product_id(titulo)')
+      .eq('user_id', usuarioAtual.id)
+      .eq('status', 'active'),
+  ]);
+
+  const draws     = drawsRes.data    || [];
+  const purchases = purchasesRes.data || [];
+
+  // ── Meus números na rodada ativa ──────────────────────────
+  const rodadaAtiva = draws[0];
+  if (rodadaAtiva) {
+    const { data: meusNums } = await sb
+      .from('draw_numbers')
+      .select('numero')
+      .eq('draw_id', rodadaAtiva.id)
+      .eq('user_id', usuarioAtual.id)
+      .order('numero');
+
+    const wrap = document.getElementById('meus-numeros-wrap');
+    if (meusNums && meusNums.length > 0) {
+      wrap.style.display = 'block';
+      document.getElementById('meus-numeros-lista').textContent =
+        meusNums.map(n => n.numero.toLocaleString('pt-BR')).join(' · ');
+
+      // Barra de meta
+      const metaAtual = Number(rodadaAtiva.meta_atual) || 0;
+      const metaTotal = Number(rodadaAtiva.meta_valor) || 0;
+      const pct       = metaTotal > 0 ? Math.min(100, (metaAtual / metaTotal) * 100) : 0;
+      const isMoeda   = rodadaAtiva.meta_tipo !== 'quantidade';
+      const fmt       = v => isMoeda
+        ? v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
+        : v.toLocaleString('pt-BR') + ' exemplares';
+
+      document.getElementById('meta-progresso-bar').style.width = pct.toFixed(1) + '%';
+      document.getElementById('meta-progresso-txt').textContent = `${fmt(metaAtual)} / ${fmt(metaTotal)} (${pct.toFixed(0)}%)`;
+
+      const faltam = Math.max(0, metaTotal - metaAtual);
+      if (faltam <= 0) {
+        document.getElementById('meta-faltam').textContent = 'Meta atingida — aguardando sorteio';
+      } else {
+        document.getElementById('meta-faltam').textContent = `Faltam ${fmt(faltam)} para o sorteio`;
+      }
+    } else {
+      wrap.style.display = 'none';
+    }
+  }
+
+  // Sorteios fechados recentes para histórico de vencedores
+  const { data: fechados } = await sb
+    .from('draws')
+    .select('id, titulo')
+    .eq('status', 'drawn')
+    .order('criado_em', { ascending: false })
+    .limit(3);
+
+  let html = '';
+
+  if (draws.length === 0) {
+    html += `<div class="vazio">
+      <div class="vazio-icone">🎯</div>
+      <div class="vazio-titulo">Nenhum sorteio aberto</div>
+      <p class="vazio-texto">Nenhum sorteio em andamento no momento.<br>Fique de olho — novos sorteios são anunciados pelo e-mail.</p>
+    </div>`;
+  } else {
+    const partes = await Promise.all(draws.map(async (draw) => {
+      const { data: entries } = await sb
+        .from('draw_entries')
+        .select('id, cotas_base, cotas_bonus, dep_validado, qualificado, purchase_id')
+        .eq('draw_id', draw.id)
+        .eq('user_id', usuarioAtual.id);
+
+      const totBase  = (entries || []).reduce((s, e) => s + (e.cotas_base  || 0), 0);
+      const totBonus = (entries || []).reduce((s, e) => s + (e.cotas_bonus || 0), 0);
+      const qualif   = (entries || []).filter(e => e.qualificado).length;
+
+      const purchasesComEntry   = new Set((entries || []).map(e => e.purchase_id));
+      const purchasesPendentes  = purchases.filter(p => !purchasesComEntry.has(p.id));
+
+      return `<div class="sorteio-card">
+        <div class="sorteio-status">Sorteio aberto</div>
+        <div class="sorteio-titulo">${draw.titulo || 'Sorteio'}</div>
+        ${(draw.premio_1 || draw.premio_2) ? `<div class="sorteio-premios">
+          ${draw.premio_1 ? `1° — <strong>${draw.premio_1}</strong>` : ''}
+          ${draw.premio_2 ? `&nbsp;·&nbsp; 2° — ${draw.premio_2}` : ''}
+        </div>` : ''}
+
+        <div class="cotas-grid">
+          <div class="cota-item">
+            <div class="cota-num">${totBase}</div>
+            <div class="cota-label">Cotas base</div>
+          </div>
+          <div class="cota-item">
+            <div class="cota-num">${totBonus}</div>
+            <div class="cota-label">Cotas bônus</div>
+          </div>
+          <div class="cota-item">
+            <div class="cota-num">${totBase + totBonus}</div>
+            <div class="cota-label">Total</div>
+          </div>
+        </div>
+
+        ${qualif > 0 ? `<div class="entry-linha">
+          <span class="entry-chave">Participações qualificadas</span>
+          <span class="entry-val ok">✓ ${qualif} confirmada${qualif !== 1 ? 's' : ''}</span>
+        </div>` : ''}
+
+        ${purchasesPendentes.map(p => {
+          const dias       = Math.floor((Date.now() - new Date(p.criado_em).getTime()) / 86400000);
+          const podeValid  = dias >= 7;
+          const faltam     = 7 - dias;
+          return `<div style="margin-top:16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--borda2)">
+            <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:10px">
+              ${p.produto?.titulo || 'Produto'} · ${p.cotas || 0} cota${(p.cotas || 0) !== 1 ? 's' : ''}
+            </div>
+            ${!podeValid ? `<div style="font-size:12px;color:var(--ouro);margin-bottom:10px">
+              Disponível para validação em ${faltam} dia${faltam !== 1 ? 's' : ''}
+            </div>` : ''}
+            <button class="btn-validar" onclick="abrirFormDep('${draw.id}','${p.id}','${(p.produto?.titulo || '').replace(/'/g, "\\'")}')" ${!podeValid ? 'disabled' : ''}>
+              ${podeValid ? 'Validar participação →' : 'Aguardando período de leitura'}
+            </button>
+            <div class="dep-form" id="dep-${p.id}">
+              <label style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:8px">
+                Depoimento (mín. 20 palavras)
+              </label>
+              <textarea class="dep-textarea" id="txt-${p.id}"
+                placeholder="O que você aprendeu ou sentiu lendo este livro? Mínimo 20 palavras."
+                oninput="contarPalavras('${p.id}')"></textarea>
+              <div class="contador-palavras" id="cnt-${p.id}">0 palavras</div>
+              <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">
+                Redes sociais que segue (multiplica cotas)
+              </div>
+              <div class="redes-check" id="redes-${p.id}">
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','whatsapp')">WhatsApp</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','instagram')">Instagram</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','facebook')">Facebook</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','tiktok')">TikTok</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','youtube')">YouTube</button>
+              </div>
+              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participação ✦</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }));
+    html += partes.join('');
+  }
+
+  // Histórico de vencedores
+  if ((fechados || []).length > 0) {
+    html += `<div style="margin-top:32px">
+      <div class="sec-titulo">Histórico de vencedores</div>
+      <div class="vencedores-lista" id="vencedoresList">
+        <div class="loading-txt" style="padding:20px 0;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:2px">Carregando…</div>
+      </div>
+    </div>`;
+  }
+
+  cont.innerHTML = html;
+
+  // Carregar vencedores dos sorteios fechados
+  if ((fechados || []).length > 0) {
+    const vencIds = fechados.map(d => d.id);
+    const { data: winners } = await sb
+      .from('draw_winners')
+      .select('posicao, nome_publico, draw_id, user_id, draws:draw_id(titulo, premio_1, premio_2)')
+      .in('draw_id', vencIds)
+      .order('posicao');
+
+    const listEl = document.getElementById('vencedoresList');
+    if (listEl) {
+      if (!winners || winners.length === 0) {
+        listEl.innerHTML = '<div class="vazio-texto" style="padding:12px 0;font-size:13px">Nenhum vencedor registrado ainda.</div>';
+      } else {
+        // Verificar se o usuário atual venceu algum desses
+        const myWins = (winners || []).filter(w => w.user_id === usuarioAtual.id);
+
+        // Destaque especial se venceu
+        let destaque = '';
+        if (myWins.length > 0) {
+          const pos = myWins[0].posicao === 1 ? '🥇 1º Lugar' : '🥈 2º Lugar';
+          destaque = `<div style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.4);padding:20px;margin-bottom:20px;position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">${pos}</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:4px">Você foi sorteado(a)!</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Parabéns! Verifique seu e-mail para instruções de resgate do prêmio.</div>
+          </div>`;
+        }
+
+        listEl.innerHTML = destaque + winners.map(w => `
+          <div class="vencedor-row">
+            <div class="vencedor-pos">${w.posicao}°</div>
+            <div class="vencedor-info">
+              <div class="vencedor-nome">${w.nome_publico || 'Ganhador'}</div>
+              <div class="vencedor-data">${w.draws?.titulo || ''}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div class="vencedor-premio">${w.posicao === 1 ? (w.draws?.premio_1 || '—') : (w.draws?.premio_2 || '—')}</div>
+              <a href="/auditoria-sorteio.html?draw_id=${w.draw_id}" target="_blank"
+                 style="font-size:10px;color:rgba(200,168,75,.6);text-decoration:none;letter-spacing:.5px">
+                🔒 ver auditoria
+              </a>
+            </div>
+          </div>`).join('');
+      }
+    }
+  }
+}
+
+function abrirFormDep(drawId, purchaseId, titulo) {
+  const form = document.getElementById('dep-' + purchaseId);
+  if (form) form.classList.toggle('show');
+}
+
+function contarPalavras(pid) {
+  const txt = (document.getElementById('txt-' + pid)?.value || '').trim();
+  const n   = txt ? txt.split(/\s+/).filter(Boolean).length : 0;
+  const el  = document.getElementById('cnt-' + pid);
+  if (el) el.textContent = n + ' palavra' + (n !== 1 ? 's' : '') + (n >= 20 ? ' ✓' : ' (mín. 20)');
+}
+
+const redesSelecionadas = {};
+function toggleRede(btn, pid, rede) {
+  const key = pid + '_' + rede;
+  redesSelecionadas[key] = !redesSelecionadas[key];
+  btn.classList.toggle('on', redesSelecionadas[key]);
+}
+
+async function enviarValidacao(drawId, purchaseId) {
+  const dep   = (document.getElementById('txt-' + purchaseId)?.value || '').trim();
+  const words = dep ? dep.split(/\s+/).filter(Boolean).length : 0;
+  if (words < 20) {
+    toast('O depoimento precisa ter pelo menos 20 palavras.', 'erro');
+    return;
+  }
+
+  const redes = Object.entries(redesSelecionadas)
+    .filter(([k, v]) => k.startsWith(purchaseId + '_') && v)
+    .map(([k]) => k.replace(purchaseId + '_', ''));
+
+  const { data: { session } } = await sb.auth.getSession();
+  toast('Enviando validação…');
+
+  try {
+    const res = await fetch(`${EDGE_BASE}/validate-entry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ draw_id: drawId, purchase_id: purchaseId, depoimento: dep, redes_seguidas: redes }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      toast(data.error || 'Erro ao validar participação.', 'erro');
+      return;
+    }
+    toast(`✦ Participação confirmada! ${data.cotas_total} cotas (${data.multiplicador}×)`);
+    abasCarregadas['sorteios'] = false;
+    setTimeout(() => { abasCarregadas['sorteios'] = false; carregarSorteios(); }, 1200);
+  } catch {
+    toast('Erro de conexão. Tente novamente.', 'erro');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// EXTRATO
+// ══════════════════════════════════════════════════════════
+async function carregarExtrato() {
+  const cont = document.getElementById('listaExtrato');
+
+  const { data: payments, error } = await sb
+    .from('payments')
+    .select('id, valor, status, metodo, criado_em, produto:product_id(titulo)')
+    .eq('user_id', usuarioAtual.id)
+    .order('criado_em', { ascending: false });
+
+  if (error || !payments || payments.length === 0) {
+    cont.innerHTML = `<div class="vazio">
+      <div class="vazio-icone">📄</div>
+      <div class="vazio-titulo">Nenhum pagamento</div>
+      <p class="vazio-texto">Seu histórico de pagamentos aparecerá aqui.</p>
+    </div>`;
+    return;
+  }
+
+  const statusLabel = { approved: 'Aprovado', pending: 'Pendente', rejected: 'Recusado', refunded: 'Reembolsado', cancelled: 'Cancelado' };
+  const metodoLabel = { pix: 'PIX', credit_card: 'Cartão', debit_card: 'Débito', ticket: 'Boleto', boleto: 'Boleto' };
+
+  // Totais
+  const totalPago = payments
+    .filter(p => p.status === 'approved')
+    .reduce((s, p) => s + (Number(p.valor) || 0), 0);
+
+  cont.innerHTML = `
+    <div class="extrato-tabela">
+      ${payments.map(p => {
+        const dt  = new Date(p.criado_em);
+        const dia = dt.toLocaleDateString('pt-BR');
+        const hr  = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return `<div class="extrato-linha">
+          <div>
+            <div class="extrato-produto">${p.produto?.titulo || 'Produto'}</div>
+            <div class="extrato-data">${dia} às ${hr}</div>
+          </div>
+          <div class="extrato-detalhe">
+            <span class="badge-status ${p.status || ''}">${statusLabel[p.status] || p.status || '—'}</span>
+            ${p.metodo ? `<span class="extrato-metodo">${metodoLabel[p.metodo] || p.metodo}</span>` : ''}
+          </div>
+          <div class="extrato-valor">${p.valor ? 'R$\u00a0' + Number(p.valor).toFixed(2).replace('.', ',') : '—'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${totalPago > 0 ? `<div class="extrato-resumo">
+      <div class="resumo-item">
+        <div class="resumo-label">Total investido</div>
+        <div class="resumo-val">R$\u00a0${totalPago.toFixed(2).replace('.', ',')}</div>
+      </div>
+      <div class="resumo-item">
+        <div class="resumo-label">Transações aprovadas</div>
+        <div class="resumo-val">${payments.filter(p => p.status === 'approved').length}</div>
+      </div>
+    </div>` : ''}`;
+}
+
+// ══════════════════════════════════════════════════════════
+// ASSINATURA
+// ══════════════════════════════════════════════════════════
+async function carregarAssinatura() {
+  const cont = document.getElementById('conteudoAssinatura');
+
+  const { data: subs } = await sb
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', usuarioAtual.id)
+    .order('criado_em', { ascending: false })
+    .limit(1);
+
+  const sub = subs?.[0];
+
+  if (!sub) {
+    cont.innerHTML = `<div class="plano-card">
+      <div class="plano-nome">Sem assinatura ativa</div>
+      <span class="plano-badge sem-plano">Gratuito</span>
+      <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:24px">
+        Com a assinatura você acessa músicas autorais, bônus exclusivos e
+        aumenta suas chances no Programa Cultural.
+      </p>
+      <div class="plano-beneficios">
+        <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso ilimitado às faixas da editora</div>
+        <div class="beneficio-item"><strong>Cotas bônus</strong>Multiplicador de cotas nos sorteios</div>
+        <div class="beneficio-item"><strong>Lançamentos antecipados</strong>Acesso antes do público geral</div>
+        <div class="beneficio-item"><strong>Conteúdo exclusivo</strong>Material complementar dos títulos</div>
+      </div>
+      <a href="https://wa.me/5554999467085?text=Quero+saber+mais+sobre+a+assinatura+da+Editora+Tr%C3%AAs+Trevo"
+         target="_blank" rel="noopener" class="plano-acao">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.555 4.116 1.527 5.843L.057 23.885l6.253-1.639A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.948 0-3.763-.527-5.326-1.441l-.38-.226-3.964 1.04 1.053-3.877-.247-.399A9.941 9.941 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+        </svg>
+        Quero saber mais
+      </a>
+    </div>`;
+    return;
+  }
+
+  const venc       = sub.vencimento ? new Date(sub.vencimento).toLocaleDateString('pt-BR') : '—';
+  const inicio     = sub.criado_em  ? new Date(sub.criado_em).toLocaleDateString('pt-BR')  : '—';
+  const statusMap  = { active: 'Ativa', paused: 'Pausada', canceled: 'Cancelada' };
+  const badgeClass = { active: 'ativo', paused: 'pausado', canceled: 'cancelado' }[sub.status] || 'sem-plano';
+  const isAtiva    = sub.status === 'active';
+
+  cont.innerHTML = `<div class="plano-card">
+    <div class="plano-nome">Assinatura ${sub.plano || 'Padrão'}</div>
+    <span class="plano-badge ${badgeClass}">${statusMap[sub.status] || sub.status}</span>
+
+    <div class="plano-detalhes">
+      <div class="entry-linha">
+        <span class="entry-chave">Início</span>
+        <span class="entry-val">${inicio}</span>
+      </div>
+      <div class="entry-linha">
+        <span class="entry-chave">Vencimento</span>
+        <span class="entry-val ${isAtiva ? '' : 'pendente'}">${venc}</span>
+      </div>
+      ${sub.plano ? `<div class="entry-linha">
+        <span class="entry-chave">Plano</span>
+        <span class="entry-val">${sub.plano}</span>
+      </div>` : ''}
+    </div>
+
+    ${isAtiva ? `<div class="plano-beneficios" style="margin-top:20px">
+      <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso liberado</div>
+      <div class="beneficio-item"><strong>Cotas bônus</strong>Multiplicador ativo</div>
+    </div>` : ''}
+
+    <div style="margin-top:20px;font-size:12px;color:rgba(255,255,255,.3);line-height:1.7">
+      Para cancelar, alterar plano ou qualquer dúvida:<br>
+      <a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS DE UI
+// ══════════════════════════════════════════════════════════
+function skeletonCards(n) {
+  return Array.from({ length: n }, () => `<div class="sk-card">
+    <div class="skeleton sk-cover"></div>
+    <div>
+      <div class="skeleton sk-line m"></div>
+      <div class="skeleton sk-line s"></div>
+      <div class="skeleton sk-line l" style="margin-top:16px"></div>
+    </div>
+    <div><div class="skeleton sk-btn"></div></div>
+  </div>`).join('');
+}
+
+function vazioCont(icon, titulo, texto) {
+  return `<div class="vazio">
+    <div class="vazio-icone">${icon}</div>
+    <div class="vazio-titulo">${titulo}</div>
+    <p class="vazio-texto">${texto}</p>
+  </div>`;
+}
+
+function toast(msg, tipo) {
+  clearTimeout(toastTimer);
   const t = document.getElementById('toast');
   t.textContent = msg;
+  t.className = 'toast' + (tipo === 'erro' ? ' erro' : '');
+  // Força reflow p/ reiniciar a transição
+  void t.offsetWidth;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+  toastTimer = setTimeout(() => t.classList.remove('show'), tipo === 'erro' ? 5000 : 4000);
 }
 
+// ── Inicializar ──
 init();
 </script>
 </body>

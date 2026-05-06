@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalizar Compra — Editora Três Trevo</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --verde:#0f2d1a;--verde-medio:#1a4a2e;--verde-claro:#2a6b42;
+  --ouro:#c8a84b;--ouro-claro:#e8c96a;--ouro-escuro:#8a6f28;
+  --creme:#f5f0e8;--branco:#fdfbf7;--texto:#1c1c1c;
+  --borda:rgba(200,168,75,0.15);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--verde);color:var(--branco);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--verde)}::-webkit-scrollbar-thumb{background:var(--ouro-escuro)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(15,45,26,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--borda)}
+.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
+  color:var(--ouro);text-decoration:none;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+.nav-marca::before{content:'✦';font-size:14px;opacity:.7}
+.nav-back{font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--ouro)}
+
+.page{min-height:100vh;padding:100px 24px 60px;display:flex;align-items:flex-start;justify-content:center}
+.checkout-wrap{width:100%;max-width:920px;display:grid;grid-template-columns:1fr 380px;gap:40px;align-items:start}
+
+/* Produto */
+.produto-card{background:rgba(255,255,255,.03);border:1px solid var(--borda);padding:36px;position:relative}
+.produto-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent)}
+.produto-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);margin-bottom:20px;
+  display:flex;align-items:center;gap:10px}
+.produto-label::before{content:'';width:24px;height:1px;background:var(--ouro)}
+.produto-genero{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px}
+.produto-titulo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;line-height:1.2;margin-bottom:6px}
+.produto-autor{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.5px;margin-bottom:20px}
+.produto-desc{font-size:14px;color:rgba(255,255,255,.5);line-height:1.8;margin-bottom:24px}
+.produto-cotas-box{padding:16px 20px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.15);
+  display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.produto-cotas-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--ouro);line-height:1}
+.produto-cotas-txt{font-size:12px;color:rgba(255,255,255,.45);line-height:1.6}
+.produto-preco-grande{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--ouro);line-height:1}
+.produto-preco-label{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+
+/* Painel direito */
+.painel{display:flex;flex-direction:column;gap:16px}
+
+/* Login */
+.login-card{background:rgba(255,255,255,.03);border:1px solid var(--borda);padding:28px;position:relative}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent)}
+.card-titulo{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px}
+.campo-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.35);margin-bottom:8px;display:block}
+.campo-input{width:100%;padding:11px 14px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);color:var(--branco);font-family:'Jost',sans-serif;
+  font-size:14px;outline:none;transition:border-color .2s;margin-bottom:12px}
+.campo-input:focus{border-color:var(--ouro)}
+.campo-input::placeholder{color:rgba(255,255,255,.2)}
+.msg-auth{font-size:12px;color:rgba(255,255,255,.35);line-height:1.6;min-height:36px;margin-top:4px}
+.msg-auth.sucesso{color:var(--ouro-claro)}
+.msg-auth.erro{color:#e88}
+
+.usuario-logado{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.15)}
+.usuario-email{font-size:13px;color:rgba(255,255,255,.6)}
+.btn-trocar{font-size:11px;color:var(--ouro);background:none;border:none;cursor:pointer;
+  letter-spacing:1px;text-transform:uppercase;padding:4px 8px;transition:opacity .2s}
+.btn-trocar:hover{opacity:.7}
+
+/* Botão comprar */
+.btn-comprar{width:100%;padding:16px;background:var(--ouro);color:var(--verde);
+  border:none;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;
+  letter-spacing:.5px;cursor:pointer;transition:background .2s;display:flex;
+  align-items:center;justify-content:center;gap:10px}
+.btn-comprar:hover{background:var(--ouro-claro)}
+.btn-comprar:disabled{opacity:.45;cursor:not-allowed}
+.btn-comprar svg{width:18px;height:18px;flex-shrink:0}
+
+/* Métodos */
+.metodos{display:flex;gap:8px;flex-wrap:wrap}
+.metodo-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:5px 10px;
+  border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35)}
+
+/* Garantia */
+.garantia-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);padding:20px;
+  font-size:12px;color:rgba(255,255,255,.3);line-height:1.7}
+.garantia-card strong{color:rgba(255,255,255,.55)}
+
+/* Loading overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;
+  justify-content:center;z-index:9999;flex-direction:column;gap:16px;display:none}
+.overlay.show{display:flex}
+.spinner{width:40px;height:40px;border:3px solid rgba(200,168,75,.2);border-top-color:var(--ouro);
+  border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay-txt{font-size:13px;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase}
+
+/* Alert */
+.alert{padding:14px 18px;margin-bottom:12px;font-size:13px;line-height:1.6;display:none}
+.alert.show{display:block}
+.alert.erro{background:rgba(220,53,69,.1);border:1px solid rgba(220,53,69,.3);color:#f5a7b0}
+.alert.sucesso{background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.2);color:var(--ouro-claro)}
+
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .checkout-wrap{grid-template-columns:1fr}
+  .painel{order:-1}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-marca">Editora Três Trevo</a>
+  <a href="/#catalogo" class="nav-back">← Voltar ao catálogo</a>
+</nav>
+
+<div class="page">
+  <div class="checkout-wrap">
+
+    <!-- Produto -->
+    <div>
+      <div class="produto-card" id="produtoCard">
+        <div class="produto-label">Finalizar compra</div>
+        <div class="produto-genero" id="prodGenero">Carregando…</div>
+        <div class="produto-titulo" id="prodTitulo">—</div>
+        <div class="produto-autor" id="prodAutor">—</div>
+        <div class="produto-desc" id="prodDesc"></div>
+        <div class="produto-cotas-box">
+          <div class="produto-cotas-num" id="prodCotas">—</div>
+          <div class="produto-cotas-txt">
+            cotas no Programa Cultural<br>
+            <span style="color:rgba(255,255,255,.25);font-size:11px">Válidas após D+7 e validação do depoimento</span>
+          </div>
+        </div>
+        <div class="produto-preco-label">Valor</div>
+        <div class="produto-preco-grande" id="prodPreco">—</div>
+      </div>
+    </div>
+
+    <!-- Painel lateral -->
+    <div class="painel">
+
+      <!-- Alert de erro/sucesso -->
+      <div class="alert" id="alertBox"></div>
+
+      <!-- Auth -->
+      <div class="login-card" id="loginCard">
+        <div class="card-titulo">Seu e-mail</div>
+        <div id="areaLogado" style="display:none">
+          <div class="usuario-logado">
+            <span class="usuario-email" id="labelEmail"></span>
+            <button class="btn-trocar" onclick="trocarEmail()">Trocar</button>
+          </div>
+        </div>
+        <div id="areaMagicLink">
+          <label class="campo-label" for="emailInput">E-mail para receber o ebook</label>
+          <input type="email" id="emailInput" class="campo-input" placeholder="seu@email.com" autocomplete="email">
+          <button style="width:100%;padding:11px;background:transparent;border:1px solid var(--borda);
+            color:var(--ouro);font-family:'Jost',sans-serif;font-size:12px;letter-spacing:1px;
+            text-transform:uppercase;cursor:pointer;transition:all .2s"
+            id="btnMagicLink" onclick="enviarMagicLink()">Receber link de acesso →</button>
+          <div class="msg-auth" id="msgAuth">Digite seu e-mail e enviaremos um link de acesso seguro.</div>
+        </div>
+      </div>
+
+      <!-- Botão comprar -->
+      <button class="btn-comprar" id="btnComprar" onclick="iniciarCompra()" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+        Pagar com MercadoPago
+      </button>
+
+      <!-- Métodos -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="card-titulo" style="margin-bottom:4px">Formas de pagamento</div>
+        <div class="metodos">
+          <span class="metodo-tag">PIX</span>
+          <span class="metodo-tag">Cartão de crédito</span>
+          <span class="metodo-tag">Boleto</span>
+        </div>
+      </div>
+
+      <!-- Garantia -->
+      <div class="garantia-card">
+        <strong>Garantia de 7 dias (CDC art. 49)</strong><br>
+        Se não ficar satisfeito, devolvemos 100% do valor. Entre em contato: sac@3trevo.com.br<br><br>
+        <strong>Entrega imediata</strong><br>
+        Após o pagamento, o PDF é liberado na sua biblioteca e enviado por e-mail automaticamente.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Overlay de carregamento -->
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div class="overlay-txt" id="overlayTxt">Redirecionando para pagamento…</div>
+</div>
+
+<script src="/js/supabase-client.js"></script>
+<script>
+// ── INIT ──────────────────────────────────────────────────
+let usuarioAtual = null;
+let productId    = null;
+
+async function init() {
+  // Ler product_id da query string
+  const params = new URLSearchParams(window.location.search);
+  productId = params.get('product_id');
+
+  // Carregar produto (por product_id ou slug)
+  if (!productId) {
+    const slug = params.get('slug');
+    if (slug) await carregarPorSlug(slug);
+    else mostrarAlerta('Produto não especificado. Volte ao catálogo e escolha um título.', 'erro');
+  } else {
+    await carregarProduto(productId);
+  }
+
+  // Verificar sessão
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    setUsuario(session.user);
+  }
+
+  sb.auth.onAuthStateChange((_e, session) => {
+    if (session) setUsuario(session.user);
+  });
+
+  // Status de retorno do MP
+  const status = params.get('status');
+  if (status === 'failure') {
+    mostrarAlerta('Pagamento não aprovado. Tente novamente ou escolha outra forma de pagamento.', 'erro');
+  } else if (status === 'pending') {
+    mostrarAlerta('Pagamento pendente. Aguarde a confirmação e verifique sua biblioteca em alguns minutos.', 'sucesso');
+  }
+}
+
+// ── PRODUTO ───────────────────────────────────────────────
+async function carregarProduto(id) {
+  const { data: p } = await sb.from('products').select('*').eq('id', id).eq('ativo', true).single();
+  if (!p) { mostrarAlerta('Produto não encontrado.', 'erro'); return; }
+  renderProduto(p);
+}
+
+async function carregarPorSlug(slug) {
+  const { data: p } = await sb.from('products').select('*').eq('slug', slug).eq('ativo', true).single();
+  if (!p) {
+    // Fallback local
+    const local = CATALOGO[slug];
+    if (!local) { mostrarAlerta('Produto não encontrado.', 'erro'); return; }
+    document.getElementById('prodGenero').textContent = local.genero;
+    document.getElementById('prodTitulo').textContent = local.titulo;
+    document.getElementById('prodAutor').textContent  = local.autor;
+    document.getElementById('prodCotas').textContent  = local.cotas;
+    document.getElementById('prodPreco').textContent  = 'R$' + local.preco.toFixed(2).replace('.', ',');
+    return;
+  }
+  productId = p.id;
+  renderProduto(p);
+}
+
+function renderProduto(p) {
+  productId = p.id;
+  document.getElementById('prodGenero').textContent  = p.genero || p.tipo;
+  document.getElementById('prodTitulo').textContent  = p.titulo;
+  document.getElementById('prodAutor').textContent   = p.autor || '';
+  document.getElementById('prodDesc').textContent    = p.descricao || '';
+  document.getElementById('prodCotas').textContent   = p.cotas;
+  document.getElementById('prodPreco').textContent   = 'R$' + Number(p.preco).toFixed(2).replace('.', ',');
+}
+
+// ── AUTH ──────────────────────────────────────────────────
+function setUsuario(user) {
+  usuarioAtual = user;
+  document.getElementById('labelEmail').textContent = user.email;
+  document.getElementById('areaLogado').style.display    = 'block';
+  document.getElementById('areaMagicLink').style.display = 'none';
+  document.getElementById('btnComprar').disabled = !productId;
+}
+
+function trocarEmail() {
+  usuarioAtual = null;
+  document.getElementById('areaLogado').style.display    = 'none';
+  document.getElementById('areaMagicLink').style.display = 'block';
+  document.getElementById('btnComprar').disabled = true;
+}
+
+async function enviarMagicLink() {
+  const email = document.getElementById('emailInput').value.trim();
+  const btn   = document.getElementById('btnMagicLink');
+  const msg   = document.getElementById('msgAuth');
+
+  if (!email || !email.includes('@')) {
+    msg.textContent = 'Digite um e-mail válido.';
+    msg.className   = 'msg-auth erro';
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Enviando…';
+
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+
+  btn.disabled    = false;
+  btn.textContent = 'Receber link de acesso →';
+
+  if (error) {
+    msg.textContent = 'Erro: ' + error.message;
+    msg.className   = 'msg-auth erro';
+  } else {
+    msg.innerHTML = '✦ Link enviado! Verifique seu e-mail e clique no link para continuar a compra.<br><small style="opacity:.6">Pode levar até 2 minutos.</small>';
+    msg.className = 'msg-auth sucesso';
+  }
+}
+
+// ── COMPRA ────────────────────────────────────────────────
+async function iniciarCompra() {
+  if (!usuarioAtual || !productId) return;
+
+  const btn = document.getElementById('btnComprar');
+  btn.disabled = true;
+  mostrarOverlay('Criando preferência de pagamento…');
+
+  try {
+    const session = await sb.auth.getSession();
+    const token   = session.data.session?.access_token;
+
+    if (!token) {
+      ocultarOverlay();
+      mostrarAlerta('Sessão expirada. Faça login novamente.', 'erro');
+      btn.disabled = false;
+      return;
+    }
+
+    const res = await fetch(`${EDGE_BASE}/create-preference`, {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        user_email: usuarioAtual.email,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      ocultarOverlay();
+      mostrarAlerta(data.error || 'Erro ao criar pagamento. Tente novamente.', 'erro');
+      btn.disabled = false;
+      return;
+    }
+
+    // Redirecionar para o checkout do MercadoPago
+    mostrarOverlay('Redirecionando para o MercadoPago…');
+    window.location.href = data.init_point;
+
+  } catch (err) {
+    console.error(err);
+    ocultarOverlay();
+    mostrarAlerta('Erro de conexão. Verifique sua internet e tente novamente.', 'erro');
+    btn.disabled = false;
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function mostrarAlerta(msg, tipo) {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg;
+  el.className   = `alert show ${tipo}`;
+}
+
+function mostrarOverlay(txt) {
+  document.getElementById('overlayTxt').textContent = txt || 'Aguarde…';
+  document.getElementById('overlay').classList.add('show');
+}
+
+function ocultarOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+init();
+</script>
+</body>
+</html>
