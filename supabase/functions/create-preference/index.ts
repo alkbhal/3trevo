@@ -103,8 +103,8 @@ serve(async (req: Request) => {
       notification_url:  `${SUPABASE_URL}/functions/v1/mp-webhook`,
       statement_descriptor: "TRES TREVO",
       payment_methods: {
-        excluded_payment_types: [],
-        installments: 1,                  // sem parcelamento para manter valor certo
+        excluded_payment_types: [{ id: "ticket" }], // sem boleto: compensação bancária impede entrega imediata
+        installments: 1,
       },
     };
 
