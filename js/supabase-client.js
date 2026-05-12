@@ -16,4 +16,5 @@ const CATALOGO = {
   vigilante:      { titulo: 'Vigilante',                               autor: 'Said Anes', genero: 'Ficção Literária',  emoji: '🔍', cor: '#2a1a1a', cotas: 10, preco: 76.74 },
   terceiraguerra: { titulo: 'O Nascimento Silencioso da 3ª GM',         autor: 'Said Anes', genero: 'Ficção Documental', emoji: '🌐', cor: '#1a1a2e', cotas: 10, preco: 76.74 },
   antifalencia:   { titulo: 'O Guia Antifalência do Empreendedor',      autor: 'Said Anes', genero: 'Manual',           emoji: '📘', cor: '#1a2a3e', cotas: 3,  preco: 46.04 },
+  atico:          { titulo: 'Antes do App, o Método',                   autor: 'Said Anes', genero: 'Finanças · Método', emoji: '⚡', cor: '#1a2a1a', cotas: 3,  preco: 37.00 },
 };
