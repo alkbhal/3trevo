@@ -1,0 +1,157 @@
+{
+  "versao": "3.0",
+  "gerado_em": "2026-05-11T00:00:00.000Z",
+  "nota": "Arquivo público. Métricas financeiras e marcos de sorteio residem exclusivamente no Cloudflare KV via Worker protegido.",
+
+  "editora": {
+    "nome": "Editora Três Trevo",
+    "cnpj": "18.928.966/0001-59",
+    "email": "sac@3trevo.com.br",
+    "whatsapp": "5554999467085",
+    "instagram": "@3trevo",
+    "cidade": "Montauri/RS · Brasil"
+  },
+
+  "hero": {
+    "leitores": 247,
+    "titulos": 5,
+    "desc_pt": "Publicamos ebooks que mudam perspectivas. Adquira, leia e concorra a prêmios — semanais, mensais e ao Grande Sorteio."
+  },
+
+  "catalogo": {
+    "justicamento": {
+      "titulo": "Justiça(mento) para Orelha",
+      "autor": "Said Anes",
+      "genero": "Ensaio · Entrada",
+      "faixa": "entrada",
+      "descricao": "Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.",
+      "preco": "R$15,35",
+      "preco_num": 15.35,
+      "cotas": 1,
+      "emoji": "⚖️",
+      "ativo": true,
+      "badge": "",
+      "degustacao": "ebook-justicamento.html"
+    },
+    "atico": {
+      "titulo": "Antes do App, o Método",
+      "subtitulo": "O sistema que o Ático vai automatizar",
+      "autor": "Said Anes",
+      "genero": "Finanças · Método",
+      "faixa": "intermediario",
+      "descricao": "Planilha + lista inteligente + Morning Brief. O método manual que o Ático vai automatizar. Early adopters ganham acesso beta garantido.",
+      "preco": "R$37,00",
+      "preco_num": 37.00,
+      "cotas": 3,
+      "emoji": "⚡",
+      "ativo": true,
+      "badge": "NOVO",
+      "bonus": "Acesso beta ao Ático incluso",
+      "degustacao": "ebook-atico.html"
+    },
+    "antifalencia": {
+      "titulo": "O Guia Antifalência do Empreendedor Iniciante",
+      "autor": "Said Anes",
+      "genero": "Manual · Intermediário",
+      "faixa": "intermediario",
+      "descricao": "A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado.",
+      "preco": "R$46,04",
+      "preco_num": 46.04,
+      "cotas": 3,
+      "emoji": "📘",
+      "ativo": true,
+      "badge": "",
+      "degustacao": "ebook-antifalencia.html"
+    },
+    "vigilante": {
+      "titulo": "Vigilante",
+      "autor": "Said Anes",
+      "genero": "Ficção Literária · Premium",
+      "faixa": "premium",
+      "descricao": "Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão.",
+      "preco": "R$76,74",
+      "preco_num": 76.74,
+      "cotas": 10,
+      "emoji": "🔍",
+      "ativo": true,
+      "badge": "",
+      "degustacao": "ebook-vigilante.html"
+    },
+    "terceiraguerra": {
+      "titulo": "O Nascimento Silencioso da 3ª Guerra Mundial",
+      "autor": "Said Anes",
+      "genero": "Ficção Documental · Premium",
+      "faixa": "premium",
+      "descricao": "Como guerras modernas acontecem sem disparos — no campo da informação, economia e política. Assustadoramente atual.",
+      "preco": "R$76,74",
+      "preco_num": 76.74,
+      "cotas": 10,
+      "emoji": "🌐",
+      "ativo": true,
+      "badge": "",
+      "degustacao": "ebook-terceira-guerra.html"
+    }
+  },
+
+  "programa_cultural": {
+    "serie_atual": 1,
+    "sorteio_ativo": {
+      "nome": "1° Sorteio",
+      "premio": "R$ 500",
+      "status": "em_andamento"
+    },
+    "worker_endpoint": "/api/serie",
+    "requisitos": {
+      "depoimento_min_palavras": 20,
+      "instagram_obrigatorio": true,
+      "prazo_participacao_dias": 7
+    },
+    "raspadinha": {
+      "faixa_a_brinde": "brinde digital + cupom próxima compra",
+      "faixa_b_bonus": "10 cotas extras no sorteio principal"
+    }
+  },
+
+  "redes": {
+    "whatsapp":  { "nome": "WhatsApp",  "url": "https://wa.me/5554999467085", "ativo": true },
+    "instagram": { "nome": "Instagram", "url": "https://instagram.com/3trevo", "ativo": true },
+    "facebook":  { "nome": "Facebook",  "url": "https://facebook.com/3trevo",  "ativo": true },
+    "tiktok":    { "nome": "TikTok",    "url": "https://tiktok.com/@3trevo",   "ativo": true },
+    "youtube":   { "nome": "YouTube",   "url": "https://youtube.com/@3trevo",  "ativo": true }
+  },
+
+  "faq": [
+    {
+      "p": "O que é o Programa Cultural?",
+      "r": "É um concurso cultural onde você adquire um ebook, lê, valida sua participação e concorre a prêmios em dinheiro. A série tem quatro sorteios de R$500, um de R$1.000 e o Grande Sorteio. Suas cotas permanecem válidas até serem sorteadas — ou até o Grande Sorteio zerar a série."
+    },
+    {
+      "p": "Como funcionam os sorteios?",
+      "r": "A série avança conforme os exemplares são vendidos. Quando um marco de vendas é atingido, o sorteio correspondente é desbloqueado. Não há data fixa — quanto mais a comunidade compra, mais rápido os sorteios chegam."
+    },
+    {
+      "p": "O que são as Raspadinhas?",
+      "r": "A cada lote de cotas emitidas na série, sorteios instantâneos são realizados automaticamente. Os ganhadores recebem brindes digitais da Editora ou cotas extras no sorteio principal — sem sair da corrida."
+    },
+    {
+      "p": "Como ganho mais cotas?",
+      "r": "Cada título comprado gera cotas conforme sua faixa. Seguindo as redes sociais da Editora, suas cotas são multiplicadas automaticamente — quanto mais redes, maior o multiplicador."
+    },
+    {
+      "p": "Minha cota some se eu não ganhar?",
+      "r": "Não. Suas cotas permanecem válidas em todos os sorteios da série atual. Só saem da corrida os números sorteados. O Grande Sorteio é o único que zera toda a série."
+    },
+    {
+      "p": "O que acontece após o Grande Sorteio?",
+      "r": "A série zera completamente. Uma nova série começa do zero. Para participar da nova série é necessário adquirir um novo título ou ter assinatura ativa."
+    },
+    {
+      "p": "Como recebo meu ebook?",
+      "r": "Após confirmação do pagamento, você recebe o PDF por e-mail (sac@3trevo.com.br) e por WhatsApp automaticamente, junto com o link de validação do Programa Cultural."
+    },
+    {
+      "p": "Posso pedir reembolso?",
+      "r": "Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral via sac@3trevo.com.br. O reembolso cancela automaticamente a participação no Programa Cultural."
+    }
+  ]
+}
