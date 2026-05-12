@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -111,6 +112,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 .alert.erro{background:rgba(220,53,69,.1);border:1px solid rgba(220,53,69,.3);color:#f5a7b0}
 .alert.sucesso{background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.2);color:var(--ouro-claro)}
 
+/* Brick container */
+#paymentBrick_container{display:none}
+#brickPlaceholder{padding:16px 18px;background:rgba(200,168,75,.06);border:1px solid var(--borda);
+  text-align:center;font-size:13px;color:rgba(255,255,255,.35);letter-spacing:.5px}
+
 @media(max-width:768px){
   nav{padding:0 20px}
   .checkout-wrap{grid-template-columns:1fr}
@@ -174,23 +180,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
         </div>
       </div>
 
-      <!-- Botão comprar -->
-      <button class="btn-comprar" id="btnComprar" onclick="iniciarCompra()" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="1" y="4" width="22" height="16" rx="2"/>
-          <line x1="1" y1="10" x2="23" y2="10"/>
-        </svg>
-        Pagar com MercadoPago
-      </button>
-
-      <!-- Métodos -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="card-titulo" style="margin-bottom:4px">Formas de pagamento</div>
-        <div class="metodos">
-          <span class="metodo-tag">PIX</span>
-          <span class="metodo-tag">Cartão de crédito</span>
-        </div>
-      </div>
+      <!-- Payment Brick -->
+      <div id="brickPlaceholder">Faça login para exibir o formulário de pagamento</div>
+      <div id="paymentBrick_container"></div>
 
       <!-- Garantia -->
       <div class="garantia-card">
@@ -213,8 +205,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 <script src="/js/supabase-client.js"></script>
 <script>
 // ── INIT ──────────────────────────────────────────────────
-let usuarioAtual = null;
-let productId    = null;
+const MP_PUBLIC_KEY = 'APP_USR-ccf11545-2dc3-4bf5-a0f7-5329b2a44bbb';
+let usuarioAtual    = null;
+let productId       = null;
+let productPrice    = null;
+let brickController = null;
 
 async function init() {
   // Ler product_id da query string
@@ -274,13 +269,15 @@ async function carregarPorSlug(slug) {
 }
 
 function renderProduto(p) {
-  productId = p.id;
+  productId    = p.id;
+  productPrice = Number(p.preco);
   document.getElementById('prodGenero').textContent  = p.genero || p.tipo;
   document.getElementById('prodTitulo').textContent  = p.titulo;
   document.getElementById('prodAutor').textContent   = p.autor || '';
   document.getElementById('prodDesc').textContent    = p.descricao || '';
   document.getElementById('prodCotas').textContent   = p.cotas;
-  document.getElementById('prodPreco').textContent   = 'R$' + Number(p.preco).toFixed(2).replace('.', ',');
+  document.getElementById('prodPreco').textContent   = 'R$' + productPrice.toFixed(2).replace('.', ',');
+  inicializarBrick();
 }
 
 // ── AUTH ──────────────────────────────────────────────────
@@ -289,14 +286,16 @@ function setUsuario(user) {
   document.getElementById('labelEmail').textContent = user.email;
   document.getElementById('areaLogado').style.display    = 'block';
   document.getElementById('areaMagicLink').style.display = 'none';
-  document.getElementById('btnComprar').disabled = !productId;
+  inicializarBrick();
 }
 
 function trocarEmail() {
   usuarioAtual = null;
+  if (brickController) { brickController.unmount(); brickController = null; }
+  document.getElementById('paymentBrick_container').style.display = 'none';
+  document.getElementById('brickPlaceholder').style.display       = 'block';
   document.getElementById('areaLogado').style.display    = 'none';
   document.getElementById('areaMagicLink').style.display = 'block';
-  document.getElementById('btnComprar').disabled = true;
 }
 
 async function enviarMagicLink() {
@@ -330,56 +329,71 @@ async function enviarMagicLink() {
   }
 }
 
-// ── COMPRA ────────────────────────────────────────────────
-async function iniciarCompra() {
-  if (!usuarioAtual || !productId) return;
+// ── PAYMENT BRICK ─────────────────────────────────────────
+async function inicializarBrick() {
+  if (!usuarioAtual || !productId || !productPrice) return;
+  if (brickController) return; // já inicializado
 
-  const btn = document.getElementById('btnComprar');
-  btn.disabled = true;
-  mostrarOverlay('Criando preferência de pagamento…');
+  document.getElementById('brickPlaceholder').style.display       = 'none';
+  document.getElementById('paymentBrick_container').style.display = 'block';
 
-  try {
-    const session = await sb.auth.getSession();
-    const token   = session.data.session?.access_token;
+  const mp            = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+  const bricksBuilder = mp.bricks();
 
-    if (!token) {
-      ocultarOverlay();
-      mostrarAlerta('Sessão expirada. Faça login novamente.', 'erro');
-      btn.disabled = false;
-      return;
-    }
-
-    const res = await fetch(`${EDGE_BASE}/create-preference`, {
-      method:  'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`,
+  brickController = await bricksBuilder.create('payment', 'paymentBrick_container', {
+    initialization: {
+      amount: productPrice,
+      payer:  { email: usuarioAtual.email },
+    },
+    customization: {
+      paymentMethods: {
+        creditCard:  'all',
+        debitCard:   'all',
+        ticket:      'none',
+        bankTransfer: 'none',
+        atm:         'none',
       },
-      body: JSON.stringify({
-        product_id: productId,
-        user_email: usuarioAtual.email,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || data.error) {
-      ocultarOverlay();
-      mostrarAlerta(data.error || 'Erro ao criar pagamento. Tente novamente.', 'erro');
-      btn.disabled = false;
-      return;
-    }
-
-    // Redirecionar para o checkout do MercadoPago
-    mostrarOverlay('Redirecionando para o MercadoPago…');
-    window.location.href = data.init_point;
-
-  } catch (err) {
-    console.error(err);
-    ocultarOverlay();
-    mostrarAlerta('Erro de conexão. Verifique sua internet e tente novamente.', 'erro');
-    btn.disabled = false;
-  }
+      visual: {
+        style: { theme: 'dark' },
+        hidePaymentButton: false,
+      },
+    },
+    callbacks: {
+      onReady: () => { ocultarOverlay(); },
+      onSubmit: async ({ formData }) => {
+        mostrarOverlay('Processando pagamento…');
+        try {
+          const session = await sb.auth.getSession();
+          const token   = session.data.session?.access_token;
+          if (!token) {
+            ocultarOverlay();
+            mostrarAlerta('Sessão expirada. Faça login novamente.', 'erro');
+            return;
+          }
+          const res  = await fetch(`${EDGE_BASE}/process-payment`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body:    JSON.stringify({ product_id: productId, ...formData }),
+          });
+          const data = await res.json();
+          if (!res.ok || data.error) {
+            ocultarOverlay();
+            mostrarAlerta(data.error || 'Pagamento recusado. Tente novamente.', 'erro');
+            return;
+          }
+          window.location.href = '/area-cliente.html?status=success';
+        } catch (err) {
+          console.error(err);
+          ocultarOverlay();
+          mostrarAlerta('Erro de conexão. Verifique sua internet e tente novamente.', 'erro');
+        }
+      },
+      onError: (error) => {
+        console.error('Brick error:', error);
+        mostrarAlerta('Erro no formulário de pagamento. Recarregue a página.', 'erro');
+      },
+    },
+  });
 }
 
 // ── HELPERS ───────────────────────────────────────────────
