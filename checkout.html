@@ -111,6 +111,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 #brickPlaceholder{padding:16px 18px;background:rgba(26,74,46,.04);border:1px solid rgba(26,74,46,.12);
   text-align:center;font-size:13px;color:rgba(26,26,22,.45);letter-spacing:.5px}
 
+/* PIX QR Code */
+#pixContainer{display:none;text-align:center;padding:24px 0}
+#pixContainer.ativo{display:block}
+.pix-titulo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--verde-escuro);margin-bottom:8px}
+.pix-sub{font-size:13px;color:rgba(26,26,22,.55);margin-bottom:20px;line-height:1.6}
+.pix-qr{width:200px;height:200px;border:2px solid rgba(26,74,46,.15);margin:0 auto 16px;display:block}
+.pix-copia{background:#f4efe5;border:1px solid rgba(26,74,46,.15);padding:12px 16px;font-size:11px;
+  font-family:monospace;word-break:break-all;color:rgba(26,26,22,.6);margin-bottom:12px;text-align:left;max-height:80px;overflow:auto}
+.btn-copiar{width:100%;padding:12px;background:var(--verde-escuro);color:#f4efe5;border:none;
+  font-size:13px;letter-spacing:.5px;cursor:pointer;transition:background .2s;margin-bottom:8px}
+.btn-copiar:hover{background:var(--verde-medio)}
+.pix-aviso{font-size:12px;color:rgba(26,26,22,.4);line-height:1.6}
+.pix-aguardando{display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:12px;color:rgba(26,74,46,.6);letter-spacing:1px;text-transform:uppercase;margin-top:12px}
+.pix-dot{width:8px;height:8px;border-radius:50%;background:#1a4a2e;animation:pulsePix 1.4s ease-in-out infinite}
+.pix-dot:nth-child(2){animation-delay:.2s}
+.pix-dot:nth-child(3){animation-delay:.4s}
+@keyframes pulsePix{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
 @media(max-width:768px){
   nav{padding:0 20px}
   .checkout-wrap{grid-template-columns:1fr}
@@ -177,6 +196,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
       <!-- Payment Brick -->
       <div id="brickPlaceholder">Faça login para exibir o formulário de pagamento</div>
       <div id="paymentBrick_container"></div>
+
+      <!-- PIX QR Code (aparece após confirmação PIX) -->
+      <div id="pixContainer">
+        <div class="pix-titulo">Pague com PIX</div>
+        <div class="pix-sub">Escaneie o QR Code ou copie o codigo abaixo no app do seu banco.<br>O acesso e liberado em segundos apos a confirmacao.</div>
+        <img id="pixQrImg" class="pix-qr" src="" alt="QR Code PIX">
+        <div class="pix-copia" id="pixCodigoTexto"></div>
+        <button class="btn-copiar" onclick="copiarPix()">Copiar codigo PIX</button>
+        <div class="pix-aviso">O codigo expira em 30 minutos. Nao feche esta pagina.</div>
+        <div class="pix-aguardando">
+          <span class="pix-dot"></span><span class="pix-dot"></span><span class="pix-dot"></span>
+          <span>Aguardando pagamento</span>
+        </div>
+      </div>
 
       <!-- Garantia -->
       <div class="garantia-card">
@@ -343,11 +376,12 @@ async function inicializarBrick() {
     },
     customization: {
       paymentMethods: {
-        creditCard: 'all',
-        debitCard:  'all',
+        creditCard:   'all',
+        debitCard:    'all',
+        bankTransfer: ['pix'],
       },
       visual: {
-        style: { theme: 'dark' },
+        style: { theme: 'default' },
         hidePaymentButton: false,
       },
     },
@@ -374,7 +408,15 @@ async function inicializarBrick() {
             mostrarAlerta(data.error || 'Pagamento recusado. Tente novamente.', 'erro');
             return;
           }
-          window.location.href = '/area-cliente.html?status=success';
+          ocultarOverlay();
+          if (data.status === 'approved') {
+            window.location.href = '/area-cliente.html?status=success';
+          } else if (data.status === 'pending' && data.pix_qr) {
+            // PIX — mostrar QR code
+            mostrarPixQr(data.pix_qr, data.pix_qr_texto);
+          } else {
+            mostrarAlerta('Pagamento pendente. Verifique seu email em alguns minutos.', 'sucesso');
+          }
         } catch (err) {
           console.error(err);
           ocultarOverlay();
@@ -388,6 +430,25 @@ async function inicializarBrick() {
     },
   });
   brickInicializando = false;
+}
+
+// ── PIX ───────────────────────────────────────────────────
+function mostrarPixQr(qrBase64, qrTexto) {
+  document.getElementById('paymentBrick_container').style.display = 'none';
+  const pix = document.getElementById('pixContainer');
+  if (qrBase64) document.getElementById('pixQrImg').src = 'data:image/png;base64,' + qrBase64;
+  document.getElementById('pixCodigoTexto').textContent = qrTexto || '';
+  pix.classList.add('ativo');
+  window._pixCodigo = qrTexto || '';
+}
+
+function copiarPix() {
+  const txt = window._pixCodigo || document.getElementById('pixCodigoTexto').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.btn-copiar');
+    btn.textContent = 'Copiado!';
+    setTimeout(() => { btn.textContent = 'Copiar codigo PIX'; }, 2000);
+  });
 }
 
 // ── HELPERS ───────────────────────────────────────────────
