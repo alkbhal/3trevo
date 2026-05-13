@@ -1309,8 +1309,9 @@ document.addEventListener('DOMContentLoaded',function(){
       var itens = d[0].valor;
       var grid = document.getElementById('faqGrid');
       if (!grid) return;
-      grid.innerHTML = itens.map(function(item, i) {
-        return '<div class="faq-item reveal" onclick="toggleFaq(this)" style="transition-delay:' + (i*0.05) + 's">' +
+      // visivel direto — items dinâmicos não passam pelo IntersectionObserver
+      grid.innerHTML = itens.map(function(item) {
+        return '<div class="faq-item reveal visivel" onclick="toggleFaq(this)">' +
           '<div class="faq-pergunta"><span>' + escapeHtml(item.p||'') + '</span><span class="faq-icone" aria-hidden="true">+</span></div>' +
           '<div class="faq-resposta">' + escapeHtml(item.r||'') + '</div>' +
           '</div>';
