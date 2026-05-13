@@ -371,6 +371,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
     </div>
     <div class="topbar-right">
       <div class="topbar-user" id="topbar-user"></div>
+      <span class="role-badge" id="topbar-role" style="font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border:1px solid rgba(200,168,75,.25);color:rgba(200,168,75,.7)"></span>
       <button class="btn-sair" onclick="logout()">Sair</button>
     </div>
   </div>
@@ -382,12 +383,12 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
 
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-section">Visão Geral</div>
+      <div class="sidebar-section" data-role-group="geral">Visão Geral</div>
       <div class="nav-item ativo" data-sec="dashboard" onclick="irPara('dashboard',this)">
         <span class="nav-icon">◈</span>Dashboard
       </div>
 
-      <div class="sidebar-section">Catálogo</div>
+      <div class="sidebar-section" data-role-group="catalogo">Catálogo</div>
       <div class="nav-item" data-sec="produtos" onclick="irPara('produtos',this)">
         <span class="nav-icon">◻</span>Produtos
         <span class="nav-badge" id="badge-produtos">—</span>
@@ -396,7 +397,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         <span class="nav-icon">+</span>Novo Produto
       </div>
 
-      <div class="sidebar-section">Programa Cultural</div>
+      <div class="sidebar-section" data-role-group="programa">Programa Cultural</div>
       <div class="nav-item" data-sec="sorteios" onclick="irPara('sorteios',this)">
         <span class="nav-icon">◇</span>Rodadas
         <span class="nav-badge" id="badge-sorteios">—</span>
@@ -405,9 +406,22 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         <span class="nav-icon">≡</span>Participantes
       </div>
 
-      <div class="sidebar-section">Site</div>
+      <div class="sidebar-section" data-role-group="site">Site</div>
       <div class="nav-item" data-sec="conteudo" onclick="irPara('conteudo',this)">
         <span class="nav-icon">✎</span>Conteúdo
+      </div>
+
+      <div class="sidebar-section" data-role-group="equipe">Equipe</div>
+      <div class="nav-item" data-sec="equipe" onclick="irPara('equipe',this)">
+        <span class="nav-icon">◑</span>Gestão de Equipe
+      </div>
+
+      <div class="sidebar-section" data-role-group="escritor">Meu Espaço</div>
+      <div class="nav-item" data-sec="extrato" onclick="irPara('extrato',this)">
+        <span class="nav-icon">◎</span>Extrato
+      </div>
+      <div class="nav-item" data-sec="manuscritos" onclick="irPara('manuscritos',this)">
+        <span class="nav-icon">✉</span>Manuscritos
       </div>
     </aside>
 
@@ -756,7 +770,158 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         </div>
       </div>
 
+      <!-- ── EQUIPE (gestor) ── -->
+      <div class="secao" id="sec-equipe">
+        <div class="secao-topo" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="secao-titulo">Gestão de Equipe</div>
+            <div class="secao-sub">Adicione membros, defina roles e percentuais de royalty</div>
+          </div>
+          <button class="btn btn-ouro" onclick="abrirModalMembro()">+ Novo Membro</button>
+        </div>
+        <div class="card" style="padding:0">
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr>
+                <th>Nome</th><th>Email</th><th>Role</th><th>Royalty %</th><th>Status</th><th></th>
+              </tr></thead>
+              <tbody id="equipe-tbody">
+                <tr><td colspan="6"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EXTRATO (escritor) ── -->
+      <div class="secao" id="sec-extrato">
+        <div class="secao-topo">
+          <div class="secao-titulo">Meu Extrato</div>
+          <div class="secao-sub">Vendas e royalties dos seus títulos</div>
+        </div>
+        <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+          <div class="stat-card"><div class="stat-icon">◻</div><div class="stat-label">Títulos publicados</div><div class="stat-valor" id="ext-titulos">—</div></div>
+          <div class="stat-card"><div class="stat-icon">✦</div><div class="stat-label">Total de vendas</div><div class="stat-valor" id="ext-vendas">—</div></div>
+          <div class="stat-card"><div class="stat-icon">◎</div><div class="stat-label">Percentual royalty</div><div class="stat-valor" id="ext-pct" style="font-size:24px">—</div></div>
+        </div>
+        <div class="card" style="padding:0">
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr>
+                <th>Título</th><th>Faixa</th><th>Vendas</th><th>Royalty estimado</th>
+              </tr></thead>
+              <tbody id="extrato-tbody">
+                <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,.25);margin-top:12px;line-height:1.6">
+          Valores estimados com base no percentual definido pelo gestor. Pagamentos processados conforme acordado contratualmente.
+        </p>
+      </div>
+
+      <!-- ── MANUSCRITOS (escritor) ── -->
+      <div class="secao" id="sec-manuscritos">
+        <div class="secao-topo">
+          <div class="secao-titulo">Manuscritos</div>
+          <div class="secao-sub">Envie seus trabalhos para avaliação editorial</div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-titulo">Enviar novo manuscrito</div>
+          <div class="grid-2">
+            <div class="campo">
+              <label class="campo-label">Título da obra *</label>
+              <input type="text" class="f-input" id="ms-titulo" placeholder="Nome do livro ou conto">
+            </div>
+            <div class="campo">
+              <label class="campo-label">Gênero</label>
+              <input type="text" class="f-input" id="ms-genero" placeholder="Ficção, Ensaio, Poesia…">
+            </div>
+          </div>
+          <div class="campo">
+            <label class="campo-label">Sinopse</label>
+            <textarea class="f-textarea" id="ms-sinopse" rows="3" placeholder="Resumo da obra — o que o leitor vai encontrar…"></textarea>
+          </div>
+          <div class="campo">
+            <label class="campo-label">Arquivo (PDF)</label>
+            <div class="upload-zone" id="ms-upload-zone"
+              ondragover="dragOver(event,'ms-upload-zone')"
+              ondragleave="dragLeave('ms-upload-zone')"
+              ondrop="dropManuscrito(event)">
+              <input type="file" id="ms-upload-input" accept=".pdf" onchange="handleManuscritoSelect(this.files[0])">
+              <div class="upload-icon">⬆</div>
+              <div class="upload-label">Arraste o PDF ou clique para selecionar</div>
+            </div>
+            <div id="ms-arquivo-preview" style="display:none"></div>
+            <div class="progress-bar" id="ms-prog"><div class="progress-bar-fill" id="ms-prog-fill"></div></div>
+          </div>
+          <button class="btn btn-ouro" onclick="enviarManuscrito()" id="btn-enviar-ms">Enviar para avaliação</button>
+        </div>
+
+        <div class="card" style="padding:0">
+          <div class="card-titulo" style="padding:16px 20px;margin-bottom:0;border-bottom:1px solid var(--borda2)">Envios anteriores</div>
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr><th>Título</th><th>Gênero</th><th>Status</th><th>Enviado em</th><th>Nota do gestor</th></tr></thead>
+              <tbody id="manuscritos-tbody">
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </main>
+  </div>
+</div>
+
+<!-- ── MODAL NOVO MEMBRO ── -->
+<div class="modal-overlay" id="modal-membro">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-titulo" id="modal-membro-titulo">Novo Membro</div>
+      <button class="modal-fechar" onclick="fecharModal('modal-membro')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="membro-id">
+      <div class="campo">
+        <label class="campo-label">Nome *</label>
+        <input type="text" class="f-input" id="membro-nome" placeholder="Nome completo">
+      </div>
+      <div class="campo">
+        <label class="campo-label">Email *</label>
+        <input type="email" class="f-input" id="membro-email" placeholder="email@exemplo.com">
+      </div>
+      <div class="grid-2">
+        <div class="campo">
+          <label class="campo-label">Role</label>
+          <select class="f-select" id="membro-role">
+            <option value="escritor">Escritor</option>
+            <option value="vendas">Vendas</option>
+            <option value="design">Design</option>
+            <option value="gestor">Gestor</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label class="campo-label">Royalty (%)</label>
+          <input type="number" class="f-input" id="membro-royalty" placeholder="0" min="0" max="100" step="0.01">
+          <div class="campo-hint">Apenas para escritores — % sobre vendas brutas</div>
+        </div>
+      </div>
+      <div class="campo">
+        <label class="campo-label">Status</label>
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
+          <label class="toggle"><input type="checkbox" id="membro-ativo" checked><span class="toggle-slider"></span></label>
+          <span style="font-size:13px;color:rgba(255,255,255,.5)">Membro ativo</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-membro')">Cancelar</button>
+      <button class="btn btn-ouro" onclick="salvarMembro()">Salvar</button>
+    </div>
   </div>
 </div>
 
@@ -978,14 +1143,22 @@ const ADMIN_EMAIL = 'al_kbhal@yahoo.com.br';
 
 const sb = supabase.createClient(SB_URL, SB_ANON);
 
-// Estado
-let currentUser = null;
+// Estado global
+let currentUser   = null;
+let currentRole   = null; // 'gestor' | 'escritor' | 'vendas' | 'design'
+let currentPerfil = null; // { nome, percentual_royalty }
 let produtoEditId = null;
 let drawEditId = null;
 let drawVencedorId = null;
 let uploadedArquivoUrl = null;
 let uploadedCapaUrl = null;
 let produtosCache = [];
+
+// Permissões por role
+const PODE = {
+  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe'], escritor:['extrato','manuscritos'], vendas:['dashboard','sorteios','participantes'], design:['produtos','novo-produto','conteudo'] },
+};
+function podeVer(sec) { return (PODE.verNav[currentRole] || []).includes(sec); }
 
 // ── AUTH ──────────────────────────────────────────────────────────
 async function initAuth() {
@@ -1003,12 +1176,21 @@ async function initAuth() {
 }
 
 async function verificarAdmin(user) {
-  if (user.email !== ADMIN_EMAIL) {
+  const { data: perfil, error } = await sb
+    .from('admin_users')
+    .select('role, nome, percentual_royalty, ativo')
+    .eq('email', user.email)
+    .single();
+
+  if (error || !perfil || !perfil.ativo) {
     await sb.auth.signOut();
-    toast('Acesso negado. Este painel é restrito.', 'erro');
+    toast('Acesso não autorizado para este painel.', 'erro');
     return;
   }
-  currentUser = user;
+
+  currentUser   = user;
+  currentRole   = perfil.role;
+  currentPerfil = perfil;
   mostrarAdmin();
 }
 
@@ -1021,11 +1203,35 @@ function mostrarLogin() {
 function mostrarAdmin() {
   document.getElementById('tela-login').style.display = 'none';
   document.getElementById('tela-admin').style.display = 'block';
-  document.getElementById('topbar-user').textContent = currentUser.email;
-  carregarDashboard();
-  carregarProdutos();
-  carregarSorteios();
-  carregarConteudo();
+  document.getElementById('topbar-user').textContent = currentPerfil?.nome || currentUser.email;
+
+  // Mostrar/ocultar nav items por role
+  document.querySelectorAll('.nav-item[data-sec]').forEach(el => {
+    el.style.display = podeVer(el.dataset.sec) ? '' : 'none';
+  });
+  document.querySelectorAll('.sidebar-section[data-role-group]').forEach(el => {
+    const group = el.dataset.roleGroup;
+    const prox = el.nextElementSibling;
+    el.style.display = prox && prox.style.display !== 'none' ? '' : 'none';
+  });
+
+  // Badge de role no topbar
+  const badge = document.getElementById('topbar-role');
+  if (badge) { badge.textContent = currentRole; badge.className = 'role-badge role-'+currentRole; }
+
+  // Ir para seção inicial por role
+  const inicio = { gestor:'dashboard', escritor:'extrato', vendas:'dashboard', design:'produtos' };
+  const secInicio = inicio[currentRole] || 'dashboard';
+  irPara(secInicio, document.querySelector('[data-sec="'+secInicio+'"]'));
+
+  // Carregar dados
+  if (podeVer('dashboard'))    carregarDashboard();
+  if (podeVer('produtos'))     carregarProdutos();
+  if (podeVer('sorteios'))     carregarSorteios();
+  if (podeVer('conteudo'))     carregarConteudo();
+  if (podeVer('equipe'))       carregarEquipe();
+  if (podeVer('extrato'))      carregarExtrato();
+  if (podeVer('manuscritos'))  carregarManuscritos();
 }
 
 async function logout() {
@@ -1093,7 +1299,8 @@ function irPara(sec, el) {
   if (el) el.classList.add('ativo');
   const labels = {
     'dashboard':'Dashboard','produtos':'Produtos','novo-produto':'Novo Produto',
-    'sorteios':'Rodadas','participantes':'Participantes','conteudo':'Conteúdo'
+    'sorteios':'Rodadas','participantes':'Participantes','conteudo':'Conteúdo',
+    'equipe':'Gestão de Equipe','extrato':'Meu Extrato','manuscritos':'Manuscritos'
   };
   document.getElementById('breadcrumb').textContent = labels[sec] || sec;
   fecharMobileNav();
@@ -1992,6 +2199,210 @@ async function salvarFaq() {
   btn.disabled = false; btn.textContent = 'Salvar FAQ';
   if (error) { toast('Erro: '+error.message,'erro'); return; }
   toast('FAQ atualizado!','ok');
+}
+
+// ── EQUIPE ────────────────────────────────────────────────────────
+let membroEditId = null;
+
+async function carregarEquipe() {
+  const tbody = document.getElementById('equipe-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>';
+  const { data, error } = await sb.from('admin_users').select('*').order('criado_em');
+  if (error) { toast('Erro ao carregar equipe: ' + error.message, 'erro'); return; }
+  if (!data?.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">◑</div><div class="empty-txt">Nenhum membro cadastrado</div></div></td></tr>';
+    return;
+  }
+  const roleBadge = { gestor:'#c8a84b', escritor:'#4caf7e', vendas:'#64b5f6', design:'#ce93d8' };
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td style="font-size:14px;color:rgba(255,255,255,.8)">${escHtml(m.nome||'—')}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,.45)">${escHtml(m.email)}</td>
+      <td><span style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border:1px solid ${roleBadge[m.role]||'#999'};color:${roleBadge[m.role]||'#999'}">${m.role}</span></td>
+      <td style="color:rgba(255,255,255,.55)">${m.percentual_royalty > 0 ? m.percentual_royalty + '%' : '—'}</td>
+      <td><span class="badge ${m.ativo?'badge-ativo':'badge-rascunho'}">${m.ativo?'Ativo':'Inativo'}</span></td>
+      <td><div class="acoes-cell">
+        <button class="btn btn-outline btn-xs" onclick="editarMembro('${m.id}')">Editar</button>
+        ${m.email !== currentUser.email ? `<button class="btn btn-danger btn-xs" onclick="toggleMembroAtivo('${m.id}',${!m.ativo},'${escHtml(m.nome||m.email)}')">
+          ${m.ativo?'Desativar':'Ativar'}</button>` : ''}
+      </div></td>
+    </tr>`).join('');
+}
+
+function abrirModalMembro() {
+  membroEditId = null;
+  ['membro-nome','membro-email','membro-royalty'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('membro-role').value  = 'escritor';
+  document.getElementById('membro-ativo').checked = true;
+  document.getElementById('membro-email').disabled = false;
+  document.getElementById('modal-membro-titulo').textContent = 'Novo Membro';
+  document.getElementById('modal-membro').classList.add('aberto');
+}
+
+function editarMembro(id) {
+  sb.from('admin_users').select('*').eq('id',id).single().then(({data}) => {
+    if (!data) return;
+    membroEditId = id;
+    document.getElementById('membro-id').value       = id;
+    document.getElementById('membro-nome').value     = data.nome || '';
+    document.getElementById('membro-email').value    = data.email;
+    document.getElementById('membro-email').disabled = true;
+    document.getElementById('membro-role').value     = data.role;
+    document.getElementById('membro-royalty').value  = data.percentual_royalty || 0;
+    document.getElementById('membro-ativo').checked  = !!data.ativo;
+    document.getElementById('modal-membro-titulo').textContent = 'Editar Membro';
+    document.getElementById('modal-membro').classList.add('aberto');
+  });
+}
+
+async function salvarMembro() {
+  const nome    = document.getElementById('membro-nome').value.trim();
+  const email   = document.getElementById('membro-email').value.trim();
+  const role    = document.getElementById('membro-role').value;
+  const royalty = parseFloat(document.getElementById('membro-royalty').value) || 0;
+  const ativo   = document.getElementById('membro-ativo').checked;
+  if (!nome || !email) { toast('Nome e email são obrigatórios.', 'erro'); return; }
+  const payload = { nome, role, percentual_royalty: royalty, ativo };
+  let error;
+  if (membroEditId) {
+    ({ error } = await sb.from('admin_users').update(payload).eq('id', membroEditId));
+  } else {
+    ({ error } = await sb.from('admin_users').insert({ ...payload, email }));
+  }
+  if (error) { toast('Erro: ' + error.message, 'erro'); return; }
+  toast(membroEditId ? 'Membro atualizado!' : 'Membro adicionado!', 'ok');
+  fecharModal('modal-membro');
+  carregarEquipe();
+}
+
+async function toggleMembroAtivo(id, ativo, nome) {
+  if (!confirm(`${ativo?'Ativar':'Desativar'} "${nome}"?`)) return;
+  const { error } = await sb.from('admin_users').update({ ativo }).eq('id', id);
+  if (error) { toast('Erro: ' + error.message, 'erro'); return; }
+  toast(`Membro ${ativo?'ativado':'desativado'}.`, 'ok');
+  carregarEquipe();
+}
+
+// ── EXTRATO ESCRITOR ──────────────────────────────────────────────
+async function carregarExtrato() {
+  if (!currentUser) return;
+  const tbody = document.getElementById('extrato-tbody');
+  if (!tbody) return;
+
+  // Percentual do escritor
+  const pct = currentPerfil?.percentual_royalty || 0;
+  const elPct = document.getElementById('ext-pct');
+  if (elPct) elPct.textContent = pct > 0 ? pct + '%' : 'Não definido';
+
+  // Produtos do escritor (pelo autor_email)
+  const { data: prods } = await sb.from('products')
+    .select('id, titulo, tipo, preco, cotas')
+    .eq('autor_email', currentUser.email)
+    .eq('ativo', true);
+
+  const elTitulos = document.getElementById('ext-titulos');
+  if (elTitulos) elTitulos.textContent = (prods||[]).length;
+
+  if (!prods?.length) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">Nenhum título vinculado ao seu perfil ainda.</div></div></td></tr>';
+    document.getElementById('ext-vendas').textContent = '0';
+    return;
+  }
+
+  // Para cada produto, contar vendas (purchases)
+  let totalVendas = 0;
+  let rows = '';
+  for (const p of prods) {
+    const { count } = await sb.from('purchases').select('id',{count:'exact',head:true}).eq('product_id',p.id).eq('status','active');
+    const vendas = count || 0;
+    totalVendas += vendas;
+    const royaltyEst = pct > 0 ? 'R$ ' + (vendas * Number(p.preco) * pct / 100).toFixed(2).replace('.',',') : '—';
+    const faixa = p.tipo === 'ebook' ? (p.cotas===1?'Entrada':p.cotas<=3?'Intermediário':'Premium') : p.tipo;
+    rows += `<tr>
+      <td style="font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(255,255,255,.85)">${escHtml(p.titulo)}</td>
+      <td><span class="tipo-badge">${faixa}</span></td>
+      <td style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ouro)">${vendas}</td>
+      <td style="color:rgba(255,255,255,.6)">${royaltyEst}</td>
+    </tr>`;
+  }
+  document.getElementById('ext-vendas').textContent = totalVendas;
+  tbody.innerHTML = rows;
+}
+
+// ── MANUSCRITOS ───────────────────────────────────────────────────
+let uploadedMsUrl = null;
+
+async function carregarManuscritos() {
+  const tbody = document.getElementById('manuscritos-tbody');
+  if (!tbody) return;
+  const { data, error } = await sb.from('manuscritos')
+    .select('*').eq('autor_email', currentUser.email).order('criado_em',{ascending:false});
+  if (error) { toast('Erro: ' + error.message,'erro'); return; }
+  if (!data?.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="empty-icon">✉</div><div class="empty-txt">Nenhum manuscrito enviado ainda.</div></div></td></tr>';
+    return;
+  }
+  const statusBadge = { aguardando:'badge-rascunho', em_revisao:'badge-status badge-aberto', aprovado:'badge-ativo', recusado:'badge-status badge-encerrado' };
+  const statusLabel = { aguardando:'Aguardando', em_revisao:'Em revisão', aprovado:'Aprovado', recusado:'Recusado' };
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td style="font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(255,255,255,.85)">${escHtml(m.titulo)}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,.4)">${escHtml(m.genero||'—')}</td>
+      <td><span class="badge ${statusBadge[m.status]||''}">${statusLabel[m.status]||m.status}</span></td>
+      <td style="font-size:11px;color:rgba(255,255,255,.3)">${m.criado_em ? new Date(m.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,.45)">${escHtml(m.nota_gestor||'—')}</td>
+    </tr>`).join('');
+}
+
+function dropManuscrito(e) {
+  e.preventDefault();
+  document.getElementById('ms-upload-zone').classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) handleManuscritoSelect(file);
+}
+
+async function handleManuscritoSelect(file) {
+  if (!file || file.type !== 'application/pdf') { toast('Apenas PDF é aceito.','erro'); return; }
+  const progFill = document.getElementById('ms-prog-fill');
+  const preview  = document.getElementById('ms-arquivo-preview');
+  progFill.style.width = '10%';
+  let prog = 10;
+  const iv = setInterval(()=>{ prog = Math.min(prog+10,85); progFill.style.width=prog+'%'; },400);
+  const path = Date.now()+'_'+Math.random().toString(36).slice(2)+'.pdf';
+  const { error } = await sb.storage.from('manuscritos').upload(path, file, { contentType:'application/pdf', upsert:false });
+  clearInterval(iv);
+  if (error) { progFill.style.width='0%'; toast('Erro no upload: '+error.message,'erro'); return; }
+  progFill.style.width = '100%';
+  uploadedMsUrl = path;
+  preview.style.display = 'block';
+  preview.innerHTML = `<div class="upload-preview"><div class="upload-preview-icon">📄</div><div class="upload-preview-info"><div class="upload-preview-name">${escHtml(file.name)}</div><div class="upload-preview-size">${formatBytes(file.size)}</div></div></div>`;
+  toast('PDF carregado!','ok');
+}
+
+async function enviarManuscrito() {
+  const titulo = document.getElementById('ms-titulo').value.trim();
+  if (!titulo) { toast('Informe o título da obra.','erro'); return; }
+  const btn = document.getElementById('btn-enviar-ms');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  const payload = {
+    autor_email: currentUser.email,
+    autor_nome:  currentPerfil?.nome || '',
+    titulo,
+    genero:      document.getElementById('ms-genero').value.trim() || null,
+    sinopse:     document.getElementById('ms-sinopse').value.trim() || null,
+    arquivo_url: uploadedMsUrl || null,
+    status:      'aguardando',
+  };
+  const { error } = await sb.from('manuscritos').insert(payload);
+  btn.disabled = false; btn.textContent = 'Enviar para avaliação';
+  if (error) { toast('Erro: '+error.message,'erro'); return; }
+  toast('Manuscrito enviado! O gestor será notificado.','ok');
+  ['ms-titulo','ms-genero','ms-sinopse'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ms-arquivo-preview').style.display='none';
+  document.getElementById('ms-prog-fill').style.width='0%';
+  uploadedMsUrl = null;
+  carregarManuscritos();
 }
 
 // ── UTIL ──────────────────────────────────────────────────────────
