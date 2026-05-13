@@ -1130,14 +1130,28 @@ function renderizarMeta(arrecadado){
 
 async function carregarProgresso(){
   try{
-    var SB2='https://xfkepekffdyrtcgagwqo.supabase.co';
-    var KEY2='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
-    var H2={'apikey':KEY2,'Authorization':'Bearer '+KEY2};
-    var r=await fetch(SB2+'/rest/v1/draws?status=in.(open,aguardando_qualificacao)&order=criado_em.desc&limit=1&select=meta_atual,meta_valor',{headers:H2});
+    // Usa o Worker — retorna apenas progresso_pct, nunca expõe marcos internos
+    var r=await fetch('https://serie-tt.al-kbhal.workers.dev/api/serie');
     var d=await r.json();
-    if(d&&d[0]&&Number(d[0].meta_valor)>0){
-      META_TOTAL=Number(d[0].meta_valor);
-      renderizarMeta(Number(d[0].meta_atual)||0);
+    if(d&&d.ok){
+      // Progresso_pct já calculado pelo Worker (marcos são segredo comercial)
+      var pct=d.progresso_pct||0;
+      document.getElementById('barraProgresso').style.width=pct+'%';
+      var f=fraseParaPercentual(pct);
+      document.getElementById('metaFrase').innerHTML=f.frase;
+      document.getElementById('metaFraseSub').textContent=f.sub;
+      ['marca0','marca25','marca50','marca75','marca100'].forEach(function(id,i){
+        var el=document.getElementById(id);
+        if(el)el.classList.toggle('ativa',pct>=[0,25,50,75,100][i]);
+      });
+      var ativo=pct>=100?5:pct>=75?4:pct>=50?3:pct>=25?2:1;
+      for(var i=1;i<=5;i++){
+        var dg=document.getElementById('degrauMeta'+i);
+        if(!dg)continue;
+        dg.classList.remove('ativo','concluido');
+        if(i===ativo)dg.classList.add('ativo');
+        else if(i<ativo)dg.classList.add('concluido');
+      }
     } else renderizarMeta(0);
   }catch(e){renderizarMeta(0);}
 }
@@ -1233,18 +1247,22 @@ document.addEventListener('DOMContentLoaded',function(){
   // ── Carregar stats do hero dinamicamente ──────────────────
   async function carregarStatsBanner() {
     try {
-      // Leitores = compradores com purchase ativo
-      var rP = await fetch(SB+'/rest/v1/purchases?status=eq.active&select=user_id', {
-        headers: Object.assign({}, HDR, {'Prefer': 'count=exact', 'Range': '0-0'})
-      });
-      var cP = rP.headers.get('Content-Range');
-      if (cP) {
-        var leitores = parseInt(cP.split('/')[1]);
-        var el = document.getElementById('statLeitores');
-        if (el && !isNaN(leitores) && leitores > 0) el.textContent = leitores;
+      // Worker retorna cotas, participantes e sorteio sem expor marcos
+      var rW = await fetch('https://serie-tt.al-kbhal.workers.dev/api/serie');
+      var w  = await rW.json();
+
+      if (w && w.ok) {
+        // Participantes reais
+        var elL = document.getElementById('statLeitores');
+        if (elL && w.participantes >= 0) elL.textContent = w.participantes;
+
+        // Prêmio do sorteio atual
+        var els2 = document.querySelectorAll('.hero-stats .stat-num');
+        if (els2[2] && w.sorteio_atual && w.sorteio_atual.premio)
+          els2[2].textContent = w.sorteio_atual.premio;
       }
 
-      // Títulos = produtos ativos
+      // Títulos = produtos ativos (via Supabase público)
       var rT = await fetch(SB+'/rest/v1/products?ativo=eq.true&select=id', {
         headers: Object.assign({}, HDR, {'Prefer': 'count=exact', 'Range': '0-0'})
       });
@@ -1254,15 +1272,9 @@ document.addEventListener('DOMContentLoaded',function(){
         var els = document.querySelectorAll('.hero-stats .stat-num');
         if (els[1] && !isNaN(titulos) && titulos > 0) els[1].textContent = titulos;
       }
-
-      // Prêmio = draw atual aberto
-      var rD = await fetch(SB+'/rest/v1/draws?status=in.(open,aguardando_qualificacao)&order=criado_em.desc&limit=1&select=premio_1,premio_2', {headers: HDR});
-      var draws = await rD.json();
-      if (draws && draws[0] && draws[0].premio_1) {
-        var els2 = document.querySelectorAll('.hero-stats .stat-num');
-        if (els2[2]) els2[2].textContent = draws[0].premio_1;
-      }
     } catch(e) { console.warn('Stats banner:', e); }
+  }
+
   }
 
   // ── Carregar meta/progresso dinamicamente ──────────────────

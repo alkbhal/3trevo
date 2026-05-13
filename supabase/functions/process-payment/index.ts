@@ -144,6 +144,15 @@ serve(async (req: Request) => {
         user.email,
         sb,
       );
+
+      // ── 7b. Avisar Worker da venda (atualiza progresso da série) ──
+      const WORKER_URL  = "https://serie-tt.al-kbhal.workers.dev/api/serie/venda";
+      const SERIE_TOKEN = Deno.env.get("SERIE_TOKEN") ?? "";
+      fetch(WORKER_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SERIE_TOKEN}` },
+        body:    JSON.stringify({ ebook_slug: product.slug }),
+      }).catch(e => console.warn("[WORKER] Falha ao registrar venda:", e));
     }
 
     return new Response(
