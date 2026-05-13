@@ -511,6 +511,11 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
               <input type="text" class="f-input" id="prod-autor" placeholder="Nome do autor">
             </div>
             <div class="campo">
+              <label class="campo-label">Email do autor (royalty)</label>
+              <input type="email" class="f-input" id="prod-autor-email" placeholder="autor@email.com">
+              <div class="campo-hint">Vincula este produto ao extrato do escritor. Deve corresponder ao email cadastrado em Equipe.</div>
+            </div>
+            <div class="campo">
               <label class="campo-label">Descrição</label>
               <textarea class="f-textarea" id="prod-descricao" placeholder="Descrição do produto…" rows="4"></textarea>
             </div>
@@ -1430,7 +1435,8 @@ function editarProduto(id) {
   document.getElementById('prod-id').value = p.id;
   document.getElementById('prod-titulo').value = p.titulo || '';
   document.getElementById('prod-slug').value = p.slug || '';
-  document.getElementById('prod-autor').value = p.autor || '';
+  document.getElementById('prod-autor').value       = p.autor       || '';
+  document.getElementById('prod-autor-email').value = p.autor_email || '';
   document.getElementById('prod-descricao').value = p.descricao || '';
   document.getElementById('prod-tipo').value = p.tipo || 'ebook';
   document.getElementById('prod-genero').value = p.genero || '';
@@ -1459,7 +1465,7 @@ function limparFormProduto() {
   uploadedArquivoUrl = null;
   uploadedCapaUrl = null;
   document.getElementById('prod-id').value = '';
-  ['prod-titulo','prod-slug','prod-autor','prod-descricao','prod-genero','prod-preco','prod-cotas','prod-ordem'].forEach(id => {
+  ['prod-titulo','prod-slug','prod-autor','prod-autor-email','prod-descricao','prod-genero','prod-preco','prod-cotas','prod-ordem'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('prod-tipo').value = 'ebook';
@@ -1486,7 +1492,8 @@ async function salvarProduto() {
   const payload = {
     titulo,
     slug,
-    autor: document.getElementById('prod-autor').value.trim() || null,
+    autor:       document.getElementById('prod-autor').value.trim()       || null,
+    autor_email: document.getElementById('prod-autor-email').value.trim() || null,
     descricao: document.getElementById('prod-descricao').value.trim() || null,
     tipo: document.getElementById('prod-tipo').value,
     genero: document.getElementById('prod-genero').value.trim() || null,
