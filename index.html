@@ -728,7 +728,6 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           <div>
             <div class="premio-val" data-pt="1 salário mínimo nacional" data-en="1 national minimum wage" data-es="1 salario mínimo nacional">1 salário mínimo nacional</div>
             <div class="premio-desc" data-pt="Transferência bancária · PIX · pago em D+7" data-en="Bank transfer · PIX · paid at D+7" data-es="Transferencia bancaria · PIX · pagado en D+7">Transferência bancária · PIX · pago em D+7</div>
-            <div class="premio-desc" style="color:var(--ouro-texto);margin-top:4px" data-pt="Conectado a todas as redes: até 2 salários mínimos" data-en="Connected to all networks: up to 2 minimum wages" data-es="Conectado a todas las redes: hasta 2 salarios mínimos">Conectado a todas as redes: <strong>até 2 salários mínimos</strong></div>
           </div>
         </div>
         <div class="premio-item">
@@ -736,7 +735,6 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           <div>
             <div class="premio-val">R$ 500,00</div>
             <div class="premio-desc" data-pt="Transferência bancária · PIX · pago em D+7" data-en="Bank transfer · PIX · paid at D+7" data-es="Transferencia bancaria · PIX · pagado en D+7">Transferência bancária · PIX · pago em D+7</div>
-            <div class="premio-desc" style="color:var(--ouro-texto);margin-top:4px" data-pt="Conectado a todas as redes: R$ 1.000,00" data-en="Connected to all networks: R$ 1,000.00" data-es="Conectado a todas las redes: R$ 1.000,00">Conectado a todas as redes: <strong>R$ 1.000,00</strong></div>
           </div>
         </div>
 
@@ -1132,10 +1130,16 @@ function renderizarMeta(arrecadado){
 
 async function carregarProgresso(){
   try{
-    var r=await fetch('/progresso.json?t='+Date.now());
-    if(r.ok){var d=await r.json();renderizarMeta(d.arrecadado||ARRECADADO_FALLBACK);}
-    else renderizarMeta(ARRECADADO_FALLBACK);
-  }catch(e){renderizarMeta(ARRECADADO_FALLBACK);}
+    var SB2='https://xfkepekffdyrtcgagwqo.supabase.co';
+    var KEY2='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
+    var H2={'apikey':KEY2,'Authorization':'Bearer '+KEY2};
+    var r=await fetch(SB2+'/rest/v1/draws?status=in.(open,aguardando_qualificacao)&order=criado_em.desc&limit=1&select=meta_atual,meta_valor',{headers:H2});
+    var d=await r.json();
+    if(d&&d[0]&&Number(d[0].meta_valor)>0){
+      META_TOTAL=Number(d[0].meta_valor);
+      renderizarMeta(Number(d[0].meta_atual)||0);
+    } else renderizarMeta(0);
+  }catch(e){renderizarMeta(0);}
 }
 
 var metaAtivada=false;
@@ -1225,6 +1229,42 @@ document.addEventListener('DOMContentLoaded',function(){
   var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
   var HDR = {'apikey': KEY, 'Authorization': 'Bearer '+KEY};
 
+
+  // ── Carregar stats do hero dinamicamente ──────────────────
+  async function carregarStatsBanner() {
+    try {
+      // Leitores = compradores com purchase ativo
+      var rP = await fetch(SB+'/rest/v1/purchases?status=eq.active&select=user_id', {
+        headers: Object.assign({}, HDR, {'Prefer': 'count=exact', 'Range': '0-0'})
+      });
+      var cP = rP.headers.get('Content-Range');
+      if (cP) {
+        var leitores = parseInt(cP.split('/')[1]);
+        var el = document.getElementById('statLeitores');
+        if (el && !isNaN(leitores) && leitores > 0) el.textContent = leitores;
+      }
+
+      // Títulos = produtos ativos
+      var rT = await fetch(SB+'/rest/v1/products?ativo=eq.true&select=id', {
+        headers: Object.assign({}, HDR, {'Prefer': 'count=exact', 'Range': '0-0'})
+      });
+      var cT = rT.headers.get('Content-Range');
+      if (cT) {
+        var titulos = parseInt(cT.split('/')[1]);
+        var els = document.querySelectorAll('.hero-stats .stat-num');
+        if (els[1] && !isNaN(titulos) && titulos > 0) els[1].textContent = titulos;
+      }
+
+      // Prêmio = draw atual aberto
+      var rD = await fetch(SB+'/rest/v1/draws?status=in.(open,aguardando_qualificacao)&order=criado_em.desc&limit=1&select=premio_1,premio_2', {headers: HDR});
+      var draws = await rD.json();
+      if (draws && draws[0] && draws[0].premio_1) {
+        var els2 = document.querySelectorAll('.hero-stats .stat-num');
+        if (els2[2]) els2[2].textContent = draws[0].premio_1;
+      }
+    } catch(e) { console.warn('Stats banner:', e); }
+  }
+
   // ── Carregar meta/progresso dinamicamente ──────────────────
   async function carregarMetaBanco() {
     try {
@@ -1308,6 +1348,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // Executar após DOM pronto
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
+      carregarStatsBanner();
       carregarMetaBanco();
       carregarPremiosBanco();
       carregarCatalogoBanco();
