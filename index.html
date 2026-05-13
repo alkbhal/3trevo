@@ -48,6 +48,15 @@
   --borda-ouro:rgba(200,168,75,.25);
   --footer:#0a1910;
 }
+/* ── BANNER PROMOCIONAL ── */
+#site-banner{display:none;padding:10px 24px;text-align:center;font-size:13px;position:relative;z-index:1001;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;letter-spacing:.2px}
+#site-banner.ativo{display:flex}
+.banner-texto{color:#f4efe5}
+.banner-cta{padding:5px 14px;border:1px solid rgba(255,255,255,.45);color:#f4efe5;text-decoration:none;font-size:12px;white-space:nowrap;transition:background .2s;letter-spacing:.5px}
+.banner-cta:hover{background:rgba(255,255,255,.15)}
+.banner-fechar{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.5);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;transition:color .2s}
+.banner-fechar:hover{color:#fff}
+
 html{scroll-behavior:smooth}
 body{font-family:'Jost',sans-serif;background:var(--creme);color:var(--tinta);overflow-x:hidden;font-size:16px;line-height:1.6}
 a{text-decoration:none;color:inherit}
@@ -480,6 +489,9 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 </style>
 </head>
 <body>
+
+<!-- BANNER PROMOCIONAL -->
+<div id="site-banner" role="banner" aria-live="polite"></div>
 
 <!-- NAV -->
 <nav id="navbar" role="navigation" aria-label="Navegação principal">
@@ -1244,6 +1256,71 @@ document.addEventListener('DOMContentLoaded',function(){
   var HDR = {'apikey': KEY, 'Authorization': 'Bearer '+KEY};
 
 
+  // ── Carregar banner promocional ───────────────────────────
+  async function carregarBanner() {
+    try {
+      var r = await fetch(SB+'/rest/v1/config?chave=eq.banner&select=valor', {headers: HDR});
+      var d = await r.json();
+      if (!d || !d[0] || !d[0].valor) return;
+      var b = d[0].valor;
+      if (!b.ativo) return;
+      if (b.expira_em && new Date(b.expira_em) < new Date()) return;
+      var el = document.getElementById('site-banner');
+      if (!el) return;
+      el.style.background = b.cor || '#1a4a2e';
+      var html = '<span class="banner-texto">' + (b.texto||'') + '</span>';
+      if (b.cta_texto && b.cta_url) {
+        html += '<a href="' + b.cta_url + '" class="banner-cta">' + b.cta_texto + '</a>';
+      }
+      html += '<button class="banner-fechar" onclick="this.parentElement.classList.remove(\'ativo\')" aria-label="Fechar">×</button>';
+      el.innerHTML = html;
+      el.classList.add('ativo');
+    } catch(e) { console.warn('Banner:', e); }
+  }
+
+  // ── Carregar hero text dinamicamente ──────────────────────
+  async function carregarHero() {
+    try {
+      var r = await fetch(SB+'/rest/v1/config?chave=eq.hero&select=valor', {headers: HDR});
+      var d = await r.json();
+      if (!d || !d[0] || !d[0].valor) return;
+      var h = d[0].valor;
+      if (h.titulo_pt) {
+        var elT = document.querySelector('h1.hero-titulo');
+        if (elT) { elT.textContent = h.titulo_pt; elT.setAttribute('data-pt', h.titulo_pt); }
+      }
+      if (h.subtitulo_pt) {
+        var elS = document.querySelector('.hero-subtitulo');
+        if (elS) { elS.textContent = h.subtitulo_pt; elS.setAttribute('data-pt', h.subtitulo_pt); }
+      }
+      if (h.desc_pt) {
+        var elD = document.querySelector('.hero-desc');
+        if (elD) { elD.textContent = h.desc_pt; elD.setAttribute('data-pt', h.desc_pt); }
+      }
+    } catch(e) { console.warn('Hero:', e); }
+  }
+
+  // ── Carregar FAQ dinamicamente ─────────────────────────────
+  async function carregarFaq() {
+    try {
+      var r = await fetch(SB+'/rest/v1/config?chave=eq.faq&select=valor', {headers: HDR});
+      var d = await r.json();
+      if (!d || !d[0] || !Array.isArray(d[0].valor) || !d[0].valor.length) return;
+      var itens = d[0].valor;
+      var grid = document.getElementById('faqGrid');
+      if (!grid) return;
+      grid.innerHTML = itens.map(function(item, i) {
+        return '<div class="faq-item reveal" onclick="toggleFaq(this)" style="transition-delay:' + (i*0.05) + 's">' +
+          '<div class="faq-pergunta"><span>' + escapeHtml(item.p||'') + '</span><span class="faq-icone" aria-hidden="true">+</span></div>' +
+          '<div class="faq-resposta">' + escapeHtml(item.r||'') + '</div>' +
+          '</div>';
+      }).join('');
+    } catch(e) { console.warn('FAQ:', e); }
+  }
+  function escapeHtml(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   // ── Carregar stats do hero dinamicamente ──────────────────
   async function carregarStatsBanner() {
     try {
@@ -1360,12 +1437,18 @@ document.addEventListener('DOMContentLoaded',function(){
   // Executar após DOM pronto
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
+      carregarBanner();
+      carregarHero();
+      carregarFaq();
       carregarStatsBanner();
       carregarMetaBanco();
       carregarPremiosBanco();
       carregarCatalogoBanco();
     });
   } else {
+    carregarBanner();
+    carregarHero();
+    carregarFaq();
     carregarMetaBanco();
     carregarPremiosBanco();
     carregarCatalogoBanco();
