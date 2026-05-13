@@ -1609,7 +1609,7 @@ async function carregarExtrato() {
 
   const { data: payments, error } = await sb
     .from('payments')
-    .select('id, valor, status, metodo, criado_em, produto:product_id(titulo)')
+    .select('id, valor, status, metodo, criado_em, produto:product_id(titulo, slug)')
     .eq('user_id', usuarioAtual.id)
     .order('criado_em', { ascending: false });
 
@@ -1636,6 +1636,9 @@ async function carregarExtrato() {
         const dt  = new Date(p.criado_em);
         const dia = dt.toLocaleDateString('pt-BR');
         const hr  = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const retomar = p.status === 'pending' && p.produto?.slug
+          ? `<a href="/checkout.html?slug=${p.produto.slug}" style="font-size:11px;color:var(--ouro);letter-spacing:1px;text-decoration:none;text-transform:uppercase;border:1px solid rgba(200,168,75,.4);padding:3px 8px;white-space:nowrap">Retomar →</a>`
+          : '';
         return `<div class="extrato-linha">
           <div>
             <div class="extrato-produto">${p.produto?.titulo || 'Produto'}</div>
@@ -1644,6 +1647,7 @@ async function carregarExtrato() {
           <div class="extrato-detalhe">
             <span class="badge-status ${p.status || ''}">${statusLabel[p.status] || p.status || '—'}</span>
             ${p.metodo ? `<span class="extrato-metodo">${metodoLabel[p.metodo] || p.metodo}</span>` : ''}
+            ${retomar}
           </div>
           <div class="extrato-valor">${p.valor ? 'R$\u00a0' + Number(p.valor).toFixed(2).replace('.', ',') : '—'}</div>
         </div>`;

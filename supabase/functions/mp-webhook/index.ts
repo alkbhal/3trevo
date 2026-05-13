@@ -407,243 +407,73 @@ function buildEmailHtml(data: {
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compra confirmada — Editora Três Trevo</title>
-</head>
-<body style="margin:0;padding:0;background:#0a1f0f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#f0ebe0">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0a1f0f;padding:40px 0">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
-               style="max-width:600px;width:100%;background:#0f2d1a;border:1px solid rgba(200,168,75,0.2)">
-
-          <!-- TOPO: barra dourada -->
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Compra confirmada — Editora Três Trevo</title></head>
+<body style="margin:0;padding:0;background:#f0ebe0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0ebe0;padding:40px 0">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#fdfbf7;border:1px solid rgba(26,74,46,.12)">
+  <tr><td style="height:4px;background:linear-gradient(90deg,#1a4a2e,#c8a84b)"></td></tr>
+  <tr><td style="padding:32px 48px 24px;border-bottom:1px solid rgba(26,74,46,.08)">
+    <p style="margin:0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#1a4a2e">✦ &nbsp; Editora Três Trevo</p>
+  </td></tr>
+  <tr><td style="padding:36px 48px 0">
+    <h1 style="margin:0 0 12px;font-size:30px;font-weight:300;color:#0f2d1a">Sua compra foi <em style="color:#1a4a2e;font-style:italic">confirmada</em></h1>
+    <p style="margin:0;font-size:14px;color:#555;line-height:1.7">O pagamento foi aprovado. Seu ebook já está disponível na sua biblioteca.</p>
+  </td></tr>
+  <tr><td style="padding:28px 48px">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f0e8;border:1px solid rgba(26,74,46,.1);border-left:3px solid #c8a84b">
+      <tr><td style="padding:20px 24px">
+        <p style="margin:0 0 4px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8a6f28">${genero}</p>
+        <h2 style="margin:0 0 4px;font-size:20px;font-weight:600;color:#0f2d1a">${emoji} ${titulo}</h2>
+        <p style="margin:0 0 16px;font-size:13px;color:#777">${autor}</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-            <td style="height:3px;background:linear-gradient(90deg,#c8a84b,rgba(200,168,75,0.1))"></td>
+            <td style="font-size:13px;color:#555">Valor pago</td>
+            <td align="right" style="font-size:18px;font-weight:700;color:#1a4a2e">${valor}</td>
           </tr>
-
-          <!-- CABEÇALHO -->
-          <tr>
-            <td style="padding:40px 48px 32px;border-bottom:1px solid rgba(200,168,75,0.1)">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td>
-                    <p style="margin:0;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#c8a84b;opacity:0.7">
-                      ✦ &nbsp; Editora Três Trevo
-                    </p>
-                  </td>
-                  <td align="right">
-                    <p style="margin:0;font-size:11px;color:rgba(240,235,224,0.3);letter-spacing:1px">
-                      Confirmação de compra
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- SAUDAÇÃO -->
-          <tr>
-            <td style="padding:40px 48px 0">
-              <h1 style="margin:0 0 8px;font-size:28px;font-weight:300;line-height:1.2;color:#f0ebe0">
-                Sua compra foi<br><em style="color:#c8a84b;font-style:italic">confirmada</em>
-              </h1>
-              <p style="margin:16px 0 0;font-size:14px;color:rgba(240,235,224,0.5);line-height:1.7">
-                O pagamento foi aprovado e seu ebook já está disponível em sua biblioteca pessoal.
-              </p>
-            </td>
-          </tr>
-
-          <!-- CARD DO PRODUTO -->
-          <tr>
-            <td style="padding:32px 48px">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:rgba(255,255,255,0.03);border:1px solid rgba(200,168,75,0.15)">
-                <tr>
-                  <td style="height:2px;background:linear-gradient(90deg,#c8a84b,transparent)"></td>
-                </tr>
-                <tr>
-                  <td style="padding:24px 28px">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="width:56px;vertical-align:top">
-                          <div style="width:48px;height:48px;background:rgba(200,168,75,0.08);
-                               border:1px solid rgba(200,168,75,0.2);display:table-cell;
-                               text-align:center;vertical-align:middle;font-size:24px;line-height:48px">
-                            ${emoji}
-                          </div>
-                        </td>
-                        <td style="padding-left:16px;vertical-align:top">
-                          <p style="margin:0 0 2px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#c8a84b;opacity:0.6">
-                            ${genero}
-                          </p>
-                          <h2 style="margin:0 0 4px;font-size:20px;font-weight:400;color:#f0ebe0;line-height:1.2">
-                            ${titulo}
-                          </h2>
-                          <p style="margin:0;font-size:12px;color:rgba(240,235,224,0.35);letter-spacing:0.5px">
-                            ${autor}
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-
-                    <!-- Linha divisória -->
-                    <div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0"></div>
-
-                    <!-- Detalhes -->
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="padding-bottom:8px">
-                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                            <tr>
-                              <td style="font-size:12px;color:rgba(240,235,224,0.4)">Valor pago</td>
-                              <td align="right" style="font-size:16px;font-weight:600;color:#c8a84b">${valor}</td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                                 style="background:rgba(200,168,75,0.05);border:1px solid rgba(200,168,75,0.12);padding:12px 16px">
-                            <tr>
-                              <td>
-                                <span style="font-size:22px;font-weight:600;color:#c8a84b;font-family:Georgia,serif">${cotas}</span>
-                                <span style="font-size:12px;color:rgba(240,235,224,0.4);margin-left:8px">
-                                  cota${cotas !== 1 ? "s" : ""} no Programa Cultural Três Trevo
-                                </span>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- BOTÃO PRINCIPAL -->
-          <tr>
-            <td style="padding:0 48px 32px">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td align="center">
-                    <a href="${areaUrl}"
-                       style="display:inline-block;width:100%;padding:16px 24px;background:#c8a84b;
-                              color:#0f2d1a;font-size:14px;font-weight:500;text-decoration:none;
-                              letter-spacing:0.5px;text-align:center;box-sizing:border-box">
-                      Acessar minha biblioteca →
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- PROGRAMA CULTURAL -->
-          <tr>
-            <td style="padding:0 48px 32px">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);padding:24px">
-                <tr>
-                  <td>
-                    <p style="margin:0 0 12px;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#c8a84b">
-                      ✦ &nbsp; Programa Cultural
-                    </p>
-                    <p style="margin:0 0 8px;font-size:15px;color:rgba(240,235,224,0.8);font-weight:400">
-                      Como participar do sorteio
-                    </p>
-                    <table cellpadding="0" cellspacing="0" border="0" style="margin-top:12px">
-                      <tr>
-                        <td style="vertical-align:top;padding-right:10px;padding-bottom:8px">
-                          <span style="display:inline-block;width:18px;height:18px;background:rgba(200,168,75,0.1);
-                               border:1px solid rgba(200,168,75,0.3);text-align:center;line-height:18px;
-                               font-size:10px;color:#c8a84b;font-weight:600">1</span>
-                        </td>
-                        <td style="font-size:13px;color:rgba(240,235,224,0.5);line-height:1.6;padding-bottom:8px">
-                          Após 7 dias, acesse sua biblioteca e clique em <strong style="color:rgba(240,235,224,0.7)">Sorteios</strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="vertical-align:top;padding-right:10px;padding-bottom:8px">
-                          <span style="display:inline-block;width:18px;height:18px;background:rgba(200,168,75,0.1);
-                               border:1px solid rgba(200,168,75,0.3);text-align:center;line-height:18px;
-                               font-size:10px;color:#c8a84b;font-weight:600">2</span>
-                        </td>
-                        <td style="font-size:13px;color:rgba(240,235,224,0.5);line-height:1.6;padding-bottom:8px">
-                          Escreva um depoimento sobre o livro (mín. 20 palavras)
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="vertical-align:top;padding-right:10px">
-                          <span style="display:inline-block;width:18px;height:18px;background:rgba(200,168,75,0.1);
-                               border:1px solid rgba(200,168,75,0.3);text-align:center;line-height:18px;
-                               font-size:10px;color:#c8a84b;font-weight:600">3</span>
-                        </td>
-                        <td style="font-size:13px;color:rgba(240,235,224,0.5);line-height:1.6">
-                          Confirme as redes que segue para multiplicar suas cotas (até 3×)
-                        </td>
-                      </tr>
-                    </table>
-                    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)">
-                      <p style="margin:0;font-size:12px;color:rgba(240,235,224,0.3);line-height:1.7">
-                        <strong style="color:rgba(240,235,224,0.5)">Prêmios desta rodada:</strong>
-                        1° lugar — 1 salário mínimo nacional (PIX em D+7) &nbsp;·&nbsp;
-                        2° lugar — R$ 500,00 (PIX em D+7)
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- GARANTIA -->
-          <tr>
-            <td style="padding:0 48px 32px">
-              <p style="margin:0;font-size:12px;color:rgba(240,235,224,0.3);line-height:1.7;
-                         padding:16px;background:rgba(111,207,151,0.04);border:1px solid rgba(111,207,151,0.1)">
-                <strong style="color:rgba(111,207,151,0.6)">Garantia de 7 dias (CDC art. 49)</strong><br>
-                Se não ficar satisfeito, devolvemos 100% do valor sem perguntas.
-                Basta responder este e-mail ou escrever para
-                <a href="mailto:sac@3trevo.com.br" style="color:#c8a84b">sac@3trevo.com.br</a>
-              </p>
-            </td>
-          </tr>
-
-          <!-- RODAPÉ -->
-          <tr>
-            <td style="padding:24px 48px 32px;border-top:1px solid rgba(200,168,75,0.08)">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td>
-                    <p style="margin:0 0 4px;font-size:12px;color:#c8a84b;opacity:0.5;letter-spacing:2px">
-                      ✦ Editora Três Trevo
-                    </p>
-                    <p style="margin:0;font-size:11px;color:rgba(240,235,224,0.2);line-height:1.6">
-                      <a href="${siteUrl}" style="color:rgba(240,235,224,0.2);text-decoration:none">3trevo.com.br</a>
-                      &nbsp;·&nbsp;
-                      <a href="mailto:sac@3trevo.com.br" style="color:rgba(240,235,224,0.2);text-decoration:none">sac@3trevo.com.br</a>
-                    </p>
-                  </td>
-                  <td align="right">
-                    <p style="margin:0;font-size:10px;color:rgba(240,235,224,0.15)">
-                      © ${ano} Editora Três Trevo
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
+          <tr><td colspan="2" style="padding-top:8px">
+            <div style="background:#1a4a2e;color:#c8a84b;font-size:13px;padding:10px 14px">
+              ✦ &nbsp;<strong>${cotas} cota${cotas !== 1 ? "s" : ""}</strong> no Programa Cultural Três Trevo
+            </div>
+          </td></tr>
         </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+      </td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:0 48px 32px">
+    <a href="${areaUrl}" style="display:block;width:100%;padding:16px;background:#1a4a2e;color:#f0ebe0;font-size:14px;font-weight:500;text-decoration:none;text-align:center;box-sizing:border-box">Acessar minha biblioteca →</a>
+  </td></tr>
+  <tr><td style="padding:0 48px 28px">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f0e8;border:1px solid rgba(26,74,46,.1);padding:20px 24px">
+      <tr><td>
+        <p style="margin:0 0 10px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8a6f28">✦ Programa Cultural</p>
+        <p style="margin:0 0 10px;font-size:14px;color:#333;font-weight:500">Como participar do sorteio</p>
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr><td style="padding-right:10px;padding-bottom:8px;vertical-align:top"><span style="display:inline-block;width:20px;height:20px;background:#1a4a2e;color:#c8a84b;text-align:center;line-height:20px;font-size:11px;font-weight:700">1</span></td>
+            <td style="font-size:13px;color:#555;line-height:1.6;padding-bottom:8px">Após 7 dias, acesse sua biblioteca e clique em <strong>Sorteios</strong></td></tr>
+          <tr><td style="padding-right:10px;padding-bottom:8px;vertical-align:top"><span style="display:inline-block;width:20px;height:20px;background:#1a4a2e;color:#c8a84b;text-align:center;line-height:20px;font-size:11px;font-weight:700">2</span></td>
+            <td style="font-size:13px;color:#555;line-height:1.6;padding-bottom:8px">Escreva um depoimento sobre o livro (mín. 20 palavras)</td></tr>
+          <tr><td style="padding-right:10px;vertical-align:top"><span style="display:inline-block;width:20px;height:20px;background:#c8a84b;color:#0f2d1a;text-align:center;line-height:20px;font-size:11px;font-weight:700">3</span></td>
+            <td style="font-size:13px;color:#555;line-height:1.6">Suas cotas são liberadas — acompanhe pelo extrato em Minha Biblioteca</td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:0 48px 28px">
+    <p style="margin:0;font-size:12px;color:#666;line-height:1.7;padding:14px 16px;background:#f0f7f2;border:1px solid rgba(26,74,46,.15)">
+      <strong style="color:#1a4a2e">Garantia de 7 dias (CDC art. 49)</strong><br>
+      Se não ficar satisfeito, devolvemos 100% do valor. Escreva para <a href="mailto:sac@3trevo.com.br" style="color:#1a4a2e">sac@3trevo.com.br</a>
+    </p>
+  </td></tr>
+  <tr><td style="padding:20px 48px 28px;border-top:1px solid rgba(26,74,46,.08)">
+    <p style="margin:0;font-size:11px;color:#999;line-height:1.6">
+      <a href="${siteUrl}" style="color:#1a4a2e;text-decoration:none">3trevo.com.br</a> &nbsp;·&nbsp;
+      <a href="mailto:sac@3trevo.com.br" style="color:#1a4a2e;text-decoration:none">sac@3trevo.com.br</a> &nbsp;·&nbsp; © ${ano} Editora Três Trevo
+    </p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
 }
