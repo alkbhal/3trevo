@@ -1336,13 +1336,13 @@ async function initAuth() {
 }
 
 async function verificarAdmin(user) {
-  // Usa função SECURITY DEFINER para evitar bloqueio RLS recursivo
-  const { data, error } = await sb.rpc('get_my_admin_profile');
-  const perfil = Array.isArray(data) ? data[0] : data;
+  // get_admin_profile(email) — SECURITY DEFINER, sem RLS recursivo, sem auth.email()
+  const { data, error } = await sb.rpc('get_admin_profile', { p_email: user.email });
+  const perfil = Array.isArray(data) && data.length > 0 ? data[0] : null;
 
   if (error || !perfil) {
     await sb.auth.signOut();
-    toast('Acesso não autorizado. Verifique se seu email está cadastrado na equipe.', 'erro');
+    toast('Acesso não autorizado. Email não cadastrado na equipe ou inativo.', 'erro');
     return;
   }
 
@@ -1411,11 +1411,8 @@ function setTab(tab) {
 async function enviarMagicLink() {
   const email = document.getElementById('ml-email').value.trim();
   if (!email) { setLoginMsg('magic-msg', 'Informe o email.', 'erro'); return; }
-  if (email !== ADMIN_EMAIL) { setLoginMsg('magic-msg', 'Email não autorizado.', 'erro'); return; }
   const btn = document.getElementById('btn-magic');
   btn.disabled = true; btn.textContent = 'Enviando…';
-  // shouldCreateUser: true — conta criada na 1ª vez; acesso bloqueado se email não estiver em admin_users
-  // emailRedirectTo — garante retorno ao admin.html após clicar no link
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: {
@@ -1435,7 +1432,6 @@ async function loginSenha() {
   const email = document.getElementById('pw-email').value.trim();
   const senha = document.getElementById('pw-senha').value;
   if (!email || !senha) { setLoginMsg('pw-msg', 'Preencha email e senha.', 'erro'); return; }
-  if (email !== ADMIN_EMAIL) { setLoginMsg('pw-msg', 'Email não autorizado.', 'erro'); return; }
   const btn = document.getElementById('btn-login');
   btn.disabled = true; btn.textContent = 'Entrando…';
   const { error } = await sb.auth.signInWithPassword({ email, password: senha });
