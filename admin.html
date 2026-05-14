@@ -1416,7 +1416,8 @@ async function enviarMagicLink() {
   if (email !== ADMIN_EMAIL) { setLoginMsg('magic-msg', 'Email não autorizado.', 'erro'); return; }
   const btn = document.getElementById('btn-magic');
   btn.disabled = true; btn.textContent = 'Enviando…';
-  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+  // shouldCreateUser: true — conta criada na 1ª vez; acesso bloqueado se email não estiver em admin_users
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
   btn.disabled = false; btn.textContent = 'Enviar link de acesso';
   if (error) {
     setLoginMsg('magic-msg', 'Erro: ' + error.message, 'erro');
