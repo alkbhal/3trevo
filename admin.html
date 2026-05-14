@@ -1336,15 +1336,13 @@ async function initAuth() {
 }
 
 async function verificarAdmin(user) {
-  const { data: perfil, error } = await sb
-    .from('admin_users')
-    .select('role, nome, percentual_royalty, ativo')
-    .eq('email', user.email)
-    .single();
+  // Usa função SECURITY DEFINER para evitar bloqueio RLS recursivo
+  const { data, error } = await sb.rpc('get_my_admin_profile');
+  const perfil = Array.isArray(data) ? data[0] : data;
 
-  if (error || !perfil || !perfil.ativo) {
+  if (error || !perfil) {
     await sb.auth.signOut();
-    toast('Acesso não autorizado para este painel.', 'erro');
+    toast('Acesso não autorizado. Verifique se seu email está cadastrado na equipe.', 'erro');
     return;
   }
 
