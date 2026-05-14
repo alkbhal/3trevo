@@ -451,26 +451,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 .footer-selos{display:flex;gap:16px}
 .footer-selo{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.35);border:1px solid rgba(200,168,75,.15);padding:4px 10px}
 
-/* ── MINI PLAYER ── */
-#miniPlayer{position:fixed;bottom:24px;left:24px;z-index:900;
-  background:#0f2d1a;border:1px solid rgba(200,168,75,.25);
-  display:flex;align-items:center;gap:12px;padding:12px 16px;
-  opacity:0;transform:translateY(16px);transition:opacity .4s,transform .4s;
-  pointer-events:none;max-width:300px}
-#miniPlayer.visivel{opacity:1;transform:translateY(0);pointer-events:auto}
-.mp-btn{width:36px;height:36px;border-radius:50%;background:rgba(200,168,75,.15);
-  border:1px solid rgba(200,168,75,.35);display:flex;align-items:center;
-  justify-content:center;cursor:pointer;transition:background .2s;flex-shrink:0;color:#c8a84b;font-size:14px}
-.mp-btn:hover{background:rgba(200,168,75,.3)}
-.mp-info{flex:1;min-width:0}
-.mp-titulo{font-size:12px;color:#f4efe5;letter-spacing:.3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-.mp-artista{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.7)}
-.mp-barra{height:2px;background:rgba(255,255,255,.1);margin-top:8px;cursor:pointer;position:relative}
-.mp-progresso{height:100%;background:#c8a84b;width:0%;transition:width .5s linear}
-.mp-fechar{width:20px;height:20px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:rgba(255,255,255,.3);font-size:14px;flex-shrink:0;transition:color .2s;border:none;background:none}
-.mp-fechar:hover{color:rgba(255,255,255,.7)}
+/* Player injetado via player.js */
 
 /* ── REVEAL ── */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
@@ -528,6 +509,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
     <li><a href="#catalogo" data-pt="Catálogo" data-en="Catalog" data-es="Catálogo">Catálogo</a></li>
     <li><a href="#programa" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a></li>
     <li><a href="biblioteca.html">Biblioteca</a></li>
+    <li><a href="/biblioteca-musica.html">Músicas</a></li>
     <li><a href="#sobre" data-pt="Sobre" data-en="About" data-es="Acerca">Sobre</a></li>
     <li><a href="/area-cliente.html" data-pt="Minha Biblioteca" data-en="My Library" data-es="Mi Biblioteca">Minha Biblioteca</a></li>
   </ul>
@@ -544,6 +526,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   <a href="#catalogo" onclick="toggleMenu()" data-pt="Catálogo" data-en="Catalog" data-es="Catálogo">Catálogo</a>
   <a href="#programa" onclick="toggleMenu()" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a>
   <a href="biblioteca.html" onclick="toggleMenu()">Biblioteca</a>
+  <a href="/biblioteca-musica.html" onclick="toggleMenu()">Músicas</a>
   <a href="#sobre" onclick="toggleMenu()" data-pt="Sobre" data-en="About" data-es="Acerca">Sobre</a>
   <a href="#faq" onclick="toggleMenu()" data-pt="Perguntas frequentes" data-en="FAQ" data-es="Preguntas">Perguntas frequentes</a>
   <a href="/area-cliente.html" onclick="toggleMenu()" data-pt="Minha Biblioteca" data-en="My Library" data-es="Mi Biblioteca">Minha Biblioteca</a>
@@ -1013,19 +996,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   </div>
 </footer>
 
-<!-- MINI PLAYER -->
-<div id="miniPlayer" role="region" aria-label="Player de música">
-  <button class="mp-btn" id="mpBtn" onclick="mpToggle()" aria-label="Play/Pause">▶</button>
-  <div class="mp-info">
-    <div class="mp-titulo">E Ainda Assim Doer</div>
-    <div class="mp-artista">Said Anes · Trilha autoral</div>
-    <div class="mp-barra" onclick="mpSeek(event)" title="Clique para navegar">
-      <div class="mp-progresso" id="mpProgresso"></div>
-    </div>
-  </div>
-  <button class="mp-fechar" onclick="mpFechar()" aria-label="Fechar player">×</button>
-</div>
-<audio id="mpAudio" preload="none"></audio>
+<!-- Player musical carregado via player.js -->
 
 <!-- WHATSAPP -->
 <a id="waBtn" href="https://wa.me/5554999467085?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20ebooks%20da%20Editora%20Três%20Trevo."
@@ -1504,82 +1475,18 @@ document.addEventListener('DOMContentLoaded',function(){
 })();
 </script>
 
+<script src="/js/player.js"></script>
 <script>
-// ── MINI PLAYER ──────────────────────────────────────────────────────
-(function() {
-  var EDGE = 'https://xfkepekffdyrtcgagwqo.supabase.co/functions/v1';
-  var audio    = document.getElementById('mpAudio');
-  var player   = document.getElementById('miniPlayer');
-  var btn      = document.getElementById('mpBtn');
-  var progEl   = document.getElementById('mpProgresso');
-  var loaded   = false;
-  var dismissed = false;
-
-  // Aparecer após rolar 60% da página
-  window.addEventListener('scroll', function() {
-    if (dismissed) return;
+// Abrir player automaticamente após 40% de scroll
+window.addEventListener('scroll', function() {
+  if (window.TTPlayer && !window.TTPlayer.isPlaying()) {
     var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-    if (pct > 0.35) player.classList.add('visivel');
-  }, { passive: true });
-
-  // Carregar signed URL ao primeiro play
-  async function mpCarregar() {
-    if (loaded) return true;
-    try {
-      var r = await fetch(EDGE + '/get-media?track=trilha');
-      var d = await r.json();
-      if (!d.url) return false;
-      audio.src = d.url;
-      loaded = true;
-      // Renovar URL 5 min antes de expirar (55 min)
-      setTimeout(async function() {
-        var r2 = await fetch(EDGE + '/get-media?track=trilha');
-        var d2 = await r2.json();
-        if (d2.url) { var t = audio.currentTime; audio.src = d2.url; audio.currentTime = t; }
-      }, 55 * 60 * 1000);
-      return true;
-    } catch(e) { return false; }
-  }
-
-  window.mpToggle = async function() {
-    var ok = await mpCarregar();
-    if (!ok) return;
-    if (audio.paused) {
-      audio.play();
-      btn.textContent = '❚❚';
-      btn.setAttribute('aria-label', 'Pausar');
-    } else {
-      audio.pause();
-      btn.textContent = '▶';
-      btn.setAttribute('aria-label', 'Play');
+    if (pct > 0.4) {
+      window.TTPlayer.show();
+      window.removeEventListener('scroll', arguments.callee);
     }
-  };
-
-  window.mpFechar = function() {
-    audio.pause();
-    player.classList.remove('visivel');
-    dismissed = true;
-  };
-
-  window.mpSeek = function(e) {
-    if (!loaded || !audio.duration) return;
-    var rect = e.currentTarget.getBoundingClientRect();
-    var pct  = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-  };
-
-  // Atualizar barra de progresso
-  audio.addEventListener('timeupdate', function() {
-    if (!audio.duration) return;
-    progEl.style.width = (audio.currentTime / audio.duration * 100) + '%';
-  });
-
-  audio.addEventListener('ended', function() {
-    btn.textContent = '▶';
-    btn.setAttribute('aria-label', 'Play');
-    progEl.style.width = '0%';
-  });
-})();
+  }
+}, { passive: true });
 </script>
 
 </body>
