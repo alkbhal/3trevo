@@ -1090,7 +1090,7 @@ async function carregarBiblioteca() {
 
   // Se só um gênero ou poucos itens, usar grid direto
   if (ebooks.length <= 6) {
-    cont.innerHTML = `<div class="biblioteca-grid">${ebooks.map(({ l, p, meta }, i) => cardEbook(p, meta, i)).join('')}</div>`;
+    cont.innerHTML = `<div class="biblioteca-grid">${ebooks.map(({ l, p, meta }, i) => cardEbook(p, meta, i, l.id)).join('')}</div>`;
     return;
   }
 
@@ -1102,14 +1102,14 @@ async function carregarBiblioteca() {
         <div class="secao-nome">${gen}</div>
       </div>
       ${items.length > 4
-        ? `<div class="carrossel-wrap"><div class="carrossel">${items.map(({ p, meta }, i) => cardEbook(p, meta, i)).join('')}</div></div>`
-        : `<div class="biblioteca-grid">${items.map(({ p, meta }, i) => cardEbook(p, meta, i)).join('')}</div>`
+        ? `<div class="carrossel-wrap"><div class="carrossel">${items.map(({ l, p, meta }, i) => cardEbook(p, meta, i, l.id)).join('')}</div></div>`
+        : `<div class="biblioteca-grid">${items.map(({ l, p, meta }, i) => cardEbook(p, meta, i, l.id)).join('')}</div>`
       }
     </div>`;
   }).join('');
 }
 
-function cardEbook(p, meta, i) {
+function cardEbook(p, meta, i, libId) {
   const emoji  = meta.emoji || '📖';
   const titulo = p.titulo || meta.titulo || 'Ebook';
   const autor  = p.autor  || meta.autor  || '';
@@ -1136,6 +1136,7 @@ function cardEbook(p, meta, i) {
           <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg>
           PDF
         </button>
+        ${libId ? `<button onclick="event.stopPropagation();ocultarDaBiblioteca('${libId}',this)" title="Remover da biblioteca" style="background:none;border:none;cursor:pointer;color:rgba(26,26,22,.25);font-size:14px;padding:2px 4px;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(200,80,80,.7)'" onmouseout="this.style.color='rgba(26,26,22,.25)'">✕</button>` : ''}
       </div>
     </div>
   </div>`;
@@ -1614,10 +1615,19 @@ async function enviarValidacao(drawId, purchaseId) {
 async function carregarExtrato() {
   const cont = document.getElementById('listaExtrato');
 
+  // Lazy cleanup — marcar pending >72h como expired (sem precisar de pg_cron)
+  const limite72h = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
+  await sb.from('payments')
+    .update({ status: 'cancelled' })
+    .eq('user_id', usuarioAtual.id)
+    .eq('status', 'pending')
+    .lt('criado_em', limite72h);
+
   const { data: payments, error } = await sb
     .from('payments')
     .select('id, valor, status, metodo, criado_em, produto:product_id(titulo, slug)')
     .eq('user_id', usuarioAtual.id)
+    .not('status', 'in', '("expired","cancelled")')
     .order('criado_em', { ascending: false });
 
   if (error || !payments || payments.length === 0) {
@@ -1629,7 +1639,7 @@ async function carregarExtrato() {
     return;
   }
 
-  const statusLabel = { approved: 'Aprovado', pending: 'Pendente', rejected: 'Recusado', refunded: 'Reembolsado', cancelled: 'Cancelado' };
+  const statusLabel = { approved: 'Aprovado', pending: 'Pendente', rejected: 'Recusado', refunded: 'Reembolsado', cancelled: 'Cancelado', expired: 'Expirado' };
   const metodoLabel = { pix: 'PIX', credit_card: 'Cartão', debit_card: 'Débito', ticket: 'Boleto', boleto: 'Boleto' };
 
   // Totais
@@ -1643,9 +1653,12 @@ async function carregarExtrato() {
         const dt  = new Date(p.criado_em);
         const dia = dt.toLocaleDateString('pt-BR');
         const hr  = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        const retomar = p.status === 'pending' && p.produto?.slug
-          ? `<a href="/checkout.html?slug=${p.produto.slug}" style="font-size:11px;color:var(--ouro);letter-spacing:1px;text-decoration:none;text-transform:uppercase;border:1px solid rgba(200,168,75,.4);padding:3px 8px;white-space:nowrap">Retomar →</a>`
-          : '';
+        const acoesPending = p.status === 'pending' ? `
+          <div style="display:flex;gap:6px;margin-top:4px">
+            ${p.produto?.slug ? `<a href="/checkout.html?slug=${p.produto.slug}" style="font-size:11px;color:var(--ouro);letter-spacing:1px;text-decoration:none;text-transform:uppercase;border:1px solid rgba(200,168,75,.4);padding:3px 8px;white-space:nowrap">Retomar →</a>` : ''}
+            <button onclick="cancelarPayment('${p.id}',this)" style="font-size:11px;color:rgba(200,80,80,.8);letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(200,80,80,.3);padding:3px 8px;background:none;cursor:pointer;white-space:nowrap">Cancelar</button>
+          </div>` : '';
+        const retomar = '';
         return `<div class="extrato-linha">
           <div>
             <div class="extrato-produto">${p.produto?.titulo || 'Produto'}</div>
@@ -1654,7 +1667,7 @@ async function carregarExtrato() {
           <div class="extrato-detalhe">
             <span class="badge-status ${p.status || ''}">${statusLabel[p.status] || p.status || '—'}</span>
             ${p.metodo ? `<span class="extrato-metodo">${metodoLabel[p.metodo] || p.metodo}</span>` : ''}
-            ${retomar}
+            ${acoesPending}
           </div>
           <div class="extrato-valor">${p.valor ? 'R$\u00a0' + Number(p.valor).toFixed(2).replace('.', ',') : '—'}</div>
         </div>`;
@@ -1671,6 +1684,32 @@ async function carregarExtrato() {
         <div class="resumo-val">${payments.filter(p => p.status === 'approved').length}</div>
       </div>
     </div>` : ''}`;
+}
+
+async function cancelarPayment(paymentId, btn) {
+  if (!confirm('Cancelar esta compra pendente? A ação não pode ser desfeita.')) return;
+  btn.textContent = '…';
+  btn.disabled = true;
+  const { error } = await sb.from('payments')
+    .update({ status: 'cancelled' })
+    .eq('id', paymentId)
+    .eq('user_id', usuarioAtual.id)
+    .eq('status', 'pending');
+  if (error) { btn.textContent = 'Erro'; return; }
+  toast('Compra cancelada.', 'info');
+  carregarExtrato();
+}
+
+async function ocultarDaBiblioteca(libId, btn) {
+  btn.textContent = '…';
+  btn.disabled = true;
+  const { error } = await sb.from('user_library')
+    .update({ oculto: true })
+    .eq('id', libId)
+    .eq('user_id', usuarioAtual.id);
+  if (error) { btn.textContent = 'Erro'; return; }
+  toast('Removido da biblioteca.', 'info');
+  carregarBiblioteca();
 }
 
 // ══════════════════════════════════════════════════════════
