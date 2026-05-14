@@ -242,11 +242,16 @@ let productId       = null;
 let productPrice    = null;
 let brickController   = null;
 let brickInicializando = false;
+let affSlug         = null; // rastreamento de afiliado
 
 async function init() {
-  // Ler product_id da query string
+  // Ler parâmetros da query string
   const params = new URLSearchParams(window.location.search);
   productId = params.get('product_id');
+  // Capturar slug de afiliado e persistir em sessionStorage
+  const affParam = params.get('aff');
+  if (affParam) { affSlug = affParam; sessionStorage.setItem('aff', affParam); }
+  else { affSlug = sessionStorage.getItem('aff') || null; }
 
   // Carregar produto (por product_id ou slug)
   if (!productId) {
@@ -404,7 +409,7 @@ async function inicializarBrick() {
           const res  = await fetch(`${EDGE_BASE}/process-payment`, {
             method:  'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body:    JSON.stringify({ product_id: productId, ...formData }),
+            body:    JSON.stringify({ product_id: productId, aff_slug: affSlug || undefined, ...formData }),
           });
           const data = await res.json();
           if (!res.ok || data.error) {

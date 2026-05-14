@@ -397,6 +397,10 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         <span class="nav-icon">+</span>Novo Produto
       </div>
 
+      <div class="nav-item" data-sec="vendas-dash" onclick="irPara('vendas-dash',this)">
+        <span class="nav-icon">◉</span>Painel de Vendas
+      </div>
+
       <div class="sidebar-section" data-role-group="programa">Programa Cultural</div>
       <div class="nav-item" data-sec="sorteios" onclick="irPara('sorteios',this)">
         <span class="nav-icon">◇</span>Rodadas
@@ -411,9 +415,12 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         <span class="nav-icon">✎</span>Conteúdo
       </div>
 
-      <div class="sidebar-section" data-role-group="equipe">Equipe</div>
+      <div class="sidebar-section" data-role-group="equipe">Equipe & Parceiros</div>
       <div class="nav-item" data-sec="equipe" onclick="irPara('equipe',this)">
         <span class="nav-icon">◑</span>Gestão de Equipe
+      </div>
+      <div class="nav-item" data-sec="afiliados" onclick="irPara('afiliados',this)">
+        <span class="nav-icon">◈</span>Afiliados
       </div>
 
       <div class="sidebar-section" data-role-group="escritor">Meu Espaço</div>
@@ -775,6 +782,58 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         </div>
       </div>
 
+      <!-- ── AFILIADOS ── -->
+      <div class="secao" id="sec-afiliados">
+        <div class="secao-topo" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="secao-titulo">Afiliados</div>
+            <div class="secao-sub">Links rastreáveis e conversões por parceiro</div>
+          </div>
+          <button class="btn btn-ouro" onclick="abrirModalAfiliado()">+ Novo Afiliado</button>
+        </div>
+        <div class="card" style="padding:0">
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr><th>Nome</th><th>Email</th><th>Link de afiliado</th><th>Comissão</th><th>Conversões</th><th>Status</th><th></th></tr></thead>
+              <tbody id="afiliados-tbody">
+                <tr><td colspan="7"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAINEL DE VENDAS ── -->
+      <div class="secao" id="sec-vendas-dash">
+        <div class="secao-topo">
+          <div class="secao-titulo">Painel de Vendas</div>
+          <div class="secao-sub">Receita, conversões e desempenho por produto</div>
+        </div>
+        <div class="stat-grid" id="vd-stats" style="margin-bottom:24px">
+          <div class="stat-card"><div class="stat-icon">R$</div><div class="stat-label">Receita Total</div><div class="stat-valor" id="vd-receita">—</div><div class="stat-sub">todas as compras ativas</div></div>
+          <div class="stat-card"><div class="stat-icon">✦</div><div class="stat-label">Vendas Confirmadas</div><div class="stat-valor" id="vd-total">—</div><div class="stat-sub">status active</div></div>
+          <div class="stat-card"><div class="stat-icon">◎</div><div class="stat-label">Ticket Médio</div><div class="stat-valor" id="vd-ticket" style="font-size:22px">—</div><div class="stat-sub">por compra</div></div>
+          <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-label">Pagamentos Pendentes</div><div class="stat-valor" id="vd-pendentes">—</div><div class="stat-sub">aguardando confirmação</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-titulo">Vendas por produto</div>
+            <div id="vd-por-produto"><div class="loading"><div class="spinner"></div>Carregando…</div></div>
+          </div>
+          <div class="card" style="padding:0">
+            <div class="card-titulo" style="padding:16px 20px;margin-bottom:0;border-bottom:1px solid var(--borda2)">Últimas 20 vendas</div>
+            <div class="tabela-wrap">
+              <table>
+                <thead><tr><th>Produto</th><th>Valor</th><th>Data</th></tr></thead>
+                <tbody id="vd-recentes">
+                  <tr><td colspan="3"><div class="loading"><div class="spinner"></div></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ── EQUIPE (gestor) ── -->
       <div class="secao" id="sec-equipe">
         <div class="secao-topo" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -824,6 +883,17 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         <p style="font-size:11px;color:rgba(255,255,255,.25);margin-top:12px;line-height:1.6">
           Valores estimados com base no percentual definido pelo gestor. Pagamentos processados conforme acordado contratualmente.
         </p>
+        <div class="card" style="margin-top:16px;padding:0">
+          <div class="card-titulo" style="padding:16px 20px;margin-bottom:0;border-bottom:1px solid var(--borda2)">Histórico de pagamentos recebidos</div>
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr><th>Competência</th><th>Valor</th><th>Método</th><th>Data</th><th>Observação</th></tr></thead>
+              <tbody id="royalty-historico-tbody">
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- ── MANUSCRITOS (escritor) ── -->
@@ -879,6 +949,91 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
       </div>
 
     </main>
+  </div>
+</div>
+
+<!-- ── MODAL AFILIADO ── -->
+<div class="modal-overlay" id="modal-afiliado">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-titulo" id="modal-afiliado-titulo">Novo Afiliado</div>
+      <button class="modal-fechar" onclick="fecharModal('modal-afiliado')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="afiliado-id">
+      <div class="campo">
+        <label class="campo-label">Nome *</label>
+        <input type="text" class="f-input" id="afiliado-nome" placeholder="Nome do afiliado">
+      </div>
+      <div class="campo">
+        <label class="campo-label">Email *</label>
+        <input type="email" class="f-input" id="afiliado-email" placeholder="email@exemplo.com">
+      </div>
+      <div class="grid-2">
+        <div class="campo">
+          <label class="campo-label">Slug único *</label>
+          <input type="text" class="f-input" id="afiliado-slug" placeholder="nome-parceiro" style="font-family:monospace">
+          <div class="campo-hint">Será usado na URL: ?aff=slug</div>
+        </div>
+        <div class="campo">
+          <label class="campo-label">Comissão (%)</label>
+          <input type="number" class="f-input" id="afiliado-comissao" placeholder="10" min="0" max="100" step="0.1">
+        </div>
+      </div>
+      <div class="campo">
+        <label class="campo-label">Status</label>
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
+          <label class="toggle"><input type="checkbox" id="afiliado-ativo" checked><span class="toggle-slider"></span></label>
+          <span style="font-size:13px;color:rgba(255,255,255,.5)">Afiliado ativo</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-afiliado')">Cancelar</button>
+      <button class="btn btn-ouro" onclick="salvarAfiliado()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL REGISTRAR ROYALTY ── -->
+<div class="modal-overlay" id="modal-royalty">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-titulo">Registrar Pagamento de Royalty</div>
+      <button class="modal-fechar" onclick="fecharModal('modal-royalty')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="royalty-email">
+      <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:20px" id="royalty-escritor-label"></div>
+      <div class="grid-2">
+        <div class="campo">
+          <label class="campo-label">Valor pago (R$) *</label>
+          <input type="number" class="f-input" id="royalty-valor" min="0" step="0.01" placeholder="0,00">
+        </div>
+        <div class="campo">
+          <label class="campo-label">Competência *</label>
+          <input type="month" class="f-input" id="royalty-competencia">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="campo">
+          <label class="campo-label">Método</label>
+          <select class="f-select" id="royalty-metodo">
+            <option value="pix">PIX</option>
+            <option value="transferencia">Transferência</option>
+            <option value="dinheiro">Dinheiro</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label class="campo-label">Observação</label>
+          <input type="text" class="f-input" id="royalty-obs" placeholder="Opcional">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-royalty')">Cancelar</button>
+      <button class="btn btn-ouro" onclick="registrarRoyalty()">Registrar Pagamento</button>
+    </div>
   </div>
 </div>
 
@@ -1161,7 +1316,7 @@ let produtosCache = [];
 
 // Permissões por role
 const PODE = {
-  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe'], escritor:['extrato','manuscritos'], vendas:['dashboard','sorteios','participantes'], design:['produtos','novo-produto','conteudo'] },
+  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe','afiliados'], escritor:['extrato','manuscritos'], vendas:['dashboard','vendas-dash','sorteios','participantes'], design:['produtos','novo-produto','conteudo'] },
 };
 function podeVer(sec) { return (PODE.verNav[currentRole] || []).includes(sec); }
 
@@ -1237,6 +1392,8 @@ function mostrarAdmin() {
   if (podeVer('equipe'))       carregarEquipe();
   if (podeVer('extrato'))      carregarExtrato();
   if (podeVer('manuscritos'))  carregarManuscritos();
+  if (podeVer('vendas-dash'))  carregarVendasDash();
+  if (podeVer('afiliados'))    carregarAfiliados();
 }
 
 async function logout() {
@@ -1305,7 +1462,8 @@ function irPara(sec, el) {
   const labels = {
     'dashboard':'Dashboard','produtos':'Produtos','novo-produto':'Novo Produto',
     'sorteios':'Rodadas','participantes':'Participantes','conteudo':'Conteúdo',
-    'equipe':'Gestão de Equipe','extrato':'Meu Extrato','manuscritos':'Manuscritos'
+    'equipe':'Gestão de Equipe','extrato':'Meu Extrato','manuscritos':'Manuscritos',
+    'vendas-dash':'Painel de Vendas','afiliados':'Afiliados'
   };
   document.getElementById('breadcrumb').textContent = labels[sec] || sec;
   fecharMobileNav();
@@ -2208,6 +2366,61 @@ async function salvarFaq() {
   toast('FAQ atualizado!','ok');
 }
 
+// ── PAINEL DE VENDAS ──────────────────────────────────────────────
+async function carregarVendasDash() {
+  // Stats gerais
+  const { data: purchases } = await sb.from('purchases').select('valor_pago, status, product_id, criado_em').order('criado_em',{ascending:false});
+  const ativas   = (purchases||[]).filter(p => p.status === 'active');
+  const pendentes = (purchases||[]).filter(p => p.status === 'pending').length;
+  const receita  = ativas.reduce((s,p) => s + Number(p.valor_pago||0), 0);
+  const ticket   = ativas.length ? receita / ativas.length : 0;
+
+  const fmt = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('vd-receita').textContent   = fmt(receita);
+  document.getElementById('vd-total').textContent     = ativas.length;
+  document.getElementById('vd-ticket').textContent    = fmt(ticket);
+  document.getElementById('vd-pendentes').textContent = pendentes;
+
+  // Vendas por produto
+  const { data: prods } = await sb.from('products').select('id, titulo, preco');
+  const prodMap = {}; (prods||[]).forEach(p => { prodMap[p.id] = p; });
+  const porProd = {};
+  ativas.forEach(p => {
+    const k = p.product_id;
+    if (!porProd[k]) porProd[k] = { titulo: prodMap[k]?.titulo||'—', qtd:0, receita:0 };
+    porProd[k].qtd++;
+    porProd[k].receita += Number(p.valor_pago||0);
+  });
+  const sorted = Object.values(porProd).sort((a,b) => b.receita - a.receita);
+  const divProd = document.getElementById('vd-por-produto');
+  if (!sorted.length) {
+    divProd.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">Nenhuma venda confirmada</div></div>';
+  } else {
+    const maxR = sorted[0].receita || 1;
+    divProd.innerHTML = sorted.map(p => `
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+          <span style="color:rgba(255,255,255,.75)">${escHtml(p.titulo)}</span>
+          <span style="color:var(--ouro)">${p.qtd} venda${p.qtd!==1?'s':''} · ${fmt(p.receita)}</span>
+        </div>
+        <div style="height:4px;background:rgba(255,255,255,.06)">
+          <div style="height:100%;background:var(--ouro);width:${(p.receita/maxR*100).toFixed(1)}%;transition:width .5s"></div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Últimas vendas
+  const tbody = document.getElementById('vd-recentes');
+  const recentes = ativas.slice(0,20);
+  tbody.innerHTML = recentes.length ? recentes.map(p => `
+    <tr>
+      <td style="font-size:13px;color:rgba(255,255,255,.7)">${escHtml(prodMap[p.product_id]?.titulo||'—')}</td>
+      <td style="color:var(--ouro);font-family:'Cormorant Garamond',serif;font-size:16px">${fmt(Number(p.valor_pago||0))}</td>
+      <td style="font-size:11px;color:rgba(255,255,255,.3)">${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
+    </tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;padding:20px;color:rgba(255,255,255,.25)">Sem vendas</td></tr>';
+}
+
 // ── EQUIPE ────────────────────────────────────────────────────────
 let membroEditId = null;
 
@@ -2231,6 +2444,7 @@ async function carregarEquipe() {
       <td><span class="badge ${m.ativo?'badge-ativo':'badge-rascunho'}">${m.ativo?'Ativo':'Inativo'}</span></td>
       <td><div class="acoes-cell">
         <button class="btn btn-outline btn-xs" onclick="editarMembro('${m.id}')">Editar</button>
+        ${m.role === 'escritor' && m.percentual_royalty > 0 ? `<button class="btn btn-outline btn-xs" onclick="abrirModalRoyalty('${escHtml(m.email)}','${escHtml(m.nome||m.email)}')">R$ Royalty</button>` : ''}
         ${m.email !== currentUser.email ? `<button class="btn btn-danger btn-xs" onclick="toggleMembroAtivo('${m.id}',${!m.ativo},'${escHtml(m.nome||m.email)}')">
           ${m.ativo?'Desativar':'Ativar'}</button>` : ''}
       </div></td>
@@ -2291,6 +2505,140 @@ async function toggleMembroAtivo(id, ativo, nome) {
   carregarEquipe();
 }
 
+// ── AFILIADOS ─────────────────────────────────────────────────────
+let afiliadoEditId = null;
+const BASE_URL = 'https://3trevo.com.br';
+
+async function carregarAfiliados() {
+  const tbody = document.getElementById('afiliados-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>';
+  const { data: afs } = await sb.from('afiliados').select('*').order('criado_em');
+  if (!afs?.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">◈</div><div class="empty-txt">Nenhum afiliado cadastrado</div></div></td></tr>';
+    return;
+  }
+  // Contar conversões por slug
+  const slugs = afs.map(a => a.slug);
+  const { data: convs } = await sb.from('purchases').select('aff_slug').in('aff_slug', slugs).eq('status','active');
+  const convCount = {};
+  (convs||[]).forEach(c => { convCount[c.aff_slug] = (convCount[c.aff_slug]||0) + 1; });
+
+  tbody.innerHTML = afs.map(a => {
+    const link = `${BASE_URL}/#catalogo?aff=${a.slug}`;
+    return `<tr>
+      <td style="font-size:14px;color:rgba(255,255,255,.8)">${escHtml(a.nome)}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,.4)">${escHtml(a.email)}</td>
+      <td>
+        <div style="font-family:monospace;font-size:11px;color:var(--ouro);background:rgba(200,168,75,.08);padding:3px 8px;display:inline-block">${escHtml(link)}</div>
+        <button class="btn btn-outline btn-xs" style="margin-left:6px" onclick="navigator.clipboard.writeText('${link}').then(()=>toast('Link copiado!','ok'))">Copiar</button>
+      </td>
+      <td style="color:rgba(255,255,255,.55)">${a.percentual_comissao}%</td>
+      <td style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ouro)">${convCount[a.slug]||0}</td>
+      <td><span class="badge ${a.ativo?'badge-ativo':'badge-rascunho'}">${a.ativo?'Ativo':'Inativo'}</span></td>
+      <td><div class="acoes-cell">
+        <button class="btn btn-outline btn-xs" onclick="editarAfiliado('${a.id}')">Editar</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function abrirModalAfiliado() {
+  afiliadoEditId = null;
+  ['afiliado-nome','afiliado-email','afiliado-slug','afiliado-comissao'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('afiliado-ativo').checked = true;
+  document.getElementById('afiliado-email').disabled = false;
+  document.getElementById('afiliado-slug').disabled  = false;
+  document.getElementById('modal-afiliado-titulo').textContent = 'Novo Afiliado';
+  document.getElementById('modal-afiliado').classList.add('aberto');
+}
+
+function editarAfiliado(id) {
+  sb.from('afiliados').select('*').eq('id',id).single().then(({data}) => {
+    if (!data) return;
+    afiliadoEditId = id;
+    document.getElementById('afiliado-nome').value     = data.nome || '';
+    document.getElementById('afiliado-email').value    = data.email;
+    document.getElementById('afiliado-email').disabled = true;
+    document.getElementById('afiliado-slug').value     = data.slug;
+    document.getElementById('afiliado-slug').disabled  = true;
+    document.getElementById('afiliado-comissao').value = data.percentual_comissao || 10;
+    document.getElementById('afiliado-ativo').checked  = !!data.ativo;
+    document.getElementById('modal-afiliado-titulo').textContent = 'Editar Afiliado';
+    document.getElementById('modal-afiliado').classList.add('aberto');
+  });
+}
+
+async function salvarAfiliado() {
+  const nome     = document.getElementById('afiliado-nome').value.trim();
+  const email    = document.getElementById('afiliado-email').value.trim();
+  const slug     = document.getElementById('afiliado-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'-');
+  const comissao = parseFloat(document.getElementById('afiliado-comissao').value) || 10;
+  const ativo    = document.getElementById('afiliado-ativo').checked;
+  if (!nome || !email || !slug) { toast('Nome, email e slug são obrigatórios.','erro'); return; }
+  const payload = { nome, percentual_comissao: comissao, ativo };
+  let error;
+  if (afiliadoEditId) {
+    ({ error } = await sb.from('afiliados').update(payload).eq('id', afiliadoEditId));
+  } else {
+    ({ error } = await sb.from('afiliados').insert({ ...payload, email, slug }));
+  }
+  if (error) { toast('Erro: '+error.message,'erro'); return; }
+  toast(afiliadoEditId ? 'Afiliado atualizado!' : 'Afiliado criado!', 'ok');
+  fecharModal('modal-afiliado');
+  carregarAfiliados();
+}
+
+// ── ROYALTIES ─────────────────────────────────────────────────────
+function abrirModalRoyalty(email, nome) {
+  document.getElementById('royalty-email').value = email;
+  document.getElementById('royalty-escritor-label').textContent = 'Escritor: ' + nome + ' · ' + email;
+  document.getElementById('royalty-valor').value = '';
+  document.getElementById('royalty-obs').value   = '';
+  // Competência padrão = mês anterior
+  const d = new Date(); d.setMonth(d.getMonth()-1);
+  document.getElementById('royalty-competencia').value = d.toISOString().slice(0,7);
+  document.getElementById('modal-royalty').classList.add('aberto');
+}
+
+async function registrarRoyalty() {
+  const email      = document.getElementById('royalty-email').value;
+  const valor      = parseFloat(document.getElementById('royalty-valor').value);
+  const competencia = document.getElementById('royalty-competencia').value;
+  if (!valor || valor <= 0 || !competencia) { toast('Informe valor e competência.','erro'); return; }
+  const { error } = await sb.from('royalty_pagamentos').insert({
+    escritor_email: email,
+    valor,
+    competencia,
+    metodo:       document.getElementById('royalty-metodo').value,
+    observacao:   document.getElementById('royalty-obs').value.trim() || null,
+    registrado_por: currentUser.email,
+  });
+  if (error) { toast('Erro: '+error.message,'erro'); return; }
+  toast('Pagamento registrado!','ok');
+  fecharModal('modal-royalty');
+}
+
+async function carregarHistoricoRoyalty() {
+  const tbody = document.getElementById('royalty-historico-tbody');
+  if (!tbody || !currentUser) return;
+  const { data, error } = await sb.from('royalty_pagamentos')
+    .select('*').eq('escritor_email', currentUser.email).order('registrado_em',{ascending:false});
+  if (error || !data?.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:rgba(255,255,255,.25)">Nenhum pagamento registrado ainda.</td></tr>';
+    return;
+  }
+  const fmt = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2});
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ouro)">${p.competencia}</td>
+      <td style="font-weight:600;color:rgba(255,255,255,.85)">${fmt(p.valor)}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,.45);text-transform:capitalize">${p.metodo||'—'}</td>
+      <td style="font-size:11px;color:rgba(255,255,255,.3)">${p.registrado_em ? new Date(p.registrado_em).toLocaleDateString('pt-BR') : '—'}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,.4)">${escHtml(p.observacao||'—')}</td>
+    </tr>`).join('');
+}
+
 // ── EXTRATO ESCRITOR ──────────────────────────────────────────────
 async function carregarExtrato() {
   if (!currentUser) return;
@@ -2335,6 +2683,7 @@ async function carregarExtrato() {
   }
   document.getElementById('ext-vendas').textContent = totalVendas;
   tbody.innerHTML = rows;
+  carregarHistoricoRoyalty();
 }
 
 // ── MANUSCRITOS ───────────────────────────────────────────────────
@@ -2405,6 +2754,16 @@ async function enviarManuscrito() {
   btn.disabled = false; btn.textContent = 'Enviar para avaliação';
   if (error) { toast('Erro: '+error.message,'erro'); return; }
   toast('Manuscrito enviado! O gestor será notificado.','ok');
+  // Notificar gestor por email
+  const session = await sb.auth.getSession();
+  const token   = session.data.session?.access_token;
+  if (token) {
+    fetch(`${SB_URL}/functions/v1/notify-gestor`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({ tipo:'manuscrito', dados: payload }),
+    }).catch(e => console.warn('Notify gestor:', e));
+  }
   ['ms-titulo','ms-genero','ms-sinopse'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ms-arquivo-preview').style.display='none';
   document.getElementById('ms-prog-fill').style.width='0%';
