@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net sdk.mercadopago.com; connect-src 'self' *.supabase.co *.mercadopago.com api.mercadopago.com serie-tt.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co; font-src 'self' fonts.gstatic.com; frame-src sdk.mercadopago.com; object-src 'none';">
 <title>Finalizar Compra — Editora Três Trevo</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -249,9 +252,11 @@ async function init() {
   const params = new URLSearchParams(window.location.search);
   productId = params.get('product_id');
   // Capturar slug de afiliado e persistir em sessionStorage
-  const affParam = params.get('aff');
-  if (affParam) { affSlug = affParam; sessionStorage.setItem('aff', affParam); }
-  else { affSlug = sessionStorage.getItem('aff') || null; }
+  // Sanitizar aff_slug — apenas alfanumérico e hífen, max 60 chars
+  const affRaw = params.get('aff') || sessionStorage.getItem('aff') || '';
+  const affClean = /^[a-z0-9-]{1,60}$/.test(affRaw.toLowerCase()) ? affRaw.toLowerCase() : null;
+  if (params.get('aff') && affClean) sessionStorage.setItem('aff', affClean);
+  affSlug = affClean;
 
   // Carregar produto (por product_id ou slug)
   if (!productId) {
