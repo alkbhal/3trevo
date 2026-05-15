@@ -2986,6 +2986,12 @@ function forjaRenderizar() {
       </div>
       <div style="font-size:12px;color:${fail?'var(--danger)':done?'#27ae60':'var(--text-muted)'}">${FJ_LABEL[st]||st}</div>
       ${errMsg}${btns}
+      <div style="margin-top:${done||fail?'8px':'10px'};text-align:right">
+        <button class="btn btn-danger btn-xs" style="opacity:.6;font-size:10px;padding:3px 8px"
+          onclick="forjaAbrirExcluir('${p.id}','${escHtml(p.titulo||p.tema).replace(/'/g,"\\'")}')">
+          🗑 Excluir
+        </button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -3019,6 +3025,78 @@ function forjaIniciarPolling() {
 function forjaPararPolling() {
   clearInterval(fjTimer); fjTimer = null;
 }
+
+// ── EXCLUSÃO COM FEEDBACK ─────────────────────────────────────────
+let fjExcluirId = null;
+let fjExcluirTema = '';
+
+function forjaAbrirExcluir(projectId, tema) {
+  fjExcluirId = projectId;
+  fjExcluirTema = tema;
+  document.getElementById('fj-excluir-tema').textContent = tema;
+  document.getElementById('fj-feedback').value = '';
+  document.getElementById('fj-excluir-msg').textContent = '';
+  document.getElementById('modal-forja-excluir').classList.add('aberto');
+}
+
+function forjaFecharExcluir() {
+  document.getElementById('modal-forja-excluir').classList.remove('aberto');
+  fjExcluirId = null;
+}
+
+async function forjaConfirmarExcluir() {
+  if (!fjExcluirId) return;
+  const feedback = document.getElementById('fj-feedback').value.trim();
+  const btn = document.getElementById('btn-confirmar-excluir');
+  btn.disabled = true; btn.textContent = 'Excluindo…';
+  try {
+    const r = await fetch(`${FORGE_URL}/projects/${fjExcluirId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ feedback: feedback || undefined })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      fjProjects = fjProjects.filter(p => p.id !== fjExcluirId);
+      localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
+      forjaRenderizar();
+      forjaFecharExcluir();
+      toast('Projeto excluído' + (feedback ? ' com feedback enviado.' : '.'));
+    } else throw new Error(d.error || 'Erro ao excluir');
+  } catch(e) {
+    document.getElementById('fj-excluir-msg').textContent = 'Erro: ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Confirmar exclusão';
+  }
+}
 </script>
+
+<!-- MODAL EXCLUSÃO FORGE -->
+<div class="modal-overlay" id="modal-forja-excluir" onclick="if(event.target===this)forjaFecharExcluir()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-titulo">Excluir projeto</div>
+      <button class="modal-fechar" onclick="forjaFecharExcluir()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;margin-bottom:16px">
+        Tem certeza que deseja excluir <strong id="fj-excluir-tema"></strong>?
+      </p>
+      <div class="campo">
+        <label class="campo-label">Feedback para os agentes (opcional)</label>
+        <textarea id="fj-feedback" class="f-input" rows="4"
+          placeholder="Ex: O conteúdo ficou muito genérico, faltou exemplos práticos brasileiros. O capítulo 3 repetiu muito a introdução. A linguagem ficou formal demais para o público alvo."
+          style="resize:vertical;min-height:100px"></textarea>
+        <div class="campo-hint">Se preenchido, o feedback é armazenado e usado para melhorar as próximas gerações.</div>
+      </div>
+      <div id="fj-excluir-msg" style="color:var(--danger);font-size:13px;margin-top:8px"></div>
+      <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="forjaFecharExcluir()">Cancelar</button>
+        <button class="btn btn-danger" id="btn-confirmar-excluir" onclick="forjaConfirmarExcluir()">Confirmar exclusão</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
