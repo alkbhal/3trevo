@@ -81,7 +81,25 @@ async function validarSessao(env: Env, req: Request): Promise<boolean> {
   }
 }
 
+async function validarJwtSupabase(env: Env, jwt: string): Promise<boolean> {
+  try {
+    const r = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${jwt}` },
+    });
+    if (!r.ok) return false;
+    const user = await r.json() as { email?: string };
+    if (!user.email) return false;
+    const rows = await sbGet(env, `admin_users?email=eq.${encodeURIComponent(user.email)}&ativo=eq.true&select=email`);
+    return rows.length > 0;
+  } catch { return false; }
+}
+
 async function requerAuth(env: Env, req: Request): Promise<Response | null> {
+  const bearer = req.headers.get('Authorization')?.replace('Bearer ', '');
+  if (bearer && bearer.startsWith('eyJ')) {
+    const ok = await validarJwtSupabase(env, bearer);
+    if (ok) return null;
+  }
   const ok = await validarSessao(env, req);
   if (!ok) return errorResponse('Não autorizado. Faça login.', 401);
   return null;

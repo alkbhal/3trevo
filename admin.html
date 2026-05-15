@@ -423,6 +423,11 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         <span class="nav-icon">◈</span>Afiliados
       </div>
 
+      <div class="sidebar-section" data-role-group="forja">Ferramentas IA</div>
+      <div class="nav-item" data-sec="forja" onclick="irPara('forja',this)">
+        <span class="nav-icon">✦</span>Forja de Ebooks
+      </div>
+
       <div class="sidebar-section" data-role-group="escritor">Meu Espaço</div>
       <div class="nav-item" data-sec="extrato" onclick="irPara('extrato',this)">
         <span class="nav-icon">◎</span>Extrato
@@ -948,6 +953,40 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         </div>
       </div>
 
+      <!-- ── FORJA DE EBOOKS (gestor) ── -->
+      <div class="secao" id="sec-forja">
+        <div class="secao-topo">
+          <div class="secao-titulo">✦ Forja de Ebooks</div>
+          <div class="secao-sub">Gere ebooks completos com IA — do tema ao arquivo final</div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-titulo">Novo projeto</div>
+          <div class="grid-2">
+            <div class="campo">
+              <label class="campo-label">Tema do ebook *</label>
+              <input type="text" class="f-input" id="fj-tema" placeholder="ex: Livre das Dívidas: Como sair do endividamento em 12 meses">
+            </div>
+            <div class="campo">
+              <label class="campo-label">Contexto (opcional)</label>
+              <input type="text" class="f-input" id="fj-ctx" placeholder="ex: Mercado brasileiro, classe média, autor Said Anes">
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
+            <button class="btn btn-ouro" id="fj-btn" onclick="forjaEnviar()">✦ Gerar ebook</button>
+            <span id="fj-msg" style="font-size:13px;color:var(--text-muted)"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="card-titulo" style="margin:0">Projetos</div>
+            <button class="btn btn-outline btn-sm" onclick="forjaCarregar()">↺ Atualizar</button>
+          </div>
+          <div id="fj-lista"><div style="color:var(--text-muted);font-size:13px">Nenhum projeto iniciado.</div></div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -1316,7 +1355,7 @@ let produtosCache = [];
 
 // Permissões por role
 const PODE = {
-  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe','afiliados'], escritor:['extrato','manuscritos'], vendas:['dashboard','vendas-dash','sorteios','participantes'], design:['produtos','novo-produto','conteudo'] },
+  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe','afiliados','forja'], escritor:['extrato','manuscritos'], vendas:['dashboard','vendas-dash','sorteios','participantes'], design:['produtos','novo-produto','conteudo'] },
 };
 function podeVer(sec) { return (PODE.verNav[currentRole] || []).includes(sec); }
 
@@ -2776,6 +2815,130 @@ async function enviarManuscrito() {
 // ── UTIL ──────────────────────────────────────────────────────────
 function escHtml(str) {
   return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── FORJA DE EBOOKS ───────────────────────────────────────────────
+const FORGE_URL  = 'https://tr3vo-forge.al-kbhal.workers.dev';
+const FORGE_API  = 'https://tres-trevo-api.al-kbhal.workers.dev';
+const FJ_STORAGE = 'forja_projetos_v2';
+let fjProjects   = JSON.parse(localStorage.getItem(FJ_STORAGE) || '[]');
+let fjTimer      = null;
+
+const FJ_LABEL = {
+  intake:'Analisando mercado…', researcher:'Pesquisando dados…',
+  writing:'Escrevendo capítulos…', editing:'Editando…',
+  designing:'Criando design…', rendering:'Gerando arquivo…',
+  marketing:'Criando materiais…', delivering:'Finalizando…',
+  complete:'✅ Concluído', awaiting_character_images:'✅ Concluído',
+  failed:'❌ Falha'
+};
+const FJ_ORDER = ['intake','researcher','writing','editing','designing','rendering','marketing','delivering','complete'];
+
+async function forjaEnviar() {
+  const tema = document.getElementById('fj-tema').value.trim();
+  if (!tema) { toast('Informe o tema do ebook.'); return; }
+  const ctx = document.getElementById('fj-ctx').value.trim();
+  const btn = document.getElementById('fj-btn');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  document.getElementById('fj-msg').textContent = '';
+  try {
+    const r = await fetch(FORGE_URL, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ tema, contexto: ctx || undefined })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || r.statusText);
+    fjProjects.unshift({ id: d.projectId, tema: d.tema, criado: d.timestamp, status: 'intake' });
+    localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects.slice(0, 20)));
+    document.getElementById('fj-tema').value = '';
+    document.getElementById('fj-ctx').value = '';
+    document.getElementById('fj-msg').textContent = `Projeto iniciado — ID ${d.projectId.slice(0,8)}…`;
+    forjaRenderizar();
+    forjaIniciarPolling();
+  } catch(e) { toast('Erro ao iniciar: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = '✦ Gerar ebook'; }
+}
+
+async function forjaStatusProjeto(id) {
+  try {
+    const r = await fetch(`${FORGE_URL}/status/${id}`);
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+
+async function forjaCarregar() {
+  if (!fjProjects.length) return;
+  const updates = await Promise.all(fjProjects.map(p => forjaStatusProjeto(p.id)));
+  fjProjects = fjProjects.map((p, i) => updates[i] ? { ...p, ...updates[i] } : p);
+  localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects.slice(0, 20)));
+  forjaRenderizar();
+  const temAtivo = fjProjects.some(p => !['complete','awaiting_character_images','failed'].includes(p.status));
+  if (temAtivo) forjaIniciarPolling(); else forjaPararPolling();
+}
+
+function forjaRenderizar() {
+  const el = document.getElementById('fj-lista');
+  if (!el) return;
+  if (!fjProjects.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:13px">Nenhum projeto.</div>'; return; }
+  el.innerHTML = fjProjects.map(p => {
+    const st = p.status || 'intake';
+    const done = ['complete','awaiting_character_images'].includes(st);
+    const fail = st === 'failed';
+    const pct  = done ? 100 : Math.max(5, Math.round((FJ_ORDER.indexOf(st)+1)/FJ_ORDER.length*100));
+    const cor  = fail ? 'var(--danger)' : done ? '#27ae60' : 'var(--ouro)';
+    const caps = p.chapters ? `${p.chapters.filter(c=>c.status==='approved').length}/${p.chapters.length} caps ·` : '';
+    const btns = done ? `
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <a href="${FORGE_API}/api/forge/preview/${p.id}" target="_blank" rel="noopener"
+           class="btn btn-outline btn-sm">👁 Visualizar ebook</a>
+        <button class="btn btn-ouro btn-sm"
+           onclick="forjaPublicar('${p.id}','${escHtml(p.titulo||p.tema)}')">
+           Publicar no catálogo
+        </button>
+      </div>` : '';
+    const errMsg = fail && p.error_log
+      ? `<div style="font-size:11px;color:var(--danger);margin-top:4px">${escHtml((() => { try { return JSON.parse(p.error_log)[0]?.message; } catch { return p.error_log; } })() || '')}</div>`
+      : '';
+    return `<div style="border:1px solid var(--borda);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:14px;font-weight:600;color:var(--text)">${escHtml(p.titulo||p.tema)}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin:2px 0 8px">${p.id.slice(0,8)}… · ${new Date(p.criado||p.created_at||Date.now()).toLocaleDateString('pt-BR')} ${caps ? '· '+caps : ''}</div>
+      <div style="height:4px;background:var(--borda2);border-radius:2px;overflow:hidden;margin-bottom:6px">
+        <div style="height:100%;width:${pct}%;background:${cor};transition:width .5s"></div>
+      </div>
+      <div style="font-size:12px;color:${fail?'var(--danger)':done?'#27ae60':'var(--text-muted)'}">${FJ_LABEL[st]||st}</div>
+      ${errMsg}${btns}
+    </div>`;
+  }).join('');
+}
+
+async function forjaPublicar(projectId, titulo) {
+  const tituloFinal = prompt('Título para o catálogo:', titulo);
+  if (!tituloFinal) return;
+  const precoStr = prompt('Preço (R$):', '37');
+  if (precoStr === null) return;
+  const preco = parseFloat(precoStr) || 0;
+  const slug = 'forge-' + projectId.slice(0, 8);
+  try {
+    // Copia arquivo HTML do forge R2 → Supabase ebooks bucket via worker
+    const sess = await sb.auth.getSession();
+    const jwt = sess.data.session?.access_token || '';
+    const r = await fetch(`${FORGE_API}/api/admin/acervo-forge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ projectId, titulo: tituloFinal, preco })
+    });
+    const d = await r.json();
+    if (d.ok) { toast('✅ Publicado no catálogo! Slug: ' + d.slug); carregarProdutos(); }
+    else throw new Error(d.error);
+  } catch(e) { toast('Erro: ' + e.message); }
+}
+
+function forjaIniciarPolling() {
+  if (fjTimer) return;
+  fjTimer = setInterval(forjaCarregar, 30000);
+}
+function forjaPararPolling() {
+  clearInterval(fjTimer); fjTimer = null;
 }
 </script>
 </body>
