@@ -2492,13 +2492,18 @@ async function carregarVendasDash() {
 
 // ── EQUIPE ────────────────────────────────────────────────────────
 let membroEditId = null;
+let equipeCache = [];
 
 async function carregarEquipe() {
   const tbody = document.getElementById('equipe-tbody');
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>';
-  const { data, error } = await sb.from('admin_users').select('*').order('criado_em');
-  if (error) { toast('Erro ao carregar equipe: ' + error.message, 'erro'); return; }
+  const { data, error } = await sb.rpc('get_all_admin_users');
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="6" style="color:var(--erro);padding:16px;text-align:center">Erro ao carregar: ${escHtml(error.message)}</td></tr>`;
+    return;
+  }
+  equipeCache = data || [];
   if (!data?.length) {
     tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">◑</div><div class="empty-txt">Nenhum membro cadastrado</div></div></td></tr>';
     return;
@@ -2531,7 +2536,8 @@ function abrirModalMembro() {
 }
 
 function editarMembro(id) {
-  sb.from('admin_users').select('*').eq('id',id).single().then(({data}) => {
+  const _m = equipeCache.find(u => u.id === id);
+  Promise.resolve({ data: _m || null }).then(({data}) => {
     if (!data) return;
     membroEditId = id;
     document.getElementById('membro-id').value       = id;
