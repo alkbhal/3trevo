@@ -429,7 +429,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
       </div>
 
       <div class="sidebar-section" data-role-group="forja">Ferramentas IA</div>
-      <div class="nav-item" data-sec="forja" onclick="irPara('forja',this)">
+      <div class="nav-item" data-sec="forja" onclick="irPara('forja',this);forjaCarregar()">
         <span class="nav-icon">✦</span>Forja de Ebooks
       </div>
 
@@ -2914,11 +2914,42 @@ async function forjaStatusProjeto(id) {
 }
 
 async function forjaCarregar() {
-  forjaRenderizar(); // mostrar estado atual (mesmo vazio)
-  if (!fjProjects.length) return;
-  const updates = await Promise.all(fjProjects.map(p => forjaStatusProjeto(p.id)));
-  fjProjects = fjProjects.map((p, i) => updates[i] ? { ...p, ...updates[i] } : p);
-  localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects.slice(0, 20)));
+  forjaRenderizar(); // mostrar imediatamente o que há no localStorage
+  try {
+    // Buscar lista completa do servidor
+    const serverProjects = await fetch(`${FORGE_URL}/projects?limit=20`).then(r => r.json()).catch(() => []);
+    if (Array.isArray(serverProjects) && serverProjects.length) {
+      // Mesclar: servidor é a fonte de verdade para status, localStorage preserva projetos locais
+      const serverMap = new Map(serverProjects.map(p => [p.id, p]));
+      // Adicionar projetos do servidor que não estão no localStorage
+      for (const sp of serverProjects) {
+        if (!fjProjects.find(p => p.id === sp.id)) {
+          fjProjects.push({ id: sp.id, tema: sp.tema, criado: sp.created_at, status: sp.status });
+        }
+      }
+      // Atualizar status dos projetos existentes
+      fjProjects = fjProjects.map(p => {
+        const sv = serverMap.get(p.id);
+        return sv ? { ...p, ...sv, criado: p.criado || sv.created_at } : p;
+      });
+      // Ordenar por mais recente
+      fjProjects.sort((a, b) => new Date(b.criado || b.created_at || 0).getTime() - new Date(a.criado || a.created_at || 0).getTime());
+      fjProjects = fjProjects.slice(0, 20);
+      localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
+    }
+  } catch(e) { console.warn('[forja] erro ao buscar projetos:', e); }
+
+  // Buscar detalhes (capítulos) dos projetos ativos
+  const ativos = fjProjects.filter(p => !['complete','awaiting_character_images','failed'].includes(p.status));
+  if (ativos.length) {
+    const updates = await Promise.all(ativos.map(p => forjaStatusProjeto(p.id)));
+    fjProjects = fjProjects.map(p => {
+      const idx = ativos.findIndex(a => a.id === p.id);
+      return idx >= 0 && updates[idx] ? { ...p, ...updates[idx] } : p;
+    });
+    localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
+  }
+
   forjaRenderizar();
   const temAtivo = fjProjects.some(p => !['complete','awaiting_character_images','failed'].includes(p.status));
   if (temAtivo) forjaIniciarPolling(); else forjaPararPolling();
