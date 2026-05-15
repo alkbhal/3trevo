@@ -2918,11 +2918,16 @@ async function forjaCarregar() {
   try {
     // Buscar lista completa do servidor
     const serverProjects = await fetch(`${FORGE_URL}/projects?limit=20`).then(r => r.json()).catch(() => []);
-    if (Array.isArray(serverProjects) && serverProjects.length) {
-      // Mesclar: servidor é a fonte de verdade para status, localStorage preserva projetos locais
-      const serverMap = new Map(serverProjects.map(p => [p.id, p]));
+    // Filtrar cancelados/deletados do servidor
+    const serverFiltered = Array.isArray(serverProjects)
+      ? serverProjects.filter(p => p.status !== 'cancelled')
+      : [];
+    if (serverFiltered.length || Array.isArray(serverProjects)) {
+      const serverMap = new Map(serverFiltered.map(p => [p.id, p]));
+      // Remover do localStorage projetos que foram deletados no servidor
+      fjProjects = fjProjects.filter(p => serverMap.has(p.id) || !Array.isArray(serverProjects));
       // Adicionar projetos do servidor que não estão no localStorage
-      for (const sp of serverProjects) {
+      for (const sp of serverFiltered) {
         if (!fjProjects.find(p => p.id === sp.id)) {
           fjProjects.push({ id: sp.id, tema: sp.tema, criado: sp.created_at, status: sp.status });
         }
@@ -3057,11 +3062,12 @@ async function forjaConfirmarExcluir() {
     });
     const d = await r.json();
     if (d.ok) {
-      fjProjects = fjProjects.filter(p => p.id !== fjExcluirId);
+      const idRemovido = fjExcluirId;
+      fjProjects = fjProjects.filter(p => p.id !== idRemovido);
       localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
       forjaRenderizar();
       forjaFecharExcluir();
-      toast('Projeto excluído' + (feedback ? ' com feedback enviado.' : '.'));
+      toast('Projeto excluído permanentemente' + (feedback ? ' com feedback registrado.' : '.'));
     } else throw new Error(d.error || 'Erro ao excluir');
   } catch(e) {
     document.getElementById('fj-excluir-msg').textContent = 'Erro: ' + e.message;
