@@ -2914,37 +2914,33 @@ async function forjaStatusProjeto(id) {
 }
 
 async function forjaCarregar() {
-  forjaRenderizar(); // mostrar imediatamente o que há no localStorage
+  // Mostrar o que está salvo localmente enquanto busca
+  forjaRenderizar();
   try {
-    // Buscar lista completa do servidor
-    const serverProjects = await fetch(`${FORGE_URL}/projects?limit=20`).then(r => r.json()).catch(() => []);
-    // Filtrar cancelados/deletados do servidor
-    const serverFiltered = Array.isArray(serverProjects)
-      ? serverProjects.filter(p => p.status !== 'cancelled')
-      : [];
-    if (serverFiltered.length || Array.isArray(serverProjects)) {
-      const serverMap = new Map(serverFiltered.map(p => [p.id, p]));
-      // Remover do localStorage projetos que foram deletados no servidor
-      fjProjects = fjProjects.filter(p => serverMap.has(p.id) || !Array.isArray(serverProjects));
-      // Adicionar projetos do servidor que não estão no localStorage
-      for (const sp of serverFiltered) {
-        if (!fjProjects.find(p => p.id === sp.id)) {
-          fjProjects.push({ id: sp.id, tema: sp.tema, criado: sp.created_at, status: sp.status });
-        }
-      }
-      // Atualizar status dos projetos existentes
-      fjProjects = fjProjects.map(p => {
-        const sv = serverMap.get(p.id);
-        return sv ? { ...p, ...sv, criado: p.criado || sv.created_at } : p;
-      });
-      // Ordenar por mais recente
-      fjProjects.sort((a, b) => new Date(b.criado || b.created_at || 0).getTime() - new Date(a.criado || a.created_at || 0).getTime());
-      fjProjects = fjProjects.slice(0, 20);
-      localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
-    }
-  } catch(e) { console.warn('[forja] erro ao buscar projetos:', e); }
+    // Servidor é a fonte de verdade — substituir completamente o localStorage
+    const raw = await fetch(`${FORGE_URL}/projects?limit=20`);
+    if (!raw.ok) throw new Error('HTTP ' + raw.status);
+    const serverList = await raw.json();
+    if (!Array.isArray(serverList)) throw new Error('Resposta inválida');
 
-  // Buscar detalhes (capítulos) dos projetos ativos
+    // Preservar apenas dados extras do localStorage (chapters, etc.) que o servidor não retorna
+    const localMap = new Map(fjProjects.map(p => [p.id, p]));
+    fjProjects = serverList.map(sp => ({
+      ...(localMap.get(sp.id) || {}),
+      id:      sp.id,
+      tema:    sp.tema,
+      status:  sp.status,
+      criado:  localMap.get(sp.id)?.criado || sp.created_at,
+      created_at: sp.created_at,
+      updated_at: sp.updated_at,
+    }));
+    localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
+    forjaRenderizar();
+  } catch(e) {
+    console.warn('[forja] erro ao buscar projetos:', e);
+  }
+
+  // Buscar capítulos dos projetos em andamento
   const ativos = fjProjects.filter(p => !['complete','awaiting_character_images','failed'].includes(p.status));
   if (ativos.length) {
     const updates = await Promise.all(ativos.map(p => forjaStatusProjeto(p.id)));
@@ -2953,9 +2949,9 @@ async function forjaCarregar() {
       return idx >= 0 && updates[idx] ? { ...p, ...updates[idx] } : p;
     });
     localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
+    forjaRenderizar();
   }
 
-  forjaRenderizar();
   const temAtivo = fjProjects.some(p => !['complete','awaiting_character_images','failed'].includes(p.status));
   if (temAtivo) forjaIniciarPolling(); else forjaPararPolling();
 }
