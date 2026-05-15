@@ -3,6 +3,7 @@ interface Env {
   SUPABASE_SERVICE_KEY: string;
   ADMIN_SENHA?: string;
   RIFEI_WEBHOOK_SECRET?: string;
+  FORGE_STORAGE?: R2Bucket;
 }
 
 const CORS_HEADERS = {
@@ -327,6 +328,80 @@ async function handleLgpd(env: Env, req: Request): Promise<Response> {
   return corsResponse({ ok: true, mensagem: 'Solicitação registrada. Responderemos em até 15 dias úteis conforme LGPD.' }, 201);
 }
 
+// ── FORGE HANDLERS ───────────────────────────────────────────────
+
+async function sbStorageUpload(env: Env, bucket: string, path: string, body: ArrayBuffer, contentType: string): Promise<void> {
+  const r = await fetch(`${env.SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      'Content-Type': contentType,
+      'x-upsert': 'true',
+    },
+    body,
+  });
+  if (!r.ok) throw new Error(`Storage upload failed: ${await r.text()}`);
+}
+
+async function handleForgePreview(env: Env, projectId: string): Promise<Response> {
+  if (!env.FORGE_STORAGE) return new Response('Storage não configurado.', { status: 503 });
+  const obj = await env.FORGE_STORAGE.get(`html/${projectId}/index.html`);
+  if (!obj) return new Response('Ebook não encontrado ou ainda em geração.', { status: 404 });
+  return new Response(obj.body, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'X-Robots-Tag': 'noindex' },
+  });
+}
+
+async function handleForgePublicar(env: Env, req: Request): Promise<Response> {
+  const authErr = await requerAuth(env, req);
+  if (authErr) return authErr;
+  const body = await req.json() as { projectId?: string; titulo?: string; preco?: number };
+  const { projectId, titulo, preco = 0 } = body;
+  if (!projectId || !titulo) return errorResponse('projectId e titulo são obrigatórios.');
+  const slug = `forge-${projectId.slice(0, 8)}`;
+  if (env.FORGE_STORAGE) {
+    const htmlObj = await env.FORGE_STORAGE.get(`html/${projectId}/index.html`);
+    if (htmlObj) await sbStorageUpload(env, 'ebooks', `${slug}.html`, await htmlObj.arrayBuffer(), 'text/html').catch(e => console.error('[forge] html:', e));
+    const capaObj = await env.FORGE_STORAGE.get(`covers/cover_${projectId}.jpg`);
+    if (capaObj) await sbStorageUpload(env, 'capas', `${slug}.jpg`, await capaObj.arrayBuffer(), 'image/jpeg').catch(e => console.error('[forge] capa:', e));
+  }
+  await sbFetch(env, 'products', {
+    method: 'POST',
+    body: JSON.stringify({ slug, titulo, preco, cotas: 0, arquivo_url: `${slug}.html`, capa_url: `${slug}.jpg`, autor_email: 'al_kbhal@yahoo.com.br', ativo: true }),
+    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+  });
+  await registrarAuditoria(env, 'products', 'INSERT', slug, null, { titulo, preco, slug, source: 'forge' });
+  return corsResponse({ ok: true, slug, titulo });
+}
+
+async function handleWebhookForge(env: Env, req: Request): Promise<Response> {
+  try {
+    const pkg = await req.json() as Record<string, unknown>;
+    const projectId = pkg.projectId as string;
+    const status = pkg.status as string;
+    const arquivos = (pkg.arquivos as string[]) ?? [];
+    const summary = (pkg.summary as string) ?? '';
+    console.log(`[forge-delivery] project=${projectId} status=${status} files=${arquivos.length}`);
+    if ((status === 'complete' || status === 'awaiting_character_images') && env.FORGE_STORAGE) {
+      const slug = `forge-${projectId.slice(0, 8)}`;
+      const titulo = summary.match(/^"([^"]+)"/)?.[1] ?? `Forge-${projectId.slice(0, 8)}`;
+      const htmlObj = await env.FORGE_STORAGE.get(`html/${projectId}/index.html`);
+      if (htmlObj) await sbStorageUpload(env, 'ebooks', `${slug}.html`, await htmlObj.arrayBuffer(), 'text/html').catch(e => console.error('[forge] html:', e));
+      const capaObj = await env.FORGE_STORAGE.get(`covers/cover_${projectId}.jpg`);
+      if (capaObj) await sbStorageUpload(env, 'capas', `${slug}.jpg`, await capaObj.arrayBuffer(), 'image/jpeg').catch(e => console.error('[forge] capa:', e));
+      const existing = await sbGet(env, `products?slug=eq.${slug}&select=slug`).catch(() => []);
+      if (!Array.isArray(existing) || existing.length === 0) {
+        await sbPost(env, 'products', { slug, titulo, preco: 0, cotas: 0, arquivo_url: `${slug}.html`, capa_url: `${slug}.jpg`, autor_email: 'al_kbhal@yahoo.com.br', ativo: false }, 'return=minimal').catch(e => console.error('[forge] produto:', e));
+      }
+    }
+    return corsResponse({ ok: true, projectId, status, received: true });
+  } catch (err) {
+    console.error('[forge-delivery] erro:', err);
+    return errorResponse('Erro ao processar entrega forge.', 500);
+  }
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -344,6 +419,8 @@ export default {
       }
       if (path === '/api/lgpd' && method === 'POST') return handleLgpd(env, req);
       if (path === '/api/webhook/rifei' && method === 'POST') return handleWebhookRifei(env, req);
+      if (path === '/api/webhook/forge' && method === 'POST') return handleWebhookForge(env, req);
+      if (path.startsWith('/api/forge/preview/') && method === 'GET') return handleForgePreview(env, path.split('/').pop() ?? '');
 
       // Auth
       if (path === '/api/admin/login' && method === 'POST') return handleLogin(env, req);
@@ -391,6 +468,7 @@ export default {
       }
 
       if (path === '/api/health') return corsResponse({ ok: true, ts: new Date().toISOString() });
+      if (path === '/api/admin/acervo-forge' && method === 'POST') return handleForgePublicar(env, req);
 
       return errorResponse('Rota não encontrada.', 404);
     } catch (err) {
