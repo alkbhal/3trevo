@@ -155,6 +155,8 @@ button,input,select,textarea{font-family:'Jost',sans-serif}
       <div class="si on" onclick="ir('acervo',this)">◈ &nbsp;Acervo de Títulos</div>
       <div class="si" onclick="ir('premios',this)">◆ &nbsp;Prêmios</div>
       <div class="si" onclick="ir('dep',this)">″ &nbsp;Depoimentos</div>
+      <div class="slbl">Ferramentas</div>
+      <div class="si" onclick="ir('forja',this);loadForja()">✦ &nbsp;Forja de Ebooks</div>
       <div class="slbl">Configurações</div>
       <div class="si" onclick="ir('meta',this)">◉ &nbsp;Meta / Progresso</div>
       <div class="si" onclick="ir('cfg',this)">◎ &nbsp;Config geral</div>
@@ -223,6 +225,24 @@ button,input,select,textarea{font-family:'Jost',sans-serif}
           <div class="ch"><span class="ct">Aviso legal do programa</span></div>
           <div class="fg"><textarea class="fta" id="av" rows="3" placeholder="Os prêmios são pagos após D+7..."></textarea></div>
           <button class="btn bp" onclick="saveAviso()">Salvar</button>
+        </div>
+      </div>
+
+      <!-- FORJA -->
+      <div class="panel" id="panel-forja">
+        <div class="ph">
+          <div><div class="pt">✦ Forja de Ebooks</div><div class="psb">Gere um ebook completo com IA — do tema ao arquivo final.</div></div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ct">Novo projeto</span></div>
+          <div class="fg"><label class="fl">Tema do ebook</label><input type="text" class="fi" id="forja-tema" placeholder="ex: Livre das Dívidas: Como sair do endividamento em 12 meses"></div>
+          <div class="fg"><label class="fl">Contexto (opcional)</label><input type="text" class="fi" id="forja-ctx" placeholder="ex: Mercado brasileiro, classe média, tom prático"></div>
+          <button class="btn bp" id="forja-btn" onclick="forjaEnviar()">✦ Gerar ebook</button>
+          <div id="forja-msg" style="margin-top:8px;font-size:13px;color:var(--t3)"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ct">Projetos ativos</span><button class="btn bs bsm" onclick="loadForja()" style="margin-left:8px">↺</button></div>
+          <div id="forja-lista" style="margin-top:8px"></div>
         </div>
       </div>
 
@@ -715,6 +735,119 @@ function confirmDel(msg,fn){
 }
 
 document.addEventListener('DOMContentLoaded',()=>document.getElementById('ls').focus());
+
+// ── FORJA ────────────────────────────────────────
+const FORGE_URL = 'https://tr3vo-forge.al-kbhal.workers.dev';
+let forjaProjects = JSON.parse(localStorage.getItem('forja_projects')||'[]');
+let forjaTimer = null;
+
+const FORJA_STATUS_LABEL = {
+  intake:'Analisando mercado…', researcher:'Pesquisando dados…',
+  writing:'Escrevendo capítulos…', editing:'Editando…',
+  designing:'Criando design…', rendering:'Gerando arquivo…',
+  marketing:'Criando materiais…', delivering:'Finalizando entrega…',
+  complete:'✅ Concluído', awaiting_character_images:'✅ Concluído (imagens pendentes)',
+  failed:'❌ Falha'
+};
+const FORJA_STATUS_ORDER = ['intake','researcher','writing','editing','designing','rendering','marketing','delivering','complete'];
+
+async function forjaEnviar() {
+  const tema = g('forja-tema').trim();
+  if (!tema) { toast('Informe o tema do ebook.', true); return; }
+  const ctx = g('forja-ctx').trim();
+  const btn = document.getElementById('forja-btn');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  document.getElementById('forja-msg').textContent = '';
+  try {
+    const r = await fetch(FORGE_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ tema, contexto: ctx || undefined })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || r.statusText);
+    forjaProjects.unshift({ id: d.projectId, tema: d.tema, criado: d.timestamp });
+    localStorage.setItem('forja_projects', JSON.stringify(forjaProjects.slice(0,20)));
+    s('forja-tema',''); s('forja-ctx','');
+    document.getElementById('forja-msg').textContent = `Projeto iniciado — ID: ${d.projectId.slice(0,8)}…`;
+    renderForjaLista();
+    forjaStartPolling();
+  } catch(e) { toast('Erro ao iniciar: '+e.message, true); }
+  finally { btn.disabled=false; btn.textContent='✦ Gerar ebook'; }
+}
+
+async function forjaStatusProjeto(id) {
+  try {
+    const r = await fetch(`${FORGE_URL}/status/${id}`);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+async function loadForja() {
+  if (!forjaProjects.length) {
+    document.getElementById('forja-lista').innerHTML = '<div style="color:var(--t4);font-size:13px">Nenhum projeto iniciado ainda.</div>';
+    return;
+  }
+  const updates = await Promise.all(forjaProjects.map(p => forjaStatusProjeto(p.id)));
+  forjaProjects = forjaProjects.map((p,i) => updates[i] ? {...p, ...updates[i]} : p);
+  localStorage.setItem('forja_projects', JSON.stringify(forjaProjects.slice(0,20)));
+  renderForjaLista();
+  const temAtivo = forjaProjects.some(p => !['complete','awaiting_character_images','failed'].includes(p.status));
+  if (temAtivo) forjaStartPolling(); else forjaStopPolling();
+}
+
+function renderForjaLista() {
+  const el = document.getElementById('forja-lista');
+  if (!el) return;
+  if (!forjaProjects.length) { el.innerHTML='<div style="color:var(--t4);font-size:13px">Nenhum projeto.</div>'; return; }
+  el.innerHTML = forjaProjects.map(p => {
+    const st = p.status || 'intake';
+    const done = st === 'complete' || st === 'awaiting_character_images';
+    const err = st === 'failed';
+    const pct = done ? 100 : Math.round((FORJA_STATUS_ORDER.indexOf(st)+1)/FORJA_STATUS_ORDER.length*100);
+    const barColor = err ? '#e94560' : done ? '#27ae60' : 'var(--acc)';
+    const chapters = p.chapters ? `${p.chapters.filter(c=>c.status==='approved').length}/${p.chapters.length} caps` : '';
+    const publishBtn = done ? `
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+        <button class="btn bs" style="padding:4px 10px;font-size:11px" onclick="forjaPreview('${p.id}')">👁 Visualizar</button>
+        <button class="btn bp" style="padding:4px 10px;font-size:11px" onclick="forjaPublicar('${p.id}','${(p.titulo||p.tema).replace(/'/g,"\\'")}')">Publicar no catálogo</button>
+      </div>` : '';
+    return `<div style="border:1px solid var(--b1);border-radius:8px;padding:12px 14px;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--t1)">${p.titulo||p.tema}</div>
+      <div style="font-size:11px;color:var(--t3);margin:2px 0 6px">${p.id.slice(0,8)}… · ${new Date(p.criado||p.created_at||Date.now()).toLocaleDateString('pt-BR')} ${chapters ? '· '+chapters : ''}</div>
+      <div style="height:4px;background:var(--b2);border-radius:2px;overflow:hidden;margin-bottom:6px">
+        <div style="height:100%;width:${pct}%;background:${barColor};transition:width .4s"></div>
+      </div>
+      <div style="font-size:12px;color:${err?'#e94560':done?'#27ae60':'var(--t2)'}">${FORJA_STATUS_LABEL[st]||st}</div>
+      ${p.error_log ? `<div style="font-size:11px;color:#e94560;margin-top:4px">${JSON.parse(p.error_log)[0]?.message||p.error_log}</div>` : ''}
+      ${publishBtn}
+    </div>`;
+  }).join('');
+}
+
+async function forjaPreview(projectId) {
+  const previewUrl = `https://tres-trevo-api.al-kbhal.workers.dev/api/forge/preview/${projectId}`;
+  window.open(previewUrl, '_blank', 'noopener');
+}
+
+async function forjaPublicar(projectId, titulo) {
+  if (!confirm(`Publicar "${titulo}" no catálogo?`)) return;
+  try {
+    const r = await api('/api/admin/acervo-forge', {
+      method:'POST', body: JSON.stringify({ projectId, titulo })
+    });
+    if (r.ok !== false) toast('Produto adicionado ao catálogo!');
+    else throw new Error(r.error);
+  } catch(e) { toast('Erro: '+e.message, true); }
+}
+
+function forjaStartPolling() {
+  if (forjaTimer) return;
+  forjaTimer = setInterval(loadForja, 30000);
+}
+function forjaStopPolling() {
+  clearInterval(forjaTimer); forjaTimer = null;
+}
 </script>
 </body>
 </html>
