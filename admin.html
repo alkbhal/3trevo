@@ -423,6 +423,11 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         <span class="nav-icon">◈</span>Afiliados
       </div>
 
+      <div class="sidebar-section" data-role-group="conta">Conta</div>
+      <div class="nav-item" data-sec="conta" onclick="irPara('conta',this)">
+        <span class="nav-icon">⊙</span>Minha Conta
+      </div>
+
       <div class="sidebar-section" data-role-group="forja">Ferramentas IA</div>
       <div class="nav-item" data-sec="forja" onclick="irPara('forja',this)">
         <span class="nav-icon">✦</span>Forja de Ebooks
@@ -953,6 +958,29 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
         </div>
       </div>
 
+      <!-- ── MINHA CONTA ── -->
+      <div class="secao" id="sec-conta">
+        <div class="secao-topo">
+          <div class="secao-titulo">Minha Conta</div>
+          <div class="secao-sub">Configurações pessoais de acesso</div>
+        </div>
+        <div class="card" style="max-width:480px">
+          <div class="card-titulo">Trocar senha</div>
+          <div class="campo">
+            <label class="campo-label">Nova senha</label>
+            <input type="password" class="f-input" id="nova-senha" placeholder="mínimo 8 caracteres">
+          </div>
+          <div class="campo">
+            <label class="campo-label">Confirmar nova senha</label>
+            <input type="password" class="f-input" id="conf-senha" placeholder="repita a senha">
+          </div>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
+            <button class="btn btn-ouro" onclick="trocarSenha()">Salvar nova senha</button>
+            <span id="msg-senha" style="font-size:13px"></span>
+          </div>
+        </div>
+      </div>
+
       <!-- ── FORJA DE EBOOKS (gestor) ── -->
       <div class="secao" id="sec-forja">
         <div class="secao-topo">
@@ -1355,7 +1383,7 @@ let produtosCache = [];
 
 // Permissões por role
 const PODE = {
-  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe','afiliados','forja'], escritor:['extrato','manuscritos'], vendas:['dashboard','vendas-dash','sorteios','participantes'], design:['produtos','novo-produto','conteudo'] },
+  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe','afiliados','forja','conta'], escritor:['extrato','manuscritos','conta'], vendas:['dashboard','vendas-dash','sorteios','participantes','conta'], design:['produtos','novo-produto','conteudo','conta'] },
 };
 function podeVer(sec) { return (PODE.verNav[currentRole] || []).includes(sec); }
 
@@ -2817,6 +2845,20 @@ function escHtml(str) {
   return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ── MINHA CONTA ───────────────────────────────────────────────────
+async function trocarSenha() {
+  const nova = document.getElementById('nova-senha').value;
+  const conf = document.getElementById('conf-senha').value;
+  const msg  = document.getElementById('msg-senha');
+  msg.style.color = 'var(--text-muted)';
+  if (!nova || nova.length < 8) { msg.style.color='var(--danger)'; msg.textContent='Mínimo 8 caracteres.'; return; }
+  if (nova !== conf)            { msg.style.color='var(--danger)'; msg.textContent='Senhas não coincidem.'; return; }
+  msg.textContent = 'Salvando…';
+  const { error } = await sb.auth.updateUser({ password: nova });
+  if (error) { msg.style.color='var(--danger)'; msg.textContent='Erro: ' + error.message; }
+  else { msg.style.color='#27ae60'; msg.textContent='✅ Senha alterada com sucesso!'; document.getElementById('nova-senha').value=''; document.getElementById('conf-senha').value=''; }
+}
+
 // ── FORJA DE EBOOKS ───────────────────────────────────────────────
 const FORGE_URL  = 'https://tr3vo-forge.al-kbhal.workers.dev';
 const FORGE_API  = 'https://tres-trevo-api.al-kbhal.workers.dev';
@@ -2855,7 +2897,12 @@ async function forjaEnviar() {
     document.getElementById('fj-msg').textContent = `Projeto iniciado — ID ${d.projectId.slice(0,8)}…`;
     forjaRenderizar();
     forjaIniciarPolling();
-  } catch(e) { toast('Erro ao iniciar: ' + e.message); }
+  } catch(e) {
+    const msg = e.message || String(e);
+    document.getElementById('fj-msg').textContent = '❌ ' + msg;
+    document.getElementById('fj-msg').style.color = 'var(--danger)';
+    toast('Erro ao iniciar: ' + msg);
+  }
   finally { btn.disabled = false; btn.textContent = '✦ Gerar ebook'; }
 }
 
@@ -2867,6 +2914,7 @@ async function forjaStatusProjeto(id) {
 }
 
 async function forjaCarregar() {
+  forjaRenderizar(); // mostrar estado atual (mesmo vazio)
   if (!fjProjects.length) return;
   const updates = await Promise.all(fjProjects.map(p => forjaStatusProjeto(p.id)));
   fjProjects = fjProjects.map((p, i) => updates[i] ? { ...p, ...updates[i] } : p);
