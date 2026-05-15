@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoria do Sorteio — Editora Três Trevo</title>
+<meta name="description" content="Verificação pública e auditável dos sorteios do Programa Cultural Três Trevo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root {
+  --verde: #0f2d1a;
+  --verde-m: #1a4a2e;
+  --ouro: #c8a84b;
+  --ouro-c: #e8c96a;
+  --branco: #fdfbf7;
+  --texto: rgba(255,255,255,.75);
+  --texto-s: rgba(255,255,255,.45);
+  --borda: rgba(200,168,75,.18);
+  --sup: rgba(255,255,255,.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--verde);min-height:100vh;color:var(--branco)}
+
+.topo{background:rgba(0,0,0,.35);padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--borda);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.topo-marca{font-family:'Cormorant Garamond',serif;color:var(--ouro);font-size:17px;text-decoration:none;letter-spacing:.5px}
+.topo-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--texto-s)}
+
+.hero{padding:64px 48px 40px;max-width:900px;margin:0 auto;text-align:center}
+.hero-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);margin-bottom:16px}
+.hero-titulo{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,58px);font-weight:400;line-height:1.1;margin-bottom:16px}
+.hero-desc{font-size:15px;color:var(--texto-s);line-height:1.8;max-width:580px;margin:0 auto 32px}
+
+.search-wrap{max-width:900px;margin:0 auto;padding:0 48px 48px}
+.search-box{background:var(--sup);border:1px solid var(--borda);padding:32px;margin-bottom:24px}
+.search-titulo{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:16px}
+.input-row{display:grid;grid-template-columns:1fr auto;gap:12px}
+.input-sel{width:100%;padding:12px 16px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);color:var(--branco);font-size:14px;font-family:'Jost',sans-serif;outline:none;transition:border-color .2s;appearance:none}
+.input-sel:focus{border-color:var(--ouro)}
+.btn-buscar{padding:12px 28px;background:var(--ouro);color:var(--verde-m);font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:'Jost',sans-serif;letter-spacing:.5px;transition:background .2s;white-space:nowrap}
+.btn-buscar:hover{background:var(--ouro-c)}
+
+#audit-result{max-width:900px;margin:0 auto;padding:0 48px 80px}
+.card{background:var(--sup);border:1px solid var(--borda);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)}
+.card-header{padding:28px 32px;border-bottom:1px solid rgba(255,255,255,.06)}
+.card-titulo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;margin-bottom:6px}
+.card-sub{font-size:12px;color:var(--texto-s);letter-spacing:.5px}
+
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.04)}
+.meta-item{padding:20px 24px;background:var(--verde)}
+.meta-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--texto-s);margin-bottom:8px}
+.meta-valor{font-size:15px;color:var(--branco)}
+.meta-valor.ouro{color:var(--ouro)}
+.meta-valor.mono{font-family:'JetBrains Mono',monospace;font-size:12px;word-break:break-all;color:rgba(255,255,255,.6)}
+
+.numero-destaque{padding:40px 32px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(135deg,rgba(200,168,75,.05),transparent)}
+.numero-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);margin-bottom:16px}
+.numero-valor{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,10vw,100px);color:var(--ouro);line-height:1;letter-spacing:-2px;text-shadow:0 0 40px rgba(200,168,75,.3)}
+.numero-sub{font-size:14px;color:var(--texto-s);margin-top:12px}
+
+.winners-section{padding:32px}
+.section-titulo{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:20px}
+.winner-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.winner-card{border:1px solid var(--borda);padding:24px;background:rgba(200,168,75,.04);position:relative}
+.winner-card.primeiro{border-color:rgba(200,168,75,.4)}
+.winner-pos{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--texto-s);margin-bottom:8px}
+.winner-email{font-size:16px;font-family:'Cormorant Garamond',serif;color:var(--branco);margin-bottom:4px}
+.winner-numero{font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--ouro);margin-top:8px}
+.winner-numeros{font-size:11px;color:var(--texto-s)}
+
+.tabela-wrap{overflow-x:auto;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:rgba(0,0,0,.2)}
+th{padding:10px 16px;text-align:left;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--texto-s);font-weight:400;white-space:nowrap}
+tbody tr{border-top:1px solid rgba(255,255,255,.04);transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody tr.sorteado{background:rgba(200,168,75,.06);border-color:rgba(200,168,75,.2)}
+td{padding:10px 16px;color:var(--texto-s)}
+td.email{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--texto)}
+td.num{color:var(--ouro);text-align:right;font-family:'JetBrains Mono',monospace}
+td.num.sorteado{font-size:15px;font-weight:600}
+.badge-winner{font-size:10px;padding:2px 8px;background:rgba(200,168,75,.12);color:var(--ouro);border:1px solid rgba(200,168,75,.25)}
+.badge-origem{font-size:10px;padding:2px 7px;border:1px solid;color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.1)}
+.badge-origem.purchase{color:rgba(111,207,151,.7);border-color:rgba(111,207,151,.2)}
+.badge-origem.manual{color:rgba(200,168,75,.7);border-color:rgba(200,168,75,.2)}
+.badge-origem.bonus{color:rgba(130,130,255,.7);border-color:rgba(130,130,255,.2)}
+
+.hash-section{padding:32px;border-top:1px solid rgba(255,255,255,.06)}
+.hash-valor{font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,255,255,.5);word-break:break-all;background:rgba(0,0,0,.25);padding:14px 16px;border:1px solid rgba(255,255,255,.06);margin:12px 0 20px;user-select:all}
+
+.acoes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.btn-acao{padding:14px 20px;border:1px solid var(--borda);background:transparent;color:var(--ouro);font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;letter-spacing:.5px;transition:all .2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-acao:hover{background:rgba(200,168,75,.08);border-color:var(--ouro)}
+.btn-acao.success{border-color:#4caf50;color:#4caf50;background:rgba(76,175,80,.06)}
+.btn-acao.fail{border-color:#f44336;color:#f44336;background:rgba(244,67,54,.06)}
+
+.verify-result{margin-top:20px;padding:20px;border:1px solid;font-size:13px;line-height:1.7;display:none}
+.verify-result.ok{border-color:rgba(76,175,80,.35);background:rgba(76,175,80,.06);color:#81c784}
+.verify-result.err{border-color:rgba(244,67,54,.3);background:rgba(244,67,54,.05);color:#e57373}
+.verify-result pre{font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:8px;color:rgba(255,255,255,.5);overflow-x:auto}
+
+.algo-section{padding:32px;border-top:1px solid rgba(255,255,255,.06)}
+.algo-steps{counter-reset:step;display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.algo-step{display:grid;grid-template-columns:28px 1fr;gap:16px;align-items:start;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.algo-step:last-child{border-bottom:none}
+.step-num{counter-increment:step;width:28px;height:28px;background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.25);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ouro);flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.step-txt{font-size:13px;color:var(--texto-s);line-height:1.7}
+.step-txt strong{color:var(--branco)}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:80px;flex-direction:column;gap:14px}
+.spinner{width:28px;height:28px;border:2px solid rgba(200,168,75,.2);border-top-color:var(--ouro);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--texto-s)}
+
+.msg-vazio{padding:48px;text-align:center;color:var(--texto-s);font-size:14px}
+.msg-erro{padding:32px;background:rgba(244,67,54,.05);border:1px solid rgba(244,67,54,.2);color:#e57373;font-size:13px}
+
+.paginacao{display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end;font-size:12px;color:var(--texto-s)}
+.paginacao button{padding:6px 12px;border:1px solid var(--borda);background:transparent;color:var(--ouro);cursor:pointer;font-family:'Jost',sans-serif;font-size:12px;transition:all .15s}
+.paginacao button:hover:not(:disabled){background:rgba(200,168,75,.08)}
+.paginacao button:disabled{opacity:.3;cursor:not-allowed}
+
+footer{background:rgba(0,0,0,.3);padding:24px 48px;font-size:11px;color:rgba(255,255,255,.2);text-align:center;border-top:1px solid rgba(255,255,255,.05)}
+
+@media(max-width:768px){
+  .topo,.hero,.search-wrap,#audit-result,footer{padding-left:20px;padding-right:20px}
+  .input-row{grid-template-columns:1fr}
+  .winner-cards{grid-template-columns:1fr}
+  .acoes-grid{grid-template-columns:1fr}
+  .meta-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <a href="https://www.3trevo.com.br" class="topo-marca">&#10022; Editora Tres Trevo</a>
+  <span class="topo-tag">Auditoria Publica</span>
+</header>
+
+<section class="hero">
+  <div class="hero-label">&#10022; Transparencia Total</div>
+  <h1 class="hero-titulo">Auditoria do Sorteio</h1>
+  <p class="hero-desc">
+    Todos os sorteios sao executados com algoritmo deterministico de cartela de numeros e seed publico.
+    Qualquer pessoa pode verificar a integridade e reproduzir exatamente qual numero sairia dado o mesmo seed.
+  </p>
+</section>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <div class="search-titulo">Selecionar Rodada</div>
+    <div class="input-row">
+      <select class="input-sel" id="selectDraw">
+        <option value="">Carregando sorteios...</option>
+      </select>
+      <button class="btn-buscar" onclick="carregarAuditoria()">Ver Auditoria</button>
+    </div>
+  </div>
+</div>
+
+<div id="audit-result"></div>
+
+<footer>
+  Editora Tres Trevo &middot; CNPJ 18.928.966/0001-59 &middot; Montauri/RS &middot; sac@3trevo.com.br<br>
+  <span style="color:rgba(255,255,255,.12)">Sorteios auditaveis publicamente &middot; Algoritmo: cartela-mulberry32</span>
+</footer>
+
+<script>
+const SUPABASE_URL  = 'https://xfkepekffdyrtcgagwqo.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let auditAtual  = null;
+let cartelaPage = 0;
+const PER_PAGE  = 100;
+
+// ── MULBERRY32 PRNG (identico ao da Edge Function) ──────────────
+function mulberry32(seed) {
+  return function() {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seedFromString(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+  return h >>> 0;
+}
+
+async function sha256hex(str) {
+  const data = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function escapeHtml(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── INICIALIZACAO ──────────────────────────────────────────────
+async function init() {
+  const p = new URLSearchParams(window.location.search);
+  const drawIdParam = p.get('draw_id');
+
+  const { data: draws } = await sb
+    .from('draws')
+    .select('id, titulo, status, executado_em')
+    .eq('status', 'drawn')
+    .order('criado_em', { ascending: false });
+
+  const sel = document.getElementById('selectDraw');
+  if (!draws || draws.length === 0) {
+    sel.innerHTML = '<option value="">Nenhum sorteio realizado ainda</option>';
+    return;
+  }
+
+  sel.innerHTML = '<option value="">-- Escolha um sorteio --</option>';
+  draws.forEach(function(d) {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.titulo || 'Sorteio';
+    if (d.id === drawIdParam) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  if (drawIdParam) carregarAuditoria(drawIdParam);
+}
+
+async function carregarAuditoria(forceId) {
+  const drawId = forceId || document.getElementById('selectDraw').value;
+  if (!drawId) return;
+
+  cartelaPage = 0;
+
+  const el = document.getElementById('audit-result');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div><span class="loading-txt">Carregando auditoria</span></div>';
+
+  const [auditRes, drawRes] = await Promise.all([
+    sb.from('draw_audits').select('*').eq('draw_id', drawId).single(),
+    sb.from('draws').select('titulo, premio_1, premio_2, max_numeros').eq('id', drawId).single(),
+  ]);
+
+  if (auditRes.error || !auditRes.data) {
+    el.innerHTML = '<div style="padding:0 48px 48px"><div class="msg-erro">Auditoria nao encontrada para este sorteio.</div></div>';
+    return;
+  }
+
+  auditAtual = auditRes.data;
+  renderAuditoria(auditRes.data, drawRes.data);
+}
+
+function renderAuditoria(audit, draw) {
+  const el = document.getElementById('audit-result');
+  const dataExec = new Date(audit.executado_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+  const participantes = audit.participantes || [];
+  const resultado     = audit.resultado     || [];
+  const cartela       = audit.cartela       || [];
+
+  const winner1 = resultado.find(function(r){ return r.posicao === 1; });
+  const winner2 = resultado.find(function(r){ return r.posicao === 2; });
+
+  const totalAtribuidos = cartela.filter(function(n){ return n.user_id; }).length;
+  const maxN            = (draw && draw.max_numeros) ? draw.max_numeros : 100000;
+
+  var participantesRows = participantes.map(function(p, i) {
+    var isW1 = winner1 && p.user_id === winner1.user_id;
+    var isW2 = winner2 && p.user_id === winner2.user_id;
+    return '<tr' + (isW1||isW2?' class="sorteado"':'') + '>' +
+      '<td style="color:rgba(255,255,255,.3);font-size:11px">' + (i+1) + '</td>' +
+      '<td class="email">' + escapeHtml(p.email_masked) + '</td>' +
+      '<td class="num">' + ((p.total_numeros||0).toLocaleString('pt-BR')) + '</td>' +
+      '<td>' + (isW1 ? '<span class="badge-winner">1 lugar</span>' : isW2 ? '<span class="badge-winner">2 lugar</span>' : '') + '</td>' +
+      '</tr>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="card">' +
+    '  <div class="card-header">' +
+    '    <div class="card-titulo">' + escapeHtml((draw && draw.titulo) || 'Sorteio') + '</div>' +
+    '    <div class="card-sub">Rodada &middot; ' + escapeHtml(dataExec) + ' (horario de Brasilia)</div>' +
+    '  </div>' +
+    '  <div class="numero-destaque">' +
+    '    <div class="numero-label">Numero Sorteado</div>' +
+    '    <div class="numero-valor">' + (audit.numero_sorteado||0).toLocaleString('pt-BR') + '</div>' +
+    '    <div class="numero-sub">De uma cartela com <strong style="color:var(--branco)">' + totalAtribuidos.toLocaleString('pt-BR') + '</strong> numeros atribuidos de ' + maxN.toLocaleString('pt-BR') + ' possiveis</div>' +
+    '  </div>' +
+    '  <div class="meta-grid">' +
+    '    <div class="meta-item"><div class="meta-label">Participantes</div><div class="meta-valor ouro">' + participantes.length + '</div></div>' +
+    '    <div class="meta-item"><div class="meta-label">Numeros distribuidos</div><div class="meta-valor">' + totalAtribuidos.toLocaleString('pt-BR') + '</div></div>' +
+    '    <div class="meta-item"><div class="meta-label">Algoritmo</div><div class="meta-valor" style="font-size:12px">' + escapeHtml(audit.algoritmo) + '</div></div>' +
+    '    <div class="meta-item"><div class="meta-label">Seed utilizado</div><div class="meta-valor mono">' + escapeHtml(audit.seed) + '</div></div>' +
+    '  </div>' +
+    '  <div class="winners-section">' +
+    '    <div class="section-titulo">Resultado do Sorteio</div>' +
+    '    <div class="winner-cards">' +
+    (winner1 ?
+      '<div class="winner-card primeiro">' +
+      '  <div class="winner-pos">1 Lugar' + ((draw && draw.premio_1) ? ' &middot; ' + escapeHtml(draw.premio_1) : '') + '</div>' +
+      '  <div class="winner-email">' + escapeHtml(winner1.email_masked) + '</div>' +
+      '  <div class="winner-numero"># ' + ((winner1.numero_sorteado||0).toLocaleString('pt-BR')) + '</div>' +
+      '  <div class="winner-numeros">Total de ' + (winner1.total_numeros||0) + ' numero(s) na rodada</div>' +
+      '</div>' : '') +
+    (winner2 ?
+      '<div class="winner-card">' +
+      '  <div class="winner-pos">2 Lugar' + ((draw && draw.premio_2) ? ' &middot; ' + escapeHtml(draw.premio_2) : '') + '</div>' +
+      '  <div class="winner-email">' + escapeHtml(winner2.email_masked) + '</div>' +
+      '  <div class="winner-numero"># ' + ((winner2.numero_sorteado||0).toLocaleString('pt-BR')) + '</div>' +
+      '  <div class="winner-numeros">Total de ' + (winner2.total_numeros||0) + ' numero(s) na rodada</div>' +
+      '</div>' : '') +
+    '    </div>' +
+    '    <div class="section-titulo">Participantes e seus Numeros</div>' +
+    '    <div class="tabela-wrap">' +
+    '      <table>' +
+    '        <thead><tr><th>#</th><th>E-mail (mascarado)</th><th style="text-align:right">Total de Numeros</th><th></th></tr></thead>' +
+    '        <tbody>' + participantesRows + '</tbody>' +
+    '      </table>' +
+    '    </div>' +
+    '  </div>' +
+    '  <div class="winners-section" style="border-top:1px solid rgba(255,255,255,.06)">' +
+    '    <div class="section-titulo">Cartela Completa — Todos os Numeros</div>' +
+    '    <div id="cartela-tabela-wrap"></div>' +
+    '    <div class="paginacao" id="paginacao"></div>' +
+    '  </div>' +
+    '  <div class="hash-section">' +
+    '    <div class="section-titulo">Integridade &amp; Verificacao</div>' +
+    '    <p style="font-size:13px;color:var(--texto-s);line-height:1.7;margin-bottom:4px">O hash SHA-256 abaixo foi calculado no momento do sorteio a partir do JSON canonico (participantes ordenados por user_id + seed + numero sorteado + resultado). Qualquer alteracao nos dados produziria um hash diferente.</p>' +
+    '    <div class="meta-label" style="margin-top:16px">Hash SHA-256 registrado</div>' +
+    '    <div class="hash-valor" id="hashRegistrado">' + escapeHtml(audit.hash_sha256||'') + '</div>' +
+    '    <div class="acoes-grid">' +
+    '      <button class="btn-acao" id="btnVerificar" onclick="verificarIntegridade()">Verificar hash</button>' +
+    '      <button class="btn-acao" id="btnReproduzir" onclick="reproduzirSorteio()">Reproduzir no browser</button>' +
+    '      <button class="btn-acao" onclick="downloadCartela()">Download CSV da cartela</button>' +
+    '    </div>' +
+    '    <div class="verify-result" id="verifyResult"></div>' +
+    '  </div>' +
+    '  <div class="algo-section">' +
+    '    <div class="section-titulo">Como funciona o algoritmo</div>' +
+    '    <div class="algo-steps">' +
+    '      <div class="algo-step"><div class="step-num">1</div><div class="step-txt"><strong>Cartela de numeros:</strong> cada compra atribui N numeros unicos aleatorios (de 1 a ' + maxN.toLocaleString('pt-BR') + ') ao comprador. Os numeros sao sorteados com crypto.getRandomValues e persistidos em draw_numbers.</div></div>' +
+    '      <div class="algo-step"><div class="step-num">2</div><div class="step-txt"><strong>Geracao do seed:</strong> combinacao de timestamp (ms) + SHA-256 dos pares numero:user_id da cartela. O admin pode fornecer um seed personalizado para auditabilidade maxima.</div></div>' +
+    '      <div class="algo-step"><div class="step-num">3</div><div class="step-txt"><strong>PRNG Mulberry32:</strong> algoritmo deterministico de 32 bits. Dado o mesmo seed, produz <em>exatamente a mesma sequencia</em> em qualquer ambiente. Nao depende de servidor.</div></div>' +
+    '      <div class="algo-step"><div class="step-num">4</div><div class="step-txt"><strong>Sorteio do numero:</strong> gera inteiros em [1..' + maxN.toLocaleString('pt-BR') + '] ate cair em um numero atribuido na cartela. O dono desse numero e o vencedor. Maximo 2000 tentativas; fallback por selecao direta na lista.</div></div>' +
+    '      <div class="algo-step"><div class="step-num">5</div><div class="step-txt"><strong>Auditoria imutavel:</strong> hash SHA-256 do JSON canonico (participantes + seed + numeros + resultado) e calculado e persistido. Qualquer alteracao nos dados quebraria o hash.</div></div>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+
+  renderCartela(cartela, winner1 && winner1.numero_sorteado, winner2 && winner2.numero_sorteado);
+}
+
+function renderCartela(cartela, num1, num2) {
+  const wrap  = document.getElementById('cartela-tabela-wrap');
+  const pagEl = document.getElementById('paginacao');
+  if (!cartela || cartela.length === 0) {
+    wrap.innerHTML  = '<div class="msg-vazio">Snapshot da cartela nao disponivel para esta rodada.</div>';
+    pagEl.innerHTML = '';
+    return;
+  }
+
+  const total   = cartela.length;
+  const totalPg = Math.ceil(total / PER_PAGE);
+  const slice   = cartela.slice(cartelaPage * PER_PAGE, (cartelaPage + 1) * PER_PAGE);
+
+  var rows = slice.map(function(n) {
+    var isSorteado = (n.numero === num1) || (n.numero === num2);
+    var posLabel = n.numero === num1 ? '<span class="badge-winner">1 lugar</span>' :
+                   n.numero === num2 ? '<span class="badge-winner">2 lugar</span>' : '';
+    var origemCls = n.origem === 'purchase' ? 'purchase' : n.origem === 'manual' ? 'manual' : 'bonus';
+    return '<tr' + (isSorteado?' class="sorteado"':'') + '>' +
+      '<td class="num' + (isSorteado?' sorteado':'') + '">' + n.numero.toLocaleString('pt-BR') + '</td>' +
+      '<td class="email">' + escapeHtml(n.email_masked || '&mdash;') + '</td>' +
+      '<td><span class="badge-origem ' + origemCls + '">' + escapeHtml(n.origem||'&mdash;') + '</span></td>' +
+      '<td>' + posLabel + '</td>' +
+      '</tr>';
+  }).join('');
+
+  wrap.innerHTML =
+    '<div style="font-size:12px;color:var(--texto-s);margin-bottom:12px">Exibindo ' + (cartelaPage*PER_PAGE+1) + '&ndash;' + Math.min((cartelaPage+1)*PER_PAGE,total) + ' de ' + total.toLocaleString('pt-BR') + ' numeros atribuidos</div>' +
+    '<table>' +
+    '  <thead><tr><th style="text-align:right">Numero</th><th>Proprietario</th><th>Origem</th><th></th></tr></thead>' +
+    '  <tbody>' + rows + '</tbody>' +
+    '</table>';
+
+  pagEl.innerHTML =
+    '<span>' + (cartelaPage+1) + ' / ' + totalPg + '</span>' +
+    '<button onclick="mudarPagCartela(-1)" ' + (cartelaPage===0?'disabled':'') + '>Anterior</button>' +
+    '<button onclick="mudarPagCartela(1)" ' + (cartelaPage>=totalPg-1?'disabled':'') + '>Proxima</button>';
+}
+
+function mudarPagCartela(delta) {
+  if (!auditAtual) return;
+  var cartela = auditAtual.cartela || [];
+  var totalPg = Math.ceil(cartela.length / PER_PAGE);
+  cartelaPage = Math.max(0, Math.min(cartelaPage + delta, totalPg - 1));
+  var resultado = auditAtual.resultado || [];
+  var w1 = resultado.find(function(r){ return r.posicao===1; });
+  var w2 = resultado.find(function(r){ return r.posicao===2; });
+  renderCartela(cartela, w1 && w1.numero_sorteado, w2 && w2.numero_sorteado);
+}
+
+// ── VERIFICAR INTEGRIDADE DO HASH ─────────────────────────────
+async function verificarIntegridade() {
+  var audit = auditAtual;
+  if (!audit) return;
+  var btn = document.getElementById('btnVerificar');
+  btn.textContent = 'Verificando...';
+
+  var participantes = audit.participantes || [];
+  var resultado     = audit.resultado     || [];
+
+  var canonicalJson = JSON.stringify({
+    draw_id:         audit.draw_id,
+    seed:            audit.seed,
+    algoritmo:       audit.algoritmo,
+    max_numeros:     100000,
+    numero_sorteado: audit.numero_sorteado,
+    participantes:   participantes,
+    resultado:       resultado,
+  });
+
+  var computedHash    = await sha256hex(canonicalJson);
+  var registeredHash  = audit.hash_sha256;
+  var el              = document.getElementById('verifyResult');
+  el.style.display    = 'block';
+
+  if (computedHash === registeredHash) {
+    btn.classList.add('success');
+    btn.textContent = 'Hash verificado';
+    el.className = 'verify-result ok';
+    el.innerHTML = '<strong>Integridade confirmada</strong><br>O hash SHA-256 calculado agora no seu browser e identico ao hash registrado no sorteio. Os dados nao foram alterados desde o momento do sorteio.<pre>Hash calculado:  ' + computedHash + '\nHash registrado: ' + registeredHash + '</pre>';
+  } else {
+    btn.classList.add('fail');
+    btn.textContent = 'Hash diverge';
+    el.className = 'verify-result err';
+    el.innerHTML = '<strong>Divergencia detectada</strong><br>O hash calculado nao coincide com o registrado. Os dados podem ter sido alterados.<pre>Hash calculado:  ' + computedHash + '\nHash registrado: ' + registeredHash + '</pre>';
+  }
+}
+
+// ── REPRODUZIR SORTEIO NO BROWSER ────────────────────────────
+async function reproduzirSorteio() {
+  var audit = auditAtual;
+  if (!audit) return;
+  var btn = document.getElementById('btnReproduzir');
+  btn.textContent = 'Reproduzindo...';
+
+  var seedNum  = seedFromString(audit.seed);
+  var rand     = mulberry32(seedNum);
+  var cartela  = audit.cartela || [];
+  var maxN     = 100000;
+
+  var atribuidos = new Set(cartela.filter(function(n){ return n.user_id; }).map(function(n){ return n.numero; }));
+  var numToUser  = new Map(cartela.filter(function(n){ return n.user_id; }).map(function(n){ return [n.numero, n.email_masked]; }));
+
+  var num1 = null;
+  var MAX_T = 2000;
+  for (var i = 0; i < MAX_T; i++) {
+    var n = Math.floor(rand() * maxN) + 1;
+    if (atribuidos.has(n)) { num1 = n; break; }
+  }
+  if (!num1 && atribuidos.size > 0) {
+    var arr = Array.from(atribuidos);
+    num1 = arr[Math.floor(rand() * arr.length)];
+  }
+
+  var el = document.getElementById('verifyResult');
+  el.style.display = 'block';
+
+  if (!num1) {
+    btn.textContent = 'Falhou';
+    el.className = 'verify-result err';
+    el.innerHTML = '<strong>Nao foi possivel reproduzir</strong> &mdash; cartela vazia no snapshot.';
+    return;
+  }
+
+  var emailReproduzido = numToUser.get(num1) || '&mdash;';
+  var numRegistrado    = audit.numero_sorteado;
+  var match            = (num1 === numRegistrado);
+
+  if (match) {
+    btn.classList.add('success');
+    btn.textContent = 'Reproducao identica';
+    el.className = 'verify-result ok';
+    el.innerHTML = '<strong>Reproducao confirmada</strong><br>Dado o seed <code>' + escapeHtml(audit.seed) + '</code>, o algoritmo Mulberry32 produz o numero <strong style="color:var(--ouro)">' + num1.toLocaleString('pt-BR') + '</strong>, que pertence a <code>' + escapeHtml(emailReproduzido) + '</code> &mdash; identico ao registrado.';
+  } else {
+    btn.classList.add('fail');
+    btn.textContent = 'Divergencia';
+    el.className = 'verify-result err';
+    el.innerHTML = '<strong>Divergencia na reproducao</strong><br>Numero reproduzido: <strong>' + num1.toLocaleString('pt-BR') + '</strong> &mdash; Numero registrado: <strong>' + (numRegistrado||0).toLocaleString('pt-BR') + '</strong>.<br>Possivel causa: a cartela no snapshot difere da usada no sorteio original.';
+  }
+}
+
+// ── DOWNLOAD CSV DA CARTELA ──────────────────────────────────
+function downloadCartela() {
+  var audit = auditAtual;
+  if (!audit || !audit.cartela || !audit.cartela.length) {
+    alert('Snapshot da cartela nao disponivel para download.');
+    return;
+  }
+  var resultado = audit.resultado || [];
+  var w1num = (resultado.find(function(r){ return r.posicao===1; }) || {}).numero_sorteado;
+  var w2num = (resultado.find(function(r){ return r.posicao===2; }) || {}).numero_sorteado;
+
+  var linhas = ['numero,email_mascarado,origem,sorteado'];
+  audit.cartela.forEach(function(n) {
+    var sorteado = n.numero===w1num ? '1o_lugar' : n.numero===w2num ? '2o_lugar' : '';
+    linhas.push(n.numero + ',' + (n.email_masked||'') + ',' + (n.origem||'') + ',' + sorteado);
+  });
+  var csv  = linhas.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'cartela-sorteio-' + audit.draw_id + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+init();
+</script>
+</body>
+</html>

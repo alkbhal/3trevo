@@ -1,0 +1,48 @@
+# ============================================================
+# .gitignore — Editora Três Trevo
+# Repo público (GitHub Pages) — manter apenas arquivos de frontend
+# ============================================================
+
+# ── Painel admin (NUNCA no repo público) ────────────────────
+admin.html
+
+# ── Arquivos HTML obsoletos (substituídos pelo novo fluxo) ──
+ebook.html
+
+# ── Dados internos de negócio ───────────────────────────────
+config.json
+progresso.json
+
+# ── Scripts utilitários / temporários ───────────────────────
+apply_css_patch.py
+css-patch.css
+*.py
+*.bak
+
+# ── Ambiente / secrets ──────────────────────────────────────
+.env
+.env.*
+*.env
+supabase/.env
+supabase/secrets.*
+
+# ── Node / dependências ─────────────────────────────────────
+node_modules/
+.npm/
+
+# ── Supabase CLI local ──────────────────────────────────────
+.supabase/
+supabase/.branches/
+supabase/.temp/
+
+# ── IDEs e SO ───────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Logs ────────────────────────────────────────────────────
+*.log
+
+# ── Scripts de deploy (contém tokens hardcoded) ─────────────
+deploy/
