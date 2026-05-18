@@ -451,6 +451,41 @@ Responda SOMENTE com JSON: {"pontos":["ponto 1","ponto 2","ponto 3","ponto 4","p
   });
 }
 
+async function handleForgeGetChapters(env: Env, projectId: string): Promise<Response> {
+  if (!env.FORGE_STORAGE) return errorResponse('Storage não configurado.', 503);
+  const briefObj = await env.FORGE_STORAGE.get(`briefs/brief_${projectId}.json`);
+  if (!briefObj) return errorResponse('Projeto não encontrado.', 404);
+  const dna = await briefObj.json<{ chapters?: { numero: number; titulo: string }[] }>();
+  const result: { numero: number; titulo: string; corpo: string; palavras: number }[] = [];
+  for (const ch of (dna?.chapters ?? [])) {
+    const obj = await env.FORGE_STORAGE.get(`drafts/${projectId}/ch${ch.numero}.json`);
+    if (!obj) continue;
+    const d = await obj.json<{ titulo: string; corpo: string; palavras: number }>();
+    result.push({ numero: ch.numero, titulo: d.titulo, corpo: d.corpo, palavras: d.palavras ?? 0 });
+  }
+  return corsResponse(result);
+}
+
+async function handleForgeSaveChapter(env: Env, req: Request, projectId: string, chapterNum: string): Promise<Response> {
+  if (!env.FORGE_STORAGE) return errorResponse('Storage não configurado.', 503);
+  const body = await req.json<{ corpo?: string }>();
+  if (!body.corpo?.trim()) return errorResponse('corpo obrigatório.');
+  const draftPath = `drafts/${projectId}/ch${chapterNum}.json`;
+  const obj = await env.FORGE_STORAGE.get(draftPath);
+  if (!obj) return errorResponse('Capítulo não encontrado.', 404);
+  const draft = await obj.json<Record<string, unknown>>();
+  const palavras = body.corpo.trim().split(/\s+/).filter(Boolean).length;
+  await env.FORGE_STORAGE.put(draftPath, JSON.stringify({ ...draft, corpo: body.corpo, palavras }, null, 2), {
+    httpMetadata: { contentType: 'application/json; charset=utf-8' },
+  });
+  // Invalidar cache do resumo NotebookLM
+  await env.FORGE_STORAGE.delete(`summary/${projectId}/index.html`).catch(() => {});
+  // Re-renderizar HTML do ebook
+  await fetch(`https://tr3vo-forge.al-kbhal.workers.dev/rerender/${projectId}`, { method: 'POST' })
+    .catch(e => console.error('[save-chapter] rerender:', e));
+  return corsResponse({ ok: true, palavras });
+}
+
 async function handleForgePublicar(env: Env, req: Request): Promise<Response> {
   const authErr = await requerAuth(env, req);
   if (authErr) return authErr;
@@ -568,6 +603,10 @@ export default {
 
       if (path === '/api/health') return corsResponse({ ok: true, ts: new Date().toISOString() });
       if (path === '/api/admin/acervo-forge' && method === 'POST') return handleForgePublicar(env, req);
+      const forgeChaptersMatch = path.match(/^\/api\/forge\/chapters\/([0-9a-f-]{36})$/i);
+      if (forgeChaptersMatch && method === 'GET') return handleForgeGetChapters(env, forgeChaptersMatch[1]);
+      const forgeChapterMatch = path.match(/^\/api\/forge\/chapter\/([0-9a-f-]{36})\/(\d+)$/i);
+      if (forgeChapterMatch && method === 'PUT') return handleForgeSaveChapter(env, req, forgeChapterMatch[1], forgeChapterMatch[2]);
 
       return errorResponse('Rota não encontrada.', 404);
     } catch (err) {

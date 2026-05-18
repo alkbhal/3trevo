@@ -2977,6 +2977,8 @@ function forjaRenderizar() {
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
         <a href="${FORGE_API}/api/forge/preview/${p.id}" target="_blank" rel="noopener"
            class="btn btn-outline btn-sm">👁 Visualizar</a>
+        <button class="btn btn-outline btn-sm"
+           onclick="forjaAbrirEditor('${p.id}','${escHtml(p.titulo||p.tema).replace(/'/g,"\\'")}')">✏️ Editar</button>
         <a href="${FORGE_API}/api/forge/summary/${p.id}" target="_blank" rel="noopener"
            class="btn btn-outline btn-sm">📋 Resumo</a>
         <button class="btn btn-ouro btn-sm"
@@ -3053,6 +3055,113 @@ async function forjaMostrarCusto(id) {
   } catch { btn.textContent = '💰 erro'; btn.disabled = false; }
 }
 
+// ── EDITOR DE CAPÍTULOS ───────────────────────────────────────────
+let fjEditorProject = null;
+let fjEditorChapters = [];
+let fjEditorCapIdx = 0;
+
+async function forjaAbrirEditor(projectId, titulo) {
+  fjEditorProject = projectId;
+  fjEditorChapters = [];
+  document.getElementById('fj-editor-titulo').textContent = titulo;
+  document.getElementById('fj-editor-lista').innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:12px">Carregando…</div>';
+  document.getElementById('fj-editor-area').innerHTML = '';
+  document.getElementById('modal-forja-editor').classList.add('aberto');
+  try {
+    const jwt = (await sb.auth.getSession()).data.session?.access_token || '';
+    const r = await fetch(`${FORGE_API}/api/forge/chapters/${projectId}`, {
+      headers: { 'Authorization': 'Bearer ' + jwt }
+    });
+    fjEditorChapters = await r.json();
+    fjEditorRenderizarLista();
+    if (fjEditorChapters.length > 0) fjEditorSelecionarCap(0);
+  } catch(e) {
+    document.getElementById('fj-editor-lista').innerHTML = `<div style="color:var(--danger);padding:12px;font-size:12px">Erro: ${e.message}</div>`;
+  }
+}
+
+function fjEditorFechar() {
+  document.getElementById('modal-forja-editor').classList.remove('aberto');
+}
+
+function fjEditorRenderizarLista() {
+  document.getElementById('fj-editor-lista').innerHTML = fjEditorChapters.map((c,i) => `
+    <div id="fjeitem-${i}" onclick="fjEditorSelecionarCap(${i})"
+      style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--borda2);transition:background .15s">
+      <div style="font-size:10px;color:var(--text-muted)">Cap ${c.numero} · ${c.palavras}p</div>
+      <div style="font-size:12px;font-weight:500;margin-top:2px;line-height:1.3">${escHtml(c.titulo)}</div>
+    </div>`).join('');
+}
+
+function fjEditorSelecionarCap(i) {
+  fjEditorCapIdx = i;
+  document.querySelectorAll('[id^="fjeitem-"]').forEach((el,idx) => {
+    el.style.background = idx === i ? 'var(--bg-hover,rgba(0,0,0,.04))' : '';
+  });
+  const cap = fjEditorChapters[i];
+  document.getElementById('fj-editor-area').innerHTML = `
+    <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:8px">
+      Capítulo ${cap.numero} — <span id="fje-titulo">${escHtml(cap.titulo)}</span>
+    </div>
+    <textarea id="fje-textarea" style="width:100%;height:calc(100% - 90px);min-height:300px;resize:vertical;font-family:Georgia,serif;font-size:14px;line-height:1.7;padding:12px;border:1px solid var(--borda);border-radius:6px;background:var(--bg,#fff);color:var(--text);box-sizing:border-box"
+      oninput="fjEditorAtualizarContagem()">${escHtml(cap.corpo)}</textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <span id="fje-contagem" style="font-size:11px;color:var(--text-muted)">${cap.palavras} palavras</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="fjEditorReRender()" id="btn-rerender-editor">↺ Re-renderizar</button>
+        <button class="btn btn-ouro btn-sm" onclick="fjEditorSalvar()" id="btn-salvar-cap">Salvar capítulo</button>
+      </div>
+    </div>`;
+}
+
+function fjEditorAtualizarContagem() {
+  const txt = document.getElementById('fje-textarea')?.value || '';
+  const n = txt.trim().split(/\s+/).filter(Boolean).length;
+  const el = document.getElementById('fje-contagem');
+  if (el) el.textContent = n + ' palavras';
+}
+
+async function fjEditorSalvar() {
+  const cap = fjEditorChapters[fjEditorCapIdx];
+  const corpo = document.getElementById('fje-textarea')?.value;
+  if (!corpo?.trim()) return;
+  const btn = document.getElementById('btn-salvar-cap');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    const jwt = (await sb.auth.getSession()).data.session?.access_token || '';
+    const r = await fetch(`${FORGE_API}/api/forge/chapter/${fjEditorProject}/${cap.numero}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify({ corpo })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      fjEditorChapters[fjEditorCapIdx] = { ...cap, corpo, palavras: d.palavras };
+      fjEditorRenderizarLista();
+      document.querySelectorAll('[id^="fjeitem-"]').forEach((el,i) => {
+        if (i === fjEditorCapIdx) el.style.background = 'var(--bg-hover,rgba(0,0,0,.04))';
+      });
+      const el = document.getElementById('fje-contagem');
+      if (el) el.textContent = d.palavras + ' palavras';
+      toast(`✅ Capítulo ${cap.numero} salvo — HTML atualizado`);
+    } else throw new Error(d.error);
+  } catch(e) { toast('Erro: ' + e.message, 'erro'); }
+  finally { btn.disabled = false; btn.textContent = 'Salvar capítulo'; }
+}
+
+async function fjEditorReRender() {
+  const btn = document.getElementById('btn-rerender-editor');
+  if (!btn) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(`${FORGE_URL}/rerender/${fjEditorProject}`, { method: 'POST' });
+    const d = await r.json();
+    if (d.ok) toast(`✅ HTML re-gerado (${d.chapters} caps)`);
+    else throw new Error(JSON.stringify(d));
+  } catch(e) { toast('Erro: ' + e.message, 'erro'); }
+  finally { btn.disabled = false; btn.textContent = '↺ Re-renderizar'; }
+}
+
 function forjaIniciarPolling() {
   if (fjTimer) return;
   fjTimer = setInterval(forjaCarregar, 30000);
@@ -3106,6 +3215,26 @@ async function forjaConfirmarExcluir() {
   }
 }
 </script>
+
+<!-- MODAL EDITOR DE CAPÍTULOS -->
+<div class="modal-overlay" id="modal-forja-editor" onclick="if(event.target===this)fjEditorFechar()"
+  style="align-items:stretch;padding:0">
+  <div class="modal" style="max-width:100%;width:100%;height:100%;max-height:100%;border-radius:0;display:flex;flex-direction:column;margin:0">
+    <div class="modal-header" style="flex-shrink:0;display:flex;align-items:center;gap:12px">
+      <div class="modal-titulo" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        ✏️ <span id="fj-editor-titulo">Editor</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="fjEditorReRender()" style="flex-shrink:0">↺ Re-renderizar</button>
+      <button class="modal-fechar" onclick="fjEditorFechar()">✕</button>
+    </div>
+    <div style="display:flex;flex:1;min-height:0;overflow:hidden">
+      <!-- Lista de capítulos -->
+      <div id="fj-editor-lista" style="width:200px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--borda);"></div>
+      <!-- Área de edição -->
+      <div id="fj-editor-area" style="flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column"></div>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL EXCLUSÃO FORGE -->
 <div class="modal-overlay" id="modal-forja-excluir" onclick="if(event.target===this)forjaFecharExcluir()">
