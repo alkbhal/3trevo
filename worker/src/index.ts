@@ -555,6 +555,8 @@ export default {
       if (path === '/api/webhook/forge' && method === 'POST') return handleWebhookForge(env, req);
       if (path.startsWith('/api/forge/preview/') && method === 'GET') return handleForgePreview(env, path.split('/').pop() ?? '');
       if (path.startsWith('/api/forge/summary/') && method === 'GET') return handleForgeSummary(env, path.split('/').pop() ?? '');
+      const _chMatch = path.match(/^\/api\/forge\/chapters\/([0-9a-f-]{36})$/i);
+      if (_chMatch && method === 'GET') return handleForgeGetChapters(env, _chMatch[1]);
 
       // Auth
       if (path === '/api/admin/login' && method === 'POST') return handleLogin(env, req);
@@ -603,8 +605,6 @@ export default {
 
       if (path === '/api/health') return corsResponse({ ok: true, ts: new Date().toISOString() });
       if (path === '/api/admin/acervo-forge' && method === 'POST') return handleForgePublicar(env, req);
-      const forgeChaptersMatch = path.match(/^\/api\/forge\/chapters\/([0-9a-f-]{36})$/i);
-      if (forgeChaptersMatch && method === 'GET') return handleForgeGetChapters(env, forgeChaptersMatch[1]);
       const forgeChapterMatch = path.match(/^\/api\/forge\/chapter\/([0-9a-f-]{36})\/(\d+)$/i);
       if (forgeChapterMatch && method === 'PUT') return handleForgeSaveChapter(env, req, forgeChapterMatch[1], forgeChapterMatch[2]);
 

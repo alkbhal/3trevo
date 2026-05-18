@@ -3072,7 +3072,13 @@ async function forjaAbrirEditor(projectId, titulo) {
     const r = await fetch(`${FORGE_API}/api/forge/chapters/${projectId}`, {
       headers: { 'Authorization': 'Bearer ' + jwt }
     });
-    fjEditorChapters = await r.json();
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error('Erro ' + r.status + ': ' + (err.error || 'sem detalhes'));
+    }
+    const data = await r.json();
+    fjEditorChapters = Array.isArray(data) ? data : [];
+    if (!fjEditorChapters.length) throw new Error('Nenhum capítulo encontrado.');
     fjEditorRenderizarLista();
     if (fjEditorChapters.length > 0) fjEditorSelecionarCap(0);
   } catch(e) {
