@@ -2974,13 +2974,17 @@ function forjaRenderizar() {
     const cor  = fail ? 'var(--danger)' : done ? '#27ae60' : 'var(--ouro)';
     const caps = p.chapters ? `${p.chapters.filter(c=>c.status==='approved').length}/${p.chapters.length} caps ·` : '';
     const btns = done ? `
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
         <a href="${FORGE_API}/api/forge/preview/${p.id}" target="_blank" rel="noopener"
-           class="btn btn-outline btn-sm">👁 Visualizar ebook</a>
+           class="btn btn-outline btn-sm">👁 Visualizar</a>
+        <a href="${FORGE_API}/api/forge/summary/${p.id}" target="_blank" rel="noopener"
+           class="btn btn-outline btn-sm">📋 Resumo</a>
         <button class="btn btn-ouro btn-sm"
            onclick="forjaPublicar('${p.id}','${escHtml(p.titulo||p.tema)}')">
            Publicar no catálogo
         </button>
+        <button class="btn btn-outline btn-sm" id="custo-${p.id}"
+           onclick="forjaMostrarCusto('${p.id}')">💰 Custo</button>
       </div>` : '';
     const errMsg = fail && p.error_log
       ? `<div style="font-size:11px;color:var(--danger);margin-top:4px">${escHtml((() => { try { return JSON.parse(p.error_log)[0]?.message; } catch { return p.error_log; } })() || '')}</div>`
@@ -3023,6 +3027,30 @@ async function forjaPublicar(projectId, titulo) {
     if (d.ok) { toast('✅ Publicado no catálogo! Slug: ' + d.slug); carregarProdutos(); }
     else throw new Error(d.error);
   } catch(e) { toast('Erro: ' + e.message); }
+}
+
+async function forjaMostrarCusto(id) {
+  const btn = document.getElementById('custo-' + id);
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '…';
+  try {
+    const r = await fetch(`${FORGE_URL}/costs/${id}`);
+    const d = await r.json();
+    const t = d.total;
+    if (!t || !t.total_calls) {
+      btn.textContent = '💰 sem dados*';
+      btn.title = '*Tracking ativo apenas para projetos gerados após 2026-05-18';
+      btn.disabled = false;
+      return;
+    }
+    const usd = (t.total_usd || 0).toFixed(4);
+    const brl = ((t.total_usd || 0) * 5.7).toFixed(2);
+    const breakdown = (d.breakdown || [])
+      .map(b => `${b.worker}: $${(b.cost_usd||0).toFixed(4)} (${b.calls} calls)`)
+      .join(' | ');
+    btn.outerHTML = `<span style="font-size:11px;color:#27ae60;cursor:default" title="${breakdown}">💰 $${usd} ≈ R$${brl} · ${t.total_calls} calls</span>`;
+  } catch { btn.textContent = '💰 erro'; btn.disabled = false; }
 }
 
 function forjaIniciarPolling() {
