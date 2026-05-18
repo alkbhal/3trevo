@@ -4,6 +4,7 @@ interface Env {
   ADMIN_SENHA?: string;
   RIFEI_WEBHOOK_SECRET?: string;
   FORGE_STORAGE?: R2Bucket;
+  ANTHROPIC_API_KEY?: string;
 }
 
 const CORS_HEADERS = {
@@ -348,8 +349,105 @@ async function handleForgePreview(env: Env, projectId: string): Promise<Response
   if (!env.FORGE_STORAGE) return new Response('Storage não configurado.', { status: 503 });
   const obj = await env.FORGE_STORAGE.get(`html/${projectId}/index.html`);
   if (!obj) return new Response('Ebook não encontrado ou ainda em geração.', { status: 404 });
-  return new Response(obj.body, {
+  let html = await obj.text();
+  const printWidget = `<style>#_pdfbtn{position:fixed;bottom:28px;right:28px;z-index:9999}#_pdfbtn button{background:#1a4a2e;color:#f5f0e8;border:none;padding:13px 22px;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.35);transition:background .2s}#_pdfbtn button:hover{background:#2a6b42}@media print{#_pdfbtn{display:none}}</style><div id="_pdfbtn"><button onclick="window.print()">⬇ Salvar PDF</button></div>`;
+  html = html.includes('</body>') ? html.replace('</body>', printWidget + '</body>') : html + printWidget;
+  return new Response(html, {
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'X-Robots-Tag': 'noindex' },
+  });
+}
+
+async function callHaikuApi(apiKey: string, prompt: string): Promise<string> {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 512,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  if (!res.ok) return '';
+  const data = await res.json<{ content: [{ text: string }] }>();
+  return data.content?.[0]?.text ?? '';
+}
+
+function buildSummaryHtml(titulo: string, summaries: { titulo: string; pontos: string[] }[], projectId: string): string {
+  const chaptersHtml = summaries.map((ch, i) => `
+<section>
+  <h2>${i + 1}. ${ch.titulo}</h2>
+  <ul>${ch.pontos.map(p => `<li>${p}</li>`).join('')}</ul>
+</section>`).join('');
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resumo — ${titulo}</title>
+<meta name="description" content="Resumo executivo de ${titulo}. Principais pontos por capítulo.">
+<style>body{font-family:Georgia,serif;max-width:760px;margin:0 auto;padding:40px 20px;color:#1c1c1c;line-height:1.7;background:#fdfbf7}h1{font-size:2rem;color:#0f2d1a;border-bottom:2px solid #c8a84b;padding-bottom:12px;margin-bottom:8px}.sub{color:#555;margin-bottom:40px;font-style:italic}h2{font-size:1.2rem;color:#1a4a2e;margin-top:32px;margin-bottom:8px}ul{padding-left:20px}li{margin-bottom:8px}.cta{display:inline-block;margin-top:40px;padding:12px 24px;background:#1a4a2e;color:#f5f0e8;text-decoration:none;border-radius:8px}footer{margin-top:60px;font-size:.85rem;color:#999;border-top:1px solid #ddd;padding-top:16px}</style>
+</head>
+<body>
+<h1>${titulo}</h1>
+<p class="sub">Resumo executivo · ${summaries.length} capítulos</p>
+${chaptersHtml}
+<p><a href="https://tres-trevo-api.al-kbhal.workers.dev/api/forge/preview/${projectId}" class="cta">Ler o ebook completo →</a></p>
+<footer>Editora Três Trevo · <a href="https://3trevo.com.br">3trevo.com.br</a></footer>
+</body></html>`;
+}
+
+async function handleForgeSummary(env: Env, projectId: string): Promise<Response> {
+  if (!env.FORGE_STORAGE) return new Response('Storage não configurado.', { status: 503 });
+
+  // Cache hit — servir direto
+  const cached = await env.FORGE_STORAGE.get(`summary/${projectId}/index.html`);
+  if (cached) {
+    return new Response(cached.body, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=86400' },
+    });
+  }
+
+  const briefObj = await env.FORGE_STORAGE.get(`briefs/brief_${projectId}.json`);
+  if (!briefObj) return new Response('Projeto não encontrado.', { status: 404 });
+
+  const dna = await briefObj.json<{ obra?: { titulo?: string }; chapters?: { numero: number; titulo: string }[] }>();
+  const titulo = dna?.obra?.titulo ?? 'Sem título';
+  const chapters = dna?.chapters ?? [];
+
+  if (!env.ANTHROPIC_API_KEY) return new Response('API key não configurada.', { status: 503 });
+
+  const summaries: { titulo: string; pontos: string[] }[] = [];
+
+  for (const ch of chapters) {
+    const draftObj = await env.FORGE_STORAGE.get(`drafts/${projectId}/ch${ch.numero}.json`);
+    if (!draftObj) continue;
+    const draft = await draftObj.json<{ titulo: string; corpo: string }>();
+    const raw = await callHaikuApi(
+      env.ANTHROPIC_API_KEY,
+      `Extraia EXATAMENTE 5 pontos-chave práticos do capítulo abaixo do ebook "${titulo}".
+
+Capítulo: ${draft.titulo}
+
+${draft.corpo.slice(0, 4000)}
+
+Responda SOMENTE com JSON: {"pontos":["ponto 1","ponto 2","ponto 3","ponto 4","ponto 5"]}`
+    );
+    try {
+      const m = raw.match(/\{[\s\S]*?\}/);
+      const parsed = JSON.parse(m?.[0] ?? '{}') as { pontos?: string[] };
+      summaries.push({ titulo: draft.titulo, pontos: parsed.pontos ?? [] });
+    } catch {
+      summaries.push({ titulo: draft.titulo, pontos: [] });
+    }
+  }
+
+  const html = buildSummaryHtml(titulo, summaries, projectId);
+  await env.FORGE_STORAGE.put(`summary/${projectId}/index.html`, html, {
+    httpMetadata: { contentType: 'text/html' },
+  });
+
+  return new Response(html, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=86400' },
   });
 }
 
@@ -421,6 +519,7 @@ export default {
       if (path === '/api/webhook/rifei' && method === 'POST') return handleWebhookRifei(env, req);
       if (path === '/api/webhook/forge' && method === 'POST') return handleWebhookForge(env, req);
       if (path.startsWith('/api/forge/preview/') && method === 'GET') return handleForgePreview(env, path.split('/').pop() ?? '');
+      if (path.startsWith('/api/forge/summary/') && method === 'GET') return handleForgeSummary(env, path.split('/').pop() ?? '');
 
       // Auth
       if (path === '/api/admin/login' && method === 'POST') return handleLogin(env, req);
