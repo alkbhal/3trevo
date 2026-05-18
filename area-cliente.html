@@ -918,6 +918,23 @@ async function init() {
   const volEl = document.getElementById('playerVol');
   volEl.addEventListener('click', ajustarVolume);
 
+  // Supabase PKCE: trocar token_hash do magic link pela sessão
+  const params = new URLSearchParams(window.location.search);
+  const tokenHash = params.get('token_hash');
+  const tokenType = params.get('type');
+  if (tokenHash) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    const { data, error } = await sb.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: tokenType === 'recovery' ? 'recovery' : 'email'
+    });
+    if (!error && data.session) {
+      usuarioAtual = data.user;
+      mostrarDashboard();
+      return;
+    }
+  }
+
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     usuarioAtual = session.user;
@@ -949,7 +966,7 @@ async function enviarMagicLink() {
   btn.textContent = 'Enviando…';
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.href }
+    options: { emailRedirectTo: window.location.origin + '/area-cliente.html' }
   });
   btn.disabled = false;
   btn.textContent = 'Receber link de acesso';
