@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 /* ── RESET ── */
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1033,9 +1034,32 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
               </select>
             </div>
           </div>
+          <!-- Upload PDF ou colar texto -->
           <div class="campo" style="margin-bottom:12px">
-            <label class="campo-label">Texto do manuscrito *</label>
-            <textarea class="f-input" id="fj-ing-texto" rows="12"
+            <label class="campo-label">Manuscrito *</label>
+
+            <!-- Drop zone / botão de upload -->
+            <div id="fj-dropzone"
+              style="border:2px dashed var(--borda);border-radius:4px;padding:28px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:12px"
+              onclick="document.getElementById('fj-pdf-input').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--ouro)'"
+              ondragleave="this.style.borderColor='var(--borda)'"
+              ondrop="fjDropPDF(event)">
+              <div style="font-size:28px;margin-bottom:8px">📄</div>
+              <div style="font-size:14px;font-weight:500">Arraste um PDF aqui ou clique para selecionar</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Formatos aceitos: PDF · O texto é extraído localmente, nada é enviado sem sua confirmação</div>
+              <div id="fj-pdf-progress" style="margin-top:12px;display:none">
+                <div style="background:var(--borda);border-radius:4px;height:4px;overflow:hidden">
+                  <div id="fj-pdf-bar" style="background:var(--ouro);height:100%;width:0%;transition:width .3s"></div>
+                </div>
+                <div id="fj-pdf-status" style="font-size:12px;color:var(--text-muted);margin-top:6px"></div>
+              </div>
+            </div>
+            <input type="file" id="fj-pdf-input" accept=".pdf" style="display:none" onchange="fjLerPDF(this.files[0])">
+
+            <div style="text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:8px">— ou cole o texto diretamente —</div>
+
+            <textarea class="f-input" id="fj-ing-texto" rows="10"
               style="resize:vertical;font-family:Georgia,serif;font-size:14px;line-height:1.7"
               placeholder="Cole aqui o texto completo do seu rascunho — capítulos, partes, qualquer formato. Mínimo 200 caracteres."></textarea>
             <div id="fj-ing-contagem" style="font-size:12px;color:var(--text-muted);margin-top:4px"></div>
@@ -2920,6 +2944,66 @@ const FJ_LABEL = {
   complete:'✅ Concluído', awaiting_character_images:'✅ Concluído',
   failed:'❌ Falha'
 };
+
+// ── PDF.js: extração de texto ──────────────────────────────────────
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function fjDropPDF(e) {
+  e.preventDefault();
+  document.getElementById('fj-dropzone').style.borderColor = 'var(--borda)';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') fjLerPDF(file);
+  else toast('Selecione um arquivo PDF.');
+}
+
+async function fjLerPDF(file) {
+  if (!file) return;
+  const dz     = document.getElementById('fj-dropzone');
+  const prog   = document.getElementById('fj-pdf-progress');
+  const bar    = document.getElementById('fj-pdf-bar');
+  const status = document.getElementById('fj-pdf-status');
+  const ta     = document.getElementById('fj-ing-texto');
+
+  prog.style.display = 'block';
+  bar.style.width    = '5%';
+  status.textContent = `Lendo ${file.name}…`;
+
+  try {
+    const buf  = await file.arrayBuffer();
+    const pdf  = await pdfjsLib.getDocument({ data: buf }).promise;
+    const total = pdf.numPages;
+    let texto  = '';
+
+    for (let i = 1; i <= total; i++) {
+      bar.style.width = `${Math.round((i / total) * 90)}%`;
+      status.textContent = `Extraindo página ${i} de ${total}…`;
+      const page    = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const linha   = content.items.map(item => item.str).join(' ');
+      texto += linha + '\n\n';
+    }
+
+    bar.style.width    = '100%';
+    status.textContent = `✅ ${total} páginas extraídas — ${texto.trim().split(/\s+/).length.toLocaleString('pt-BR')} palavras`;
+
+    ta.value = texto.trim();
+    ta.dispatchEvent(new Event('input'));  // atualiza contador
+
+    // Sugerir título pelo nome do arquivo
+    const tit = document.getElementById('fj-ing-titulo');
+    if (!tit.value) {
+      tit.value = file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ').trim();
+    }
+
+    dz.style.borderColor = 'var(--ok)';
+    setTimeout(() => { dz.style.borderColor = 'var(--borda)'; }, 3000);
+  } catch(e) {
+    status.textContent = '❌ Erro ao ler PDF: ' + (e.message || String(e));
+    bar.style.background = 'var(--erro)';
+    toast('Erro ao extrair PDF: ' + (e.message || String(e)));
+  }
+}
 
 function fjMudarAba(aba) {
   const painelGerar  = document.getElementById('fj-painel-gerar');
