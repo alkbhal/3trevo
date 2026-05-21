@@ -988,8 +988,15 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
           <div class="secao-sub">Gere ebooks completos com IA — do tema ao arquivo final</div>
         </div>
 
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-titulo">Novo projeto</div>
+        <!-- Abas Gerar / Ingerir -->
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="btn btn-ouro btn-sm" id="fj-tab-gerar" onclick="fjMudarAba('gerar')">✦ Gerar do zero</button>
+          <button class="btn btn-outline btn-sm" id="fj-tab-ingest" onclick="fjMudarAba('ingest')">📄 Ingerir Manuscrito</button>
+        </div>
+
+        <!-- Painel: Gerar do zero -->
+        <div class="card" style="margin-bottom:16px" id="fj-painel-gerar">
+          <div class="card-titulo">Novo projeto — geração completa</div>
           <div class="grid-2">
             <div class="campo">
               <label class="campo-label">Tema do ebook *</label>
@@ -1003,6 +1010,39 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
           <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
             <button class="btn btn-ouro" id="fj-btn" onclick="forjaEnviar()">✦ Gerar ebook</button>
             <span id="fj-msg" style="font-size:13px;color:var(--text-muted)"></span>
+          </div>
+        </div>
+
+        <!-- Painel: Ingerir Manuscrito -->
+        <div class="card" style="margin-bottom:16px;display:none" id="fj-painel-ingest">
+          <div class="card-titulo">Ingerir Manuscrito</div>
+          <div class="card-sub" style="margin-bottom:16px;color:var(--text-muted);font-size:13px">
+            Cole seu rascunho abaixo. O Opus vai analisar, extrair o DNA da obra, completar capítulos faltantes na sua voz e polir tudo.
+          </div>
+          <div class="grid-2" style="margin-bottom:12px">
+            <div class="campo">
+              <label class="campo-label">Título da obra (opcional)</label>
+              <input type="text" class="f-input" id="fj-ing-titulo" placeholder="Se vazio, detectado automaticamente">
+            </div>
+            <div class="campo">
+              <label class="campo-label">Modo</label>
+              <select class="f-input" id="fj-ing-modo">
+                <option value="ambos">Completar + Polir (recomendado)</option>
+                <option value="completar">Completar capítulos faltantes</option>
+                <option value="aprimorar">Polir o que já existe</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo" style="margin-bottom:12px">
+            <label class="campo-label">Texto do manuscrito *</label>
+            <textarea class="f-input" id="fj-ing-texto" rows="12"
+              style="resize:vertical;font-family:Georgia,serif;font-size:14px;line-height:1.7"
+              placeholder="Cole aqui o texto completo do seu rascunho — capítulos, partes, qualquer formato. Mínimo 200 caracteres."></textarea>
+            <div id="fj-ing-contagem" style="font-size:12px;color:var(--text-muted);margin-top:4px"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="btn btn-ouro" id="fj-ing-btn" onclick="forjaIngerir()">📄 Enviar para a Forja</button>
+            <span id="fj-ing-msg" style="font-size:13px;color:var(--text-muted)"></span>
           </div>
         </div>
 
@@ -2873,13 +2913,77 @@ let fjProjects   = JSON.parse(localStorage.getItem(FJ_STORAGE) || '[]');
 let fjTimer      = null;
 
 const FJ_LABEL = {
-  intake:'Analisando mercado…', researcher:'Pesquisando dados…',
-  writing:'Escrevendo capítulos…', editing:'Editando…',
+  intake:'Analisando mercado…', 'ingest-analysis':'🔍 Analisando manuscrito (Opus)…',
+  researcher:'Pesquisando dados…', writing:'Escrevendo capítulos…', editing:'Editando…',
   designing:'Criando design…', rendering:'Gerando arquivo…',
   marketing:'Criando materiais…', delivering:'Finalizando…',
   complete:'✅ Concluído', awaiting_character_images:'✅ Concluído',
   failed:'❌ Falha'
 };
+
+function fjMudarAba(aba) {
+  const painelGerar  = document.getElementById('fj-painel-gerar');
+  const painelIngest = document.getElementById('fj-painel-ingest');
+  const btnGerar     = document.getElementById('fj-tab-gerar');
+  const btnIngest    = document.getElementById('fj-tab-ingest');
+  if (aba === 'gerar') {
+    painelGerar.style.display  = '';
+    painelIngest.style.display = 'none';
+    btnGerar.className  = 'btn btn-ouro btn-sm';
+    btnIngest.className = 'btn btn-outline btn-sm';
+  } else {
+    painelGerar.style.display  = 'none';
+    painelIngest.style.display = '';
+    btnGerar.className  = 'btn btn-outline btn-sm';
+    btnIngest.className = 'btn btn-ouro btn-sm';
+    // Contador de palavras ao digitar
+    const ta = document.getElementById('fj-ing-texto');
+    const fn = () => {
+      const w = ta.value.trim().split(/\s+/).filter(Boolean).length;
+      document.getElementById('fj-ing-contagem').textContent = w ? `${w.toLocaleString('pt-BR')} palavras` : '';
+    };
+    ta.removeEventListener('input', fn);
+    ta.addEventListener('input', fn);
+  }
+}
+
+async function forjaIngerir() {
+  const texto  = document.getElementById('fj-ing-texto').value.trim();
+  const titulo = document.getElementById('fj-ing-titulo').value.trim();
+  const modo   = document.getElementById('fj-ing-modo').value;
+  const btn    = document.getElementById('fj-ing-btn');
+  const msg    = document.getElementById('fj-ing-msg');
+  if (!texto || texto.length < 200) { toast('Cole o manuscrito (mínimo 200 caracteres).'); return; }
+  btn.disabled = true; btn.textContent = 'Enviando…'; msg.textContent = ''; msg.style.color = '';
+  try {
+    const r = await fetch(`${FORGE_URL}/ingest`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ manuscrito: texto, titulo: titulo || undefined, modo })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || r.statusText);
+    fjProjects.unshift({
+      id: d.projectId,
+      tema: titulo || 'Manuscrito',
+      criado: new Date().toISOString(),
+      status: 'intake',
+      origem: 'ingestao'
+    });
+    localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects.slice(0, 20)));
+    document.getElementById('fj-ing-texto').value = '';
+    document.getElementById('fj-ing-titulo').value = '';
+    document.getElementById('fj-ing-contagem').textContent = '';
+    msg.textContent = `✅ Manuscrito enviado — ID ${d.projectId.slice(0,8)}… · ${d.palavras?.toLocaleString('pt-BR')} palavras recebidas`;
+    forjaRenderizar();
+    forjaIniciarPolling();
+    fjMudarAba('gerar');
+  } catch(e) {
+    msg.textContent = '❌ ' + (e.message || String(e));
+    msg.style.color = 'var(--danger)';
+    toast('Erro ao enviar manuscrito: ' + (e.message || String(e)));
+  }
+  finally { btn.disabled = false; btn.textContent = '📄 Enviar para a Forja'; }
+}
 const FJ_ORDER = ['intake','researcher','writing','editing','designing','rendering','marketing','delivering','complete'];
 
 async function forjaEnviar() {
