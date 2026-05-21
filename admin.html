@@ -2946,8 +2946,12 @@ const FJ_LABEL = {
 };
 
 // ── PDF.js: extração de texto ──────────────────────────────────────
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+try {
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+} catch(e) { console.warn('[PDF.js] não carregado:', e); }
 
 function fjDropPDF(e) {
   e.preventDefault();
@@ -2959,6 +2963,10 @@ function fjDropPDF(e) {
 
 async function fjLerPDF(file) {
   if (!file) return;
+  if (typeof pdfjsLib === 'undefined') {
+    toast('PDF.js não carregou. Cole o texto manualmente no campo abaixo.', 'erro');
+    return;
+  }
   const dz     = document.getElementById('fj-dropzone');
   const prog   = document.getElementById('fj-pdf-progress');
   const bar    = document.getElementById('fj-pdf-bar');
