@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 /* ── RESET ── */
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1044,10 +1045,10 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
               onclick="document.getElementById('fj-pdf-input').click()"
               ondragover="event.preventDefault();this.style.borderColor='var(--ouro)'"
               ondragleave="this.style.borderColor='var(--borda)'"
-              ondrop="fjDropPDF(event)">
+              ondrop="fjDropArquivo(event)">
               <div style="font-size:28px;margin-bottom:8px">📄</div>
-              <div style="font-size:14px;font-weight:500">Arraste um PDF aqui ou clique para selecionar</div>
-              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Formatos aceitos: PDF · O texto é extraído localmente, nada é enviado sem sua confirmação</div>
+              <div style="font-size:14px;font-weight:500">Arraste o arquivo aqui ou clique para selecionar</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Formatos aceitos: PDF · DOCX · TXT · RTF · O texto é extraído localmente</div>
               <div id="fj-pdf-progress" style="margin-top:12px;display:none">
                 <div style="background:var(--borda);border-radius:4px;height:4px;overflow:hidden">
                   <div id="fj-pdf-bar" style="background:var(--ouro);height:100%;width:0%;transition:width .3s"></div>
@@ -1055,7 +1056,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
                 <div id="fj-pdf-status" style="font-size:12px;color:var(--text-muted);margin-top:6px"></div>
               </div>
             </div>
-            <input type="file" id="fj-pdf-input" accept=".pdf" style="display:none" onchange="fjLerPDF(this.files[0])">
+            <input type="file" id="fj-pdf-input" accept=".pdf,.docx,.doc,.txt,.rtf" style="display:none" onchange="fjLerArquivo(this.files[0])">
 
             <div style="text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:8px">— ou cole o texto diretamente —</div>
 
@@ -2952,64 +2953,93 @@ try {
       'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
 } catch(e) { console.warn('[PDF.js] não carregado:', e); }
+// mammoth.js (DOCX) — carregado do CDN, falha silenciosa se indisponível
+if (typeof mammoth === 'undefined') console.warn('[mammoth.js] não carregado — DOCX indisponível');
 
-function fjDropPDF(e) {
+function fjDropArquivo(e) {
   e.preventDefault();
   document.getElementById('fj-dropzone').style.borderColor = 'var(--borda)';
   const file = e.dataTransfer.files[0];
-  if (file && file.type === 'application/pdf') fjLerPDF(file);
-  else toast('Selecione um arquivo PDF.');
+  if (file) fjLerArquivo(file);
+  else toast('Nenhum arquivo detectado.');
 }
 
-async function fjLerPDF(file) {
+async function fjLerArquivo(file) {
   if (!file) return;
-  if (typeof pdfjsLib === 'undefined') {
-    toast('PDF.js não carregou. Cole o texto manualmente no campo abaixo.', 'erro');
+  const ext  = file.name.split('.').pop().toLowerCase();
+  const dz   = document.getElementById('fj-dropzone');
+  const prog = document.getElementById('fj-pdf-progress');
+  const bar  = document.getElementById('fj-pdf-bar');
+  const st   = document.getElementById('fj-pdf-status');
+  const ta   = document.getElementById('fj-ing-texto');
+
+  const ACEITOS = ['pdf','docx','doc','txt','rtf'];
+  if (!ACEITOS.includes(ext)) {
+    toast(`Formato .${ext} não suportado. Use: PDF, DOCX, TXT ou RTF.`, 'erro');
     return;
   }
-  const dz     = document.getElementById('fj-dropzone');
-  const prog   = document.getElementById('fj-pdf-progress');
-  const bar    = document.getElementById('fj-pdf-bar');
-  const status = document.getElementById('fj-pdf-status');
-  const ta     = document.getElementById('fj-ing-texto');
 
   prog.style.display = 'block';
-  bar.style.width    = '5%';
-  status.textContent = `Lendo ${file.name}…`;
+  bar.style.background = 'var(--ouro)';
+  bar.style.width = '5%';
+  st.textContent = `Lendo ${file.name}…`;
 
+  let texto = '';
   try {
-    const buf  = await file.arrayBuffer();
-    const pdf  = await pdfjsLib.getDocument({ data: buf }).promise;
-    const total = pdf.numPages;
-    let texto  = '';
-
-    for (let i = 1; i <= total; i++) {
-      bar.style.width = `${Math.round((i / total) * 90)}%`;
-      status.textContent = `Extraindo página ${i} de ${total}…`;
-      const page    = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const linha   = content.items.map(item => item.str).join(' ');
-      texto += linha + '\n\n';
+    if (ext === 'pdf') {
+      if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js não carregou — cole o texto manualmente.');
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      const total = pdf.numPages;
+      for (let i = 1; i <= total; i++) {
+        bar.style.width = `${Math.round((i / total) * 90)}%`;
+        st.textContent = `Extraindo página ${i} de ${total}…`;
+        const page    = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        texto += content.items.map(it => it.str).join(' ') + '\n\n';
+      }
+    } else if (ext === 'docx' || ext === 'doc') {
+      if (typeof mammoth === 'undefined') throw new Error('Mammoth.js não carregou — cole o texto manualmente.');
+      bar.style.width = '40%';
+      st.textContent = 'Extraindo texto do Word…';
+      const buf    = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: buf });
+      texto = result.value;
+    } else if (ext === 'txt') {
+      bar.style.width = '60%';
+      st.textContent  = 'Lendo texto…';
+      texto = await file.text();
+    } else if (ext === 'rtf') {
+      bar.style.width = '60%';
+      st.textContent  = 'Extraindo texto do RTF…';
+      const raw = await file.text();
+      // Remover tags e comandos RTF; preservar texto legível
+      texto = raw
+        .replace(/\{\\[^}]*\}/g, '')          // blocos de controle
+        .replace(/\\[a-z]+\d* ?/g, ' ')        // comandos \word
+        .replace(/[{}\\]/g, '')                 // chaves e barras restantes
+        .replace(/[ \t]{2,}/g, ' ')             // espaços extras
+        .trim();
     }
 
-    bar.style.width    = '100%';
-    status.textContent = `✅ ${total} páginas extraídas — ${texto.trim().split(/\s+/).length.toLocaleString('pt-BR')} palavras`;
+    bar.style.width = '100%';
+    const palavras = texto.trim().split(/\s+/).filter(Boolean).length;
+    st.textContent = `✅ Extraído — ${palavras.toLocaleString('pt-BR')} palavras`;
 
     ta.value = texto.trim();
-    ta.dispatchEvent(new Event('input'));  // atualiza contador
+    ta.dispatchEvent(new Event('input'));
 
-    // Sugerir título pelo nome do arquivo
     const tit = document.getElementById('fj-ing-titulo');
     if (!tit.value) {
-      tit.value = file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ').trim();
+      tit.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').trim();
     }
 
     dz.style.borderColor = 'var(--ok)';
     setTimeout(() => { dz.style.borderColor = 'var(--borda)'; }, 3000);
   } catch(e) {
-    status.textContent = '❌ Erro ao ler PDF: ' + (e.message || String(e));
+    st.textContent = '❌ ' + (e.message || String(e));
     bar.style.background = 'var(--erro)';
-    toast('Erro ao extrair PDF: ' + (e.message || String(e)));
+    toast((e.message || String(e)), 'erro');
   }
 }
 
