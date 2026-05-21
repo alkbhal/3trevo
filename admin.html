@@ -3213,6 +3213,9 @@ function forjaRenderizar() {
         </button>
         <button class="btn btn-outline btn-sm" id="custo-${p.id}"
            onclick="forjaMostrarCusto('${p.id}')">💰 Custo</button>
+      </div>` : fail ? `
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-outline btn-sm" onclick="forjaRetry('${p.id}')">↺ Tentar novamente</button>
       </div>` : '';
     const errMsg = fail && p.error_log
       ? `<div style="font-size:11px;color:var(--danger);margin-top:4px">${escHtml((() => { try { return JSON.parse(p.error_log)[0]?.message; } catch { return p.error_log; } })() || '')}</div>`
@@ -3233,6 +3236,23 @@ function forjaRenderizar() {
       </div>
     </div>`;
   }).join('');
+}
+
+async function forjaRetry(projectId) {
+  try {
+    const r = await fetch(`${FORGE_URL}/retry/${projectId}`, { method: 'POST' });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || r.statusText);
+    // Atualizar status local
+    const p = fjProjects.find(x => x.id === projectId);
+    if (p) p.status = 'intake';
+    localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
+    forjaRenderizar();
+    forjaIniciarPolling();
+    toast(`Projeto relançado a partir do ${d.reinjectedAt}. Aguarde…`);
+  } catch(e) {
+    toast('Erro ao retentar: ' + (e.message || String(e)), 'erro');
+  }
 }
 
 async function forjaPublicar(projectId, titulo) {
