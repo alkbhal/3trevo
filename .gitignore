@@ -46,3 +46,17 @@ Thumbs.db
 
 # ── Scripts de deploy (contém tokens hardcoded) ─────────────
 deploy/
+
+# ── Bancos de dados locais ───────────────────────────────────
+ruvector.db
+*.db
+*.sqlite
+
+# ── Artefatos de ferramentas (claude-flow, swarm, wrangler) ──
+.claude-flow/
+.swarm/
+.wrangler/
+.claude/
+
+# ── Scripts de setup temporários ────────────────────────────
+setup-*.ps1
