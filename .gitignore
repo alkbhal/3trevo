@@ -60,3 +60,4 @@ ruvector.db
 
 # ── Scripts de setup temporários ────────────────────────────
 setup-*.ps1
+.gstack/

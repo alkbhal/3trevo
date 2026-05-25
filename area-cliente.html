@@ -773,6 +773,7 @@ nav{
     <button class="aba" onclick="trocarAba('sorteios',this)" role="tab">Sorteios</button>
     <button class="aba" onclick="trocarAba('extrato',this)" role="tab">Extrato</button>
     <button class="aba" onclick="trocarAba('assinatura',this)" role="tab">Assinatura</button>
+    <button class="aba" onclick="trocarAba('planilhaviva',this)" role="tab">Planilha Viva</button>
   </div>
 
   <!-- ── ABA: BIBLIOTECA ── -->
@@ -833,6 +834,12 @@ nav{
     <div id="conteudoAssinatura">
       <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
     </div>
+  </div>
+
+  <!-- ── ABA: PLANILHA VIVA ── -->
+  <div id="aba-planilhaviva" class="aba-conteudo" role="tabpanel">
+    <div class="sec-titulo">Planilha Viva · SFDTT</div>
+    <div id="conteudoPlanilhaViva"></div>
   </div>
 
 </div><!-- /tela-dashboard -->
@@ -1073,6 +1080,7 @@ function trocarAba(id, btn) {
     if (id === 'extrato')    carregarExtrato();
     if (id === 'assinatura') carregarAssinatura();
   }
+  if (id === 'planilhaviva') carregarPlanilhaViva();
 }
 
 // ── STATS ─────────────────────────────────────────────────
@@ -1860,6 +1868,71 @@ async function carregarAssinatura() {
       <a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>
     </div>
   </div>`;
+}
+
+// ── PLANILHA VIVA ─────────────────────────────────────────
+function carregarPlanilhaViva() {
+  const cont = document.getElementById('conteudoPlanilhaViva');
+  const KEY = 'tt_sfdtt_token';
+  const token = localStorage.getItem(KEY);
+
+  if (token) {
+    const vis = token.slice(0,8) + '…' + token.slice(-4);
+    cont.innerHTML = `
+      <div class="plano-card">
+        <div class="plano-nome">Planilha Viva</div>
+        <span class="plano-badge ativo">Código configurado</span>
+        <p style="font-size:14px;color:rgba(26,26,22,.6);line-height:1.8;margin:16px 0 24px">
+          Sistema Financeiro Doméstico — diagnóstico financeiro pessoal com inteligência adaptativa.
+        </p>
+        <a href="https://finintel.com.br/?u=${encodeURIComponent(token)}"
+           target="_blank" rel="noopener noreferrer" class="plano-acao"
+           style="text-decoration:none;display:inline-flex;margin-bottom:20px">
+          Acessar Planilha Viva →
+        </a>
+        <div style="margin-top:20px;font-size:12px;color:rgba(26,26,22,.35);line-height:1.8;border-top:1px solid var(--borda);padding-top:16px">
+          Código: <code style="font-family:monospace;background:rgba(26,74,46,.06);padding:2px 6px">${vis}</code><br>
+          <button onclick="localStorage.removeItem('tt_sfdtt_token');carregarPlanilhaViva()"
+            style="background:none;border:none;cursor:pointer;color:rgba(200,168,75,.7);font-family:'Jost',sans-serif;font-size:12px;padding:0;margin-top:6px;text-decoration:underline">
+            Alterar código de acesso
+          </button>
+        </div>
+      </div>`;
+  } else {
+    cont.innerHTML = `
+      <div class="plano-card">
+        <div class="plano-nome">Planilha Viva</div>
+        <p style="font-size:14px;color:rgba(26,26,22,.6);line-height:1.8;margin-bottom:24px">
+          Sistema Financeiro Doméstico — controle financeiro pessoal com diagnóstico adaptativo.<br>
+          Cole abaixo o código de acesso UUID que você recebeu.
+        </p>
+        <label class="campo-label" for="sfdttTokenInput">Código de acesso</label>
+        <input id="sfdttTokenInput" class="campo-input" type="text"
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          onkeydown="if(event.key==='Enter')salvarTokenSFDTT()">
+        <button onclick="salvarTokenSFDTT()" class="plano-acao"
+          style="border:none;cursor:pointer;font-family:'Jost',sans-serif">
+          Salvar e acessar →
+        </button>
+        <div style="margin-top:20px;font-size:12px;color:rgba(26,26,22,.35);line-height:1.8">
+          Não tem um código? Fale com a editora:<br>
+          <a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>
+        </div>
+      </div>`;
+  }
+}
+
+function salvarTokenSFDTT() {
+  const input = document.getElementById('sfdttTokenInput');
+  if (!input) return;
+  const token = input.value.trim();
+  if (!token || token.length < 32) {
+    toast('Código inválido. Cole o UUID completo recebido por e-mail.', 'erro');
+    return;
+  }
+  localStorage.setItem('tt_sfdtt_token', token);
+  window.open('https://finintel.com.br/?u=' + encodeURIComponent(token), '_blank');
+  carregarPlanilhaViva();
 }
 
 // ══════════════════════════════════════════════════════════
