@@ -117,6 +117,16 @@ nav{
 .login-voltar{margin-top:16px;text-align:center}
 .login-voltar a{font-size:12px;color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}
 .login-voltar a:hover{color:var(--ouro)}
+.login-divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.login-divider span{font-size:11px;letter-spacing:1px;color:rgba(26,26,22,.3);white-space:nowrap}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(26,74,46,.12)}
+.btn-secundario{width:100%;padding:12px;background:transparent;color:var(--ouro-claro);border:1px solid rgba(200,168,75,.35);font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.btn-secundario:hover{border-color:var(--ouro);background:rgba(200,168,75,.06)}
+.btn-secundario:disabled{opacity:.5;cursor:not-allowed}
+.campo-senha-wrap{position:relative;margin-bottom:20px}
+.campo-senha-wrap .campo-input{margin-bottom:0}
+.senha-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(26,26,22,.35);padding:4px;line-height:1;font-size:14px;transition:color .2s}
+.senha-toggle:hover{color:var(--ouro)}
 
 /* ══════════════════════════════════════════════════════════
    DASHBOARD
@@ -710,11 +720,19 @@ nav{
   <div class="login-box">
     <div class="login-logo">✦ Três Trevo</div>
     <p class="login-sub">Acesse sua biblioteca pessoal</p>
-    <label class="campo-label" for="emailLogin">Seu e-mail</label>
+    <label class="campo-label" for="emailLogin">E-mail</label>
     <input type="email" id="emailLogin" class="campo-input" placeholder="seu@email.com"
-      autocomplete="email" onkeydown="if(event.key==='Enter')enviarMagicLink()">
-    <button class="btn-primario" id="btnLogin" onclick="enviarMagicLink()">Receber link de acesso</button>
-    <p class="login-msg" id="msgLogin">Digite o e-mail usado na compra e enviaremos um link de acesso seguro.</p>
+      autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('senhaLogin').focus()">
+    <label class="campo-label" for="senhaLogin">Senha</label>
+    <div class="campo-senha-wrap">
+      <input type="password" id="senhaLogin" class="campo-input" placeholder="••••••••"
+        autocomplete="current-password" onkeydown="if(event.key==='Enter')entrarComSenha()">
+      <button class="senha-toggle" type="button" onclick="toggleSenha()" title="Mostrar/ocultar senha">👁</button>
+    </div>
+    <button class="btn-primario" id="btnSenha" onclick="entrarComSenha()">Entrar</button>
+    <div class="login-divider"><span>ou</span></div>
+    <button class="btn-secundario" id="btnMagic" onclick="enviarMagicLink()">Receber link por e-mail</button>
+    <p class="login-msg" id="msgLogin"></p>
     <div class="login-voltar"><a href="/">← Voltar ao site</a></div>
   </div>
 </div>
@@ -953,15 +971,44 @@ async function init() {
 }
 
 // ── LOGIN ─────────────────────────────────────────────────
-async function enviarMagicLink() {
+function emailValido() {
   const email = document.getElementById('emailLogin').value.trim();
-  const btn   = document.getElementById('btnLogin');
   const msg   = document.getElementById('msgLogin');
   if (!email || !email.includes('@')) {
     msg.textContent = 'Digite um e-mail válido.';
     msg.className = 'login-msg erro';
+    return null;
+  }
+  return email;
+}
+
+async function entrarComSenha() {
+  const email = emailValido();
+  if (!email) return;
+  const senha = document.getElementById('senhaLogin').value;
+  const btn   = document.getElementById('btnSenha');
+  const msg   = document.getElementById('msgLogin');
+  if (!senha) {
+    msg.textContent = 'Digite sua senha ou use o link por e-mail.';
+    msg.className = 'login-msg erro';
     return;
   }
+  btn.disabled = true;
+  btn.textContent = 'Entrando…';
+  const { error } = await sb.auth.signInWithPassword({ email, password: senha });
+  btn.disabled = false;
+  btn.textContent = 'Entrar';
+  if (error) {
+    msg.textContent = error.message.includes('Invalid login') ? 'E-mail ou senha incorretos.' : 'Erro: ' + error.message;
+    msg.className = 'login-msg erro';
+  }
+}
+
+async function enviarMagicLink() {
+  const email = emailValido();
+  if (!email) return;
+  const btn = document.getElementById('btnMagic');
+  const msg = document.getElementById('msgLogin');
   btn.disabled = true;
   btn.textContent = 'Enviando…';
   const { error } = await sb.auth.signInWithOtp({
@@ -969,7 +1016,7 @@ async function enviarMagicLink() {
     options: { emailRedirectTo: window.location.origin + '/area-cliente.html' }
   });
   btn.disabled = false;
-  btn.textContent = 'Receber link de acesso';
+  btn.textContent = 'Receber link por e-mail';
   if (error) {
     msg.textContent = 'Erro: ' + error.message;
     msg.className = 'login-msg erro';
@@ -977,6 +1024,11 @@ async function enviarMagicLink() {
     msg.innerHTML = '✦ Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style="opacity:.6">Pode levar até 2 minutos. Cheque o spam.</small>';
     msg.className = 'login-msg sucesso';
   }
+}
+
+function toggleSenha() {
+  const campo = document.getElementById('senhaLogin');
+  campo.type = campo.type === 'password' ? 'text' : 'password';
 }
 
 async function sair() {
@@ -1142,17 +1194,20 @@ function cardEbook(p, meta, i, libId) {
       }
       <div class="ebook-capa-emoji" style="${imgSrc ? 'display:none' : ''}">${emoji}</div>
       <div class="ebook-capa-grad"></div>
-      ${genero ? `<span class="ebook-capa-genero">${genero}</span>` : ''}
+      ${p.slug === 'atico' ? `<span class="ebook-capa-genero" style="background:rgba(200,123,27,.85);color:#fff">⚡ Beta</span>` : (genero ? `<span class="ebook-capa-genero">${genero}</span>` : '')}
     </div>
     <div class="ebook-body">
       <div class="ebook-titulo">${titulo}</div>
       <div class="ebook-autor">${autor}</div>
       <div class="ebook-footer">
         <span class="ebook-cotas">${cotas} cota${cotas !== 1 ? 's' : ''}</span>
-        <button class="btn-dl" id="dl-${p.id}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}')">
-          <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg>
-          PDF
-        </button>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${p.slug === 'atico' ? `<a href="ebook-atico-conteudo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(200,123,27,.12);border:1px solid rgba(200,123,27,.3);color:#7a5c1e;font-size:11px;font-weight:500;text-decoration:none;white-space:nowrap;border-radius:2px">⚡ Ler</a>` : ''}
+          <button class="btn-dl" id="dl-${p.id}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}')">
+            <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg>
+            PDF
+          </button>
+        </div>
         ${libId ? `<button onclick="event.stopPropagation();ocultarDaBiblioteca('${libId}',this)" title="Remover da biblioteca" style="background:none;border:none;cursor:pointer;color:rgba(26,26,22,.25);font-size:14px;padding:2px 4px;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(200,80,80,.7)'" onmouseout="this.style.color='rgba(26,26,22,.25)'">✕</button>` : ''}
       </div>
     </div>

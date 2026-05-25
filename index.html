@@ -599,6 +599,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
       <button class="filtro" onclick="filtrar('reflexao',this)" data-pt="Reflexão" data-en="Reflection" data-es="Reflexión">Reflexão</button>
       <button class="filtro" onclick="filtrar('ficcao',this)" data-pt="Ficção" data-en="Fiction" data-es="Ficción">Ficção</button>
       <button class="filtro" onclick="filtrar('manuais',this)" data-pt="Manuais" data-en="Guides" data-es="Manuales">Manuais</button>
+      <button class="filtro" onclick="filtrar('financas',this)" data-pt="Finanças" data-en="Finance" data-es="Finanzas">Finanças</button>
     </div>
   </div>
   <div class="grid-ebooks" role="list">
@@ -684,20 +685,24 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
     </article>
 
     <!-- Card Ático -->
-    <div class="ebook-card" data-categoria="financas">
+    <article class="ebook-card reveal" role="listitem" data-genero="financas"
+      onclick="location.href='atico.html'" style="cursor:pointer">
       <div class="ebook-emoji">⚡</div>
       <div class="ebook-genero">Finanças · Método</div>
       <h3 class="ebook-titulo">Antes do App, o Método</h3>
       <div class="ebook-autor">Said Anes</div>
       <p class="ebook-desc">Planilha + lista inteligente + Morning Brief. O método manual que o Ático vai automatizar. Early adopters ganham acesso beta garantido.</p>
+      <div class="ebook-premio-box">✦ Concorre ao sorteio cultural · 3 cotas + acesso beta garantido</div>
       <div class="ebook-footer">
         <div>
           <div class="ebook-preco">R$37,00</div>
           <div class="ebook-cotas">3 cotas + acesso beta</div>
         </div>
-        <a href="checkout.html?slug=atico" class="ebook-btn">Adquirir</a>
+        <a href="checkout.html?slug=atico"
+           class="ebook-btn" onclick="event.stopPropagation()"
+           data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
       </div>
-    </div>
+    </article>
 
   </div>
 </section>
