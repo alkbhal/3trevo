@@ -3162,6 +3162,7 @@ async function forjaCarregar() {
       id:      sp.id,
       tema:    sp.tema,
       status:  sp.status,
+      scores:  sp.scores,
       criado:  localMap.get(sp.id)?.criado || sp.created_at,
       created_at: sp.created_at,
       updated_at: sp.updated_at,
@@ -3199,6 +3200,26 @@ function forjaRenderizar() {
     const pct  = done ? 100 : Math.max(5, Math.round((FJ_ORDER.indexOf(st)+1)/FJ_ORDER.length*100));
     const cor  = fail ? 'var(--danger)' : done ? '#27ae60' : 'var(--ouro)';
     const caps = p.chapters ? `${p.chapters.filter(c=>c.status==='approved').length}/${p.chapters.length} caps ·` : '';
+    // Seção de mercados viáveis para escrita nativa
+    const langSection = (() => {
+      if (!done || !p.scores) return '';
+      const threshold = 72;
+      let sc;
+      try { sc = typeof p.scores === 'string' ? JSON.parse(p.scores) : p.scores; } catch { sc = {}; }
+      const disponiveis = ['en-US','es-ES','de-DE'].filter(l => (sc[l] ?? 0) >= threshold);
+      if (!disponiveis.length) return '';
+      const checks = disponiveis.map(l =>
+        `<label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);padding:4px 8px;border:1px solid var(--borda);border-radius:4px">
+          <input type="checkbox" checked data-lang="${l}" data-proj="${p.id}" style="accent-color:var(--ouro);cursor:pointer">
+          ${l} <span style="color:var(--text-muted);font-size:11px">${sc[l]}</span>
+        </label>`
+      ).join('');
+      return `<div style="margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--borda);border-radius:6px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:7px">✦ Mercados viáveis para escrita nativa:</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">${checks}</div>
+        <button class="btn btn-outline btn-sm" onclick="forjaSolicitarEscrita('${p.id}')">Solicitar escrita nos idiomas marcados</button>
+      </div>`;
+    })();
     const btns = done ? `
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
         <a href="${FORGE_API}/api/forge/preview/${p.id}" target="_blank" rel="noopener"
@@ -3213,7 +3234,7 @@ function forjaRenderizar() {
         </button>
         <button class="btn btn-outline btn-sm" id="custo-${p.id}"
            onclick="forjaMostrarCusto('${p.id}')">💰 Custo</button>
-      </div>` : fail ? `
+      </div>${langSection}` : fail ? `
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="btn btn-outline btn-sm" onclick="forjaRetry('${p.id}')">↺ Tentar novamente</button>
       </div>` : '';
@@ -3236,6 +3257,14 @@ function forjaRenderizar() {
       </div>
     </div>`;
   }).join('');
+}
+
+function forjaSolicitarEscrita(projectId) {
+  const cbs = document.querySelectorAll(`input[type="checkbox"][data-proj="${projectId}"][data-lang]:checked`);
+  const langs = [...cbs].map(cb => cb.dataset.lang);
+  if (!langs.length) { toast('Selecione pelo menos um idioma.', 'aviso'); return; }
+  // TODO: chamar POST /write/:projectId/lang/:lang quando o endpoint for implementado
+  toast(`Em breve: escrita nativa em ${langs.join(', ')} — endpoint em desenvolvimento.`, 'info');
 }
 
 async function forjaRetry(projectId) {
