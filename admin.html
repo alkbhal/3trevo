@@ -3259,12 +3259,38 @@ function forjaRenderizar() {
   }).join('');
 }
 
-function forjaSolicitarEscrita(projectId) {
+async function forjaSolicitarEscrita(projectId) {
   const cbs = document.querySelectorAll(`input[type="checkbox"][data-proj="${projectId}"][data-lang]:checked`);
   const langs = [...cbs].map(cb => cb.dataset.lang);
   if (!langs.length) { toast('Selecione pelo menos um idioma.', 'aviso'); return; }
-  // TODO: chamar POST /write/:projectId/lang/:lang quando o endpoint for implementado
-  toast(`Em breve: escrita nativa em ${langs.join(', ')} — endpoint em desenvolvimento.`, 'info');
+
+  toast(`Solicitando escrita nativa em ${langs.join(', ')}…`, 'info');
+
+  const results = await Promise.allSettled(
+    langs.map(lang => fetch(`${FORGE_URL}/write/${projectId}/lang/${lang}`, { method: 'POST' })
+      .then(async r => { const d = await r.json(); if (!r.ok) throw new Error(d.error || r.statusText); return d; })
+    )
+  );
+
+  let criados = [];
+  let erros = [];
+  for (const res of results) {
+    if (res.status === 'fulfilled') {
+      const d = res.value;
+      criados.push(d.lang);
+      fjProjects.unshift({ id: d.projectId, tema: `${fjProjects.find(p=>p.id===projectId)?.tema||''} [${d.lang}]`, status: 'writing', idiomas_saida: JSON.stringify([d.lang]), scores: '{}', created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+    } else {
+      erros.push(res.reason?.message || 'erro');
+    }
+  }
+
+  if (criados.length) {
+    localStorage.setItem(FJ_STORAGE, JSON.stringify(fjProjects));
+    forjaRenderizar();
+    forjaIniciarPolling();
+    toast(`Escrita nativa iniciada em: ${criados.join(', ')}. Acompanhe o progresso abaixo.`);
+  }
+  if (erros.length) toast(`Erro em ${erros.length} idioma(s): ${erros.join('; ')}`, 'erro');
 }
 
 async function forjaRetry(projectId) {
