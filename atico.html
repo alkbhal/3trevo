@@ -30,9 +30,16 @@
   --ouro2: #E8961F;
   --ourobg:rgba(200,123,27,.10);
   --ouroborder:rgba(200,123,27,.22);
-  --verde: #1A5C38;   /* eco do 3trevo, mais escuro */
-  --vermelho:#B93030;
-  --teal:  #0E8C7A;
+  --verde: #1F7A4D;   /* positivo — alinhado ao app */
+  --verdebg:#E8F5E9;
+  --vermelho:#B3261E;
+  --vermelhobg:#FFEBEE;
+  --teal:  #0E8C7A;   /* teal brilhante — acento de gráficos */
+  --brand: #0F4C4A;   /* Ático brand — teal profundo do app */
+  --brandbg:rgba(15,76,74,.10);
+  --brandborder:rgba(15,76,74,.22);
+  --branddeep:#0A3735;
+  --brandsoft:#E3EEED;
   --sombra:0 2px 20px rgba(26,23,20,.07),0 1px 4px rgba(26,23,20,.05);
   --sombra2:0 8px 48px rgba(26,23,20,.12),0 2px 8px rgba(26,23,20,.06);
 }
@@ -49,8 +56,8 @@ a{text-decoration:none;color:inherit}
 img{display:block}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:var(--s1)}
-::-webkit-scrollbar-thumb{background:var(--ouro)}
-a:focus-visible,button:focus-visible{outline:2px solid var(--ouro);outline-offset:3px}
+::-webkit-scrollbar-thumb{background:var(--brand)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
 
 /* ── UTILITÁRIOS ── */
 .container{max-width:1080px;margin:0 auto;padding:0 28px}
@@ -89,12 +96,12 @@ nav.sc{height:54px;border-color:var(--b2)}
 .nav-btn{
   font-family:'DM Sans',sans-serif;
   font-size:12px;font-weight:500;letter-spacing:.3px;
-  background:var(--tinta);color:var(--bg);
+  background:var(--brand);color:#fff;
   padding:8px 20px;
   transition:background .2s,transform .15s;
   display:inline-block;
 }
-.nav-btn:hover{background:var(--t2);transform:translateY(-1px)}
+.nav-btn:hover{background:var(--branddeep);transform:translateY(-1px)}
 @media(max-width:768px){
   nav{padding:0 20px}
   .nav-links,.nav-btn{display:none}
@@ -194,12 +201,12 @@ nav.sc{height:54px;border-color:var(--b2)}
 .hero-acoes{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .btn-a{
   display:inline-flex;align-items:center;gap:10px;
-  background:var(--tinta);color:var(--bg);
+  background:var(--brand);color:#fff;
   font-size:13px;font-weight:500;
   padding:13px 26px;
   transition:background .2s,transform .15s;
 }
-.btn-a:hover{background:var(--t2);transform:translateY(-1px)}
+.btn-a:hover{background:var(--branddeep);transform:translateY(-1px)}
 .btn-b{
   display:inline-flex;align-items:center;gap:8px;
   font-size:13px;color:var(--t3);
@@ -267,8 +274,8 @@ nav.sc{height:54px;border-color:var(--b2)}
   transition:color .15s;
 }
 .mn.on{
-  color:var(--ouro);background:var(--ourobg);
-  border-left:2px solid var(--ouro);
+  color:var(--brand);background:var(--brandbg);
+  border-left:2px solid var(--brand);
 }
 .mn:not(.on):hover{color:var(--t2)}
 .ms-sep{height:1px;background:var(--borda);margin:6px 0}
@@ -280,7 +287,7 @@ nav.sc{height:54px;border-color:var(--b2)}
 }
 .ms-av{
   width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(135deg,var(--ouro),var(--teal));
+  background:linear-gradient(135deg,var(--brand),var(--teal));
   display:flex;align-items:center;justify-content:center;
   font-size:9px;color:#fff;font-weight:700;
 }
@@ -325,13 +332,13 @@ nav.sc{height:54px;border-color:var(--b2)}
 .bl{font-size:8px;color:var(--t4)}
 /* Brief */
 .mbr{
-  background:linear-gradient(135deg,rgba(200,123,27,.06),rgba(14,140,122,.05));
-  border:1px solid var(--ouroborder);
+  background:linear-gradient(135deg,rgba(15,76,74,.06),rgba(14,140,122,.05));
+  border:1px solid var(--brandborder);
   padding:10px 12px;
 }
 .mbr-h{
   display:flex;align-items:center;gap:5px;
-  font-size:9px;color:var(--ouro);
+  font-size:9px;color:var(--brand);
   letter-spacing:1px;text-transform:uppercase;
   margin-bottom:7px;
 }
@@ -535,7 +542,7 @@ nav.sc{height:54px;border-color:var(--b2)}
 }
 .compra-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--ouro),var(--teal));
+  background:linear-gradient(90deg,var(--brand),var(--teal));
 }
 .compra-genero{
   font-size:10px;letter-spacing:3px;text-transform:uppercase;
@@ -574,13 +581,13 @@ nav.sc{height:54px;border-color:var(--b2)}
 .btn-compra{
   width:100%;
   display:flex;align-items:center;justify-content:center;gap:10px;
-  background:var(--tinta);color:var(--bg);
+  background:var(--brand);color:#fff;
   font-size:14px;font-weight:500;letter-spacing:.3px;
   padding:15px 24px;
   transition:background .2s,transform .15s;
   border:none;cursor:pointer;
 }
-.btn-compra:hover{background:var(--t2);transform:translateY(-1px)}
+.btn-compra:hover{background:var(--branddeep);transform:translateY(-1px)}
 .compra-nota{
   font-size:10px;color:var(--t4);
   text-align:center;margin-top:12px;line-height:1.6;
@@ -632,12 +639,12 @@ nav.sc{height:54px;border-color:var(--b2)}
 }
 .asst-avatar{
   width:34px;height:34px;
-  background:var(--ouro);
+  background:var(--brand);
   display:flex;align-items:center;justify-content:center;
   font-size:16px;border-radius:50%;
 }
 .asst-nome{font-size:13px;font-weight:500;color:#fff;margin-bottom:2px}
-.asst-status{font-size:10px;color:var(--ouro);letter-spacing:.5px}
+.asst-status{font-size:10px;color:var(--brandsoft);letter-spacing:.5px}
 .asst-msgs{
   padding:20px;
   display:flex;flex-direction:column;gap:12px;
@@ -689,9 +696,9 @@ nav.sc{height:54px;border-color:var(--b2)}
 }
 .asst-beta-note{
   padding:8px 16px;
-  background:var(--ourobg);
-  border-top:1px solid var(--ouroborder);
-  font-size:10px;color:var(--ouro);
+  background:var(--brandbg);
+  border-top:1px solid var(--brandborder);
+  font-size:10px;color:var(--brand);
   letter-spacing:1px;text-align:center;text-transform:uppercase;
 }
 
@@ -867,10 +874,10 @@ footer{
                 <div class="mm-data">Agora</div>
               </div>
               <div class="mc-grid">
-                <div class="mc">
-                  <div class="mc-l">Saldo</div>
-                  <div class="mc-v pos">R$4.280</div>
-                  <div class="mc-d">▲ +12%</div>
+                <div class="mc" style="background:var(--brand);border-color:transparent">
+                  <div class="mc-l" style="color:rgba(255,255,255,.7);letter-spacing:1.5px">Saldo</div>
+                  <div class="mc-v" style="color:#fff">R$4.280</div>
+                  <div class="mc-d" style="color:rgba(255,255,255,.65)">▲ +12%</div>
                 </div>
                 <div class="mc">
                   <div class="mc-l">Gastos</div>
@@ -880,7 +887,7 @@ footer{
                 <div class="mc">
                   <div class="mc-l">Investido</div>
                   <div class="mc-v neu">R$800</div>
-                  <div class="mc-d pos">✓ meta</div>
+                  <div class="mc-d" style="color:var(--verde)">✓ meta</div>
                 </div>
               </div>
               <div class="mg">
