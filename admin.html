@@ -457,7 +457,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
           <div class="stat-card"><div class="stat-icon">◻</div><div class="stat-label">Produtos Ativos</div><div class="stat-valor" id="st-produtos">—</div><div class="stat-sub">publicados</div></div>
           <div class="stat-card"><div class="stat-icon">◇</div><div class="stat-label">Rodadas Abertas</div><div class="stat-valor" id="st-rodadas">—</div><div class="stat-sub">em andamento</div></div>
           <div class="stat-card"><div class="stat-icon">≡</div><div class="stat-label">Total Participantes</div><div class="stat-valor" id="st-participantes">—</div><div class="stat-sub">todas as rodadas</div></div>
-          <div class="stat-card"><div class="stat-icon">✦</div><div class="stat-label">Próximo Sorteio</div><div class="stat-valor" id="st-proximo" style="font-size:22px">—</div><div class="stat-sub" id="st-proximo-sub">—</div></div>
+          <div class="stat-card"><div class="stat-icon">✦</div><div class="stat-label">Próxima Premiação</div><div class="stat-valor" id="st-proximo" style="font-size:22px">—</div><div class="stat-sub" id="st-proximo-sub">—</div></div>
         </div>
         <div class="grid-2">
           <div class="card">
@@ -669,7 +669,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
       <div class="secao" id="sec-sorteios">
         <div class="secao-topo" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
-            <div class="secao-titulo">Rodadas de Sorteio</div>
+            <div class="secao-titulo">Ciclos de Premiação</div>
             <div class="secao-sub">Gerencie as rodadas do Programa Cultural</div>
           </div>
           <button class="btn btn-ouro" onclick="abrirModalNovaDraw()">+ Nova Rodada</button>
@@ -1234,7 +1234,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
           <input type="text" class="f-input" id="draw-titulo-in" placeholder="Ex: Rodada Maio 2025">
         </div>
         <div class="campo">
-          <label class="campo-label">Data do sorteio</label>
+          <label class="campo-label">Data da premiação</label>
           <input type="date" class="f-input" id="draw-data">
         </div>
       </div>
@@ -1393,7 +1393,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
 <div class="modal-overlay" id="modal-executar-sorteio">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-titulo">▶ Executar Sorteio</div>
+      <div class="modal-titulo">▶ Executar Premiação</div>
       <button class="modal-fechar" onclick="fecharModal('modal-executar-sorteio')">✕</button>
     </div>
     <div class="modal-body">
@@ -1410,7 +1410,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
     </div>
     <div class="modal-footer" id="exec-footer">
       <button class="btn btn-outline" onclick="fecharModal('modal-executar-sorteio')">Cancelar</button>
-      <button class="btn btn-ouro" id="btn-executar-sorteio" onclick="executarSorteio()">▶ Executar Sorteio Agora</button>
+      <button class="btn btn-ouro" id="btn-executar-sorteio" onclick="executarSorteio()">▶ Executar Premiação Agora</button>
     </div>
   </div>
 </div>
@@ -2040,7 +2040,7 @@ async function carregarSorteios() {
         <button class="btn btn-outline btn-sm" onclick="editarDraw('${d.id}')">Editar</button>
         <button class="btn btn-outline btn-sm" onclick="abrirVencedores('${d.id}')">Vencedores</button>
         <button class="btn btn-outline btn-sm" onclick="abrirCartela('${d.id}','${escHtml(d.titulo||'')}',${d.max_numeros||100000})">🎯 Cartela</button>
-        ${d.status === 'closed' || d.status === 'aguardando_qualificacao' || (d.status !== 'open' && d.status !== 'drawn') ? `<button class="btn btn-ouro btn-sm" onclick="abrirModalExecutarSorteio('${d.id}','${escHtml(d.titulo||'')}')">▶ Executar Sorteio</button>` : ''}
+        ${d.status === 'closed' || d.status === 'aguardando_qualificacao' || (d.status !== 'open' && d.status !== 'drawn') ? `<button class="btn btn-ouro btn-sm" onclick="abrirModalExecutarSorteio('${d.id}','${escHtml(d.titulo||'')}')">▶ Executar Premiação</button>` : ''}
         ${d.status === 'drawn' ? `<a class="btn btn-outline btn-sm" href="/auditoria-sorteio.html?draw_id=${d.id}" target="_blank">🔒 Ver Auditoria</a>` : ''}
         <button class="btn btn-danger btn-sm" onclick="deletarDraw('${d.id}')">Del</button>
       </div>
@@ -2299,7 +2299,7 @@ function abrirModalExecutarSorteio(drawId, titulo) {
   document.getElementById('exec-resultado').style.display = 'none';
   document.getElementById('exec-resultado').innerHTML = '';
   document.getElementById('btn-executar-sorteio').disabled = false;
-  document.getElementById('btn-executar-sorteio').textContent = '▶ Executar Sorteio Agora';
+  document.getElementById('btn-executar-sorteio').textContent = '▶ Executar Premiação Agora';
   document.getElementById('exec-footer').style.display = 'flex';
   document.getElementById('modal-executar-sorteio').classList.add('aberto');
 }
@@ -2309,14 +2309,14 @@ async function executarSorteio() {
   const seed = document.getElementById('exec-seed').value.trim();
   const btn  = document.getElementById('btn-executar-sorteio');
 
-  if (!confirm('Esta ação é irreversível. O sorteio será executado, vencedores definidos e emails enviados. Confirmar?')) return;
+  if (!confirm('Esta ação é irreversível. A premiação será executada, beneficiários definidos e e-mails enviados. Confirmar?')) return;
 
   btn.disabled = true;
   btn.textContent = '⏳ Executando...';
 
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { toast('Sessão expirada. Faça login novamente.', 'erro'); btn.disabled = false; btn.textContent = '▶ Executar Sorteio Agora'; return; }
+    if (!session) { toast('Sessão expirada. Faça login novamente.', 'erro'); btn.disabled = false; btn.textContent = '▶ Executar Premiação Agora'; return; }
 
     const body = { draw_id: execDrawId };
     if (seed) body.admin_seed = seed;
@@ -2351,7 +2351,7 @@ async function executarSorteio() {
 
     elRes.innerHTML = `
       <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.25);padding:20px;margin-top:16px">
-        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.6);margin-bottom:12px">Sorteio realizado com sucesso</div>
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.6);margin-bottom:12px">Premiação realizada com sucesso</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fdfbf7;margin-bottom:12px">
           🥇 ${escHtml(w1?.email_masked || '—')}<br>
           🥈 ${escHtml(w2?.email_masked || '—')}
@@ -2364,12 +2364,12 @@ async function executarSorteio() {
         </a>
       </div>`;
 
-    btn.textContent = '✓ Sorteio realizado';
+    btn.textContent = '✓ Premiação realizada';
     document.getElementById('exec-footer').innerHTML = `
       <button class="btn btn-outline" onclick="fecharModal('modal-executar-sorteio');carregarSorteios()">Fechar</button>`;
     carregarSorteios();
     carregarDashboard();
-    toast('Sorteio executado! Vencedores notificados.', 'ok');
+    toast('Premiação executada! Beneficiários notificados.', 'ok');
 
   } catch(e) {
     toast('Erro inesperado: ' + e.message, 'erro');

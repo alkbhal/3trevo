@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Auditoria do Sorteio — Editora Três Trevo</title>
-<meta name="description" content="Verificação pública e auditável dos sorteios do Programa Cultural Três Trevo.">
+<title>Auditoria da Premiação — Editora Três Trevo</title>
+<meta name="description" content="Verificação pública e auditável das premiações do Programa Cultural Três Trevo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -144,10 +144,10 @@ footer{background:rgba(0,0,0,.3);padding:24px 48px;font-size:11px;color:rgba(255
 
 <section class="hero">
   <div class="hero-label">&#10022; Transparencia Total</div>
-  <h1 class="hero-titulo">Auditoria do Sorteio</h1>
+  <h1 class="hero-titulo">Auditoria da Premiação</h1>
   <p class="hero-desc">
-    Todos os sorteios sao executados com algoritmo deterministico de cartela de numeros e seed publico.
-    Qualquer pessoa pode verificar a integridade e reproduzir exatamente qual numero sairia dado o mesmo seed.
+    Todas as premiações são executadas com algoritmo determinístico de cartela de números e seed público.
+    Qualquer pessoa pode verificar a integridade e reproduzir exatamente qual número sairia dado o mesmo seed.
   </p>
 </section>
 
@@ -156,7 +156,7 @@ footer{background:rgba(0,0,0,.3);padding:24px 48px;font-size:11px;color:rgba(255
     <div class="search-titulo">Selecionar Rodada</div>
     <div class="input-row">
       <select class="input-sel" id="selectDraw">
-        <option value="">Carregando sorteios...</option>
+        <option value="">Carregando premiações...</option>
       </select>
       <button class="btn-buscar" onclick="carregarAuditoria()">Ver Auditoria</button>
     </div>
@@ -167,7 +167,7 @@ footer{background:rgba(0,0,0,.3);padding:24px 48px;font-size:11px;color:rgba(255
 
 <footer>
   Editora Tres Trevo &middot; CNPJ 18.928.966/0001-59 &middot; Montauri/RS &middot; sac@3trevo.com.br<br>
-  <span style="color:rgba(255,255,255,.12)">Sorteios auditaveis publicamente &middot; Algoritmo: cartela-mulberry32</span>
+  <span style="color:rgba(255,255,255,.12)">Premiações auditáveis publicamente &middot; Algoritmo: cartela-mulberry32</span>
 </footer>
 
 <script>
@@ -219,15 +219,15 @@ async function init() {
 
   const sel = document.getElementById('selectDraw');
   if (!draws || draws.length === 0) {
-    sel.innerHTML = '<option value="">Nenhum sorteio realizado ainda</option>';
+    sel.innerHTML = '<option value="">Nenhuma premiação realizada ainda</option>';
     return;
   }
 
-  sel.innerHTML = '<option value="">-- Escolha um sorteio --</option>';
+  sel.innerHTML = '<option value="">-- Escolha uma premiação --</option>';
   draws.forEach(function(d) {
     const opt = document.createElement('option');
     opt.value = d.id;
-    opt.textContent = d.titulo || 'Sorteio';
+    opt.textContent = d.titulo || 'Premiação';
     if (d.id === drawIdParam) opt.selected = true;
     sel.appendChild(opt);
   });
@@ -250,7 +250,7 @@ async function carregarAuditoria(forceId) {
   ]);
 
   if (auditRes.error || !auditRes.data) {
-    el.innerHTML = '<div style="padding:0 48px 48px"><div class="msg-erro">Auditoria nao encontrada para este sorteio.</div></div>';
+    el.innerHTML = '<div style="padding:0 48px 48px"><div class="msg-erro">Auditoria nao encontrada para esta premiação.</div></div>';
     return;
   }
 
@@ -286,11 +286,11 @@ function renderAuditoria(audit, draw) {
   el.innerHTML =
     '<div class="card">' +
     '  <div class="card-header">' +
-    '    <div class="card-titulo">' + escapeHtml((draw && draw.titulo) || 'Sorteio') + '</div>' +
+    '    <div class="card-titulo">' + escapeHtml((draw && draw.titulo) || 'Premiação') + '</div>' +
     '    <div class="card-sub">Rodada &middot; ' + escapeHtml(dataExec) + ' (horario de Brasilia)</div>' +
     '  </div>' +
     '  <div class="numero-destaque">' +
-    '    <div class="numero-label">Numero Sorteado</div>' +
+    '    <div class="numero-label">Número Selecionado</div>' +
     '    <div class="numero-valor">' + (audit.numero_sorteado||0).toLocaleString('pt-BR') + '</div>' +
     '    <div class="numero-sub">De uma cartela com <strong style="color:var(--branco)">' + totalAtribuidos.toLocaleString('pt-BR') + '</strong> numeros atribuidos de ' + maxN.toLocaleString('pt-BR') + ' possiveis</div>' +
     '  </div>' +
@@ -301,7 +301,7 @@ function renderAuditoria(audit, draw) {
     '    <div class="meta-item"><div class="meta-label">Seed utilizado</div><div class="meta-valor mono">' + escapeHtml(audit.seed) + '</div></div>' +
     '  </div>' +
     '  <div class="winners-section">' +
-    '    <div class="section-titulo">Resultado do Sorteio</div>' +
+    '    <div class="section-titulo">Resultado da Premiação</div>' +
     '    <div class="winner-cards">' +
     (winner1 ?
       '<div class="winner-card primeiro">' +
@@ -333,7 +333,7 @@ function renderAuditoria(audit, draw) {
     '  </div>' +
     '  <div class="hash-section">' +
     '    <div class="section-titulo">Integridade &amp; Verificacao</div>' +
-    '    <p style="font-size:13px;color:var(--texto-s);line-height:1.7;margin-bottom:4px">O hash SHA-256 abaixo foi calculado no momento do sorteio a partir do JSON canonico (participantes ordenados por user_id + seed + numero sorteado + resultado). Qualquer alteracao nos dados produziria um hash diferente.</p>' +
+    '    <p style="font-size:13px;color:var(--texto-s);line-height:1.7;margin-bottom:4px">O hash SHA-256 abaixo foi calculado no momento da premiação a partir do JSON canonico (participantes ordenados por user_id + seed + numero selecionado + resultado). Qualquer alteracao nos dados produziria um hash diferente.</p>' +
     '    <div class="meta-label" style="margin-top:16px">Hash SHA-256 registrado</div>' +
     '    <div class="hash-valor" id="hashRegistrado">' + escapeHtml(audit.hash_sha256||'') + '</div>' +
     '    <div class="acoes-grid">' +
@@ -346,10 +346,10 @@ function renderAuditoria(audit, draw) {
     '  <div class="algo-section">' +
     '    <div class="section-titulo">Como funciona o algoritmo</div>' +
     '    <div class="algo-steps">' +
-    '      <div class="algo-step"><div class="step-num">1</div><div class="step-txt"><strong>Cartela de numeros:</strong> cada compra atribui N numeros unicos aleatorios (de 1 a ' + maxN.toLocaleString('pt-BR') + ') ao comprador. Os numeros sao sorteados com crypto.getRandomValues e persistidos em draw_numbers.</div></div>' +
+    '      <div class="algo-step"><div class="step-num">1</div><div class="step-txt"><strong>Cartela de numeros:</strong> cada compra atribui N numeros unicos aleatorios (de 1 a ' + maxN.toLocaleString('pt-BR') + ') ao comprador. Os numeros são selecionados com crypto.getRandomValues e persistidos em draw_numbers.</div></div>' +
     '      <div class="algo-step"><div class="step-num">2</div><div class="step-txt"><strong>Geracao do seed:</strong> combinacao de timestamp (ms) + SHA-256 dos pares numero:user_id da cartela. O admin pode fornecer um seed personalizado para auditabilidade maxima.</div></div>' +
     '      <div class="algo-step"><div class="step-num">3</div><div class="step-txt"><strong>PRNG Mulberry32:</strong> algoritmo deterministico de 32 bits. Dado o mesmo seed, produz <em>exatamente a mesma sequencia</em> em qualquer ambiente. Nao depende de servidor.</div></div>' +
-    '      <div class="algo-step"><div class="step-num">4</div><div class="step-txt"><strong>Sorteio do numero:</strong> gera inteiros em [1..' + maxN.toLocaleString('pt-BR') + '] ate cair em um numero atribuido na cartela. O dono desse numero e o vencedor. Maximo 2000 tentativas; fallback por selecao direta na lista.</div></div>' +
+    '      <div class="algo-step"><div class="step-num">4</div><div class="step-txt"><strong>Seleção do número:</strong> gera inteiros em [1..' + maxN.toLocaleString('pt-BR') + '] ate cair em um numero atribuido na cartela. O dono desse numero e o vencedor. Maximo 2000 tentativas; fallback por selecao direta na lista.</div></div>' +
     '      <div class="algo-step"><div class="step-num">5</div><div class="step-txt"><strong>Auditoria imutavel:</strong> hash SHA-256 do JSON canonico (participantes + seed + numeros + resultado) e calculado e persistido. Qualquer alteracao nos dados quebraria o hash.</div></div>' +
     '    </div>' +
     '  </div>' +
@@ -437,7 +437,7 @@ async function verificarIntegridade() {
     btn.classList.add('success');
     btn.textContent = 'Hash verificado';
     el.className = 'verify-result ok';
-    el.innerHTML = '<strong>Integridade confirmada</strong><br>O hash SHA-256 calculado agora no seu browser e identico ao hash registrado no sorteio. Os dados nao foram alterados desde o momento do sorteio.<pre>Hash calculado:  ' + computedHash + '\nHash registrado: ' + registeredHash + '</pre>';
+    el.innerHTML = '<strong>Integridade confirmada</strong><br>O hash SHA-256 calculado agora no seu browser é idêntico ao hash registrado na premiação. Os dados não foram alterados desde o momento da premiação.<pre>Hash calculado:  ' + computedHash + '\nHash registrado: ' + registeredHash + '</pre>';
   } else {
     btn.classList.add('fail');
     btn.textContent = 'Hash diverge';
@@ -495,7 +495,7 @@ async function reproduzirSorteio() {
     btn.classList.add('fail');
     btn.textContent = 'Divergencia';
     el.className = 'verify-result err';
-    el.innerHTML = '<strong>Divergencia na reproducao</strong><br>Numero reproduzido: <strong>' + num1.toLocaleString('pt-BR') + '</strong> &mdash; Numero registrado: <strong>' + (numRegistrado||0).toLocaleString('pt-BR') + '</strong>.<br>Possivel causa: a cartela no snapshot difere da usada no sorteio original.';
+    el.innerHTML = '<strong>Divergencia na reproducao</strong><br>Numero reproduzido: <strong>' + num1.toLocaleString('pt-BR') + '</strong> &mdash; Numero registrado: <strong>' + (numRegistrado||0).toLocaleString('pt-BR') + '</strong>.<br>Possivel causa: a cartela no snapshot difere da usada na premiação original.';
   }
 }
 
@@ -510,7 +510,7 @@ function downloadCartela() {
   var w1num = (resultado.find(function(r){ return r.posicao===1; }) || {}).numero_sorteado;
   var w2num = (resultado.find(function(r){ return r.posicao===2; }) || {}).numero_sorteado;
 
-  var linhas = ['numero,email_mascarado,origem,sorteado'];
+  var linhas = ['numero,email_mascarado,origem,selecionado'];
   audit.cartela.forEach(function(n) {
     var sorteado = n.numero===w1num ? '1o_lugar' : n.numero===w2num ? '2o_lugar' : '';
     linhas.push(n.numero + ',' + (n.email_masked||'') + ',' + (n.origem||'') + ',' + sorteado);
@@ -520,7 +520,7 @@ function downloadCartela() {
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');
   a.href     = url;
-  a.download = 'cartela-sorteio-' + audit.draw_id + '.csv';
+  a.download = 'cartela-premiacao-' + audit.draw_id + '.csv';
   a.click();
   URL.revokeObjectURL(url);
 }

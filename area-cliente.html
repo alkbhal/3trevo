@@ -770,7 +770,7 @@ nav{
   <div class="abas" role="tablist">
     <button class="aba ativa" onclick="trocarAba('biblioteca',this)" role="tab" aria-selected="true">Biblioteca</button>
     <button class="aba" onclick="trocarAba('musicas',this)" role="tab">Músicas</button>
-    <button class="aba" onclick="trocarAba('sorteios',this)" role="tab">Sorteios</button>
+    <button class="aba" onclick="trocarAba('sorteios',this)" role="tab">Premiações</button>
     <button class="aba" onclick="trocarAba('extrato',this)" role="tab">Extrato</button>
     <button class="aba" onclick="trocarAba('assinatura',this)" role="tab">Assinatura</button>
     <button class="aba" onclick="trocarAba('planilhaviva',this)" role="tab">Planilha Viva</button>
@@ -794,14 +794,14 @@ nav{
 
   <!-- ── ABA: SORTEIOS ── -->
   <div id="aba-sorteios" class="aba-conteudo" role="tabpanel">
-    <div class="sec-titulo">Programa Cultural — Sorteios</div>
+    <div class="sec-titulo">Programa Cultural — Premiações</div>
     <!-- Meus números na rodada atual -->
     <div id="meus-numeros-wrap" style="display:none;margin-bottom:24px">
       <div style="background:rgba(200,168,75,.05);border:1px solid rgba(200,168,75,.18);padding:20px;position:relative">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
         <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">Meus Números — Rodada Atual</div>
         <div id="meus-numeros-lista" style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--branco);line-height:1.8;margin-bottom:12px">—</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.35)">Cada número representa uma chance de ser sorteado</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.35)">Cada número representa uma cota de participação</div>
       </div>
       <!-- Barra de progresso da meta -->
       <div style="margin-top:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:16px">
@@ -1462,9 +1462,9 @@ async function carregarSorteios() {
 
       const faltam = Math.max(0, metaTotal - metaAtual);
       if (faltam <= 0) {
-        document.getElementById('meta-faltam').textContent = 'Meta atingida — aguardando sorteio';
+        document.getElementById('meta-faltam').textContent = 'Meta atingida — aguardando premiação';
       } else {
-        document.getElementById('meta-faltam').textContent = `Faltam ${fmt(faltam)} para o sorteio`;
+        document.getElementById('meta-faltam').textContent = `Faltam ${fmt(faltam)} para a premiação`;
       }
     } else {
       wrap.style.display = 'none';
@@ -1484,8 +1484,8 @@ async function carregarSorteios() {
   if (draws.length === 0) {
     html += `<div class="vazio">
       <div class="vazio-icone">🎯</div>
-      <div class="vazio-titulo">Nenhum sorteio aberto</div>
-      <p class="vazio-texto">Nenhum sorteio em andamento no momento.<br>Fique de olho — novos sorteios são anunciados pelo e-mail.</p>
+      <div class="vazio-titulo">Nenhuma premiação aberta</div>
+      <p class="vazio-texto">Nenhuma premiação em andamento no momento.<br>Fique de olho — novas premiações são anunciadas pelo e-mail.</p>
     </div>`;
   } else {
     const partes = await Promise.all(draws.map(async (draw) => {
@@ -1503,8 +1503,8 @@ async function carregarSorteios() {
       const purchasesPendentes  = purchases.filter(p => !purchasesComEntry.has(p.id));
 
       return `<div class="sorteio-card">
-        <div class="sorteio-status">Sorteio aberto</div>
-        <div class="sorteio-titulo">${draw.titulo || 'Sorteio'}</div>
+        <div class="sorteio-status">Premiação aberta</div>
+        <div class="sorteio-titulo">${draw.titulo || 'Premiação'}</div>
         ${(draw.premio_1 || draw.premio_2) ? `<div class="sorteio-premios">
           ${draw.premio_1 ? `1° — <strong>${draw.premio_1}</strong>` : ''}
           ${draw.premio_2 ? `&nbsp;·&nbsp; 2° — ${draw.premio_2}` : ''}
@@ -1607,7 +1607,7 @@ async function carregarSorteios() {
           destaque = `<div style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.4);padding:20px;margin-bottom:20px;position:relative">
             <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
             <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">${pos}</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:4px">Você foi sorteado(a)!</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:4px">Você foi selecionado(a)!</div>
             <div style="font-size:12px;color:rgba(255,255,255,.5)">Parabéns! Verifique seu e-mail para instruções de resgate do prêmio.</div>
           </div>`;
         }
@@ -1616,7 +1616,7 @@ async function carregarSorteios() {
           <div class="vencedor-row">
             <div class="vencedor-pos">${w.posicao}°</div>
             <div class="vencedor-info">
-              <div class="vencedor-nome">${w.nome_publico || 'Ganhador'}</div>
+              <div class="vencedor-nome">${w.nome_publico || 'Beneficiário'}</div>
               <div class="vencedor-data">${w.draws?.titulo || ''}</div>
             </div>
             <div style="text-align:right;flex-shrink:0">
@@ -1813,11 +1813,11 @@ async function carregarAssinatura() {
       <span class="plano-badge sem-plano">Gratuito</span>
       <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:24px">
         Com a assinatura você acessa músicas autorais, bônus exclusivos e
-        aumenta suas chances no Programa Cultural.
+        amplia sua elegibilidade no Programa Cultural.
       </p>
       <div class="plano-beneficios">
         <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso ilimitado às faixas da editora</div>
-        <div class="beneficio-item"><strong>Cotas bônus</strong>Multiplicador de cotas nos sorteios</div>
+        <div class="beneficio-item"><strong>Cotas bônus</strong>Multiplicador de cotas nas premiações</div>
         <div class="beneficio-item"><strong>Lançamentos antecipados</strong>Acesso antes do público geral</div>
         <div class="beneficio-item"><strong>Conteúdo exclusivo</strong>Material complementar dos títulos</div>
       </div>

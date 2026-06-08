@@ -216,7 +216,7 @@ footer{background:rgba(0,0,0,0.3);padding:20px 32px;font-size:11px;color:rgba(25
         <div class="req-check" id="checkWhatsapp"></div>
         <div class="req-info">
           <strong>Entrar no grupo WhatsApp</strong>
-          <span>Dobra o número de cotas para o sorteio</span>
+          <span>Dobra o número de cotas de participação</span>
         </div>
         <span class="req-badge bonus">+BÔNUS</span>
       </div>
@@ -235,7 +235,7 @@ footer{background:rgba(0,0,0,0.3);padding:20px 32px;font-size:11px;color:rgba(25
       <div class="cotas-num" id="numCotas">1</div>
       <div class="cotas-txt">
         <strong id="txtCotasBase">1 cota de participação</strong>
-        <span id="txtCotasDesc">Cumpra os bônus para aumentar suas chances</span>
+        <span id="txtCotasDesc">Cumpra os bônus para ampliar sua elegibilidade</span>
         <div class="cotas-bônus" id="txtBonus" style="display:none"></div>
       </div>
     </div>
@@ -255,8 +255,8 @@ footer{background:rgba(0,0,0,0.3);padding:20px 32px;font-size:11px;color:rgba(25
     <div class="sucesso-icone">🎉</div>
     <h2 class="sucesso-titulo">Participação confirmada!</h2>
     <span class="sucesso-cotas" id="sucCotas">3</span>
-    <div class="sucesso-cotas-txt">COTAS NO SORTEIO</div>
-    <p class="sucesso-txt" style="margin-top:16px">Você receberá a confirmação por e-mail e WhatsApp. Boa sorte!</p>
+    <div class="sucesso-cotas-txt">COTAS DE PARTICIPAÇÃO</div>
+    <p class="sucesso-txt" style="margin-top:16px">Você receberá a confirmação por e-mail e WhatsApp. Boa participação!</p>
     <a href="https://www.instagram.com/3trevo" style="display:inline-block;padding:12px 28px;background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.3);color:var(--ouro);text-decoration:none;font-size:13px;margin-top:8px">Acompanhar @3trevo →</a>
   </div>
 
@@ -329,7 +329,7 @@ function calcularCotas() {
     document.getElementById('txtCotasDesc').textContent = 'Bônus aplicados ✓';
   } else {
     document.getElementById('txtBonus').style.display = 'none';
-    document.getElementById('txtCotasDesc').textContent = 'Cumpra os bônus para aumentar suas chances';
+    document.getElementById('txtCotasDesc').textContent = 'Cumpra os bônus para ampliar sua elegibilidade';
   }
   verificarBotao();
 }
