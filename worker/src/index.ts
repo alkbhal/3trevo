@@ -1,8 +1,11 @@
-interface Env {
+import { handleCheckoutWebhook, gatewayPlaceholder } from './checkout-proprio';
+
+export interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_KEY: string;
   ADMIN_SENHA?: string;
   RIFEI_WEBHOOK_SECRET?: string;
+  CHECKOUT_WEBHOOK_SECRET?: string; // checkout próprio — gateway ainda não escolhido (spec 5B.3)
   FORGE_STORAGE?: R2Bucket;
   ANTHROPIC_API_KEY?: string;
 }
@@ -14,15 +17,15 @@ const CORS_HEADERS = {
   'Access-Control-Max-Age': '86400',
 };
 
-function corsResponse(body: unknown, status = 200): Response {
+export function corsResponse(body: unknown, status = 200): Response {
   return Response.json(body, { status, headers: CORS_HEADERS });
 }
 
-function errorResponse(message: string, status = 400): Response {
+export function errorResponse(message: string, status = 400): Response {
   return corsResponse({ error: message, ok: false }, status);
 }
 
-function sbFetch(env: Env, path: string, opts: RequestInit = {}): Promise<Response> {
+export function sbFetch(env: Env, path: string, opts: RequestInit = {}): Promise<Response> {
   return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
     ...opts,
     headers: {
@@ -107,7 +110,7 @@ async function requerAuth(env: Env, req: Request): Promise<Response | null> {
   return null;
 }
 
-async function registrarAuditoria(
+export async function registrarAuditoria(
   env: Env,
   tabela: string,
   operacao: string,
@@ -554,6 +557,8 @@ export default {
       }
       if (path === '/api/lgpd' && method === 'POST') return handleLgpd(env, req);
       if (path === '/api/webhook/rifei' && method === 'POST') return handleWebhookRifei(env, req);
+      // Checkout próprio — substitui a Rifei. Gateway a definir (spec 5B.3); ver checkout-proprio.ts
+      if (path === '/api/checkout/webhook' && method === 'POST') return handleCheckoutWebhook(env, req, gatewayPlaceholder);
       if (path === '/api/webhook/forge' && method === 'POST') return handleWebhookForge(env, req);
       if (path.startsWith('/api/forge/preview/') && method === 'GET') return handleForgePreview(env, path.split('/').pop() ?? '');
       if (path.startsWith('/api/forge/summary/') && method === 'GET') return handleForgeSummary(env, path.split('/').pop() ?? '');
