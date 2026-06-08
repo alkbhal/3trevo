@@ -1448,7 +1448,7 @@ let produtosCache = [];
 
 // Permissões por role
 const PODE = {
-  verNav:    { gestor:['dashboard','produtos','novo-produto','sorteios','participantes','conteudo','equipe','afiliados','forja','conta'], escritor:['extrato','manuscritos','conta'], vendas:['dashboard','vendas-dash','sorteios','participantes','conta'], design:['produtos','novo-produto','conteudo','conta'] },
+  verNav:    { gestor:['dashboard','vendas-dash','produtos','novo-produto','sorteios','participantes','conteudo','equipe','afiliados','forja','conta'], escritor:['extrato','manuscritos','conta'], vendas:['dashboard','vendas-dash','sorteios','participantes','conta'], design:['produtos','novo-produto','conteudo','conta'] },
 };
 function podeVer(sec) { return (PODE.verNav[currentRole] || []).includes(sec); }
 
@@ -1603,6 +1603,8 @@ function irPara(sec, el) {
   fecharMobileNav();
   if (sec === 'novo-produto' && !produtoEditId) limparFormProduto();
   if (sec === 'participantes') carregarParticipantes();
+  if (sec === 'vendas-dash')   carregarVendasDash();
+  if (sec === 'afiliados')     carregarAfiliados();
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────
@@ -1617,9 +1619,11 @@ function toast(msg, tipo='info') {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────
 async function carregarDashboard() {
-  // Produtos ativos — count real + lista recente separados
-  const { count: totalProds } = await sb.from('products').select('id',{count:'exact',head:true});
-  const { count: ativosCount } = await sb.from('products').select('id',{count:'exact',head:true}).eq('ativo',true);
+  // Produtos ativos — count via select (HEAD com count:exact gera 503 no plano atual)
+  const { data: _allProds }   = await sb.from('products').select('id');
+  const { data: _ativosProds } = await sb.from('products').select('id').eq('ativo',true);
+  const totalProds  = (_allProds||[]).length;
+  const ativosCount = (_ativosProds||[]).length;
   const { data: prods } = await sb.from('products').select('id,titulo,tipo,ativo,criado_em').order('criado_em',{ascending:false}).limit(5);
   document.getElementById('st-produtos').textContent = ativosCount || 0;
   document.getElementById('badge-produtos').textContent = totalProds || 0;
@@ -1638,9 +1642,9 @@ async function carregarDashboard() {
     document.getElementById('st-proximo-sub').textContent = proxima.titulo;
   }
 
-  // Participantes
-  const { count } = await sb.from('draw_entries').select('id',{count:'exact',head:true});
-  document.getElementById('st-participantes').textContent = count || 0;
+  // Participantes — count via select (HEAD com count:exact gera 503 no plano atual)
+  const { data: _entries } = await sb.from('draw_entries').select('id');
+  document.getElementById('st-participantes').textContent = (_entries||[]).length;
 
   // Listas
   const dashProds = document.getElementById('dash-produtos-lista');
