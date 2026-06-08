@@ -2,12 +2,6 @@
 **Três Trevo | Uso interno, afiliados e promoters**
 **Data:** 8 de junho de 2026
 
-> **Nota de atualização pendente:** A "Frase-Blindagem" (Seção 3) e o Checklist (Seção 4)
-> ainda referenciam o **modelo antigo** ("redação ≥80 palavras", "seguidores verificados",
-> "desempenho de rede social"). O modelo aprovado em 2026-06-08 é:
-> **Depoimento (1 frase, 2 dimensões) + Questionário de Interesse anônimo, sem redes sociais.**
-> Atualizar as seções 3 e 4 antes de distribuir para afiliados.
-
 ---
 
 ## 1. Termos Vedados — nunca usar, nem internamente com afiliados
@@ -46,16 +40,13 @@
 
 ## 3. Frase-Blindagem — para documento formal e brief de afiliados
 
-> ⚠️ **Atualizar antes de distribuir** — a versão abaixo contém referências ao modelo antigo
-> (80 palavras, seguidores). Substituir pelo modelo vigente: depoimento + questionário anônimo.
-
 > **Natureza jurídica:** O Programa Cultural Três Trevo é um programa de **seleção por
-> critérios de elegibilidade e desempenho**, não um jogo de azar. A participação envolve:
-> (1) aquisição do ebook como produto de valor cultural; (2) realização de atividade editorial
-> (~~redação crítica ≥80 palavras~~ → **depoimento com as duas dimensões exigidas**);
-> (3) ~~verificação de rede social~~ → **questionário de interesse anônimo (voluntário)**.
-> A alocação de prêmios resulta de **análise de dados** (critérios pré-definidos), não sorteio
-> aleatório. Cada participante recebe cotas proporcionais à sua contribuição verificável.
+> critérios de elegibilidade e contribuição verificável**, não um jogo de azar. A participação
+> envolve: (1) aquisição do ebook como produto de valor cultural e editorial; (2) elaboração
+> de depoimento com as duas dimensões exigidas — experiência no site e opinião fundamentada
+> sobre o produto; (3) questionário de interesse anônimo e voluntário, sem vínculo com redes
+> sociais. A alocação de prêmios resulta de **análise de critérios pré-definidos**, não
+> aleatoriedade. Cada participante recebe cotas proporcionais à sua contribuição aprovada.
 > Terminologia proibida: sorteio, chance, aposta, loteria, rifa, ganho aleatório.
 
 ---
@@ -63,9 +54,9 @@
 ## 4. Checklist para Material de Afiliado — antes de distribuir
 
 - [ ] O ebook é referenciado como **produto com valor didático próprio**, não "brinde"?
-- [ ] Há menção explícita aos **critérios de elegibilidade** (depoimento aprovado com as duas dimensões)?
+- [ ] Há menção explícita aos **critérios de elegibilidade** — depoimento com as duas dimensões (experiência + opinião)?
 - [ ] **Nenhuma palavra da lista "Vedada"** aparece no material?
-- [ ] Está claro que **cotas dependem de contribuição verificável**, não apenas de compra?
+- [ ] Está claro que **cotas dependem de depoimento aprovado**, não apenas de compra?
 - [ ] O nome é sempre **"Programa Cultural"**, não "sorteio" ou "concurso de sorte"?
-- [ ] Há indicação de que a **seleção é por análise de critérios**, não randomização?
-- [ ] ~~Seguidores verificados~~ — removido do modelo. Não mencionar redes sociais como critério.
+- [ ] Há indicação de que a **seleção é por análise de critérios**, não aleatoriedade?
+- [ ] Redes sociais **não aparecem** como critério — o questionário é anônimo e voluntário, sem rastreamento de seguidores?
