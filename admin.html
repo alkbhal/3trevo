@@ -1398,19 +1398,32 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
     </div>
     <div class="modal-body">
       <div id="exec-draw-info" style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--borda2);font-family:'Cormorant Garamond',serif;font-size:18px"></div>
+
+      <!-- Semente Bitcoin — obrigatória -->
       <div class="campo">
-        <label class="campo-label">Seed manual (opcional)</label>
-        <input type="text" class="f-input" id="exec-seed" placeholder="Deixe em branco para seed automático (timestamp + hash)">
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.6">
-          Para máxima transparência, use o hash de um bloco recente do Bitcoin (ex: bloco #900000).
-          Qualquer string pode ser usada como seed — será registrada publicamente na auditoria.
+        <label class="campo-label" style="color:#c8a84b">Hash do bloco Bitcoin <span style="color:#e57373">*</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" class="f-input" id="exec-bitcoin-hash"
+            placeholder="000000000000000000... (64 chars hex)"
+            style="font-family:monospace;font-size:12px;flex:1"
+            oninput="limparValidacaoBloco()">
+          <button class="btn btn-outline" style="white-space:nowrap;font-size:11px;padding:8px 12px"
+            onclick="buscarBlocoAtual()">⛏ Bloco atual</button>
         </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.6">
+          Semente obrigatória. Algoritmo: <code style="color:#c8a84b">sha256-bigint-v1</code> — idêntico ao Loteria-TT.<br>
+          O bloco deve ter <strong style="color:#fdfbf7">mínimo 6 confirmações</strong>. Qualquer pessoa pode reproduzir
+          o resultado com: hash + draw_id + lista de participantes.
+        </div>
+        <div id="exec-bloco-info" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);font-size:12px;line-height:1.8"></div>
       </div>
-      <div id="exec-resultado" style="display:none"></div>
+
+      <div id="exec-resultado" style="display:none;margin-top:16px"></div>
     </div>
     <div class="modal-footer" id="exec-footer">
       <button class="btn btn-outline" onclick="fecharModal('modal-executar-sorteio')">Cancelar</button>
-      <button class="btn btn-ouro" id="btn-executar-sorteio" onclick="executarSorteio()">▶ Executar Premiação Agora</button>
+      <button class="btn btn-outline" style="font-size:11px" onclick="validarBlocoAntes()">✓ Validar bloco</button>
+      <button class="btn btn-ouro" id="btn-executar-sorteio" onclick="executarSorteio()">▶ Executar Premiação</button>
     </div>
   </div>
 </div>
@@ -2299,21 +2312,87 @@ let execDrawId = null;
 function abrirModalExecutarSorteio(drawId, titulo) {
   execDrawId = drawId;
   document.getElementById('exec-draw-info').textContent = titulo || 'Rodada';
-  document.getElementById('exec-seed').value = '';
+  document.getElementById('exec-bitcoin-hash').value = '';
+  document.getElementById('exec-bloco-info').style.display = 'none';
+  document.getElementById('exec-bloco-info').innerHTML = '';
   document.getElementById('exec-resultado').style.display = 'none';
   document.getElementById('exec-resultado').innerHTML = '';
   document.getElementById('btn-executar-sorteio').disabled = false;
-  document.getElementById('btn-executar-sorteio').textContent = '▶ Executar Premiação Agora';
+  document.getElementById('btn-executar-sorteio').textContent = '▶ Executar Premiação';
   document.getElementById('exec-footer').style.display = 'flex';
   document.getElementById('modal-executar-sorteio').classList.add('aberto');
 }
 
+function limparValidacaoBloco() {
+  document.getElementById('exec-bloco-info').style.display = 'none';
+}
+
+async function buscarBlocoAtual() {
+  const el = document.getElementById('exec-bloco-info');
+  el.style.display = 'block';
+  el.innerHTML = '⏳ Buscando bloco mais recente…';
+  try {
+    const res = await fetch('https://blockstream.info/api/blocks/tip');
+    if (!res.ok) throw new Error('API indisponível');
+    const blocks = await res.json();
+    const bloco = blocks[0];
+    document.getElementById('exec-bitcoin-hash').value = bloco.id;
+    el.innerHTML = `<span style="color:#7de8a8">⛏ Bloco #${bloco.height.toLocaleString('pt-BR')}</span> · ${bloco.tx_count} txs · <span style="color:rgba(255,255,255,.4)">Confirmações sendo contadas…</span>`;
+    await validarBlocoAntes();
+  } catch(e) {
+    el.innerHTML = `<span style="color:#e57373">Erro: ${e.message} — tente mempool.space</span>`;
+  }
+}
+
+async function validarBlocoAntes() {
+  const hash = document.getElementById('exec-bitcoin-hash').value.trim();
+  const el   = document.getElementById('exec-bloco-info');
+  if (!hash || hash.length < 60) {
+    el.style.display = 'block';
+    el.innerHTML = '<span style="color:#e57373">Hash inválido. Um hash Bitcoin tem 64 caracteres hexadecimais.</span>';
+    return false;
+  }
+  el.style.display = 'block';
+  el.innerHTML = '⏳ Validando bloco no Bitcoin…';
+  try {
+    const [blocoRes, tipRes] = await Promise.all([
+      fetch(`https://blockstream.info/api/block/${hash}`),
+      fetch('https://blockstream.info/api/blocks/tip/height'),
+    ]);
+    if (!blocoRes.ok) throw new Error('Bloco não encontrado');
+    const bloco       = await blocoRes.json();
+    const tipHeight   = tipRes.ok ? parseInt(await tipRes.text()) : bloco.height;
+    const confirmacoes = Math.max(0, tipHeight - bloco.height + 1);
+    const ok          = confirmacoes >= 6;
+    const dt          = new Date(bloco.timestamp * 1000).toLocaleString('pt-BR');
+    el.innerHTML = `
+      <div><strong style="color:${ok?'#7de8a8':'#e57373'}">Bloco #${bloco.height.toLocaleString('pt-BR')}</strong> · ${dt}</div>
+      <div>Confirmações: <strong style="color:${ok?'#7de8a8':'#ffb74d'}">${confirmacoes}</strong> ${ok?'✓ suficientes':'⚠ aguarde mais '+(6-confirmacoes)}</div>
+      <div style="color:rgba(255,255,255,.3);margin-top:4px;word-break:break-all;font-family:monospace;font-size:10px">${hash}</div>`;
+    return ok;
+  } catch(e) {
+    el.innerHTML = `<span style="color:#e57373">Erro ao validar: ${e.message}</span>`;
+    return false;
+  }
+}
+
 async function executarSorteio() {
   if (!execDrawId) return;
-  const seed = document.getElementById('exec-seed').value.trim();
-  const btn  = document.getElementById('btn-executar-sorteio');
+  const bitcoinHash = document.getElementById('exec-bitcoin-hash').value.trim();
+  const btn         = document.getElementById('btn-executar-sorteio');
 
-  if (!confirm('Esta ação é irreversível. A premiação será executada, beneficiários definidos e e-mails enviados. Confirmar?')) return;
+  if (!bitcoinHash || bitcoinHash.length < 60) {
+    toast('Informe o hash do bloco Bitcoin (64 chars).', 'erro');
+    return;
+  }
+
+  const blocoValido = await validarBlocoAntes();
+  if (!blocoValido) {
+    toast('Bloco Bitcoin sem confirmações suficientes. Aguarde e tente novamente.', 'erro');
+    return;
+  }
+
+  if (!confirm('Esta ação é IRREVERSÍVEL.\n\nAlgoritmo: sha256-bigint-v1\nSemente: Bitcoin block hash\n\nA premiação será executada, beneficiários definidos e e-mails enviados. Confirmar?')) return;
 
   btn.disabled = true;
   btn.textContent = '⏳ Executando...';
@@ -2322,8 +2401,7 @@ async function executarSorteio() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { toast('Sessão expirada. Faça login novamente.', 'erro'); btn.disabled = false; btn.textContent = '▶ Executar Premiação Agora'; return; }
 
-    const body = { draw_id: execDrawId };
-    if (seed) body.admin_seed = seed;
+    const body = { draw_id: execDrawId, bitcoin_block_hash: bitcoinHash };
 
     const res = await fetch(`${SB_URL}/functions/v1/execute-draw`, {
       method: 'POST',
@@ -2349,21 +2427,25 @@ async function executarSorteio() {
     }
 
     // Sucesso — mostrar resultado
-    const r = json.resultado || [];
+    const r  = json.resultado || [];
     const w1 = r.find(x => x.posicao === 1);
     const w2 = r.find(x => x.posicao === 2);
 
     elRes.innerHTML = `
-      <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.25);padding:20px;margin-top:16px">
-        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.6);margin-bottom:12px">Premiação realizada com sucesso</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fdfbf7;margin-bottom:12px">
-          🥇 ${escHtml(w1?.email_masked || '—')}<br>
-          🥈 ${escHtml(w2?.email_masked || '—')}
+      <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.25);padding:20px">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.6);margin-bottom:12px">Premiação realizada · sha256-bigint-v1</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fdfbf7;margin-bottom:16px">
+          🥇 ${escHtml(w1?.email_masked || '—')} · nº ${(w1?.numero||'').toLocaleString('pt-BR')}<br>
+          🥈 ${escHtml(w2?.email_masked || '—')} · nº ${(w2?.numero||'').toLocaleString('pt-BR')}
         </div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:4px">Participantes: ${json.total_participantes}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:12px;word-break:break-all">Hash SHA-256: <span style="font-family:monospace;color:rgba(200,168,75,.5)">${escHtml(json.hash_sha256||'')}</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);line-height:2">
+          <div>Bloco Bitcoin: <span style="color:#fdfbf7">#${(json.bitcoin_block_height||'').toLocaleString('pt-BR')}</span> · ${json.bitcoin_confirmacoes} confirmações</div>
+          <div>Participantes: ${json.total_participantes} · Cartela: ${json.snapshot_count} números</div>
+          <div style="word-break:break-all">Snapshot hash: <span style="font-family:monospace;color:rgba(200,168,75,.5)">${escHtml(json.snapshot_hash||'')}</span></div>
+          <div style="word-break:break-all">Audit hash: <span style="font-family:monospace;color:rgba(200,168,75,.5)">${escHtml(json.audit_hash||'')}</span></div>
+        </div>
         <a href="/auditoria-sorteio.html?draw_id=${escHtml(execDrawId)}" target="_blank"
-           style="display:inline-block;padding:10px 20px;border:1px solid rgba(200,168,75,.3);color:#c8a84b;text-decoration:none;font-size:12px">
+           style="display:inline-block;margin-top:14px;padding:10px 20px;border:1px solid rgba(200,168,75,.3);color:#c8a84b;text-decoration:none;font-size:12px">
           🔒 Ver auditoria pública →
         </a>
       </div>`;
