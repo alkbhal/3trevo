@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#0f2d1a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <style>
@@ -24,14 +24,17 @@
   --borda:rgba(26,74,46,0.15);
 }
 html{scroll-behavior:smooth}
-body{font-family:'Jost',sans-serif;background:var(--papiro);color:var(--tinta);min-height:100vh;overflow-x:hidden}
+body{font-family:'Poppins',sans-serif;background:var(--papiro);color:var(--tinta);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.45}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--papiro)}::-webkit-scrollbar-thumb{background:var(--ouro-escuro)}
 
 nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
   display:flex;align-items:center;justify-content:space-between;
   background:rgba(15,45,26,0.97);backdrop-filter:blur(12px);
   border-bottom:1px solid rgba(200,168,75,.2)}
-.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
+.nav-marca{font-family:'Lora',serif;font-size:20px;font-weight:600;
   color:var(--ouro);text-decoration:none;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
 .nav-marca::before{content:'✦';font-size:14px;opacity:.7}
 .nav-back{font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}
@@ -48,14 +51,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
   display:flex;align-items:center;gap:10px}
 .produto-label::before{content:'';width:24px;height:1px;background:var(--ouro-escuro)}
 .produto-genero{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(26,74,46,.5);margin-bottom:8px}
-.produto-titulo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;line-height:1.2;margin-bottom:6px;color:var(--tinta)}
+.produto-titulo{font-family:'Lora',serif;font-size:28px;font-weight:300;line-height:1.2;margin-bottom:6px;color:var(--tinta)}
 .produto-autor{font-size:13px;color:rgba(26,26,22,.45);letter-spacing:.5px;margin-bottom:20px}
 .produto-desc{font-size:14px;color:rgba(26,26,22,.55);line-height:1.8;margin-bottom:24px}
 .produto-cotas-box{padding:16px 20px;background:rgba(26,74,46,.05);border:1px solid rgba(26,74,46,.12);
   display:flex;align-items:center;gap:16px;margin-bottom:24px}
-.produto-cotas-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--verde-medio);line-height:1}
+.produto-cotas-num{font-family:'Lora',serif;font-size:32px;font-weight:600;color:var(--verde-medio);line-height:1}
 .produto-cotas-txt{font-size:12px;color:rgba(26,26,22,.5);line-height:1.6}
-.produto-preco-grande{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--verde-medio);line-height:1}
+.produto-preco-grande{font-family:'Lora',serif;font-size:48px;font-weight:600;color:var(--verde-medio);line-height:1}
 .produto-preco-label{font-size:11px;color:rgba(26,26,22,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
 
 /* Painel direito */
@@ -69,7 +72,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 .campo-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;
   color:rgba(26,26,22,.45);margin-bottom:8px;display:block}
 .campo-input{width:100%;padding:11px 14px;background:#fff;
-  border:1px solid rgba(26,74,46,.2);color:var(--tinta);font-family:'Jost',sans-serif;
+  border:1px solid rgba(26,74,46,.2);color:var(--tinta);font-family:'Poppins',sans-serif;
   font-size:14px;outline:none;transition:border-color .2s;margin-bottom:12px}
 .campo-input:focus{border-color:var(--verde-medio)}
 .campo-input::placeholder{color:rgba(26,26,22,.3)}
@@ -86,7 +89,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 
 /* Botão comprar */
 .btn-comprar{width:100%;padding:16px;background:var(--verde-medio);color:var(--papiro);
-  border:none;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;
+  border:none;font-family:'Poppins',sans-serif;font-size:14px;font-weight:500;
   letter-spacing:.5px;cursor:pointer;transition:background .2s;display:flex;
   align-items:center;justify-content:center;gap:10px}
 .btn-comprar:hover{background:var(--verde-claro)}
@@ -121,12 +124,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 /* PIX QR Code */
 #pixContainer{display:none;text-align:center;padding:24px 0}
 #pixContainer.ativo{display:block}
-.pix-titulo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--verde-escuro);margin-bottom:8px}
+.pix-titulo{font-family:'Lora',serif;font-size:22px;font-weight:400;color:var(--verde);margin-bottom:8px}
 .pix-sub{font-size:13px;color:rgba(26,26,22,.55);margin-bottom:20px;line-height:1.6}
 .pix-qr{width:200px;height:200px;border:2px solid rgba(26,74,46,.15);margin:0 auto 16px;display:block}
 .pix-copia{background:#f4efe5;border:1px solid rgba(26,74,46,.15);padding:12px 16px;font-size:11px;
   font-family:monospace;word-break:break-all;color:rgba(26,26,22,.6);margin-bottom:12px;text-align:left;max-height:80px;overflow:auto}
-.btn-copiar{width:100%;padding:12px;background:var(--verde-escuro);color:#f4efe5;border:none;
+.btn-copiar{width:100%;padding:12px;background:var(--verde);color:#f4efe5;border:none;
   font-size:13px;letter-spacing:.5px;cursor:pointer;transition:background .2s;margin-bottom:8px}
 .btn-copiar:hover{background:var(--verde-medio)}
 .pix-aviso{font-size:12px;color:rgba(26,26,22,.4);line-height:1.6}
@@ -148,7 +151,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 
 <nav>
   <a href="/" class="nav-marca">Editora Três Trevo</a>
-  <a href="/#catalogo" class="nav-back">← Voltar ao catálogo</a>
+  <a href="/catalogo.html" class="nav-back">← Catálogo</a>
 </nav>
 
 <div class="page">
@@ -166,7 +169,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
           <div class="produto-cotas-num" id="prodCotas">—</div>
           <div class="produto-cotas-txt">
             cotas no Programa Cultural<br>
-            <span style="color:rgba(255,255,255,.25);font-size:11px">Válidas após D+7 e validação do depoimento</span>
+            <span style="color:rgba(26,26,22,.4);font-size:11px">Válidas após D+7 e validação do depoimento</span>
           </div>
         </div>
         <div class="produto-preco-label">Valor</div>
@@ -193,7 +196,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
           <label class="campo-label" for="emailInput">E-mail para receber o ebook</label>
           <input type="email" id="emailInput" class="campo-input" placeholder="seu@email.com" autocomplete="email">
           <button style="width:100%;padding:11px;background:transparent;border:1px solid var(--borda);
-            color:var(--ouro);font-family:'Jost',sans-serif;font-size:12px;letter-spacing:1px;
+            color:var(--ouro);font-family:'Poppins',sans-serif;font-size:12px;letter-spacing:1px;
             text-transform:uppercase;cursor:pointer;transition:all .2s"
             id="btnMagicLink" onclick="enviarMagicLink()">Receber link de acesso →</button>
           <div class="msg-auth" id="msgAuth">Digite seu e-mail e enviaremos um link de acesso seguro.</div>
@@ -207,11 +210,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
       <!-- PIX QR Code (aparece após confirmação PIX) -->
       <div id="pixContainer">
         <div class="pix-titulo">Pague com PIX</div>
-        <div class="pix-sub">Escaneie o QR Code ou copie o codigo abaixo no app do seu banco.<br>O acesso e liberado em segundos apos a confirmacao.</div>
+        <div class="pix-sub">Escaneie o QR Code ou copie o código abaixo no app do seu banco.<br>O acesso é liberado em segundos após a confirmação.</div>
         <img id="pixQrImg" class="pix-qr" src="" alt="QR Code PIX">
         <div class="pix-copia" id="pixCodigoTexto"></div>
         <button class="btn-copiar" onclick="copiarPix()">Copiar codigo PIX</button>
-        <div class="pix-aviso">O codigo expira em 30 minutos. Nao feche esta pagina.</div>
+        <div class="pix-aviso">O código expira em 30 minutos. Não feche esta página.</div>
         <div class="pix-aguardando">
           <span class="pix-dot"></span><span class="pix-dot"></span><span class="pix-dot"></span>
           <span>Aguardando pagamento</span>

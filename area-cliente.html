@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#0f2d1a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 /* ══════════════════════════════════════════════════════════
@@ -31,7 +31,7 @@
 }
 html{scroll-behavior:smooth}
 body{
-  font-family:'Jost',sans-serif;background:#f5f0e8;
+  font-family:'Poppins',sans-serif;background:#f5f0e8;
   color:#1a1a16;min-height:100vh;overflow-x:hidden;
 }
 body::before{
@@ -52,7 +52,7 @@ nav{
   border-bottom:1px solid var(--borda);
 }
 .nav-marca{
-  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
+  font-family:'Lora',serif;font-size:20px;font-weight:600;
   color:var(--ouro);text-decoration:none;letter-spacing:.5px;
   display:flex;align-items:center;gap:10px;
 }
@@ -62,7 +62,7 @@ nav{
 .btn-sair{
   font-size:12px;letter-spacing:1px;padding:7px 16px;
   border:1px solid var(--borda);color:var(--ouro);background:transparent;
-  cursor:pointer;font-family:'Jost',sans-serif;transition:all .2s;
+  cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;
 }
 .btn-sair:hover{background:rgba(200,168,75,.1)}
 
@@ -85,7 +85,7 @@ nav{
   background:linear-gradient(90deg,var(--ouro),transparent);
 }
 .login-logo{
-  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;
+  font-family:'Lora',serif;font-size:28px;font-weight:400;
   color:var(--ouro);margin-bottom:8px;text-align:center;
 }
 .login-sub{font-size:13px;color:rgba(26,26,22,.5);text-align:center;margin-bottom:36px;line-height:1.6}
@@ -96,14 +96,14 @@ nav{
 .campo-input{
   width:100%;padding:12px 16px;background:#fff;
   border:1px solid rgba(26,74,46,.2);color:#1a1a16;
-  font-family:'Jost',sans-serif;font-size:14px;outline:none;
+  font-family:'Poppins',sans-serif;font-size:14px;outline:none;
   transition:border-color .2s;margin-bottom:20px;border-radius:0;
 }
 .campo-input:focus{border-color:var(--ouro)}
 .campo-input::placeholder{color:rgba(26,26,22,.3)}
 .btn-primario{
   width:100%;padding:14px;background:var(--ouro);color:var(--verde);
-  border:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;
+  border:none;font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;
   letter-spacing:.5px;cursor:pointer;transition:background .2s;margin-top:4px;
 }
 .btn-primario:hover{background:var(--ouro-claro)}
@@ -120,7 +120,7 @@ nav{
 .login-divider{display:flex;align-items:center;gap:12px;margin:16px 0}
 .login-divider span{font-size:11px;letter-spacing:1px;color:rgba(26,26,22,.3);white-space:nowrap}
 .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(26,74,46,.12)}
-.btn-secundario{width:100%;padding:12px;background:transparent;color:var(--ouro-claro);border:1px solid rgba(200,168,75,.35);font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.btn-secundario{width:100%;padding:12px;background:transparent;color:var(--ouro-claro);border:1px solid rgba(200,168,75,.35);font-family:'Poppins',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.3px}
 .btn-secundario:hover{border-color:var(--ouro);background:rgba(200,168,75,.06)}
 .btn-secundario:disabled{opacity:.5;cursor:not-allowed}
 .campo-senha-wrap{position:relative;margin-bottom:20px}
@@ -139,7 +139,7 @@ nav{
   color:var(--ouro);margin-bottom:6px;display:flex;align-items:center;gap:8px;
 }
 .dash-saudacao::before{content:'✦';opacity:.6}
-.dash-titulo{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;line-height:1.1}
+.dash-titulo{font-family:'Lora',serif;font-size:32px;font-weight:400;line-height:1.1}
 .dash-titulo em{font-style:italic;color:var(--ouro)}
 
 /* Stats row */
@@ -150,7 +150,7 @@ nav{
 .stat-item{flex:1;padding:20px 28px;border-right:1px solid rgba(26,74,46,.1)}
 .stat-item:last-child{border-right:none}
 .stat-num{
-  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  font-family:'Lora',serif;font-size:28px;font-weight:600;
   color:var(--verde-medio);line-height:1;
 }
 .stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(26,26,22,.4);margin-top:4px}
@@ -165,7 +165,7 @@ nav{
   padding:14px 20px;font-size:11px;letter-spacing:2px;text-transform:uppercase;
   color:rgba(26,26,22,.4);cursor:pointer;background:none;
   border:none;border-bottom:2px solid transparent;
-  font-family:'Jost',sans-serif;transition:all .2s;margin-bottom:-1px;
+  font-family:'Poppins',sans-serif;transition:all .2s;margin-bottom:-1px;
   white-space:nowrap;flex-shrink:0;
 }
 .aba:hover{color:rgba(26,26,22,.7)}
@@ -253,7 +253,7 @@ nav{
 }
 .ebook-body{padding:14px}
 .ebook-titulo{
-  font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:400;
+  font-family:'Lora',serif;font-size:15px;font-weight:400;
   line-height:1.3;margin-bottom:4px;
 }
 .ebook-autor{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.5px;margin-bottom:12px}
@@ -264,7 +264,7 @@ nav{
 .btn-dl{
   font-size:10px;letter-spacing:1px;text-transform:uppercase;
   padding:7px 14px;background:var(--ouro);color:var(--verde);border:none;
-  cursor:pointer;font-family:'Jost',sans-serif;font-weight:500;
+  cursor:pointer;font-family:'Poppins',sans-serif;font-weight:500;
   transition:background .2s;text-decoration:none;display:inline-flex;
   align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;
 }
@@ -279,7 +279,7 @@ nav{
   margin-bottom:16px;
 }
 .secao-nome{
-  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;
+  font-family:'Lora',serif;font-size:20px;font-weight:400;
   color:rgba(255,255,255,.7);
 }
 .secao-ver-todos{
@@ -464,7 +464,7 @@ nav{
 }
 @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .sorteio-titulo{
-  font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:4px;
+  font-family:'Lora',serif;font-size:22px;font-weight:400;margin-bottom:4px;
 }
 .sorteio-premios{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:24px;line-height:1.6}
 .cotas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
@@ -473,7 +473,7 @@ nav{
   text-align:center;
 }
 .cota-num{
-  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  font-family:'Lora',serif;font-size:28px;font-weight:600;
   color:var(--verde-medio);line-height:1;
 }
 .cota-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px}
@@ -488,7 +488,7 @@ nav{
 .entry-val.pendente{color:var(--ouro)}
 .btn-validar{
   padding:12px 24px;background:var(--ouro);color:var(--verde);border:none;
-  font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:.5px;
+  font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;letter-spacing:.5px;
   cursor:pointer;transition:background .2s;margin-top:16px;
 }
 .btn-validar:hover{background:var(--ouro-claro)}
@@ -498,7 +498,7 @@ nav{
 .dep-textarea{
   width:100%;padding:12px 14px;background:rgba(255,255,255,.05);
   border:1px solid rgba(255,255,255,.1);color:var(--branco);
-  font-family:'Jost',sans-serif;font-size:14px;outline:none;
+  font-family:'Poppins',sans-serif;font-size:14px;outline:none;
   resize:vertical;min-height:100px;line-height:1.7;
   transition:border-color .2s;margin-bottom:12px;
 }
@@ -506,7 +506,7 @@ nav{
 .redes-check{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .rede-btn{
   padding:7px 14px;border:1px solid var(--borda);background:transparent;
-  color:rgba(255,255,255,.4);font-family:'Jost',sans-serif;font-size:11px;
+  color:rgba(255,255,255,.4);font-family:'Poppins',sans-serif;font-size:11px;
   letter-spacing:1px;text-transform:uppercase;cursor:pointer;
   transition:all .2s;user-select:none;
 }
@@ -522,7 +522,7 @@ nav{
 .vencedor-pos{
   width:28px;height:28px;border:1px solid var(--ouro);
   display:flex;align-items:center;justify-content:center;
-  font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--ouro);flex-shrink:0;
+  font-family:'Lora',serif;font-size:14px;color:var(--ouro);flex-shrink:0;
 }
 .vencedor-info{flex:1;min-width:0}
 .vencedor-nome{font-size:14px;color:rgba(255,255,255,.75)}
@@ -547,7 +547,7 @@ nav{
   padding:4px 10px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);
 }
 .extrato-valor{
-  font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;
+  font-family:'Lora',serif;font-size:18px;font-weight:600;
   color:var(--ouro);text-align:right;
 }
 .extrato-detalhe{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
@@ -564,7 +564,7 @@ nav{
 .resumo-item{}
 .resumo-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(26,26,22,.45)}
 .resumo-val{
-  font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--verde-medio);margin-top:4px;
+  font-family:'Lora',serif;font-size:22px;color:var(--verde-medio);margin-top:4px;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -578,7 +578,7 @@ nav{
   content:'';display:block;width:40px;height:2px;background:var(--ouro);margin-bottom:24px;
 }
 .plano-nome{
-  font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;
+  font-family:'Lora',serif;font-size:26px;font-weight:400;
   margin-bottom:4px;
 }
 .plano-badge{
@@ -618,7 +618,7 @@ nav{
   margin:0 auto 20px;font-size:28px;opacity:.4;
 }
 .vazio-titulo{
-  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;
+  font-family:'Lora',serif;font-size:20px;font-weight:400;
   color:rgba(26,26,22,.5);margin-bottom:8px;
 }
 .vazio-texto{font-size:13px;color:rgba(26,26,22,.35);line-height:1.7}
@@ -800,7 +800,7 @@ nav{
       <div style="background:rgba(200,168,75,.05);border:1px solid rgba(200,168,75,.18);padding:20px;position:relative">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
         <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">Meus Números — Rodada Atual</div>
-        <div id="meus-numeros-lista" style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--branco);line-height:1.8;margin-bottom:12px">—</div>
+        <div id="meus-numeros-lista" style="font-family:'Lora',serif;font-size:20px;color:var(--branco);line-height:1.8;margin-bottom:12px">—</div>
         <div style="font-size:12px;color:rgba(255,255,255,.35)">Cada número representa uma cota de participação</div>
       </div>
       <!-- Barra de progresso da meta -->
@@ -1607,7 +1607,7 @@ async function carregarSorteios() {
           destaque = `<div style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.4);padding:20px;margin-bottom:20px;position:relative">
             <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
             <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">${pos}</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:4px">Você foi selecionado(a)!</div>
+            <div style="font-family:'Lora',serif;font-size:22px;margin-bottom:4px">Você foi selecionado(a)!</div>
             <div style="font-size:12px;color:rgba(255,255,255,.5)">Parabéns! Verifique seu e-mail para instruções de resgate do prêmio.</div>
           </div>`;
         }
@@ -1893,7 +1893,7 @@ function carregarPlanilhaViva() {
         <div style="margin-top:20px;font-size:12px;color:rgba(26,26,22,.35);line-height:1.8;border-top:1px solid var(--borda);padding-top:16px">
           Código: <code style="font-family:monospace;background:rgba(26,74,46,.06);padding:2px 6px">${vis}</code><br>
           <button onclick="localStorage.removeItem('tt_sfdtt_token');carregarPlanilhaViva()"
-            style="background:none;border:none;cursor:pointer;color:rgba(200,168,75,.7);font-family:'Jost',sans-serif;font-size:12px;padding:0;margin-top:6px;text-decoration:underline">
+            style="background:none;border:none;cursor:pointer;color:rgba(200,168,75,.7);font-family:'Poppins',sans-serif;font-size:12px;padding:0;margin-top:6px;text-decoration:underline">
             Alterar código de acesso
           </button>
         </div>
@@ -1911,7 +1911,7 @@ function carregarPlanilhaViva() {
           placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
           onkeydown="if(event.key==='Enter')salvarTokenSFDTT()">
         <button onclick="salvarTokenSFDTT()" class="plano-acao"
-          style="border:none;cursor:pointer;font-family:'Jost',sans-serif">
+          style="border:none;cursor:pointer;font-family:'Poppins',sans-serif">
           Salvar e acessar →
         </button>
         <div style="margin-top:20px;font-size:12px;color:rgba(26,26,22,.35);line-height:1.8">
