@@ -1295,7 +1295,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
 <div class="modal-overlay" id="modal-cartela">
   <div class="modal" style="max-width:780px;width:95vw">
     <div class="modal-header">
-      <div class="modal-titulo">🎯 Gestão de Cartela</div>
+      <div class="modal-titulo">Gestão de Cartela</div>
       <button class="modal-fechar" onclick="fecharModal('modal-cartela')">✕</button>
     </div>
     <div class="modal-body">
@@ -1393,7 +1393,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
 <div class="modal-overlay" id="modal-executar-sorteio">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-titulo">▶ Executar Premiação</div>
+      <div class="modal-titulo">Executar Premiação</div>
       <button class="modal-fechar" onclick="fecharModal('modal-executar-sorteio')">✕</button>
     </div>
     <div class="modal-body">
@@ -1408,7 +1408,7 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
             style="font-family:monospace;font-size:12px;flex:1"
             oninput="limparValidacaoBloco()">
           <button class="btn btn-outline" style="white-space:nowrap;font-size:11px;padding:8px 12px"
-            onclick="buscarBlocoAtual()">⛏ Bloco atual</button>
+            onclick="buscarBlocoAtual()">Buscar bloco</button>
         </div>
         <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.6">
           Semente obrigatória. Algoritmo: <code style="color:#c8a84b">sha256-bigint-v1</code> — idêntico ao Loteria-TT.<br>
@@ -1422,8 +1422,20 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
     </div>
     <div class="modal-footer" id="exec-footer">
       <button class="btn btn-outline" onclick="fecharModal('modal-executar-sorteio')">Cancelar</button>
-      <button class="btn btn-outline" style="font-size:11px" onclick="validarBlocoAntes()">✓ Validar bloco</button>
-      <button class="btn btn-ouro" id="btn-executar-sorteio" onclick="executarSorteio()">▶ Executar Premiação</button>
+      <button class="btn btn-outline" style="font-size:11px" onclick="validarBlocoAntes()">Verificar bloco</button>
+      <button class="btn btn-ouro" id="btn-executar-sorteio" onclick="pedirConfirmacaoSorteio()">Executar Premiação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONFIRM SORTEIO ── -->
+<div class="confirm-overlay" id="confirm-sorteio">
+  <div class="confirm-box" style="border-color:rgba(200,168,75,.25)">
+    <div class="confirm-titulo" style="color:var(--ouro)">Executar premiação?</div>
+    <div class="confirm-txt">Esta ação é irreversível. O algoritmo <strong style="color:rgba(255,255,255,.6)">sha256-bigint-v1</strong> será executado com a semente Bitcoin fornecida. Os beneficiários serão definidos e notificados por e-mail.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-outline" onclick="fecharConfirmSorteio()">Cancelar</button>
+      <button class="btn btn-ouro" onclick="fecharConfirmSorteio();executarSorteio()">Confirmar execução</button>
     </div>
   </div>
 </div>
@@ -1852,6 +1864,25 @@ function confirmarDelete() {
 
 function fecharConfirm() {
   document.getElementById('confirm-delete').classList.remove('aberto');
+}
+
+async function pedirConfirmacaoSorteio() {
+  if (!execDrawId) return;
+  const bitcoinHash = document.getElementById('exec-bitcoin-hash').value.trim();
+  if (!bitcoinHash || bitcoinHash.length < 60) {
+    toast('Informe o hash do bloco Bitcoin (64 chars).', 'erro');
+    return;
+  }
+  const blocoValido = await validarBlocoAntes();
+  if (!blocoValido) {
+    toast('Bloco Bitcoin sem confirmações suficientes. Aguarde e tente novamente.', 'erro');
+    return;
+  }
+  document.getElementById('confirm-sorteio').classList.add('aberto');
+}
+
+function fecharConfirmSorteio() {
+  document.getElementById('confirm-sorteio').classList.remove('aberto');
 }
 
 async function deletarProduto() {
@@ -2330,14 +2361,14 @@ function limparValidacaoBloco() {
 async function buscarBlocoAtual() {
   const el = document.getElementById('exec-bloco-info');
   el.style.display = 'block';
-  el.innerHTML = '⏳ Buscando bloco mais recente…';
+  el.innerHTML = 'Buscando bloco mais recente…';
   try {
     const res = await fetch('https://blockstream.info/api/blocks/tip');
     if (!res.ok) throw new Error('API indisponível');
     const blocks = await res.json();
     const bloco = blocks[0];
     document.getElementById('exec-bitcoin-hash').value = bloco.id;
-    el.innerHTML = `<span style="color:#7de8a8">⛏ Bloco #${bloco.height.toLocaleString('pt-BR')}</span> · ${bloco.tx_count} txs · <span style="color:rgba(255,255,255,.4)">Confirmações sendo contadas…</span>`;
+    el.innerHTML = `<span style="color:#7de8a8">Bloco #${bloco.height.toLocaleString('pt-BR')}</span> · ${bloco.tx_count} txs · <span style="color:rgba(255,255,255,.4)">Contando confirmações…</span>`;
     await validarBlocoAntes();
   } catch(e) {
     el.innerHTML = `<span style="color:#e57373">Erro: ${e.message} — tente mempool.space</span>`;
@@ -2353,7 +2384,7 @@ async function validarBlocoAntes() {
     return false;
   }
   el.style.display = 'block';
-  el.innerHTML = '⏳ Validando bloco no Bitcoin…';
+  el.innerHTML = 'Validando bloco no Bitcoin…';
   try {
     const [blocoRes, tipRes] = await Promise.all([
       fetch(`https://blockstream.info/api/block/${hash}`),
@@ -2367,7 +2398,7 @@ async function validarBlocoAntes() {
     const dt          = new Date(bloco.timestamp * 1000).toLocaleString('pt-BR');
     el.innerHTML = `
       <div><strong style="color:${ok?'#7de8a8':'#e57373'}">Bloco #${bloco.height.toLocaleString('pt-BR')}</strong> · ${dt}</div>
-      <div>Confirmações: <strong style="color:${ok?'#7de8a8':'#ffb74d'}">${confirmacoes}</strong> ${ok?'✓ suficientes':'⚠ aguarde mais '+(6-confirmacoes)}</div>
+      <div>Confirmações: <strong style="color:${ok?'#7de8a8':'#ffb74d'}">${confirmacoes}</strong> ${ok?'— suficientes':'— aguarde mais '+(6-confirmacoes)}</div>
       <div style="color:rgba(255,255,255,.3);margin-top:4px;word-break:break-all;font-family:monospace;font-size:10px">${hash}</div>`;
     return ok;
   } catch(e) {
@@ -2386,20 +2417,12 @@ async function executarSorteio() {
     return;
   }
 
-  const blocoValido = await validarBlocoAntes();
-  if (!blocoValido) {
-    toast('Bloco Bitcoin sem confirmações suficientes. Aguarde e tente novamente.', 'erro');
-    return;
-  }
-
-  if (!confirm('Esta ação é IRREVERSÍVEL.\n\nAlgoritmo: sha256-bigint-v1\nSemente: Bitcoin block hash\n\nA premiação será executada, beneficiários definidos e e-mails enviados. Confirmar?')) return;
-
   btn.disabled = true;
-  btn.textContent = '⏳ Executando...';
+  btn.textContent = 'Executando…';
 
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { toast('Sessão expirada. Faça login novamente.', 'erro'); btn.disabled = false; btn.textContent = '▶ Executar Premiação Agora'; return; }
+    if (!session) { toast('Sessão expirada. Faça login novamente.', 'erro'); btn.disabled = false; btn.textContent = 'Executar Premiação'; return; }
 
     const body = { draw_id: execDrawId, bitcoin_block_hash: bitcoinHash };
 
@@ -2422,7 +2445,7 @@ async function executarSorteio() {
         <strong>Erro:</strong> ${escHtml(json.error || 'Erro desconhecido')}
       </div>`;
       btn.disabled = false;
-      btn.textContent = '▶ Tentar novamente';
+      btn.textContent = 'Tentar novamente';
       return;
     }
 
@@ -2434,9 +2457,17 @@ async function executarSorteio() {
     elRes.innerHTML = `
       <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.25);padding:20px">
         <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.6);margin-bottom:12px">Premiação realizada · sha256-bigint-v1</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fdfbf7;margin-bottom:16px">
-          🥇 ${escHtml(w1?.email_masked || '—')} · nº ${(w1?.numero||'').toLocaleString('pt-BR')}<br>
-          🥈 ${escHtml(w2?.email_masked || '—')} · nº ${(w2?.numero||'').toLocaleString('pt-BR')}
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:baseline;gap:12px">
+            <span style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ouro);min-width:28px;flex-shrink:0">I</span>
+            <span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fdfbf7">${escHtml(w1?.email_masked || '—')}</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.3)">nº ${(w1?.numero||'').toLocaleString('pt-BR')}</span>
+          </div>
+          ${w2 ? `<div style="display:flex;align-items:baseline;gap:12px">
+            <span style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(200,168,75,.4);min-width:28px;flex-shrink:0">II</span>
+            <span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:rgba(255,255,255,.7)">${escHtml(w2?.email_masked || '—')}</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.3)">nº ${(w2?.numero||'').toLocaleString('pt-BR')}</span>
+          </div>` : ''}
         </div>
         <div style="font-size:11px;color:rgba(255,255,255,.3);line-height:2">
           <div>Bloco Bitcoin: <span style="color:#fdfbf7">#${(json.bitcoin_block_height||'').toLocaleString('pt-BR')}</span> · ${json.bitcoin_confirmacoes} confirmações</div>
@@ -2446,11 +2477,11 @@ async function executarSorteio() {
         </div>
         <a href="/auditoria-sorteio.html?draw_id=${escHtml(execDrawId)}" target="_blank"
            style="display:inline-block;margin-top:14px;padding:10px 20px;border:1px solid rgba(200,168,75,.3);color:#c8a84b;text-decoration:none;font-size:12px">
-          🔒 Ver auditoria pública →
+          Ver auditoria pública →
         </a>
       </div>`;
 
-    btn.textContent = '✓ Premiação realizada';
+    btn.textContent = 'Premiação realizada';
     document.getElementById('exec-footer').innerHTML = `
       <button class="btn btn-outline" onclick="fecharModal('modal-executar-sorteio');carregarSorteios()">Fechar</button>`;
     carregarSorteios();
@@ -2471,6 +2502,7 @@ function fecharModal(id) {
 document.addEventListener('click', e => {
   if (e.target.classList.contains('modal-overlay')) fecharModal(e.target.id);
   if (e.target.id === 'confirm-delete') fecharConfirm();
+  if (e.target.id === 'confirm-sorteio') fecharConfirmSorteio();
 });
 
 // ── CONTEÚDO ──────────────────────────────────────────────────────

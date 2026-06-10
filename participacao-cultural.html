@@ -1,447 +1,387 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Participar do Programa Cultural — Editora Três Trevo</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="referrer-policy" content="no-referrer">
+<title>Participação Cultural — Editora Três Trevo</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<meta name="theme-color" content="#0f2d1a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--verde:#1a4a2e;--ouro:#c8a84b;--ouro-claro:#e8c96a;--branco:#fdfbf7;--creme:#f5f0e8;--texto:#1c1c1c}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:#1c2a1a;color:#fff;min-height:100vh}
-.topo{background:rgba(0,0,0,0.3);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
-.marca{font-family:'Playfair Display',serif;color:var(--ouro);font-size:15px;text-decoration:none}
-.tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+:root{
+  --verde:#1a4a2e;--verde-nav:#0f2d1a;--verde2:#256640;
+  --ouro:#c8a84b;--ouro-texto:#7a5c1e;
+  --bg:#111a13;--bg2:#162019;--card:#1c2a1e;
+  --borda:rgba(255,255,255,.08);--borda-ouro:rgba(200,168,75,.25);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:#fff;min-height:100vh;font-size:15px}
+a{text-decoration:none;color:inherit}
+:focus-visible{outline:2px solid var(--ouro);outline-offset:3px}
 
+/* TOPO */
+.topo{background:rgba(0,0,0,.4);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--borda);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.marca{font-family:'Lora',serif;color:var(--ouro);font-size:15px}
+.marca::before{content:'✦ ';opacity:.7}
+.tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3)}
+
+/* HERO */
 .hero{text-align:center;padding:48px 24px 32px}
-.hero-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);margin-bottom:12px}
-.hero-titulo{font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,40px);margin-bottom:10px}
-.hero-sub{font-size:14px;color:rgba(255,255,255,0.45);max-width:480px;margin:0 auto;line-height:1.7}
+.hero-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);margin-bottom:14px;opacity:.8}
+.hero-titulo{font-family:'Lora',serif;font-size:clamp(22px,4vw,36px);font-weight:400;margin-bottom:10px;line-height:1.2}
+.hero-sub{font-size:14px;color:rgba(255,255,255,.4);max-width:440px;margin:0 auto;line-height:1.8}
 
 /* ETAPAS */
-.etapas{display:flex;justify-content:center;gap:0;max-width:680px;margin:32px auto 0;padding:0 24px}
+.etapas{display:flex;justify-content:center;max-width:640px;margin:24px auto 0;padding:0 24px}
 .etapa{flex:1;text-align:center;position:relative}
-.etapa::after{content:'';position:absolute;top:18px;right:0;width:100%;height:2px;background:rgba(255,255,255,0.08);z-index:0}
+.etapa::after{content:'';position:absolute;top:17px;left:50%;width:100%;height:1px;background:var(--borda);z-index:0}
 .etapa:last-child::after{display:none}
-.etapa-num{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:13px;font-weight:500;position:relative;z-index:1;background:#1c2a1a;transition:all .3s}
-.etapa.ativa .etapa-num{border-color:var(--ouro);color:var(--ouro);background:#1c2a1a}
-.etapa.concluida .etapa-num{border-color:var(--ouro);background:var(--ouro);color:var(--verde)}
-.etapa-txt{font-size:11px;color:rgba(255,255,255,0.35)}
+.etapa-num{width:34px;height:34px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:12px;position:relative;z-index:1;background:var(--bg);transition:all .3s;font-family:'Poppins',sans-serif}
+.etapa.ativa .etapa-num{border-color:var(--ouro);color:var(--ouro)}
+.etapa.concluida .etapa-num{border-color:var(--ouro);background:var(--ouro);color:var(--verde-nav)}
+.etapa-txt{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.3)}
 .etapa.ativa .etapa-txt{color:var(--ouro)}
 
 /* CARD */
-.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2px;max-width:640px;margin:32px auto;padding:36px;position:relative}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ouro),transparent)}
+.card{background:var(--card);border:1px solid var(--borda);max-width:620px;margin:32px auto 48px;padding:40px;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)}
 
 /* BLOQUEIO D+7 */
-.bloqueio{text-align:center;padding:32px 24px}
-.bloqueio-icone{font-size:48px;margin-bottom:16px}
-.bloqueio-titulo{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:10px;color:var(--ouro)}
-.bloqueio-txt{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.8;max-width:400px;margin:0 auto 20px}
-.bloqueio-contador{background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.2);padding:16px 24px;display:inline-block;margin-bottom:20px}
-.bloqueio-contador strong{font-family:'Playfair Display',serif;font-size:32px;color:var(--ouro);display:block}
-.bloqueio-contador span{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+.bloqueio{text-align:center;padding:24px 0}
+.bloqueio-icone{font-size:44px;margin-bottom:16px;opacity:.6}
+.bloqueio-titulo{font-family:'Lora',serif;font-size:22px;margin-bottom:10px;color:var(--ouro);font-weight:400}
+.bloqueio-txt{font-size:13px;color:rgba(255,255,255,.45);line-height:1.8;max-width:380px;margin:0 auto 20px}
+.bloqueio-contador{background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.2);padding:16px 28px;display:inline-block}
+.bloqueio-contador strong{font-family:'Lora',serif;font-size:36px;color:var(--ouro);display:block;line-height:1;font-weight:600}
+.bloqueio-contador span{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase}
 
-/* FORMULÁRIO */
-.form-secao{margin-bottom:28px}
-.form-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px;display:block}
-.form-label span{color:rgba(255,255,255,0.3);font-size:10px;text-transform:none;letter-spacing:0;margin-left:6px}
-.form-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:12px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s}
-.form-input:focus{border-color:var(--ouro)}
-.form-input[readonly]{opacity:.5;cursor:not-allowed}
-.form-textarea{resize:vertical;min-height:120px;line-height:1.6}
-.form-hint{font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;line-height:1.5}
-.char-count{text-align:right;font-size:11px;color:rgba(255,255,255,0.25);margin-top:4px}
-.char-count.ok{color:var(--ouro)}
+/* FORM */
+.form-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px;display:block;opacity:.8}
+.form-label em{color:rgba(255,255,255,.35);font-style:normal;text-transform:none;letter-spacing:0;font-size:11px}
+.form-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--borda);padding:12px 14px;color:#fff;font-family:'Poppins',sans-serif;font-size:14px;outline:none;transition:border .2s;border-radius:0}
+.form-input:focus{border-color:rgba(200,168,75,.5)}
+.form-input[readonly]{opacity:.45;cursor:default}
+.form-textarea{resize:vertical;min-height:160px;line-height:1.7}
+.form-hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.6}
+.char-counter{text-align:right;font-size:11px;color:rgba(255,255,255,.25);margin-top:4px;transition:color .3s}
+.char-counter.ok{color:rgba(200,168,75,.7)}
+.form-secao{margin-bottom:24px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
 
-/* REQUISITOS */
-.requisitos{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
-.req{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;cursor:pointer;transition:all .2s;user-select:none}
-.req:hover{border-color:rgba(200,168,75,0.3)}
-.req.concluido{border-color:rgba(200,168,75,0.4);background:rgba(200,168,75,0.06)}
-.req-check{width:24px;height:24px;border:2px solid rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:12px}
-.req.concluido .req-check{background:var(--ouro);border-color:var(--ouro);color:var(--verde)}
-.req-info strong{display:block;font-size:14px;color:rgba(255,255,255,0.85)}
-.req-info span{font-size:12px;color:rgba(255,255,255,0.35);line-height:1.5}
-.req-badge{margin-left:auto;font-size:10px;padding:3px 10px;background:rgba(200,168,75,0.15);color:var(--ouro);letter-spacing:1px;white-space:nowrap}
-.req-badge.bonus{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3)}
+/* INFO BOX */
+.info-box{background:rgba(26,74,46,.15);border:1px solid rgba(26,74,46,.3);padding:14px 18px;margin-bottom:24px}
+.info-box p{font-size:12px;color:rgba(255,255,255,.4);line-height:1.65}
+.info-box strong{color:rgba(255,255,255,.65)}
+
+/* GUIA DEPOIMENTO */
+.guia{background:rgba(200,168,75,.05);border:1px solid rgba(200,168,75,.15);padding:16px 20px;margin-bottom:20px}
+.guia-titulo{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);margin-bottom:10px;opacity:.7}
+.guia-items{display:flex;flex-direction:column;gap:8px}
+.guia-item{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:rgba(255,255,255,.45);line-height:1.5}
+.guia-item::before{content:'◇';color:var(--ouro);opacity:.5;flex-shrink:0;margin-top:1px}
 
 /* COTAS */
-.cotas-preview{background:rgba(200,168,75,0.08);border:1px solid rgba(200,168,75,0.2);padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;gap:16px}
-.cotas-num{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--ouro);line-height:1;min-width:60px}
-.cotas-txt strong{color:rgba(255,255,255,0.8);display:block;font-size:14px;margin-bottom:2px}
-.cotas-txt span{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6}
-.cotas-bônus{font-size:12px;color:var(--ouro);margin-top:4px}
+.cotas-box{background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;gap:16px}
+.cotas-num{font-family:'Lora',serif;font-size:48px;font-weight:600;color:var(--ouro);line-height:1;min-width:56px}
+.cotas-txt strong{display:block;font-size:14px;color:rgba(255,255,255,.7);margin-bottom:2px}
+.cotas-txt span{font-size:12px;color:rgba(255,255,255,.35)}
 
-/* BTN */
-.btn-enviar{width:100%;padding:18px;background:var(--ouro);color:var(--verde);border:none;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:10px}
-.btn-enviar:hover:not(:disabled){background:var(--ouro-claro)}
-.btn-enviar:disabled{opacity:.4;cursor:not-allowed}
-.btn-enviar .spinner{width:18px;height:18px;border:2px solid rgba(26,74,46,0.3);border-top-color:var(--verde);border-radius:50%;animation:spin .7s linear infinite;display:none}
+/* BOTÃO */
+.btn-enviar{width:100%;padding:16px;background:var(--ouro);color:var(--verde-nav);border:none;font-family:'Poppins',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.5px}
+.btn-enviar:hover:not(:disabled){background:#d4b452}
+.btn-enviar:disabled{opacity:.35;cursor:not-allowed}
+.spinner{width:18px;height:18px;border:2px solid rgba(26,74,46,.4);border-top-color:var(--verde-nav);border-radius:50%;animation:spin .7s linear infinite;display:none}
 .btn-enviar.loading .spinner{display:block}
 .btn-enviar.loading .btn-txt{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* SUCESSO */
-.sucesso{text-align:center;padding:24px 0;display:none}
-.sucesso-icone{font-size:56px;margin-bottom:16px}
-.sucesso-titulo{font-family:'Playfair Display',serif;font-size:26px;color:var(--ouro);margin-bottom:10px}
-.sucesso-txt{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.8;margin-bottom:20px}
-.sucesso-cotas{font-family:'Playfair Display',serif;font-size:48px;color:var(--ouro);font-weight:900;display:block;margin:8px 0 4px}
-.sucesso-cotas-txt{font-size:13px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+/* ESTADOS PÓS-ENVIO */
+.estado-box{text-align:center;padding:24px 0;display:none}
+.estado-icone{font-size:48px;margin-bottom:16px;opacity:.8;font-family:'Lora',serif}
+.estado-titulo{font-family:'Lora',serif;font-size:24px;font-weight:400;margin-bottom:10px}
+.estado-txt{font-size:13px;color:rgba(255,255,255,.45);line-height:1.8;max-width:400px;margin:0 auto 20px}
+.estado-cotas{font-family:'Lora',serif;font-size:52px;font-weight:600;color:var(--ouro);display:block;line-height:1}
+.estado-cotas-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px;display:block}
+.estado-aviso{background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.15);padding:14px 20px;margin-top:20px;text-align:left;font-size:12px;color:rgba(255,255,255,.4);line-height:1.7}
+.estado-aviso strong{color:rgba(255,255,255,.6)}
+#estadoAprovado .estado-titulo{color:var(--ouro)}
+#estadoRevisao .estado-titulo{color:rgba(200,168,75,.7)}
+#estadoReprovado .estado-titulo{color:rgba(255,100,100,.7)}
 
-/* AVISO */
-.aviso{background:rgba(200,168,75,0.06);border-left:3px solid var(--ouro);padding:12px 16px;margin-bottom:20px}
-.aviso p{font-size:12px;color:rgba(255,255,255,0.45);line-height:1.65}
-.aviso strong{color:rgba(255,255,255,0.7)}
+/* LINK AUDITORIA */
+.link-auditoria{display:inline-block;margin-top:16px;font-size:12px;color:rgba(200,168,75,.5);text-decoration:underline;text-underline-offset:3px;transition:color .2s}
+.link-auditoria:hover{color:var(--ouro)}
 
-footer{background:rgba(0,0,0,0.3);padding:20px 32px;font-size:11px;color:rgba(255,255,255,0.18);text-align:center;border-top:1px solid rgba(255,255,255,0.05);margin-top:48px}
+/* FOOTER */
+footer{text-align:center;padding:20px 24px;font-size:11px;color:rgba(255,255,255,.2);border-top:1px solid var(--borda);margin-top:8px}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .card{margin:20px 12px 32px;padding:24px}
+  .form-grid{grid-template-columns:1fr}
+  .topo{padding:0 16px}
+}
 </style>
-  <meta name="description" content="Ebooks de empreendedorismo e financas com concurso cultural de leitura.">
-  <meta name="theme-color" content="#1e5c3a">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Editora Tres Trevo">
-  <meta property="og:image" content="https://3trevo.com.br/assets/og-default.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta property="og:title" content="Participar do Programa Cultural — Editora Três Trevo">
-  <meta property="og:url" content="https://3trevo.com.br/participacao-cultural.html">
 </head>
 <body>
 
 <header class="topo">
-  <a href="https://www.3trevo.com.br" class="marca">✦ Editora Três Trevo</a>
+  <a href="https://www.3trevo.com.br" class="marca">Editora Três Trevo</a>
   <span class="tag">Programa Cultural</span>
 </header>
 
-<!-- ETAPAS -->
 <div class="hero">
   <div class="hero-label">✦ Programa Cultural Três Trevo</div>
-  <h1 class="hero-titulo">Valide suas cotas de participação</h1>
-  <p class="hero-sub">Após a leitura, registre seu depoimento e cumpra os requisitos para concorrer ao prêmio.</p>
+  <h1 class="hero-titulo">Valide sua participação</h1>
+  <p class="hero-sub">Após a leitura, escreva seu depoimento genuíno e confirme suas cotas de participação na série.</p>
 </div>
 
-<div class="etapas">
-  <div class="etapa concluida" id="etapa1">
-    <div class="etapa-num">✓</div>
-    <div class="etapa-txt">Comprou</div>
-  </div>
-  <div class="etapa concluida" id="etapa2">
-    <div class="etapa-num">✓</div>
-    <div class="etapa-txt">Recebeu o ebook</div>
-  </div>
-  <div class="etapa ativa" id="etapa3">
-    <div class="etapa-num">3</div>
-    <div class="etapa-txt">Valide agora</div>
-  </div>
-  <div class="etapa" id="etapa4">
-    <div class="etapa-num">4</div>
-    <div class="etapa-txt">Concorrendo</div>
-  </div>
+<div class="etapas" role="list" aria-label="Progresso da participação">
+  <div class="etapa concluida" role="listitem"><div class="etapa-num">✓</div><div class="etapa-txt">Adquiriu</div></div>
+  <div class="etapa concluida" role="listitem"><div class="etapa-num">✓</div><div class="etapa-txt">Recebeu</div></div>
+  <div class="etapa ativa" id="etapa3" role="listitem"><div class="etapa-num">3</div><div class="etapa-txt">Validar</div></div>
+  <div class="etapa" id="etapa4" role="listitem"><div class="etapa-num">4</div><div class="etapa-txt">Concorrendo</div></div>
 </div>
 
-<!-- CARD PRINCIPAL -->
+<main>
 <div class="card" id="cardPrincipal">
 
-  <!-- BLOQUEIO D+7 (mostrado se ainda não passaram 7 dias) -->
+  <!-- BLOQUEIO D+7 -->
   <div class="bloqueio" id="bloqueioD7" style="display:none">
-    <div class="bloqueio-icone">⏳</div>
-    <h2 class="bloqueio-titulo">Ainda não é hora</h2>
-    <p class="bloqueio-txt">Para garantir que você teve tempo de ler, a participação é liberada 7 dias após a compra. Isso também protege seu direito de arrependimento.</p>
+    <div class="bloqueio-icone">◇</div>
+    <h2 class="bloqueio-titulo">Aguarde o período de leitura</h2>
+    <p class="bloqueio-txt">Para garantir uma experiência genuína de leitura, a participação é liberada 7 dias após a compra. Isso também protege seu direito de arrependimento (CDC art. 49).</p>
     <div class="bloqueio-contador">
       <strong id="diasRestantes">—</strong>
-      <span>DIAS PARA LIBERAR</span>
+      <span>Dias para liberar</span>
     </div>
-    <p style="font-size:12px;color:rgba(255,255,255,0.3)">Você receberá um lembrete por e-mail e WhatsApp quando a participação for liberada.</p>
+    <p style="font-size:11px;color:rgba(255,255,255,.25);margin-top:16px">Você receberá um lembrete quando a participação for liberada.</p>
   </div>
 
-  <!-- FORMULÁRIO (mostrado após D+7) -->
+  <!-- FORMULÁRIO -->
   <div id="formParticipacao">
 
-    <div class="aviso">
-      <p>Este link é exclusivo para você. <strong>CPF e ebook identificados automaticamente</strong> pela sua compra. Não compartilhe este link.</p>
+    <div class="info-box">
+      <p>Link exclusivo de participação. <strong>Ebook e compra identificados automaticamente.</strong> Não compartilhe este link.</p>
     </div>
 
-    <!-- DADOS IDENTIFICADOS -->
     <div class="form-secao">
-      <label class="form-label">Ebook adquirido</label>
-      <input type="text" class="form-input" id="campoEbook" readonly>
+      <label class="form-label" for="campoEbook">Ebook adquirido</label>
+      <input type="text" class="form-input" id="campoEbook" readonly aria-readonly="true">
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div class="form-secao">
-        <label class="form-label">CPF <span>(código de participação)</span></label>
-        <input type="text" class="form-input" id="campoCPF" readonly>
-      </div>
-      <div class="form-secao">
-        <label class="form-label">Nome</label>
-        <input type="text" class="form-input" id="campoNome" readonly>
-      </div>
-    </div>
-
-    <!-- CONTATO (editável) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div class="form-secao">
-        <label class="form-label">E-mail <span>(para confirmar participação)</span></label>
-        <input type="email" class="form-input" id="campoEmail" placeholder="seu@email.com">
-      </div>
-      <div class="form-secao">
-        <label class="form-label">WhatsApp <span>(com DDD)</span></label>
-        <input type="tel" class="form-input" id="campoWhatsapp" placeholder="(54) 99999-9999">
-      </div>
+    <div class="form-secao">
+      <label class="form-label" for="campoNome">Nome <em>(identificado pela compra)</em></label>
+      <input type="text" class="form-input" id="campoNome" readonly aria-readonly="true">
     </div>
 
     <!-- DEPOIMENTO -->
     <div class="form-secao">
-      <label class="form-label">Seu depoimento sobre o livro <span>(obrigatório — mínimo 80 palavras)</span></label>
-      <textarea class="form-input form-textarea" id="campoDepoimento" placeholder="Conte o que você aprendeu, o que te surpreendeu, como o livro impactou sua vida ou negócio..." oninput="contarPalavras()"></textarea>
-      <div class="char-count" id="contadorPalavras">0 palavras (mínimo 80)</div>
-      <div class="form-hint">Depoimentos genéricos ou claramente não relacionados ao conteúdo do livro serão desclassificados conforme o regulamento.</div>
+      <label class="form-label" for="campoDepoimento">Seu depoimento <em>(mínimo 40 caracteres)</em></label>
+
+      <div class="guia">
+        <div class="guia-titulo">O que seu depoimento deve abordar</div>
+        <div class="guia-items">
+          <div class="guia-item">Sua experiência de leitura — o que o livro te fez pensar, sentir ou questionar</div>
+          <div class="guia-item">Sua opinião sobre o conteúdo — o que funcionou, o que te surpreendeu, o que discordou</div>
+        </div>
+      </div>
+
+      <textarea class="form-input form-textarea" id="campoDepoimento"
+        placeholder="Escreva aqui o que o livro representou para você. Depoimentos genéricos ou sem relação com o conteúdo serão reprovados pelo sistema de moderação."
+        oninput="contarChars()" aria-describedby="contadorChars guiaDepo"></textarea>
+      <div class="char-counter" id="contadorChars" aria-live="polite">0 / 40 caracteres mínimos</div>
+      <div class="form-hint" id="guiaDepo">Depoimentos que não demonstrem leitura real do livro são automaticamente reprovados. Seja específico sobre o conteúdo que leu.</div>
     </div>
 
-    <!-- REQUISITOS -->
-    <label class="form-label" style="margin-bottom:14px">Requisitos obrigatórios</label>
-    <div class="requisitos">
-      <div class="req" id="reqInstagram" onclick="toggleReq('instagram')">
-        <div class="req-check" id="checkInstagram"></div>
-        <div class="req-info">
-          <strong>Seguir @3trevo no Instagram</strong>
-          <span>Clique aqui para seguir e marque como concluído</span>
-        </div>
-        <span class="req-badge">OBRIGATÓRIO</span>
-      </div>
-    </div>
-
-    <label class="form-label" style="margin:20px 0 14px">Bônus — cotas extras</label>
-    <div class="requisitos">
-      <div class="req" id="reqWhatsapp" onclick="toggleReq('whatsapp')">
-        <div class="req-check" id="checkWhatsapp"></div>
-        <div class="req-info">
-          <strong>Entrar no grupo WhatsApp</strong>
-          <span>Dobra o número de cotas de participação</span>
-        </div>
-        <span class="req-badge bonus">+BÔNUS</span>
-      </div>
-      <div class="req" id="reqCompartilhar" onclick="toggleReq('compartilhar')">
-        <div class="req-check" id="checkCompartilhar"></div>
-        <div class="req-info">
-          <strong>Compartilhar a campanha</strong>
-          <span>+1 cota extra por compartilhamento confirmado</span>
-        </div>
-        <span class="req-badge bonus">+BÔNUS</span>
-      </div>
-    </div>
-
-    <!-- COTAS CALCULADAS -->
-    <div class="cotas-preview" id="cotasPreview">
-      <div class="cotas-num" id="numCotas">1</div>
+    <!-- COTAS PREVISTAS -->
+    <div class="cotas-box" aria-label="Cotas incluídas nesta compra">
+      <div class="cotas-num" id="numCotas">—</div>
       <div class="cotas-txt">
-        <strong id="txtCotasBase">1 cota de participação</strong>
-        <span id="txtCotasDesc">Cumpra os bônus para ampliar sua elegibilidade</span>
-        <div class="cotas-bônus" id="txtBonus" style="display:none"></div>
+        <strong id="txtCotasBase">Cotas de participação</strong>
+        <span>Válidas em todas as 6 rodadas da Série 1</span>
       </div>
     </div>
 
-    <button class="btn-enviar" id="btnEnviar" onclick="enviarParticipacao()" disabled>
-      <div class="spinner"></div>
-      <span class="btn-txt">✦ Confirmar participação</span>
+    <button class="btn-enviar" id="btnEnviar" onclick="enviarDepoimento()" disabled aria-disabled="true">
+      <div class="spinner" aria-hidden="true"></div>
+      <span class="btn-txt">✦ Enviar depoimento</span>
     </button>
 
-    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:12px;line-height:1.6">
-      Ao confirmar, você declara que leu o material e concorda com o <a href="/regras-programa-cultural.html" style="color:rgba(200,168,75,0.6)">regulamento do Programa Cultural</a>.
+    <p style="font-size:11px;color:rgba(255,255,255,.2);text-align:center;margin-top:14px;line-height:1.7">
+      Ao enviar, você declara que leu o material e concorda com o <a href="/regras-programa-cultural.html" style="color:rgba(200,168,75,.5)">regulamento do Programa Cultural</a>.<br>
+      O exercício do direito de arrependimento cancela automaticamente a participação.
     </p>
   </div>
 
-  <!-- SUCESSO -->
-  <div class="sucesso" id="telaSuccesso">
-    <div class="sucesso-icone">🎉</div>
-    <h2 class="sucesso-titulo">Participação confirmada!</h2>
-    <span class="sucesso-cotas" id="sucCotas">3</span>
-    <div class="sucesso-cotas-txt">COTAS DE PARTICIPAÇÃO</div>
-    <p class="sucesso-txt" style="margin-top:16px">Você receberá a confirmação por e-mail e WhatsApp. Boa participação!</p>
-    <a href="https://www.instagram.com/3trevo" style="display:inline-block;padding:12px 28px;background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.3);color:var(--ouro);text-decoration:none;font-size:13px;margin-top:8px">Acompanhar @3trevo →</a>
+  <!-- ESTADO: APROVADO -->
+  <div class="estado-box" id="estadoAprovado">
+    <div class="estado-icone">✦</div>
+    <h2 class="estado-titulo">Participação confirmada</h2>
+    <span class="estado-cotas" id="sucCotas">—</span>
+    <span class="estado-cotas-label">Cotas de participação</span>
+    <p class="estado-txt" style="margin-top:20px">Seu depoimento foi validado. Suas cotas estão ativas em todas as rodadas desta série. Boa participação.</p>
+    <a href="/auditoria-sorteio.html" class="link-auditoria">Acompanhar auditoria pública →</a>
+  </div>
+
+  <!-- ESTADO: EM REVISÃO -->
+  <div class="estado-box" id="estadoRevisao">
+    <div class="estado-icone" style="color:rgba(200,168,75,.6)">◈</div>
+    <h2 class="estado-titulo">Depoimento em análise</h2>
+    <p class="estado-txt">Seu depoimento foi recebido e está em revisão manual pela equipe editorial. Você receberá a confirmação em até 48 horas por e-mail.</p>
+    <div class="estado-aviso">
+      <strong>O que acontece agora?</strong><br>
+      Sua participação fica pendente até a aprovação. Se aprovado, suas cotas são creditadas retroativamente com a data de hoje. Se houver alguma questão, entraremos em contato.
+    </div>
+  </div>
+
+  <!-- ESTADO: REPROVADO -->
+  <div class="estado-box" id="estadoReprovado">
+    <div class="estado-icone" style="color:rgba(255,100,100,.5)">◇</div>
+    <h2 class="estado-titulo">Depoimento não aprovado</h2>
+    <p class="estado-txt" id="motivoReprovacao">Seu depoimento não passou pela moderação automática.</p>
+    <div class="estado-aviso">
+      <strong>Você pode tentar novamente.</strong><br>
+      Escreva um depoimento genuíno sobre o conteúdo do livro que leu. Se acredita que houve um erro, entre em contato: <a href="mailto:sac@3trevo.com.br" style="color:rgba(200,168,75,.5)">sac@3trevo.com.br</a>
+    </div>
+    <button onclick="tentarNovamente()" style="margin-top:20px;padding:10px 24px;border:1px solid rgba(200,168,75,.3);color:var(--ouro);background:transparent;cursor:pointer;font-family:'Poppins',sans-serif;font-size:13px;transition:all .2s" onmouseover="this.style.background='rgba(200,168,75,.1)'" onmouseout="this.style.background='transparent'">Tentar novamente</button>
   </div>
 
 </div>
+</main>
 
 <footer>Editora Três Trevo · CNPJ 18.928.966/0001-59 · Montauri/RS · sac@3trevo.com.br</footer>
 
 <script>
-// ─── CONFIGURAÇÃO ───────────────────────────────────────────
-const WEBHOOK_MAKE = 'SEU_WEBHOOK_AQUI';
+var SB_URL = 'https://xfkepekffdyrtcgagwqo.supabase.co';
+var ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
 
-// Mapeamento de slugs/ebooks → cotas base
-const COTAS_BASE = {
-  'justicamento':    1,
-  'guia-antifalencia': 3,
-  'vigilante':       10,
-  'terceira-guerra': 10
+var COTAS_BASE = {
+  'justicamento':1, 'vigilante':10, 'terceiraguerra':10,
+  'antifalencia':3, 'atico':3
+};
+var NOMES_EBOOK = {
+  'justicamento':      'Justiça(mento) para Orelha',
+  'vigilante':         'Vigilante',
+  'terceiraguerra':    'O Nascimento Silencioso da 3ª Guerra Mundial',
+  'antifalencia':      'O Guia Antifalência do Empreendedor Iniciante',
+  'atico':             'Antes do App, o Método'
 };
 
-// ─── INICIALIZAÇÃO ──────────────────────────────────────────
-const params = new URLSearchParams(window.location.search);
-const cpf        = params.get('cpf')    || '';
-const nome       = params.get('nome')   || '';
-const email      = params.get('email')  || '';
-const whatsapp   = params.get('phone')  || '';
-const ebook      = params.get('ebook')  || '';
-const compraData = params.get('data')   || ''; // ISO 8601 da compra (approved_at do Rifei)
+var params = new URLSearchParams(window.location.search);
+var purchaseId = params.get('pid') || '';
+var ebookSlug  = params.get('ebook') || '';
+var nomeUser   = params.get('nome') || '';
+var dataCompra = params.get('data') || '';
+var liberado   = true;
 
-// Preencher campos
-document.getElementById('campoCPF').value      = cpf  ? formatarCPF(cpf)  : '—';
-document.getElementById('campoNome').value     = nome || '—';
-document.getElementById('campoEmail').value    = email;
-document.getElementById('campoWhatsapp').value = whatsapp ? formatarPhone(whatsapp) : '';
-document.getElementById('campoEbook').value    = nomeEbook(ebook);
+// Preencher campos de exibição
+document.getElementById('campoEbook').value = NOMES_EBOOK[ebookSlug] || ebookSlug || 'Ebook Três Trevo';
+document.getElementById('campoNome').value  = nomeUser || '—';
 
-// ─── VERIFICAÇÃO D+7 ────────────────────────────────────────
-let liberado = true;
-if (compraData) {
-  const dataCompra  = new Date(compraData);
-  const dataLibera  = new Date(dataCompra.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const agora       = new Date();
-  const diasRestam  = Math.ceil((dataLibera - agora) / (1000 * 60 * 60 * 24));
+// Cotas base
+var cotas = COTAS_BASE[ebookSlug] || 1;
+document.getElementById('numCotas').textContent = cotas;
+document.getElementById('txtCotasBase').textContent = cotas + (cotas > 1 ? ' cotas' : ' cota') + ' de participação';
 
-  if (agora < dataLibera) {
+// Verificação D+7 (client-side para UX imediata)
+if (dataCompra) {
+  var dataLib = new Date(new Date(dataCompra).getTime() + 7 * 86400000);
+  if (Date.now() < dataLib) {
     liberado = false;
     document.getElementById('bloqueioD7').style.display = 'block';
     document.getElementById('formParticipacao').style.display = 'none';
-    document.getElementById('diasRestantes').textContent = diasRestam;
+    document.getElementById('diasRestantes').textContent = Math.ceil((dataLib - Date.now()) / 86400000);
   }
 }
 
-// ─── COTAS ──────────────────────────────────────────────────
-let cotasBase = COTAS_BASE[ebook] || 1;
-let bonusWhatsapp    = false;
-let bonusCompartilhar = false;
-let instagramOk      = false;
-
-function calcularCotas() {
-  let total = cotasBase;
-  let bonusTxt = [];
-  if (bonusWhatsapp)    { total *= 2; bonusTxt.push('×2 pelo WhatsApp'); }
-  if (bonusCompartilhar){ total += 1; bonusTxt.push('+1 por compartilhar'); }
-
-  document.getElementById('numCotas').textContent = total;
-  document.getElementById('txtCotasBase').textContent = `${total} cota${total>1?'s':''} de participação`;
-
-  if (bonusTxt.length) {
-    document.getElementById('txtBonus').style.display = 'block';
-    document.getElementById('txtBonus').textContent   = bonusTxt.join(' · ');
-    document.getElementById('txtCotasDesc').textContent = 'Bônus aplicados ✓';
-  } else {
-    document.getElementById('txtBonus').style.display = 'none';
-    document.getElementById('txtCotasDesc').textContent = 'Cumpra os bônus para ampliar sua elegibilidade';
-  }
-  verificarBotao();
-}
-
-function toggleReq(tipo) {
-  if (tipo === 'instagram') {
-    instagramOk = !instagramOk;
-    document.getElementById('reqInstagram').classList.toggle('concluido', instagramOk);
-    document.getElementById('checkInstagram').textContent = instagramOk ? '✓' : '';
-    if (instagramOk) window.open('https://www.instagram.com/3trevo', '_blank');
-  }
-  if (tipo === 'whatsapp') {
-    bonusWhatsapp = !bonusWhatsapp;
-    document.getElementById('reqWhatsapp').classList.toggle('concluido', bonusWhatsapp);
-    document.getElementById('checkWhatsapp').textContent = bonusWhatsapp ? '✓' : '';
-    if (bonusWhatsapp) window.open('https://chat.whatsapp.com/SEU_LINK_GRUPO', '_blank');
-  }
-  if (tipo === 'compartilhar') {
-    bonusCompartilhar = !bonusCompartilhar;
-    document.getElementById('reqCompartilhar').classList.toggle('concluido', bonusCompartilhar);
-    document.getElementById('checkCompartilhar').textContent = bonusCompartilhar ? '✓' : '';
-    if (bonusCompartilhar) {
-      if (navigator.share) {
-        navigator.share({ title:'Programa Cultural Três Trevo', url: window.location.origin });
-      }
-    }
-  }
-  calcularCotas();
-}
-
-function contarPalavras() {
-  const txt = document.getElementById('campoDepoimento').value.trim();
-  const palavras = txt ? txt.split(/\s+/).length : 0;
-  const el = document.getElementById('contadorPalavras');
-  el.textContent = `${palavras} palavras (mínimo 80)`;
-  el.classList.toggle('ok', palavras >= 80);
+function contarChars() {
+  var txt = document.getElementById('campoDepoimento').value.trim();
+  var n   = txt.length;
+  var el  = document.getElementById('contadorChars');
+  el.textContent = n + ' / 40 caracteres mínimos';
+  el.classList.toggle('ok', n >= 40);
   verificarBotao();
 }
 
 function verificarBotao() {
-  const depoimento = document.getElementById('campoDepoimento').value.trim();
-  const palavras   = depoimento ? depoimento.split(/\s+/).length : 0;
-  const emailOk    = document.getElementById('campoEmail').value.includes('@');
-  const ok = palavras >= 80 && instagramOk && emailOk && liberado;
-  document.getElementById('btnEnviar').disabled = !ok;
+  var txt = document.getElementById('campoDepoimento').value.trim();
+  var ok  = txt.length >= 40 && liberado && purchaseId;
+  var btn = document.getElementById('btnEnviar');
+  btn.disabled = !ok;
+  btn.setAttribute('aria-disabled', String(!ok));
 }
 
-document.getElementById('campoEmail').addEventListener('input', verificarBotao);
+function mostrarEstado(id) {
+  ['estadoAprovado','estadoRevisao','estadoReprovado'].forEach(function(sid){
+    document.getElementById(sid).style.display = sid === id ? 'block' : 'none';
+  });
+  document.getElementById('formParticipacao').style.display = 'none';
+  document.getElementById('etapa3').classList.remove('ativa');
+  document.getElementById('etapa3').classList.add('concluida');
+  document.getElementById('etapa3').querySelector('.etapa-num').textContent = '✓';
+  if (id === 'estadoAprovado') document.getElementById('etapa4').classList.add('ativa');
+}
 
-// ─── ENVIO ──────────────────────────────────────────────────
-async function enviarParticipacao() {
-  const btn = document.getElementById('btnEnviar');
+function tentarNovamente() {
+  document.getElementById('estadoReprovado').style.display = 'none';
+  document.getElementById('formParticipacao').style.display = 'block';
+  document.getElementById('campoDepoimento').value = '';
+  document.getElementById('contadorChars').textContent = '0 / 40 caracteres mínimos';
+  document.getElementById('contadorChars').classList.remove('ok');
+  document.getElementById('btnEnviar').disabled = true;
+}
+
+async function enviarDepoimento() {
+  var btn  = document.getElementById('btnEnviar');
+  var txt  = document.getElementById('campoDepoimento').value.trim();
   btn.classList.add('loading');
   btn.disabled = true;
 
-  const totalCotas = parseInt(document.getElementById('numCotas').textContent);
-
-  const payload = {
-    evento:        'participacao_cultural',
-    cpf:           cpf,
-    nome:          nome,
-    email:         document.getElementById('campoEmail').value,
-    whatsapp:      document.getElementById('campoWhatsapp').value,
-    ebook:         ebook,
-    ebook_nome:    nomeEbook(ebook),
-    depoimento:    document.getElementById('campoDepoimento').value.trim(),
-    instagram:     instagramOk,
-    bonus_whatsapp: bonusWhatsapp,
-    bonus_compartilhou: bonusCompartilhar,
-    cotas_total:   totalCotas,
-    data:          new Date().toISOString()
-  };
-
   try {
-    if (WEBHOOK_MAKE !== 'SEU_WEBHOOK_AQUI') {
-      await fetch(WEBHOOK_MAKE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    var r = await fetch(SB_URL + '/functions/v1/validate-depoimento', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + ANON_KEY
+      },
+      body: JSON.stringify({
+        purchase_id: purchaseId,
+        texto:       txt,
+        ebook_slug:  ebookSlug
+      })
+    });
+
+    var data = await r.json();
+
+    if (!r.ok) throw new Error(data.error || 'Erro desconhecido');
+
+    var estado = data.estado || 'revisao_manual';
+
+    if (estado === 'aprovado') {
+      document.getElementById('sucCotas').textContent = cotas;
+      mostrarEstado('estadoAprovado');
+    } else if (estado === 'revisao_manual') {
+      mostrarEstado('estadoRevisao');
+    } else {
+      var motivos = {
+        'reprovado_calao':    'Seu depoimento contém linguagem inadequada.',
+        'reprovado_conteudo': 'Seu depoimento não demonstrou relação com o conteúdo do livro adquirido.'
+      };
+      document.getElementById('motivoReprovacao').textContent = motivos[estado] || 'Seu depoimento não passou pela moderação automática.';
+      mostrarEstado('estadoReprovado');
     }
-    // Mostrar sucesso
-    document.getElementById('formParticipacao').style.display = 'none';
-    document.getElementById('telaSuccesso').style.display = 'block';
-    document.getElementById('sucCotas').textContent = totalCotas;
-    document.getElementById('etapa3').classList.remove('ativa');
-    document.getElementById('etapa3').classList.add('concluida');
-    document.getElementById('etapa3').querySelector('.etapa-num').textContent = '✓';
-    document.getElementById('etapa4').classList.add('ativa');
   } catch(e) {
     btn.classList.remove('loading');
     btn.disabled = false;
-    alert('Erro ao enviar. Verifique sua conexão e tente novamente.');
+    alert('Erro ao enviar. Verifique sua conexão e tente novamente.\n\n' + (e.message || ''));
   }
-}
-
-// ─── UTILITÁRIOS ────────────────────────────────────────────
-function formatarCPF(cpf) {
-  const c = cpf.replace(/\D/g,'');
-  return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-}
-function formatarPhone(p) {
-  return p.replace(/^\+55/, '').replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-}
-function nomeEbook(slug) {
-  const nomes = {
-    'justicamento':      'Justiça(mento) para Orelha',
-    'guia-antifalencia': 'O Guia Antifalência do Empreendedor Iniciante',
-    'vigilante':         'Vigilante',
-    'terceira-guerra':   'O Nascimento Silencioso da 3ª Guerra Mundial'
-  };
-  return nomes[slug] || slug || 'Ebook Três Trevo';
 }
 </script>
 </body>
