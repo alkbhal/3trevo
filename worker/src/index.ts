@@ -4,8 +4,7 @@ export interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_KEY: string;
   ADMIN_SENHA?: string;
-  RIFEI_WEBHOOK_SECRET?: string;
-  CHECKOUT_WEBHOOK_SECRET?: string; // checkout próprio — gateway ainda não escolhido (spec 5B.3)
+  CHECKOUT_WEBHOOK_SECRET?: string;
   FORGE_STORAGE?: R2Bucket;
   ANTHROPIC_API_KEY?: string;
 }
@@ -264,7 +263,7 @@ async function handleDeleteDepoimento(env: Env, id: string): Promise<Response> {
 async function handlePublicCatalogo(env: Env): Promise<Response> {
   const rows = await sbGet(
     env,
-    'catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,rifei_url,utm_campaign,bg_color,ordem',
+    'catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,ordem',
   );
   return corsResponse(rows);
 }
@@ -285,43 +284,6 @@ async function handlePublicConfig(env: Env, chave: string): Promise<Response> {
   return corsResponse(rows[0]);
 }
 
-async function handleWebhookRifei(env: Env, req: Request): Promise<Response> {
-  const secret = req.headers.get('X-Webhook-Secret');
-  if (secret !== env.RIFEI_WEBHOOK_SECRET) {
-    console.warn('Webhook Rifei: secret inválido');
-    return errorResponse('Não autorizado.', 401);
-  }
-  const body = await req.json<Record<string, any>>();
-  const nome = body.nome || body.customer_name || 'Desconhecido';
-  const email = body.email || body.customer_email || '';
-  const telefone = body.telefone || body.customer_phone || '';
-  const ebook_slug = body.ebook_slug || body.product_slug || '';
-  const valor_pago = body.valor_pago ?? body.amount ?? 0;
-  const id_externo = body.id_externo || body.order_id || '';
-
-  if (!email || !ebook_slug) {
-    console.error('Webhook Rifei: campos obrigatórios ausentes', { email, ebook_slug });
-    return errorResponse('Campos obrigatórios: email e ebook_slug.', 400);
-  }
-
-  const rpc = await sbFetch(env, 'rpc/upsert_cliente_pedido', {
-    method: 'POST',
-    body: JSON.stringify({ p_nome: nome, p_email: email, p_telefone: telefone, p_ebook_slug: ebook_slug, p_valor_pago: valor_pago, p_id_externo: id_externo }),
-  });
-  const resultado = await rpc.json<any>();
-  if (!resultado.ok) {
-    console.error('Erro ao registrar pedido:', resultado.erro);
-    return errorResponse('Erro ao registrar pedido: ' + resultado.erro, 500);
-  }
-  console.log('Pedido registrado:', JSON.stringify(resultado));
-  await registrarAuditoria(env, 'pedidos', 'INSERT', id_externo, null, { email, ebook_slug, valor_pago, novo: resultado.novo_pedido });
-  return corsResponse({
-    ok: true,
-    novo_pedido: resultado.novo_pedido,
-    pedido_id: resultado.pedido_id,
-    mensagem: resultado.novo_pedido ? 'Pedido registrado com sucesso.' : 'Pedido já existia — ignorado (idempotência).',
-  });
-}
 
 async function handleLgpd(env: Env, req: Request): Promise<Response> {
   const body = await req.json<{ email?: string; tipo?: string; descricao?: string }>();
@@ -556,8 +518,6 @@ export default {
         return handlePublicConfig(env, path.split('/').pop() || '');
       }
       if (path === '/api/lgpd' && method === 'POST') return handleLgpd(env, req);
-      if (path === '/api/webhook/rifei' && method === 'POST') return handleWebhookRifei(env, req);
-      // Checkout próprio — substitui a Rifei. Gateway a definir (spec 5B.3); ver checkout-proprio.ts
       if (path === '/api/checkout/webhook' && method === 'POST') return handleCheckoutWebhook(env, req, gatewayPlaceholder);
       if (path === '/api/webhook/forge' && method === 'POST') return handleWebhookForge(env, req);
       if (path.startsWith('/api/forge/preview/') && method === 'GET') return handleForgePreview(env, path.split('/').pop() ?? '');

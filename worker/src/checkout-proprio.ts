@@ -1,14 +1,8 @@
-// Esqueleto do checkout próprio — substitui a dependência da Rifei.
+// Checkout próprio — processamento de pedidos via gateway nativo.
 //
-// Por quê: o checkout público vivia hospedado numa plataforma cuja marca é "rifa",
-// o que enfraquece a tese jurídica do Programa Cultural (spec seção 0.4 — o concurso
-// não pode ser lido como sorteio comum). Mover o checkout para infraestrutura própria
-// resolve isso e elimina o ponto único de falha do processador externo.
-//
-// GATEWAY AINDA NÃO ESCOLHIDO — depende da conta PJ ativa (spec 5B.1) e dos critérios
-// de seleção já definidos (spec 5B.3: receber em conta PJ > compatível com Bling/NF-e
-// > suporta split na origem > taxa). Por isso a integração é isolada num adapter:
-// trocar de gateway = reescrever só `gatewayPlaceholder`, o handler genérico não muda.
+// Gateway ainda não escolhido — depende da conta PJ ativa (spec 5B.1).
+// Critérios: receber em conta PJ > compatível com Bling/NF-e > suporta split > taxa.
+// Trocar de gateway = reescrever só `gatewayPlaceholder`; o handler genérico não muda.
 
 import { type Env, sbFetch, registrarAuditoria, errorResponse, corsResponse } from './index';
 
@@ -29,10 +23,8 @@ export interface CheckoutGateway {
   normalizarPedido(corpo: Record<string, any>): PedidoNormalizado;
 }
 
-// Placeholder: assume o esquema HMAC-SHA256 que a própria spec já recomendava
-// para a Rifei (seção 5.2) e que a maioria dos gateways de pagamento oferece
-// nativamente. Quando o gateway for escolhido, este bloco inteiro é substituído
-// pelo esquema de assinatura real dele (cada um tem o seu formato de header/hash).
+// Placeholder: HMAC-SHA256 genérico. Quando o gateway for escolhido, substituir
+// pelo esquema de assinatura real dele (cada gateway tem seu formato de header/hash).
 export const gatewayPlaceholder: CheckoutGateway = {
   nome: 'placeholder',
 
@@ -54,8 +46,7 @@ export const gatewayPlaceholder: CheckoutGateway = {
   },
 
   normalizarPedido(corpo) {
-    // TODO: ajustar os nomes de campo para o payload real do gateway escolhido —
-    // os fallbacks abaixo só espelham o formato que a Rifei usava.
+    // TODO: ajustar nomes de campo para o payload real do gateway escolhido.
     return {
       nome: corpo.nome || corpo.customer_name || 'Desconhecido',
       email: corpo.email || corpo.customer_email || '',
@@ -67,9 +58,9 @@ export const gatewayPlaceholder: CheckoutGateway = {
   },
 };
 
-// Handler genérico: registra o pedido pelo mesmo RPC que a Rifei já usa
-// (`upsert_cliente_pedido`), então a tabela `pedidos` e tudo que depende dela
-// (cotas, draw_entries) continuam funcionando sem alteração na troca de processador.
+// Handler genérico: registra o pedido via RPC `upsert_cliente_pedido`.
+// A tabela `pedidos` e tudo que depende dela (cotas, draw_entries) continuam
+// funcionando sem alteração na troca de gateway.
 export async function handleCheckoutWebhook(env: Env, req: Request, gateway: CheckoutGateway): Promise<Response> {
   const corpoBruto = await req.text();
 
