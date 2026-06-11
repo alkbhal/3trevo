@@ -1659,12 +1659,20 @@ async function carregarDashboard() {
   document.getElementById('st-rodadas').textContent = abertas;
   document.getElementById('badge-sorteios').textContent = (draws||[]).length;
 
-  // Próximo sorteio
+  // Próximo sorteio — fallback para config.proxima_extracao_lf quando data_sorteio é null
   const proxima = (draws||[]).find(d=>d.status==='open' && d.data_sorteio);
   if (proxima) {
     const dt = new Date(proxima.data_sorteio);
     document.getElementById('st-proximo').textContent = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
     document.getElementById('st-proximo-sub').textContent = proxima.titulo;
+  } else {
+    const { data: cfgLf } = await sb.from('config').select('valor').eq('chave','proxima_extracao_lf').single();
+    if (cfgLf?.valor) {
+      const dt = new Date(cfgLf.valor);
+      document.getElementById('st-proximo').textContent = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+      const rodadaAberta = (draws||[]).find(d=>d.status==='open');
+      if (rodadaAberta) document.getElementById('st-proximo-sub').textContent = rodadaAberta.titulo;
+    }
   }
 
   // Participantes — count via select (HEAD com count:exact gera 503 no plano atual)
