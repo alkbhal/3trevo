@@ -58,6 +58,66 @@ export const gatewayPlaceholder: CheckoutGateway = {
   },
 };
 
+// ── NF-e stub (Fase 5) ────────────────────────────────────────────
+// NFE_ENABLED é lida da tabela config. Com false (padrão), insere linha
+// com status pendente_certificado. Quando B2 (pfx+Bling) for resolvido:
+// setar NFE_ENABLED=true no config e reprocessar pendentes.
+async function nfeStub(env: Env, purchaseId: string): Promise<void> {
+  try {
+    const cfgR = await sbFetch(env, 'config?chave=eq.NFE_ENABLED&select=valor');
+    const cfg   = await cfgR.json<{ valor: unknown }[]>();
+    const enabled = cfg?.[0]?.valor === true;
+    if (enabled) {
+      // TODO Fase 5: chamar Bling OAuth2 + emitir NF-e real
+      console.log('[NFe] NFE_ENABLED=true mas módulo ainda não implementado — pendente_certificado');
+    }
+    await sbFetch(env, 'notas_fiscais', {
+      method:  'POST',
+      body:    JSON.stringify({ purchase_id: purchaseId, status: 'pendente_certificado' }),
+      headers: { Prefer: 'return=minimal' },
+    });
+  } catch (e) {
+    console.error('[NFe] Erro ao criar stub:', e);
+  }
+}
+
+// ── Resend email delivery (Fase 4) ───────────────────────────────
+// Disparado após pedido registrado. Sem RESEND_API_KEY: log + skip (não bloqueia).
+async function enviarEmailResend(env: Env, email: string, nome: string, ebookSlug: string, pedidoId: string): Promise<void> {
+  if (!env.RESEND_API_KEY) {
+    console.log(`[Resend] RESEND_API_KEY ausente — email não enviado para ${email}. Pedido ${pedidoId}.`);
+    return;
+  }
+  try {
+    const downloadUrl = `https://xfkepekffdyrtcgagwqo.supabase.co/functions/v1/get-download?pedido_id=${pedidoId}&slug=${ebookSlug}`;
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from:    'Editora Três Trevo <sac@3trevo.com.br>',
+        to:      [email],
+        subject: 'Seu ebook está pronto — Três Trevo',
+        html: `<p>Olá${nome ? ', ' + nome : ''}!</p>
+<p>Obrigado pela sua compra. Seu ebook está disponível para download:</p>
+<p><a href="${downloadUrl}" style="background:#1a4a2e;color:#f5f0e8;padding:12px 24px;text-decoration:none;display:inline-block">Baixar ebook →</a></p>
+<p style="color:#666;font-size:13px">O link expira em 72h e permite até 3 downloads. Acesse também sua <a href="https://www.3trevo.com.br/area-cliente.html">Área do Cliente</a> a qualquer momento.</p>
+<p style="color:#999;font-size:12px">Editora Três Trevo · sac@3trevo.com.br</p>`,
+      }),
+    });
+    if (resp.ok) {
+      console.log(`[Resend] Email enviado para ${email} pedido=${pedidoId}`);
+    } else {
+      const err = await resp.text();
+      console.error(`[Resend] Erro ao enviar para ${email}: ${err}`);
+    }
+  } catch (e) {
+    console.error('[Resend] Exceção:', e);
+  }
+}
+
 // Handler genérico: registra o pedido via RPC `upsert_cliente_pedido`.
 // A tabela `pedidos` e tudo que depende dela (cotas, draw_entries) continuam
 // funcionando sem alteração na troca de gateway.
@@ -111,6 +171,13 @@ export async function handleCheckoutWebhook(env: Env, req: Request, gateway: Che
     novo: resultado.novo_pedido,
     gateway: gateway.nome,
   });
+
+  // Fase 4 — Resend + Fase 5 — NF-e stub (não bloqueiam resposta ao gateway)
+  if (resultado.novo_pedido) {
+    const pedidoId = resultado.pedido_id as string ?? '';
+    void enviarEmailResend(env, pedido.email, pedido.nome, pedido.ebook_slug, pedidoId);
+    void nfeStub(env, pedidoId);
+  }
 
   return corsResponse({
     ok: true,

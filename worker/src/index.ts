@@ -1,10 +1,14 @@
 import { handleCheckoutWebhook, gatewayPlaceholder } from './checkout-proprio';
+import { handleApuracao } from './apuracao';
 
 export interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_KEY: string;
+  SUPABASE_ANON_KEY: string;
   ADMIN_SENHA?: string;
   CHECKOUT_WEBHOOK_SECRET?: string;
+  FORGE_WEBHOOK_SECRET?: string;
+  RESEND_API_KEY?: string;
   FORGE_STORAGE?: R2Bucket;
   ANTHROPIC_API_KEY?: string;
 }
@@ -35,6 +39,23 @@ export function sbFetch(env: Env, path: string, opts: RequestInit = {}): Promise
       ...((opts.headers as Record<string, string>) || {}),
     },
   });
+}
+
+// Usa a anon key (pública) para leituras sem RLS admin.
+function sbFetchPublic(env: Env, path: string): Promise<Response> {
+  return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      apikey: env.SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
+async function sbGetPublic(env: Env, path: string): Promise<any[]> {
+  const r = await sbFetchPublic(env, path);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
 }
 
 async function sbGet(env: Env, path: string): Promise<any[]> {
@@ -88,7 +109,7 @@ async function validarSessao(env: Env, req: Request): Promise<boolean> {
 async function validarJwtSupabase(env: Env, jwt: string): Promise<boolean> {
   try {
     const r = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${jwt}` },
+      headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: `Bearer ${jwt}` },
     });
     if (!r.ok) return false;
     const user = await r.json() as { email?: string };
@@ -261,7 +282,7 @@ async function handleDeleteDepoimento(env: Env, id: string): Promise<Response> {
 }
 
 async function handlePublicCatalogo(env: Env): Promise<Response> {
-  const rows = await sbGet(
+  const rows = await sbGetPublic(
     env,
     'catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,ordem',
   );
@@ -269,7 +290,7 @@ async function handlePublicCatalogo(env: Env): Promise<Response> {
 }
 
 async function handlePublicPremios(env: Env): Promise<Response> {
-  const rows = await sbGet(
+  const rows = await sbGetPublic(
     env,
     'premios?ativo=eq.true&order=posicao.asc&select=posicao,descricao_pt,descricao_en,descricao_es,conectado_pt,conectado_en,conectado_es',
   );
@@ -279,7 +300,7 @@ async function handlePublicPremios(env: Env): Promise<Response> {
 async function handlePublicConfig(env: Env, chave: string): Promise<Response> {
   const BLOQUEADAS = ['admin_senha', 'publicado'];
   if (BLOQUEADAS.includes(chave)) return errorResponse('Não autorizado.', 403);
-  const rows = await sbGet(env, `config?chave=eq.${chave}&select=chave,valor`);
+  const rows = await sbGetPublic(env, `config?chave=eq.${chave}&select=chave,valor`);
   if (!rows.length) return errorResponse('Chave não encontrada.', 404);
   return corsResponse(rows[0]);
 }
@@ -475,13 +496,31 @@ async function handleForgePublicar(env: Env, req: Request): Promise<Response> {
   return corsResponse({ ok: true, slug, titulo });
 }
 
+async function verificarHMACForge(req: Request, env: Env, corpo: string): Promise<boolean> {
+  if (!env.FORGE_WEBHOOK_SECRET) return true; // sem secret configurado, aceita (modo desenvolvimento)
+  const assinatura = req.headers.get('X-Forge-Signature');
+  if (!assinatura) return false;
+  const chave = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(env.FORGE_WEBHOOK_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'],
+  );
+  const esperado = await crypto.subtle.sign('HMAC', chave, new TextEncoder().encode(corpo));
+  const esperadoHex = [...new Uint8Array(esperado)].map(b => b.toString(16).padStart(2, '0')).join('');
+  return assinatura === esperadoHex;
+}
+
 async function handleWebhookForge(env: Env, req: Request): Promise<Response> {
   try {
-    const pkg = await req.json() as Record<string, unknown>;
+    const corpoBruto = await req.text();
+    if (!await verificarHMACForge(req, env, corpoBruto)) {
+      console.warn('[forge-delivery] assinatura HMAC inválida');
+      return errorResponse('Não autorizado.', 401);
+    }
+    const pkg = JSON.parse(corpoBruto) as Record<string, unknown>;
     const projectId = pkg.projectId as string;
-    const status = pkg.status as string;
-    const arquivos = (pkg.arquivos as string[]) ?? [];
-    const summary = (pkg.summary as string) ?? '';
+    const status    = pkg.status as string;
+    const arquivos  = (pkg.arquivos as string[]) ?? [];
+    const summary   = (pkg.summary as string) ?? '';
     console.log(`[forge-delivery] project=${projectId} status=${status} files=${arquivos.length}`);
     if ((status === 'complete' || status === 'awaiting_character_images') && env.FORGE_STORAGE) {
       const slug = `forge-${projectId.slice(0, 8)}`;
@@ -512,72 +551,74 @@ export default {
 
     try {
       // Rotas públicas
-      if (path === '/api/public/catalogo' && method === 'GET') return handlePublicCatalogo(env);
-      if (path === '/api/public/premios' && method === 'GET') return handlePublicPremios(env);
+      if (path === '/api/public/catalogo' && method === 'GET') return await handlePublicCatalogo(env);
+      if (path === '/api/public/premios' && method === 'GET') return await handlePublicPremios(env);
       if (path.startsWith('/api/public/config/') && method === 'GET') {
-        return handlePublicConfig(env, path.split('/').pop() || '');
+        return await handlePublicConfig(env, path.split('/').pop() || '');
       }
-      if (path === '/api/lgpd' && method === 'POST') return handleLgpd(env, req);
-      if (path === '/api/checkout/webhook' && method === 'POST') return handleCheckoutWebhook(env, req, gatewayPlaceholder);
-      if (path === '/api/webhook/forge' && method === 'POST') return handleWebhookForge(env, req);
-      if (path.startsWith('/api/forge/preview/') && method === 'GET') return handleForgePreview(env, path.split('/').pop() ?? '');
-      if (path.startsWith('/api/forge/summary/') && method === 'GET') return handleForgeSummary(env, path.split('/').pop() ?? '');
+      if (path === '/api/lgpd' && method === 'POST') return await handleLgpd(env, req);
+      if (path === '/api/checkout/webhook' && method === 'POST') return await handleCheckoutWebhook(env, req, gatewayPlaceholder);
+      if (path === '/api/webhook/forge' && method === 'POST') return await handleWebhookForge(env, req);
+      if (path === '/api/health' && method === 'GET') return corsResponse({ ok: true, ts: new Date().toISOString() });
+      if (path.startsWith('/api/forge/preview/') && method === 'GET') return await handleForgePreview(env, path.split('/').pop() ?? '');
+      if (path.startsWith('/api/forge/summary/') && method === 'GET') return await handleForgeSummary(env, path.split('/').pop() ?? '');
       const _chMatch = path.match(/^\/api\/forge\/chapters\/([0-9a-f-]{36})$/i);
-      if (_chMatch && method === 'GET') return handleForgeGetChapters(env, _chMatch[1]);
+      if (_chMatch && method === 'GET') return await handleForgeGetChapters(env, _chMatch[1]);
 
       // Auth
-      if (path === '/api/admin/login' && method === 'POST') return handleLogin(env, req);
-      if (path === '/api/admin/logout' && method === 'POST') return handleLogout(env, req);
+      if (path === '/api/admin/login' && method === 'POST') return await handleLogin(env, req);
+      if (path === '/api/admin/logout' && method === 'POST') return await handleLogout(env, req);
 
       // Rotas protegidas
       const authErr = await requerAuth(env, req);
       if (authErr) return authErr;
 
       if (path === '/api/admin/catalogo') {
-        if (method === 'GET') return handleGetCatalogo(env);
-        if (method === 'POST') return handlePostCatalogo(env, req);
+        if (method === 'GET') return await handleGetCatalogo(env);
+        if (method === 'POST') return await handlePostCatalogo(env, req);
       }
       const catalogoMatch = path.match(/^\/api\/admin\/catalogo\/([^/]+)$/);
       if (catalogoMatch) {
         const slug = catalogoMatch[1];
-        if (method === 'PUT') return handlePutCatalogo(env, req, slug);
-        if (method === 'DELETE') return handleDeleteCatalogo(env, slug);
+        if (method === 'PUT') return await handlePutCatalogo(env, req, slug);
+        if (method === 'DELETE') return await handleDeleteCatalogo(env, slug);
       }
 
       if (path === '/api/admin/premios') {
-        if (method === 'GET') return handleGetPremios(env);
-        if (method === 'POST') return handlePostPremio(env, req);
+        if (method === 'GET') return await handleGetPremios(env);
+        if (method === 'POST') return await handlePostPremio(env, req);
       }
       const premioMatch = path.match(/^\/api\/admin\/premios\/(\d+)$/);
       if (premioMatch) {
         const id = premioMatch[1];
-        if (method === 'PUT') return handlePutPremio(env, req, id);
-        if (method === 'DELETE') return handleDeletePremio(env, id);
+        if (method === 'PUT') return await handlePutPremio(env, req, id);
+        if (method === 'DELETE') return await handleDeletePremio(env, id);
       }
 
       if (path === '/api/admin/config') {
-        if (method === 'GET') return handleGetConfig(env);
-        if (method === 'POST') return handlePostConfig(env, req);
+        if (method === 'GET') return await handleGetConfig(env);
+        if (method === 'POST') return await handlePostConfig(env, req);
       }
 
       if (path === '/api/admin/depoimentos') {
-        if (method === 'GET') return handleGetDepoimentos(env);
+        if (method === 'GET') return await handleGetDepoimentos(env);
       }
       const depMatch = path.match(/^\/api\/admin\/depoimentos\/([^/]+)$/);
       if (depMatch) {
         const id = depMatch[1];
-        if (method === 'PATCH') return handlePatchDepoimento(env, req, id);
-        if (method === 'DELETE') return handleDeleteDepoimento(env, id);
+        if (method === 'PATCH') return await handlePatchDepoimento(env, req, id);
+        if (method === 'DELETE') return await handleDeleteDepoimento(env, id);
       }
 
-      if (path === '/api/health') return corsResponse({ ok: true, ts: new Date().toISOString() });
-      if (path === '/api/admin/acervo-forge' && method === 'POST') return handleForgePublicar(env, req);
+      // Apuração LF (admin-only, já após requerAuth)
+      if (path === '/api/admin/apuracao' && method === 'POST') return await handleApuracao(env, req);
+      if (path === '/api/admin/acervo-forge' && method === 'POST') return await handleForgePublicar(env, req);
       const forgeChapterMatch = path.match(/^\/api\/forge\/chapter\/([0-9a-f-]{36})\/(\d+)$/i);
-      if (forgeChapterMatch && method === 'PUT') return handleForgeSaveChapter(env, req, forgeChapterMatch[1], forgeChapterMatch[2]);
+      if (forgeChapterMatch && method === 'PUT') return await handleForgeSaveChapter(env, req, forgeChapterMatch[1], forgeChapterMatch[2]);
 
       return errorResponse('Rota não encontrada.', 404);
     } catch (err) {
-      console.error('Erro interno:', err);
+      console.error('Erro interno:', err instanceof Error ? err.message : String(err));
       return errorResponse('Erro interno do servidor.', 500);
     }
   },
