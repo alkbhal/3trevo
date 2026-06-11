@@ -2628,10 +2628,21 @@ async function salvarFaq() {
 
 // ── PAINEL DE VENDAS ──────────────────────────────────────────────
 async function carregarVendasDash() {
-  // Stats gerais
-  const { data: purchases } = await sb.from('purchases').select('valor_pago, status, product_id, criado_em').order('criado_em',{ascending:false});
-  const ativas   = (purchases||[]).filter(p => p.status === 'active');
-  const pendentes = (purchases||[]).filter(p => p.status === 'pending').length;
+  // purchases bloqueado por RLS para anon — usa Worker (service role)
+  const jwt = (await sb.auth.getSession()).data.session?.access_token || '';
+  const resp = await fetch(FORGE_API + '/api/admin/vendas', {
+    headers: { 'Authorization': 'Bearer ' + jwt },
+  });
+  if (!resp.ok) {
+    console.error('[vendas] Worker retornou', resp.status);
+    return;
+  }
+  const payload = await resp.json();
+  const purchases = payload.purchases || [];
+  const prodsArr  = payload.products  || [];
+
+  const ativas   = purchases.filter(p => p.status === 'active');
+  const pendentes = purchases.filter(p => p.status === 'pending').length;
   const receita  = ativas.reduce((s,p) => s + Number(p.valor_pago||0), 0);
   const ticket   = ativas.length ? receita / ativas.length : 0;
 
@@ -2642,8 +2653,7 @@ async function carregarVendasDash() {
   document.getElementById('vd-pendentes').textContent = pendentes;
 
   // Vendas por produto
-  const { data: prods } = await sb.from('products').select('id, titulo, preco');
-  const prodMap = {}; (prods||[]).forEach(p => { prodMap[p.id] = p; });
+  const prodMap = {}; prodsArr.forEach(p => { prodMap[p.id] = p; });
   const porProd = {};
   ativas.forEach(p => {
     const k = p.product_id;

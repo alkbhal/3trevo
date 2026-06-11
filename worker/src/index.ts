@@ -263,6 +263,14 @@ async function handlePostConfig(env: Env, req: Request): Promise<Response> {
   return corsResponse({ ok: true });
 }
 
+async function handleGetVendas(env: Env): Promise<Response> {
+  const [purchasesR, productsR] = await Promise.all([
+    sbGet(env, 'purchases?select=id,status,valor_pago,product_id,criado_em&order=criado_em.desc'),
+    sbGet(env, 'products?select=id,titulo,preco'),
+  ]);
+  return corsResponse({ purchases: purchasesR, products: productsR });
+}
+
 async function handleGetDepoimentos(env: Env): Promise<Response> {
   const rows = await sbGet(env, 'depoimentos?order=criado_em.desc&limit=100');
   return corsResponse(rows);
@@ -609,6 +617,9 @@ export default {
         if (method === 'PATCH') return await handlePatchDepoimento(env, req, id);
         if (method === 'DELETE') return await handleDeleteDepoimento(env, id);
       }
+
+      // Vendas — purchases bloqueado por RLS para anon; worker usa service role
+      if (path === '/api/admin/vendas' && method === 'GET') return await handleGetVendas(env);
 
       // Apuração LF (admin-only, já após requerAuth)
       if (path === '/api/admin/apuracao' && method === 'POST') return await handleApuracao(env, req);
