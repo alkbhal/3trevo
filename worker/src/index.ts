@@ -264,7 +264,7 @@ async function handlePostConfig(env: Env, req: Request): Promise<Response> {
 }
 
 async function handleGetDepoimentos(env: Env): Promise<Response> {
-  const rows = await sbGet(env, 'depoimentos?order=enviado_em.desc&limit=100');
+  const rows = await sbGet(env, 'depoimentos?order=criado_em.desc&limit=100');
   return corsResponse(rows);
 }
 
