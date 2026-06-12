@@ -11,6 +11,7 @@ export interface Env {
   RESEND_API_KEY?: string;
   FORGE_STORAGE?: R2Bucket;
   ANTHROPIC_API_KEY?: string;
+  LOTERIA_SERVICE_KEY?: string;
 }
 
 const CORS_HEADERS = {
@@ -554,6 +555,88 @@ async function handleWebhookForge(env: Env, req: Request): Promise<Response> {
   }
 }
 
+// ── CRÉDITOS LOTERIA (service-to-service) ────────────────────
+
+function requerServiceKey(env: Env, req: Request): Response | null {
+  const chave = req.headers.get('X-Service-Key');
+  if (!env.LOTERIA_SERVICE_KEY || chave !== env.LOTERIA_SERVICE_KEY) {
+    return errorResponse('Não autorizado.', 401);
+  }
+  return null;
+}
+
+async function handleCreditosSaldo(env: Env, req: Request): Promise<Response> {
+  const authErr = requerServiceKey(env, req);
+  if (authErr) return authErr;
+  const cpf = new URL(req.url).searchParams.get('cpf')?.replace(/\D/g, '');
+  if (!cpf || cpf.length !== 11) return errorResponse('CPF inválido.', 400);
+
+  // Busca user_id pelo CPF em profiles
+  const profileRows = await sbGet(env, `profiles?cpf=eq.${cpf}&select=id`).catch(() => []);
+  if (!profileRows.length) return corsResponse({ saldo: 0 });
+  const userId = (profileRows[0] as { id: string }).id;
+
+  const rows = await sbGet(env, `creditos_loteria?user_id=eq.${userId}&select=saldo`).catch(() => []);
+  const saldo = rows.length > 0 ? Number((rows[0] as { saldo: string }).saldo) : 0;
+  return corsResponse({ cpf: `${cpf.slice(0, 3)}*****${cpf.slice(-2)}`, saldo });
+}
+
+async function handleCreditosDebitar(env: Env, req: Request): Promise<Response> {
+  const authErr = requerServiceKey(env, req);
+  if (authErr) return authErr;
+  const body = await req.json<{ cpf?: string; valor?: number; ref_id?: string }>();
+  const cpf = body.cpf?.replace(/\D/g, '');
+  if (!cpf || cpf.length !== 11) return errorResponse('CPF inválido.', 400);
+  if (!body.valor || body.valor <= 0) return errorResponse('Valor inválido.', 400);
+
+  const userRows = await sbGet(env, `profiles?cpf=eq.${cpf}&select=id`);
+  if (!userRows.length) return errorResponse('Usuário não encontrado no 3Trevo.', 404);
+  const userId = (userRows[0] as { id: string }).id;
+
+  const saldoRows = await sbGet(env, `creditos_loteria?user_id=eq.${userId}&select=saldo`);
+  const saldoAtual = saldoRows.length > 0 ? Number((saldoRows[0] as { saldo: string }).saldo) : 0;
+  if (saldoAtual < body.valor) {
+    return errorResponse(`Saldo insuficiente. Disponível: R$ ${saldoAtual.toFixed(2)}.`, 422);
+  }
+
+  const novoSaldo = Number((saldoAtual - body.valor).toFixed(2));
+  if (saldoRows.length > 0) {
+    await sbPatch(env, `creditos_loteria?user_id=eq.${userId}`, { saldo: novoSaldo, atualizado_em: new Date().toISOString() });
+  }
+  await sbPost(env, 'creditos_loteria_log', {
+    user_id: userId, valor: -body.valor, tipo: 'debito', origem: 'loteria_cotas', ref_id: body.ref_id ?? null,
+  }, 'return=minimal');
+  return corsResponse({ ok: true, saldo_anterior: saldoAtual, saldo_atual: novoSaldo });
+}
+
+async function handleAdminCreditosCreditar(env: Env, req: Request): Promise<Response> {
+  const authErr = await requerAuth(env, req);
+  if (authErr) return authErr;
+  const body = await req.json<{ cpf?: string; valor?: number; origem?: string; ref_id?: string }>();
+  const cpf = body.cpf?.replace(/\D/g, '');
+  if (!cpf || cpf.length !== 11) return errorResponse('CPF inválido.', 400);
+  if (!body.valor || body.valor <= 0) return errorResponse('Valor inválido.', 400);
+
+  const userRows = await sbGet(env, `profiles?cpf=eq.${cpf}&select=id`);
+  if (!userRows.length) return errorResponse('Usuário não encontrado.', 404);
+  const userId = (userRows[0] as { id: string }).id;
+
+  const saldoRows = await sbGet(env, `creditos_loteria?user_id=eq.${userId}&select=saldo`);
+  const saldoAtual = saldoRows.length > 0 ? Number((saldoRows[0] as { saldo: string }).saldo) : 0;
+  const novoSaldo = Number((saldoAtual + body.valor).toFixed(2));
+
+  if (saldoRows.length > 0) {
+    await sbPatch(env, `creditos_loteria?user_id=eq.${userId}`, { saldo: novoSaldo, atualizado_em: new Date().toISOString() });
+  } else {
+    await sbPost(env, 'creditos_loteria', { user_id: userId, saldo: novoSaldo }, 'return=minimal');
+  }
+  await sbPost(env, 'creditos_loteria_log', {
+    user_id: userId, valor: body.valor, tipo: 'credito', origem: body.origem ?? 'ajuste_admin', ref_id: body.ref_id ?? null,
+  }, 'return=minimal');
+  await registrarAuditoria(env, 'creditos_loteria', 'UPDATE', userId, { saldo: saldoAtual }, { saldo: novoSaldo });
+  return corsResponse({ ok: true, saldo_anterior: saldoAtual, saldo_atual: novoSaldo });
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -571,6 +654,8 @@ export default {
         return await handlePublicConfig(env, path.split('/').pop() || '');
       }
       if (path === '/api/lgpd' && method === 'POST') return await handleLgpd(env, req);
+      if (path === '/api/creditos/saldo' && method === 'GET') return await handleCreditosSaldo(env, req);
+      if (path === '/api/creditos/debitar' && method === 'POST') return await handleCreditosDebitar(env, req);
       if (path === '/api/checkout/webhook' && method === 'POST') return await handleCheckoutWebhook(env, req, gatewayPlaceholder);
       if (path === '/api/webhook/forge' && method === 'POST') return await handleWebhookForge(env, req);
       if (path === '/api/health' && method === 'GET') return corsResponse({ ok: true, ts: new Date().toISOString() });
@@ -626,6 +711,8 @@ export default {
 
       // Vendas — purchases bloqueado por RLS para anon; worker usa service role
       if (path === '/api/admin/vendas' && method === 'GET') return await handleGetVendas(env);
+
+      if (path === '/api/admin/creditos/creditar' && method === 'POST') return await handleAdminCreditosCreditar(env, req);
 
       // Apuração LF (admin-only, já após requerAuth)
       if (path === '/api/admin/apuracao' && method === 'POST') return await handleApuracao(env, req);

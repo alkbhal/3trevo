@@ -222,6 +222,28 @@ DROP POLICY IF EXISTS "draw_audits: public read" ON draw_audits;
 CREATE POLICY "draw_audits: public read" ON draw_audits
   FOR SELECT USING (true);
 
+-- ── CRÉDITOS LOTERIA ────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS creditos_loteria (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  saldo         numeric(10,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),
+  atualizado_em timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS creditos_loteria_user_id_idx ON creditos_loteria(user_id);
+
+CREATE TABLE IF NOT EXISTS creditos_loteria_log (
+  id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id   uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  valor     numeric(10,2) NOT NULL,
+  tipo      text NOT NULL CHECK (tipo IN ('credito', 'debito')),
+  origem    text,  -- 'depoimento_aprovado' | 'loteria_cotas' | 'ajuste_admin'
+  ref_id    text,
+  criado_em timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS creditos_loteria_log_user_id_idx ON creditos_loteria_log(user_id);
+
 -- ── BONUS ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS bonus (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -305,6 +327,17 @@ ALTER TABLE draw_winners ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "draw_winners: public read" ON draw_winners;
 CREATE POLICY "draw_winners: public read" ON draw_winners
   FOR SELECT USING (true);
+
+-- CRÉDITOS LOTERIA (usuário lê os seus; service role escreve)
+ALTER TABLE creditos_loteria ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "creditos_loteria: own select" ON creditos_loteria;
+CREATE POLICY "creditos_loteria: own select" ON creditos_loteria
+  FOR SELECT USING (auth.uid() = user_id);
+
+ALTER TABLE creditos_loteria_log ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "creditos_loteria_log: own select" ON creditos_loteria_log;
+CREATE POLICY "creditos_loteria_log: own select" ON creditos_loteria_log
+  FOR SELECT USING (auth.uid() = user_id);
 
 -- BONUS (usuário lê os seus)
 ALTER TABLE bonus ENABLE ROW LEVEL SECURITY;
