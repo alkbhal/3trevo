@@ -282,10 +282,35 @@ async function handlePublicDepoimentos(env: Env): Promise<Response> {
   return corsResponse(rows);
 }
 
+const CREDITO_POR_DEPOIMENTO = 10.00; // R$ por depoimento aprovado → 2 cotas Loteria-TT
+
 async function handlePatchDepoimento(env: Env, req: Request, id: string): Promise<Response> {
-  const body = await req.json();
+  const body = await req.json<Record<string, unknown>>();
   await sbPatch(env, `depoimentos?id=eq.${id}`, body);
   await registrarAuditoria(env, 'depoimentos', 'UPDATE', id, null, body);
+
+  // Ao aprovar: creditar R$10 em creditos_loteria
+  if (body.estado === 'aprovado') {
+    try {
+      const depRows = await sbGet(env, `depoimentos?id=eq.${id}&select=user_id`);
+      const userId = depRows.length > 0 ? (depRows[0] as { user_id: string }).user_id : null;
+      if (userId) {
+        const saldoRows = await sbGet(env, `creditos_loteria?user_id=eq.${userId}&select=saldo`);
+        const saldoAtual = saldoRows.length > 0 ? Number((saldoRows[0] as { saldo: string }).saldo) : 0;
+        const novoSaldo = Number((saldoAtual + CREDITO_POR_DEPOIMENTO).toFixed(2));
+        if (saldoRows.length > 0) {
+          await sbPatch(env, `creditos_loteria?user_id=eq.${userId}`, { saldo: novoSaldo, atualizado_em: new Date().toISOString() });
+        } else {
+          await sbPost(env, 'creditos_loteria', { user_id: userId, saldo: novoSaldo }, 'return=minimal');
+        }
+        await sbPost(env, 'creditos_loteria_log', {
+          user_id: userId, valor: CREDITO_POR_DEPOIMENTO, tipo: 'credito', origem: 'depoimento_aprovado', ref_id: id,
+        }, 'return=minimal');
+      }
+    } catch (e) {
+      console.error('[patch-dep] credito-loteria:', e);
+    }
+  }
   return corsResponse({ ok: true });
 }
 

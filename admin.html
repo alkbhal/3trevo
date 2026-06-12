@@ -442,6 +442,9 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
       <div class="nav-item" data-sec="manuscritos" onclick="irPara('manuscritos',this)">
         <span class="nav-icon">✉</span>Manuscritos
       </div>
+      <div class="nav-item" data-sec="depoimentos" onclick="irPara('depoimentos',this)">
+        <span class="nav-icon">◈</span>Depoimentos
+      </div>
     </aside>
 
     <!-- Main -->
@@ -953,6 +956,37 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
             <table>
               <thead><tr><th>Título</th><th>Gênero</th><th>Status</th><th>Enviado em</th><th>Nota do gestor</th></tr></thead>
               <tbody id="manuscritos-tbody">
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DEPOIMENTOS ── -->
+      <div class="secao" id="sec-depoimentos">
+        <div class="secao-topo">
+          <div class="secao-titulo">Depoimentos</div>
+          <div class="secao-sub">Moderação de depoimentos do Programa Cultural · aprovação credita R$10 em créditos Loteria-TT</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="btn btn-outline btn-sm" onclick="carregarDepoimentos('revisao_manual')" id="btn-dep-pendente" style="border-color:rgba(200,168,75,.4);color:var(--ouro)">Em revisão</button>
+          <button class="btn btn-outline btn-sm" onclick="carregarDepoimentos('aprovado')" id="btn-dep-aprovado">Aprovados</button>
+          <button class="btn btn-outline btn-sm" onclick="carregarDepoimentos('')" id="btn-dep-todos">Todos</button>
+        </div>
+        <div class="card" style="padding:0">
+          <div class="tabela-wrap">
+            <table class="entries-table">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th style="width:45%">Texto</th>
+                  <th>Estado</th>
+                  <th>Data</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="depoimentos-tbody">
                 <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>
               </tbody>
             </table>
@@ -1678,7 +1712,7 @@ function irPara(sec, el) {
     'dashboard':'Dashboard','produtos':'Produtos','novo-produto':'Novo Produto',
     'sorteios':'Rodadas','participantes':'Participantes','conteudo':'Conteúdo',
     'equipe':'Gestão de Equipe','extrato':'Meu Extrato','manuscritos':'Manuscritos',
-    'vendas-dash':'Painel de Vendas','afiliados':'Afiliados'
+    'vendas-dash':'Painel de Vendas','afiliados':'Afiliados','depoimentos':'Depoimentos'
   };
   document.getElementById('breadcrumb').textContent = labels[sec] || sec;
   fecharMobileNav();
@@ -1686,6 +1720,63 @@ function irPara(sec, el) {
   if (sec === 'participantes') carregarParticipantes();
   if (sec === 'vendas-dash')   carregarVendasDash();
   if (sec === 'afiliados')     carregarAfiliados();
+  if (sec === 'depoimentos')   carregarDepoimentos('revisao_manual');
+}
+
+// ── DEPOIMENTOS ───────────────────────────────────────────────────
+const DEP_ESTADO = { revisao_manual:'Em revisão', aprovado:'Aprovado', reprovado_calao:'Reprovado (linguagem)', reprovado_conteudo:'Reprovado (conteúdo)' };
+const DEP_COR    = { revisao_manual:'rgba(200,168,75,.7)', aprovado:'#6fcf97', reprovado_calao:'#e57373', reprovado_conteudo:'#e57373' };
+
+async function carregarDepoimentos(filtroEstado) {
+  const tbody = document.getElementById('depoimentos-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Carregando…</div></td></tr>';
+  const token = (await sb.auth.getSession()).data.session?.access_token || '';
+  const qs = filtroEstado ? `?estado=eq.${filtroEstado}&order=criado_em.desc&limit=100` : '?order=criado_em.desc&limit=100';
+  const res = await fetch(FORGE_API + '/api/admin/depoimentos' + qs, {
+    headers:{ Authorization: 'Bearer ' + token }
+  });
+  if (!res.ok) { toast('Erro ao carregar depoimentos','erro'); return; }
+  const rows = await res.json();
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,.3)">Nenhum depoimento encontrado</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(d => `
+    <tr>
+      <td style="font-size:12px;color:rgba(255,255,255,.6)">${escHtml(d.user_id?.substring(0,8)+'…' || '—')}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,.75);max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escHtml(d.texto||'')}">
+        ${escHtml((d.texto||'').slice(0,120))}${(d.texto||'').length>120?'…':''}
+      </td>
+      <td><span style="font-size:11px;color:${DEP_COR[d.estado]||'rgba(255,255,255,.4)'}">${DEP_ESTADO[d.estado]||d.estado||'—'}</span></td>
+      <td style="font-size:11px;color:rgba(255,255,255,.35)">${d.criado_em ? new Date(d.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
+      <td style="white-space:nowrap">
+        ${d.estado !== 'aprovado' ? `<button class="btn btn-ouro btn-sm" style="margin-right:4px" onclick="depAprovar('${d.id}')">Aprovar</button>` : ''}
+        ${d.estado !== 'reprovado_conteudo' ? `<button class="btn btn-outline btn-sm" style="color:rgba(255,100,100,.7);border-color:rgba(255,100,100,.3)" onclick="depReprovar('${d.id}')">Reprovar</button>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+async function depAprovar(id) {
+  const token = (await sb.auth.getSession()).data.session?.access_token || '';
+  const res = await fetch(FORGE_API + '/api/admin/depoimentos/' + id, {
+    method: 'PATCH',
+    headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+token },
+    body: JSON.stringify({ estado:'aprovado' })
+  });
+  if (res.ok) { toast('Aprovado — R$10 creditados na Loteria-TT','ok'); carregarDepoimentos('revisao_manual'); }
+  else toast('Erro ao aprovar','erro');
+}
+
+async function depReprovar(id) {
+  const token = (await sb.auth.getSession()).data.session?.access_token || '';
+  const res = await fetch(FORGE_API + '/api/admin/depoimentos/' + id, {
+    method: 'PATCH',
+    headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+token },
+    body: JSON.stringify({ estado:'reprovado_conteudo' })
+  });
+  if (res.ok) { toast('Depoimento reprovado','ok'); carregarDepoimentos('revisao_manual'); }
+  else toast('Erro ao reprovar','erro');
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────
