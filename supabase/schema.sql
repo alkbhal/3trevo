@@ -341,3 +341,67 @@ VALUES (
   0.00
 )
 ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- FUNÇÕES RPC
+-- ============================================================
+
+-- upsert_cliente_pedido: registra cliente + pedido via checkout próprio.
+-- Corrige bug original onde o alias 'd' era referenciado como d.pedido_id
+-- (coluna inexistente — o PK da tabela pedidos é 'id').
+CREATE OR REPLACE FUNCTION upsert_cliente_pedido(
+  p_nome       text,
+  p_email      text,
+  p_telefone   text,
+  p_ebook_slug text,
+  p_valor_pago numeric,
+  p_id_externo text
+)
+RETURNS json
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_cliente_id  uuid;
+  v_pedido_id   uuid;
+  v_ebook_titulo text;
+  v_novo         boolean := false;
+BEGIN
+  -- Buscar título do produto
+  SELECT titulo INTO v_ebook_titulo FROM products WHERE slug = p_ebook_slug;
+  IF v_ebook_titulo IS NULL THEN v_ebook_titulo := p_ebook_slug; END IF;
+
+  -- Upsert cliente por e-mail
+  SELECT id INTO v_cliente_id FROM clientes WHERE email = p_email;
+  IF v_cliente_id IS NULL THEN
+    INSERT INTO clientes (nome, email, telefone)
+    VALUES (p_nome, p_email, p_telefone)
+    RETURNING id INTO v_cliente_id;
+  ELSE
+    UPDATE clientes
+    SET nome = p_nome,
+        telefone = COALESCE(NULLIF(p_telefone, ''), telefone)
+    WHERE id = v_cliente_id;
+  END IF;
+
+  -- Idempotência por id_externo
+  SELECT id INTO v_pedido_id FROM pedidos WHERE id_externo = p_id_externo;
+  IF v_pedido_id IS NULL THEN
+    INSERT INTO pedidos (cliente_id, ebook_slug, ebook_titulo, valor_pago, id_externo, status)
+    VALUES (v_cliente_id, p_ebook_slug, v_ebook_titulo, p_valor_pago, p_id_externo, 'paid')
+    RETURNING id INTO v_pedido_id;
+    v_novo := true;
+  END IF;
+
+  RETURN json_build_object(
+    'ok',          true,
+    'pedido_id',   v_pedido_id,
+    'novo_pedido', v_novo
+  );
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN json_build_object('ok', false, 'erro', SQLERRM);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION upsert_cliente_pedido TO service_role;
