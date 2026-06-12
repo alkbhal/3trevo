@@ -1428,6 +1428,62 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
   </div>
 </div>
 
+<!-- ── MODAL APURAÇÃO LOTERIA FEDERAL ── -->
+<div class="modal-overlay" id="modal-apuracao-lf">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-titulo">Apuração — Loteria Federal</div>
+      <button class="modal-fechar" onclick="fecharModal('modal-apuracao-lf')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="lf-draw-info" style="margin-bottom:16px;font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--ouro)"></div>
+      <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:20px;line-height:1.6">
+        Fórmula LF-UNIDADES-V1: dígito das unidades do 1º ao 5º prêmio, concatenados → cota de 5 dígitos (00000–99999).
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="campo">
+          <label class="campo-label">Concurso LF <span style="color:#e57373">*</span></label>
+          <input type="number" class="f-input" id="lf-concurso" placeholder="ex: 6148">
+        </div>
+        <div class="campo">
+          <label class="campo-label">Data da extração <span style="color:#e57373">*</span></label>
+          <input type="date" class="f-input" id="lf-data-extracao">
+        </div>
+      </div>
+      <div class="campo" style="margin-top:12px">
+        <label class="campo-label">5 Prêmios da extração oficial (1º ao 5º) <span style="color:#e57373">*</span></label>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px">
+          <input type="number" class="f-input" id="lf-p1" placeholder="1º" style="text-align:center">
+          <input type="number" class="f-input" id="lf-p2" placeholder="2º" style="text-align:center">
+          <input type="number" class="f-input" id="lf-p3" placeholder="3º" style="text-align:center">
+          <input type="number" class="f-input" id="lf-p4" placeholder="4º" style="text-align:center">
+          <input type="number" class="f-input" id="lf-p5" placeholder="5º" style="text-align:center">
+        </div>
+        <div id="lf-cota-preview" style="margin-top:8px;font-size:13px;color:rgba(255,255,255,.4)">Cota derivada: —</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div class="campo">
+          <label class="campo-label">Testemunha 1</label>
+          <input type="text" class="f-input" id="lf-testemunha1" placeholder="Nome">
+        </div>
+        <div class="campo">
+          <label class="campo-label">Testemunha 2</label>
+          <input type="text" class="f-input" id="lf-testemunha2" placeholder="Nome">
+        </div>
+      </div>
+      <div class="campo" style="margin-top:12px">
+        <label class="campo-label">Nº do Certificado</label>
+        <input type="text" class="f-input" id="lf-certificado" placeholder="Opcional">
+      </div>
+      <div id="lf-resultado" style="display:none;margin-top:16px;padding:14px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.2);border-radius:8px;font-size:13px;line-height:1.8"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-apuracao-lf')">Cancelar</button>
+      <button class="btn btn-ouro" onclick="executarApuracaoLF()">Apurar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── CONFIRM SORTEIO ── -->
 <div class="confirm-overlay" id="confirm-sorteio">
   <div class="confirm-box" style="border-color:rgba(200,168,75,.25)">
@@ -2097,6 +2153,7 @@ async function carregarSorteios() {
         <button class="btn btn-outline btn-sm" onclick="abrirVencedores('${d.id}')">Vencedores</button>
         <button class="btn btn-outline btn-sm" onclick="abrirCartela('${d.id}','${escHtml(d.titulo||'')}',${d.max_numeros||100000})">🎯 Cartela</button>
         ${d.status === 'closed' || d.status === 'aguardando_qualificacao' || (d.status !== 'open' && d.status !== 'drawn') ? `<button class="btn btn-ouro btn-sm" onclick="abrirModalExecutarSorteio('${d.id}','${escHtml(d.titulo||'')}')">▶ Executar Premiação</button>` : ''}
+        ${d.status === 'open' ? `<button class="btn btn-ouro btn-sm" onclick="abrirApuracaoLF('${d.id}','${escHtml(d.titulo||'')}')">⚖ Apurar via LF</button>` : ''}
         ${d.status === 'drawn' ? `<a class="btn btn-outline btn-sm" href="/auditoria-sorteio.html?draw_id=${d.id}" target="_blank">🔒 Ver Auditoria</a>` : ''}
         <button class="btn btn-danger btn-sm" onclick="deletarDraw('${d.id}')">Del</button>
       </div>
@@ -2347,6 +2404,71 @@ async function atribuirManual() {
 
 // ── EXECUTAR SORTEIO AUDITÁVEL ────────────────────────────────────
 let execDrawId = null;
+let lfDrawId   = null;
+
+function abrirApuracaoLF(drawId, titulo) {
+  lfDrawId = drawId;
+  document.getElementById('lf-draw-info').textContent = titulo || 'Rodada';
+  ['lf-concurso','lf-data-extracao','lf-p1','lf-p2','lf-p3','lf-p4','lf-p5','lf-testemunha1','lf-testemunha2','lf-certificado']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('lf-cota-preview').textContent = 'Cota derivada: —';
+  document.getElementById('lf-resultado').style.display = 'none';
+  ['lf-p1','lf-p2','lf-p3','lf-p4','lf-p5'].forEach(id =>
+    document.getElementById(id).addEventListener('input', atualizarCotaPreview, {once:false}));
+  document.getElementById('modal-apuracao-lf').classList.add('aberto');
+}
+
+function atualizarCotaPreview() {
+  const vals = ['lf-p1','lf-p2','lf-p3','lf-p4','lf-p5'].map(id => {
+    const v = parseInt(document.getElementById(id).value, 10);
+    return isNaN(v) ? null : v;
+  });
+  if (vals.every(v => v !== null)) {
+    const cota = vals.map(p => Math.abs(p) % 10).join('');
+    document.getElementById('lf-cota-preview').textContent = `Cota derivada: ${cota}`;
+    document.getElementById('lf-cota-preview').style.color = 'var(--ouro)';
+  } else {
+    document.getElementById('lf-cota-preview').textContent = 'Cota derivada: —';
+    document.getElementById('lf-cota-preview').style.color = 'rgba(255,255,255,.4)';
+  }
+}
+
+async function executarApuracaoLF() {
+  const concurso = parseInt(document.getElementById('lf-concurso').value, 10);
+  const dataExt  = document.getElementById('lf-data-extracao').value;
+  const premios  = ['lf-p1','lf-p2','lf-p3','lf-p4','lf-p5'].map(id => parseInt(document.getElementById(id).value, 10));
+  if (!concurso || !dataExt || premios.some(isNaN)) {
+    toast('Preencha concurso, data e os 5 prêmios.', 'erro'); return;
+  }
+  const jwt = (await sb.auth.getSession()).data.session?.access_token || '';
+  const res = await fetch(FORGE_API + '/api/admin/apuracao', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+    body: JSON.stringify({
+      draw_id:          lfDrawId,
+      lf_concurso:      concurso,
+      lf_data_extracao: dataExt,
+      lf_premios:       premios,
+      testemunha_1:     document.getElementById('lf-testemunha1').value || undefined,
+      testemunha_2:     document.getElementById('lf-testemunha2').value || undefined,
+      certificado_numero: document.getElementById('lf-certificado').value || undefined,
+    }),
+  });
+  const data = await res.json();
+  const div = document.getElementById('lf-resultado');
+  div.style.display = 'block';
+  if (data.ok) {
+    div.style.borderColor = 'rgba(100,200,100,.3)';
+    div.innerHTML = `<strong style="color:#6fcf97">✓ Apuração registrada</strong><br>
+      Cota vencedora: <strong style="color:var(--ouro);font-size:18px;font-family:'Cormorant Garamond',serif">${data.cota_vencedora}</strong><br>
+      Cota emitida: ${data.cota_emitida ? '<span style="color:#6fcf97">Sim</span>' : '<span style="color:#e57373">Não — aplicar aproximação</span>'}<br>
+      Hash evidência: <code style="font-size:11px;color:rgba(255,255,255,.4)">${data.hash_evidencia}</code>`;
+    carregarSorteios();
+  } else {
+    div.style.borderColor = 'rgba(229,115,115,.3)';
+    div.innerHTML = `<strong style="color:#e57373">✗ Erro:</strong> ${escHtml(data.error||'Erro desconhecido')}`;
+  }
+}
 
 function abrirModalExecutarSorteio(drawId, titulo) {
   execDrawId = drawId;
