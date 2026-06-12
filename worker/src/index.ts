@@ -276,6 +276,11 @@ async function handleGetDepoimentos(env: Env): Promise<Response> {
   return corsResponse(rows);
 }
 
+async function handlePublicDepoimentos(env: Env): Promise<Response> {
+  const rows = await sbGetPublic(env, 'depoimentos?order=criado_em.desc&limit=20');
+  return corsResponse(rows);
+}
+
 async function handlePatchDepoimento(env: Env, req: Request, id: string): Promise<Response> {
   const body = await req.json();
   await sbPatch(env, `depoimentos?id=eq.${id}`, body);
@@ -561,6 +566,7 @@ export default {
       // Rotas públicas
       if (path === '/api/public/catalogo' && method === 'GET') return await handlePublicCatalogo(env);
       if (path === '/api/public/premios' && method === 'GET') return await handlePublicPremios(env);
+      if (path === '/api/public/depoimentos' && method === 'GET') return await handlePublicDepoimentos(env);
       if (path.startsWith('/api/public/config/') && method === 'GET') {
         return await handlePublicConfig(env, path.split('/').pop() || '');
       }
