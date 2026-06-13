@@ -19,6 +19,11 @@ ENVIRONMENT = "production"
 binding = "TT_KV"
 id = "34f4ad1650394b77a51ae527a0437a24"
 
+# R2 bucket privado para EPUBs da Biblioteca TT
+[[r2_buckets]]
+binding = "BIBLIOTECA_R2"
+bucket_name = "tt-biblioteca"
+
 # Crons:
 # - Sexta 23:00 UTC (20:00 BRT): apuração Sistema Loteria TT
 # - Toda hora: health monitor (checa componentes, detecta ataques, alerta via email)

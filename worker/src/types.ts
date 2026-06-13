@@ -19,8 +19,11 @@ export interface Env {
   // IA
   ANTHROPIC_KEY: string;
 
-  // R2 (downloads)
+  // R2 (downloads de PDFs)
   R2_PUBLIC_BUCKET_ID?: string;
+
+  // R2 privado — EPUBs da Biblioteca TT
+  BIBLIOTECA_R2?: R2Bucket;
 
   // KV (rate limiting, cache)
   TT_KV?: KVNamespace;

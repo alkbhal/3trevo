@@ -294,28 +294,22 @@ export async function handleBibliotecaStream(request: Request, env: Env): Promis
 
   const { epub_url } = JSON.parse(raw) as { epub_url: string; email: string; slug: string };
 
-  // epub_url pode ser URL externa (Gutenberg, etc.) ou caminho no R2
-  const isExternal = epub_url.startsWith('http');
-  if (isExternal) {
-    // Redireciona direto — para domínio público, não há problema de expor a URL
+  // epub_url é URL externa (Gutenberg, etc.) → redirect direto (domínio público)
+  if (epub_url.startsWith('http')) {
     return Response.redirect(epub_url, 302);
   }
 
-  // R2 privado: busca e faz proxy (requer binding BIBLIOTECA_BUCKET futuramente)
-  // Por ora, redireciona para URL pública do bucket se configurado
-  const r2Base = env.R2_PUBLIC_BUCKET_ID
-    ? `https://pub-${env.R2_PUBLIC_BUCKET_ID}.r2.dev/biblioteca/`
-    : null;
+  // epub_url é caminho no R2 privado (ex: "dom-casmurro.epub")
+  if (!env.BIBLIOTECA_R2) return new Response('Storage não configurado', { status: 503 });
 
-  if (!r2Base) return new Response('Arquivo não configurado', { status: 404 });
+  const obj = await env.BIBLIOTECA_R2.get(epub_url);
+  if (!obj) return new Response('EPUB não encontrado', { status: 404 });
 
-  const epubResp = await fetch(`${r2Base}${epub_url}`);
-  if (!epubResp.ok) return new Response('EPUB não encontrado', { status: 404 });
-
-  return new Response(epubResp.body, {
+  return new Response(obj.body, {
     headers: {
       'Content-Type': 'application/epub+zip',
       'Content-Disposition': 'inline',
+      'Content-Length': String(obj.size),
       'X-Content-Type-Options': 'nosniff',
       'Cache-Control': 'no-store',
     },
