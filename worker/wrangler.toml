@@ -17,7 +17,7 @@ ENVIRONMENT = "production"
 # KV namespace para rate limiting e health monitor
 [[kv_namespaces]]
 binding = "TT_KV"
-id = "CONFIGURE_KV_ID_HERE"
+id = "34f4ad1650394b77a51ae527a0437a24"
 
 # Crons:
 # - Sexta 23:00 UTC (20:00 BRT): apuração Sistema Loteria TT
