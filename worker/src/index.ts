@@ -47,6 +47,22 @@ import {
   registrarFalhaHMAC,
 } from './routes/health';
 import { handleHealthMonitor } from './cron/health-monitor';
+import {
+  handleBibliotecaAcervo,
+  handleBibliotecaAcesso,
+  handleBibliotecaVerificar,
+  handleBibliotecaStream,
+  handleBibliotecaMinha,
+  handleBibliotecaSelecionar,
+  handleBibliotecaMarcarLida,
+  handleBibliotecaProgresso,
+  handleBibliotecaLer,
+  handleAdminBibliotecaAcervoGet,
+  handleAdminBibliotecaAcervoCreate,
+  handleAdminBibliotecaAcervoUpdate,
+  handleAdminBibliotecaAcervoDelete,
+  handleAdminBibliotecaStats,
+} from './routes/biblioteca';
 
 // ─── CORS helper ──────────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
@@ -214,6 +230,56 @@ export default {
     if (path.startsWith('/api/admin/depoimentos/') && method === 'PATCH') {
       const id = path.replace('/api/admin/depoimentos/', '');
       return handleAdminDepoimentoUpdate(request, env, id);
+    }
+
+    // ── Biblioteca TT — públicas ───────────────────────────────────────────
+    if (path === '/api/biblioteca/acervo' && method === 'GET') {
+      return handleBibliotecaAcervo(request, env);
+    }
+    if (path === '/api/biblioteca/acesso' && method === 'POST') {
+      return handleBibliotecaAcesso(request, env);
+    }
+    if (path === '/api/biblioteca/verificar' && method === 'GET') {
+      return handleBibliotecaVerificar(request, env);
+    }
+    if (path === '/api/biblioteca/stream' && method === 'GET') {
+      return handleBibliotecaStream(request, env);
+    }
+
+    // ── Biblioteca TT — autenticadas (leitor) ──────────────────────────────
+    if (path === '/api/biblioteca/minha' && method === 'GET') {
+      return handleBibliotecaMinha(request, env);
+    }
+    if (path === '/api/biblioteca/selecionar' && method === 'POST') {
+      return handleBibliotecaSelecionar(request, env);
+    }
+    if (path === '/api/biblioteca/marcar-lida' && method === 'POST') {
+      return handleBibliotecaMarcarLida(request, env);
+    }
+    if (path === '/api/biblioteca/progresso' && method === 'POST') {
+      return handleBibliotecaProgresso(request, env);
+    }
+    if (path === '/api/biblioteca/ler' && method === 'POST') {
+      return handleBibliotecaLer(request, env);
+    }
+
+    // ── Admin Biblioteca ───────────────────────────────────────────────────
+    if (path === '/api/admin/biblioteca/acervo' && method === 'GET') {
+      return handleAdminBibliotecaAcervoGet(request, env);
+    }
+    if (path === '/api/admin/biblioteca/acervo' && method === 'POST') {
+      return handleAdminBibliotecaAcervoCreate(request, env);
+    }
+    if (path.startsWith('/api/admin/biblioteca/acervo/') && method === 'PUT') {
+      const slug = path.replace('/api/admin/biblioteca/acervo/', '');
+      return handleAdminBibliotecaAcervoUpdate(request, env, slug);
+    }
+    if (path.startsWith('/api/admin/biblioteca/acervo/') && method === 'DELETE') {
+      const slug = path.replace('/api/admin/biblioteca/acervo/', '');
+      return handleAdminBibliotecaAcervoDelete(request, env, slug);
+    }
+    if (path === '/api/admin/biblioteca/stats' && method === 'GET') {
+      return handleAdminBibliotecaStats(request, env);
     }
 
     // ── 404 ────────────────────────────────────────────────────────────────

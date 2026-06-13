@@ -336,6 +336,10 @@
       <button class="sb-item" onclick="irPara('ia',this)">
         <span class="sb-ic">◈</span> IA Studio
       </button>
+      <div class="sb-section">Conteúdo</div>
+      <button class="sb-item" onclick="irPara('biblioteca',this)">
+        <span class="sb-ic">📚</span> Biblioteca
+      </button>
       <div class="sb-section">Sistema</div>
       <button class="sb-item" onclick="irPara('sorteio',this)">
         <span class="sb-ic">◉</span> Sorteio
@@ -530,6 +534,80 @@
               <div class="ia-ctx-titulo">Última ação sugerida</div>
               <div id="ia-acao-preview"></div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BIBLIOTECA ───────────────────────────────────────────────────── -->
+      <div class="panel" id="panel-biblioteca">
+        <div class="section-hdr">
+          <div>
+            <div class="section-titulo">Biblioteca TT</div>
+            <div class="section-sub">Gerencie o acervo de clássicos e acompanhe métricas de leitura.</div>
+          </div>
+          <button class="btn-primary" onclick="abrirFormObra()">+ Nova obra</button>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;" id="bib-stats">
+          <div class="card" style="padding:16px;text-align:center;">
+            <div style="font-size:28px;font-weight:600;color:var(--v5);" id="bib-stat-obras">—</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:4px;">Obras ativas</div>
+          </div>
+          <div class="card" style="padding:16px;text-align:center;">
+            <div style="font-size:28px;font-weight:600;color:var(--v5);" id="bib-stat-ativas">—</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:4px;">Leituras abertas</div>
+          </div>
+          <div class="card" style="padding:16px;text-align:center;">
+            <div style="font-size:28px;font-weight:600;color:var(--v5);" id="bib-stat-concluidas">—</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:4px;">Concluídas</div>
+          </div>
+        </div>
+
+        <!-- Tabela acervo -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-titulo">Acervo</span>
+            <button class="btn-ghost" onclick="carregarBiblioteca()">↻ Atualizar</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr>
+                <th>Título</th><th>Autor</th><th>Ano</th><th>Gênero</th><th>Status</th><th>Ações</th>
+              </tr></thead>
+              <tbody id="bib-tabela"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Modal Nova/Editar Obra ── -->
+      <div class="modal-overlay" id="bib-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;">
+        <div class="modal" style="background:#fff;border-radius:6px;padding:28px;max-width:560px;width:92%;max-height:90vh;overflow-y:auto;">
+          <h3 style="font-family:var(--serif);font-size:20px;margin-bottom:20px;" id="bib-modal-titulo">Nova obra</h3>
+          <div style="display:grid;gap:14px;">
+            <div class="form-group"><label>Slug *</label><input id="bib-slug" class="input" placeholder="ex: dom-casmurro"></div>
+            <div class="form-group"><label>Título *</label><input id="bib-titulo-campo" class="input" placeholder="Dom Casmurro"></div>
+            <div class="form-group"><label>Autor *</label><input id="bib-autor" class="input" placeholder="Machado de Assis"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group"><label>Ano publicação</label><input id="bib-ano" class="input" type="number" placeholder="1899"></div>
+              <div class="form-group"><label>Gênero</label><input id="bib-genero" class="input" placeholder="Romance"></div>
+            </div>
+            <div class="form-group"><label>Sinopse</label><textarea id="bib-sinopse" class="input" rows="3" style="resize:vertical"></textarea></div>
+            <div class="form-group"><label>URL do EPUB <small style="color:var(--t3)">(Gutenberg, R2, etc.)</small></label><input id="bib-epub-url" class="input" placeholder="https://..."></div>
+            <div class="form-group"><label>URL da capa</label><input id="bib-capa-url" class="input" placeholder="https://..."></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group"><label>Páginas estimadas</label><input id="bib-paginas" class="input" type="number" placeholder="250"></div>
+              <div class="form-group"><label>Idioma</label><input id="bib-idioma" class="input" value="pt" placeholder="pt"></div>
+            </div>
+            <div style="display:flex;gap:20px;">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;"><input type="checkbox" id="bib-ativo" checked> Ativo</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;"><input type="checkbox" id="bib-featured"> Destaque</label>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+            <button class="btn-ghost" onclick="fecharFormObra()">Cancelar</button>
+            <button class="btn-primary" id="bib-btn-salvar" onclick="salvarObra()">Salvar obra</button>
           </div>
         </div>
       </div>
@@ -778,13 +856,14 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', hero:'Hero', depoimentos:'Depoimentos', ia:'IA Studio', sorteio:'Sorteio' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', hero:'Hero', depoimentos:'Depoimentos', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
   if (panel === 'hero') carregarHeroConfig();
   if (panel === 'depoimentos') carregarDepoimentos();
   if (panel === 'sorteio' && statsCache) renderSorteio(statsCache);
+  if (panel === 'biblioteca') carregarBiblioteca();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -1296,6 +1375,142 @@ async function executarAcaoIA(acao, btnEl) {
 
 // Init IA suggestions on load
 renderSugestoes();
+
+// ─── BIBLIOTECA TT ───────────────────────────────────────────────────────────
+let bibAcervoCache = [];
+let bibSlugEditando = null;
+
+async function carregarBiblioteca() {
+  try {
+    const [acervoR, statsR] = await Promise.all([
+      api('/api/admin/biblioteca/acervo'),
+      api('/api/admin/biblioteca/stats'),
+    ]);
+    bibAcervoCache = Array.isArray(acervoR) ? acervoR : [];
+    renderTabelaBib(bibAcervoCache);
+    if (statsR && statsR.ok) {
+      document.getElementById('bib-stat-obras').textContent = statsR.total_obras ?? '—';
+      document.getElementById('bib-stat-ativas').textContent = statsR.leituras_ativas ?? '—';
+      document.getElementById('bib-stat-concluidas').textContent = statsR.leituras_concluidas ?? '—';
+    }
+  } catch(e) { toast('Erro ao carregar biblioteca: ' + e.message, 'err'); }
+}
+
+function renderTabelaBib(livros) {
+  const el = document.getElementById('bib-tabela');
+  if (!livros.length) {
+    el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Nenhuma obra cadastrada.</td></tr>';
+    return;
+  }
+  el.innerHTML = livros.map(l => `
+    <tr>
+      <td><strong>${l.titulo}</strong><div style="font-size:11px;color:var(--t3)">${l.slug}</div></td>
+      <td>${l.autor}</td>
+      <td>${l.ano_publicacao ?? '—'}</td>
+      <td>${l.genero ?? '—'}</td>
+      <td><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${l.ativo ? '#e8f5e9' : '#ffebee'};color:${l.ativo ? '#2e7d32' : '#c62828'}">${l.ativo ? 'Ativo' : 'Inativo'}${l.featured ? ' ★' : ''}</span></td>
+      <td>
+        <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="editarObra('${l.slug}')">Editar</button>
+        <button class="btn-ghost" style="padding:4px 10px;font-size:12px;color:#c62828" onclick="desativarObra('${l.slug}','${l.ativo}')">${l.ativo ? 'Desativar' : 'Ativar'}</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function abrirFormObra() {
+  bibSlugEditando = null;
+  document.getElementById('bib-modal-titulo').textContent = 'Nova obra';
+  ['bib-slug','bib-titulo-campo','bib-autor','bib-ano','bib-genero','bib-sinopse','bib-epub-url','bib-capa-url','bib-paginas'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('bib-idioma').value = 'pt';
+  document.getElementById('bib-ativo').checked = true;
+  document.getElementById('bib-featured').checked = false;
+  document.getElementById('bib-slug').disabled = false;
+  document.getElementById('bib-modal').style.display = 'flex';
+}
+
+function editarObra(slug) {
+  const l = bibAcervoCache.find(x => x.slug === slug);
+  if (!l) return;
+  bibSlugEditando = slug;
+  document.getElementById('bib-modal-titulo').textContent = 'Editar obra';
+  document.getElementById('bib-slug').value = l.slug; document.getElementById('bib-slug').disabled = true;
+  document.getElementById('bib-titulo-campo').value = l.titulo ?? '';
+  document.getElementById('bib-autor').value = l.autor ?? '';
+  document.getElementById('bib-ano').value = l.ano_publicacao ?? '';
+  document.getElementById('bib-genero').value = l.genero ?? '';
+  document.getElementById('bib-sinopse').value = l.sinopse ?? '';
+  document.getElementById('bib-epub-url').value = l.epub_url ?? '';
+  document.getElementById('bib-capa-url').value = l.capa_url ?? '';
+  document.getElementById('bib-paginas').value = l.paginas_estimadas ?? '';
+  document.getElementById('bib-idioma').value = l.idioma ?? 'pt';
+  document.getElementById('bib-ativo').checked = !!l.ativo;
+  document.getElementById('bib-featured').checked = !!l.featured;
+  document.getElementById('bib-modal').style.display = 'flex';
+}
+
+function fecharFormObra() {
+  document.getElementById('bib-modal').style.display = 'none';
+  bibSlugEditando = null;
+}
+
+async function salvarObra() {
+  const btn = document.getElementById('bib-btn-salvar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  const payload = {
+    slug:               document.getElementById('bib-slug').value.trim(),
+    titulo:             document.getElementById('bib-titulo-campo').value.trim(),
+    autor:              document.getElementById('bib-autor').value.trim(),
+    ano_publicacao:     parseInt(document.getElementById('bib-ano').value) || null,
+    genero:             document.getElementById('bib-genero').value.trim() || null,
+    sinopse:            document.getElementById('bib-sinopse').value.trim() || null,
+    epub_url:           document.getElementById('bib-epub-url').value.trim() || null,
+    capa_url:           document.getElementById('bib-capa-url').value.trim() || null,
+    paginas_estimadas:  parseInt(document.getElementById('bib-paginas').value) || null,
+    idioma:             document.getElementById('bib-idioma').value.trim() || 'pt',
+    ativo:              document.getElementById('bib-ativo').checked,
+    featured:           document.getElementById('bib-featured').checked,
+  };
+
+  if (!payload.slug || !payload.titulo || !payload.autor) {
+    toast('Preencha os campos obrigatórios: slug, título e autor.', 'err');
+    btn.disabled = false; btn.textContent = 'Salvar obra';
+    return;
+  }
+
+  try {
+    let r;
+    if (bibSlugEditando) {
+      r = await api(`/api/admin/biblioteca/acervo/${bibSlugEditando}`, 'PUT', payload);
+    } else {
+      r = await api('/api/admin/biblioteca/acervo', 'POST', payload);
+    }
+    if (r && r.ok !== false) {
+      toast(bibSlugEditando ? 'Obra atualizada.' : 'Obra cadastrada.', 'ok');
+      fecharFormObra();
+      carregarBiblioteca();
+    } else {
+      toast('Erro ao salvar: ' + JSON.stringify(r), 'err');
+    }
+  } catch(e) { toast(e.message, 'err'); }
+
+  btn.disabled = false; btn.textContent = 'Salvar obra';
+}
+
+async function desativarObra(slug, atualAtivo) {
+  const novoEstado = !JSON.parse(atualAtivo);
+  if (!confirm(`${novoEstado ? 'Reativar' : 'Desativar'} "${slug}"?`)) return;
+  try {
+    const r = await api(`/api/admin/biblioteca/acervo/${slug}`, 'DELETE');
+    if (r && r.ok) { toast('Feito.', 'ok'); carregarBiblioteca(); }
+    else toast('Erro.', 'err');
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('bib-modal').addEventListener('click', function(e) {
+  if (e.target === this) fecharFormObra();
+});
 </script>
 </body>
 </html>
