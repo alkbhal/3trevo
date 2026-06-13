@@ -4,17 +4,23 @@ compatibility_date = "2024-09-25"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-SUPABASE_URL = "https://xfkepekffdyrtcgagwqo.supabase.co"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI"
+ENVIRONMENT = "production"
 
-[[r2_buckets]]
-binding = "FORGE_STORAGE"
-bucket_name = "forge-storage"
+# Secrets (configurar via: npx wrangler secret put NOME)
+# SUPABASE_URL
+# SUPABASE_SERVICE_KEY
+# RESEND_API_KEY
+# WEBHOOK_HMAC_SECRET
+# ANTHROPIC_KEY
+# R2_PUBLIC_BUCKET_ID    (opcional — se usar R2 para PDFs)
 
+# KV namespace para rate limiting e health monitor
 [[kv_namespaces]]
 binding = "TT_KV"
 id = "CONFIGURE_KV_ID_HERE"
 
-# Cron: busca resultado LF + apuração automática toda sexta 20h BRT (23:00 UTC)
+# Crons:
+# - Sexta 23:00 UTC (20:00 BRT): apuração Sistema Loteria TT
+# - Toda hora: health monitor (checa componentes, detecta ataques, alerta via email)
 [triggers]
-crons = ["0 23 * * 5"]
+crons = ["0 23 * * 5", "0 * * * *"]

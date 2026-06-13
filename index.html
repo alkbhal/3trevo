@@ -1,1523 +1,1225 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev serie-tt.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co; media-src 'self' blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
-<title>Editora Três Trevo — Literatura, Conhecimento e Cultura | Montauri RS</title>
-<meta name="description" content="Editora digital independente de Montauri/RS. Ebooks de ficção, ensaio e negócios. Programa Cultural com prêmios em dinheiro. Adquira, leia e concorra.">
-<meta name="keywords" content="editora digital, ebooks brasileiros, programa cultural, concurso literário, Said Anes, Montauri RS">
-<meta name="author" content="Editora Três Trevo">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.3trevo.com.br/">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Editora Três Trevo">
-<meta property="og:title" content="Editora Três Trevo — Literatura, Conhecimento e Cultura">
-<meta property="og:description" content="Ebooks que mudam perspectivas. Programa Cultural com prêmios em dinheiro. Adquira, leia e concorra.">
-<meta property="og:url" content="https://www.3trevo.com.br">
-<meta property="og:image" content="https://www.3trevo.com.br/og-image.png">
-<meta property="og:locale" content="pt_BR">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Editora Três Trevo — Literatura, Conhecimento e Cultura">
-<meta name="twitter:description" content="Ebooks que mudam perspectivas. Programa Cultural com prêmios em dinheiro.">
-<meta name="twitter:image" content="https://www.3trevo.com.br/og-image.png">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#0f2d1a">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"Editora Três Trevo","url":"https://www.3trevo.com.br","description":"Editora digital independente sediada em Montauri/RS.","address":{"@type":"PostalAddress","addressLocality":"Montauri","addressRegion":"RS","addressCountry":"BR"},"contactPoint":{"@type":"ContactPoint","telephone":"+55-54-99946-7085","contactType":"customer service","email":"sac@3trevo.com.br"}}
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --creme:#f4efe5;
-  --creme2:#ece6d6;
-  --creme3:#e4dcc8;
-  --card:#ffffff;
-  --noir:#0a0e27;
-  --verde-nav:#0f2d1a;
-  --verde:#1a4a2e;
-  --verde2:#256640;
-  --ouro:#c8a84b;
-  --ouro-texto:#7a5c1e;
-  --ouro2:#8a6c2e;
-  --tinta:#1a1a16;
-  --tinta2:#3d3c35;
-  --tinta3:#6b6860;
-  --tinta4:#9a9790;
-  --borda:rgba(26,74,46,.12);
-  --borda-ouro:rgba(200,168,75,.25);
-  --footer:#06091a;
-}
-/* ── BANNER PROMOCIONAL ── */
-#site-banner{display:none;padding:10px 24px;text-align:center;font-size:13px;position:relative;z-index:1001;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;letter-spacing:.2px}
-#site-banner.ativo{display:flex}
-.banner-texto{color:#f4efe5}
-.banner-cta{padding:5px 14px;border:1px solid rgba(255,255,255,.45);color:#f4efe5;text-decoration:none;font-size:12px;white-space:nowrap;transition:background .2s;letter-spacing:.5px}
-.banner-cta:hover{background:rgba(255,255,255,.15)}
-.banner-fechar{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.5);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;transition:color .2s}
-.banner-fechar:hover{color:#fff}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Editora digital independente de Montauri/RS. Ebooks de ficção, ensaio e negócios. Programa Cultural com prêmios em dinheiro. Adquira, leia e concorra.">
+  <meta property="og:title" content="Editora Três Trevo — Literatura, Conhecimento e Cultura">
+  <meta property="og:description" content="Ebooks que mudam perspectivas. Programa Cultural com prêmios em dinheiro.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.3trevo.com.br">
+  <meta name="theme-color" content="#0f2d1a">
+  <title>Editora Três Trevo — Literatura, Conhecimento e Cultura | Montauri RS</title>
+  <link rel="canonical" href="https://www.3trevo.com.br/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
-html{scroll-behavior:smooth}
-body{font-family:'Poppins',sans-serif;background:var(--creme);color:var(--tinta);overflow-x:hidden;font-size:16px;line-height:1.6}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  opacity:.45}
-a{text-decoration:none;color:inherit}
-a[href^="http"]{rel:noopener}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:var(--creme)}
-::-webkit-scrollbar-thumb{background:var(--ouro-texto)}
-a:focus-visible,button:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── NAV ── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:900;
-  background:var(--verde-nav);
-  border-bottom:1px solid rgba(200,168,75,.2);
-  padding:0 48px;height:64px;
-  display:flex;align-items:center;justify-content:space-between;
-  transition:height .3s;
-}
-nav.scrolled{height:54px;background:rgba(10,30,18,.98);backdrop-filter:blur(12px)}
-.nav-marca{
-  font-family:'Lora',serif;
-  font-size:20px;font-weight:600;
-  color:var(--ouro);letter-spacing:.5px;
-  display:flex;align-items:center;gap:10px;
-}
-.nav-marca::before{content:'✦';font-size:14px;opacity:.7}
-.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
-.nav-links a{
-  font-size:12px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,.6);transition:color .2s;
-}
-.nav-links a:hover{color:var(--ouro)}
-.nav-right{display:flex;align-items:center;gap:16px}
-.nav-lang{
-  font-size:11px;letter-spacing:2px;text-transform:uppercase;
-  border:1px solid rgba(200,168,75,.3);
-  padding:5px 12px;color:var(--ouro);
-  background:transparent;cursor:pointer;
-  font-family:'Poppins',sans-serif;transition:all .2s;
-}
-.nav-lang:hover{background:rgba(200,168,75,.1)}
-.nav-cta{
-  font-size:12px;letter-spacing:1px;text-transform:uppercase;
-  background:var(--ouro);color:var(--verde-nav);
-  padding:8px 20px;font-weight:500;transition:background .2s;
-  display:inline-block;
-}
-.nav-cta:hover{background:#d4b452}
-.nav-mobile-btn{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
-.nav-mobile-btn span{width:22px;height:1px;background:var(--ouro);display:block;transition:all .3s}
-.nav-mobile{
-  display:none;flex-direction:column;
-  position:fixed;top:64px;left:0;right:0;
-  background:rgba(10,30,18,.98);backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(200,168,75,.15);
-  padding:32px 24px;gap:20px;z-index:899;
-}
-.nav-mobile.aberto{display:flex}
-.nav-mobile a{
-  font-size:15px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,.6);padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,.06);transition:color .2s;
-}
-.nav-mobile a:hover{color:var(--ouro)}
+    :root {
+      --v0: #050f07; --v1: #0a1f0e; --v2: #0f2d1a;
+      --v3: #1e5c3a; --v4: #2d7a50; --v5: #4a9966;
+      --v6: #a8c5a0; --v7: #d4e8d0; --v8: #edf5eb;
+      --ouro: #c9a84c;
+      --bg: #f8f5ef; --bg2: #f0f7f0;
+      --branco: #ffffff;
+      --borda: #e0dbd2; --borda-v: rgba(30,92,58,.15);
+      --t0: #111a0e; --t1: #2a3a26; --t2: #5a6a54; --t3: #8a9a84;
+      --serif: 'Fraunces', Georgia, serif;
+      --sans:  'Instrument Sans', system-ui, sans-serif;
+      --max: 1160px;
+    }
 
-/* ── HERO ── */
-#inicio{
-  min-height:100vh;
-  display:grid;grid-template-columns:1fr 1fr;
-  align-items:center;
-  padding:100px 48px 60px;
-  background:var(--creme);
-  position:relative;overflow:hidden;
-}
-.hero-bg{
-  position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 60% 80% at 70% 50%,rgba(200,168,75,.05) 0%,transparent 60%),
-    radial-gradient(ellipse 40% 60% at 20% 80%,rgba(26,74,46,.06) 0%,transparent 50%);
-}
-.hero-linhas{
-  position:absolute;right:0;top:0;bottom:0;width:50%;
-  background:repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(26,74,46,.04) 39px,rgba(26,74,46,.04) 40px);
-  pointer-events:none;
-}
-.hero-esquerda{position:relative;z-index:2;padding-right:48px}
-.hero-tag{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:10px;letter-spacing:4px;text-transform:uppercase;
-  color:var(--ouro-texto);margin-bottom:24px;
-}
-.hero-tag::before{content:'';width:24px;height:1px;background:var(--ouro-texto)}
-h1.hero-titulo{
-  font-family:'Lora',serif;
-  font-size:clamp(40px,5vw,68px);
-  font-weight:400;line-height:1.05;
-  color:var(--tinta);margin-bottom:8px;
-}
-h1.hero-titulo em{color:var(--verde);font-style:italic}
-.hero-subtitulo{
-  font-family:'Lora',serif;
-  font-size:clamp(17px,2vw,22px);
-  font-weight:400;font-style:italic;color:var(--tinta3);
-  margin-bottom:32px;line-height:1.4;
-}
-.hero-desc{
-  font-size:16px;color:var(--tinta2);
-  line-height:1.9;max-width:440px;margin-bottom:40px;
-}
-.hero-acoes{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.btn-primario{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:14px 28px;background:var(--verde);color:#fff;
-  font-size:13px;font-weight:500;letter-spacing:.5px;
-  transition:background .2s;
-}
-.btn-primario:hover{background:var(--verde2)}
-.btn-secundario{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:14px 24px;border:1px solid var(--borda);
-  color:var(--tinta2);font-size:13px;transition:all .2s;
-}
-.btn-secundario:hover{border-color:var(--verde);color:var(--verde)}
-.hero-stats{
-  display:flex;gap:32px;margin-top:48px;
-  padding-top:32px;border-top:1px solid var(--borda);
-}
-.stat-num{
-  font-family:'Lora',serif;
-  font-size:36px;font-weight:600;
-  color:var(--verde);display:block;line-height:1;
-}
-.stat-txt{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--tinta4);margin-top:4px}
-.hero-direita{
-  position:relative;z-index:2;
-  display:flex;justify-content:center;align-items:center;
-}
-.capas-vitrine{position:relative;width:380px;height:480px}
-.capa-card{
-  position:absolute;width:200px;
-  background:var(--card);border:1px solid var(--borda-ouro);
-  padding:28px 20px;
-  display:flex;flex-direction:column;align-items:center;gap:12px;
-  transition:transform .3s;box-shadow:0 8px 32px rgba(26,74,46,.08);
-}
-.capa-card:nth-child(1){top:0;left:0;transform:rotate(-3deg)}
-.capa-card:nth-child(2){top:60px;right:0;transform:rotate(2deg)}
-.capa-card:nth-child(3){bottom:0;left:40px;transform:rotate(-1deg)}
-.capa-card:hover{transform:rotate(0) translateY(-8px)!important;z-index:10}
-.capa-faixa{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro-texto)}
-.capa-nome{font-family:'Lora',serif;font-size:14px;text-align:center;line-height:1.3;color:var(--tinta)}
-.capa-preco{font-size:13px;color:var(--verde);font-weight:500}
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--t0); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    h1,h2,h3,h4 { font-family: var(--serif); font-weight: 300; line-height: 1.15; }
+    p { line-height: 1.72; }
+    a { text-decoration: none; }
+    em { font-style: italic; }
+    .lbl { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; font-family: var(--sans); font-weight: 500; }
 
-/* ── DIVISOR ── */
-.divisor{height:1px;background:linear-gradient(90deg,transparent,rgba(10,14,39,.15),transparent);margin:0 48px}
+    /* ── HEADER ──────────────────────────────────────────────────────────────── */
+    #hdr {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,31,14,.97); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .hdr-in {
+      max-width: var(--max); margin: 0 auto; padding: 0 24px;
+      height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .logo { font-family: var(--serif); font-weight: 400; font-size: 16px; color: rgba(255,255,255,.92); letter-spacing: .02em; }
+    .logo span { color: var(--v6); }
+    nav { display: flex; align-items: center; gap: 24px; }
+    nav a { font-size: 13px; color: rgba(255,255,255,.5); transition: color .2s; }
+    nav a:hover { color: rgba(255,255,255,.9); }
+    .hdr-right { display: flex; align-items: center; gap: 12px; }
+    .lang-toggle { display: flex; border: 1px solid rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; }
+    .lang-btn { background: none; border: none; cursor: pointer; padding: 5px 9px; font-size: 11px; font-family: var(--sans); letter-spacing: .06em; color: rgba(255,255,255,.4); transition: all .2s; }
+    .lang-btn + .lang-btn { border-left: 1px solid rgba(255,255,255,.1); }
+    .lang-btn.ativo { background: var(--v3); color: #fff; }
+    .hdr-cta { background: var(--v3); color: #fff !important; padding: 8px 18px; border-radius: 2px; font-size: 13px; font-weight: 600; transition: background .2s; white-space: nowrap; }
+    .hdr-cta:hover { background: var(--v4) !important; }
+    .menu-mob { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .menu-mob span { display: block; width: 22px; height: 1.5px; background: rgba(255,255,255,.6); margin: 5px 0; }
 
-/* ── SEÇÕES ── */
-section{padding:96px 48px}
-.sec-label{
-  font-size:10px;letter-spacing:5px;text-transform:uppercase;
-  color:var(--ouro-texto);margin-bottom:12px;
-  display:flex;align-items:center;gap:12px;
-}
-.sec-label::before{content:'';width:32px;height:1px;background:var(--ouro-texto)}
-h2.sec-titulo{
-  font-family:'Lora',serif;
-  font-size:clamp(28px,4vw,48px);
-  font-weight:400;line-height:1.1;color:var(--tinta);margin-bottom:16px;
-}
-h2.sec-titulo em{font-style:italic;color:var(--verde)}
-.sec-sub{font-size:16px;color:var(--tinta2);line-height:1.8;max-width:560px}
+    /* ── HERO ────────────────────────────────────────────────────────────────── */
+    #inicio {
+      background: var(--v0); padding-top: 58px;
+      min-height: 94vh; display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
 
-/* ── CATÁLOGO ── */
-#catalogo{background:var(--creme2)}
-.catalogo-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;flex-wrap:wrap;gap:24px}
-.filtros{display:flex;gap:8px;flex-wrap:wrap}
-.filtro{
-  font-size:11px;letter-spacing:2px;text-transform:uppercase;
-  padding:7px 16px;border:1px solid var(--borda);
-  background:var(--card);color:var(--tinta2);
-  cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;
-}
-.filtro.ativo,.filtro:hover{border-color:var(--verde);color:var(--verde);background:rgba(26,74,46,.06)}
-.grid-ebooks{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:1px;background:var(--borda-ouro);border:1px solid var(--borda-ouro);
-}
-.ebook-card{
-  background:var(--card);padding:36px 28px;
-  display:flex;flex-direction:column;gap:16px;
-  transition:background .25s,transform .25s,box-shadow .25s;
-  position:relative;overflow:hidden;cursor:pointer;
-}
-.ebook-card::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--verde),transparent);
-  transform:scaleX(0);transform-origin:left;transition:transform .3s;
-}
-.ebook-card:hover{background:#fdfaf3;transform:translateY(-2px);box-shadow:0 8px 32px rgba(26,74,46,.1)}
-.ebook-card:hover::after{transform:scaleX(1)}
-.livro-mockup{width:80px;height:110px;flex-shrink:0;transition:transform .3s}
-.ebook-card:hover .livro-mockup{transform:translateY(-4px) rotate(-1deg)}
-.ebook-genero{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro-texto)}
-.ebook-titulo{font-family:'Lora',serif;font-size:22px;font-weight:400;line-height:1.2;color:var(--tinta)}
-.ebook-autor{font-size:12px;color:var(--tinta4);letter-spacing:1px}
-.ebook-desc{font-size:14px;color:var(--tinta2);line-height:1.75;flex:1}
-.ebook-premio-box{
-  padding:10px 14px;
-  background:rgba(26,74,46,.06);
-  border:1px solid rgba(26,74,46,.15);
-  border-radius:2px;font-size:13px;color:var(--verde);
-}
-.ebook-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  padding-top:16px;border-top:1px solid var(--borda);margin-top:auto;
-}
-.ebook-preco{font-family:'Lora',serif;font-size:24px;font-weight:600;color:var(--verde)}
-.ebook-cotas{font-size:11px;color:var(--tinta4)}
-.ebook-btn{
-  font-size:11px;letter-spacing:1px;text-transform:uppercase;
-  padding:8px 16px;background:transparent;
-  border:1px solid var(--verde);color:var(--verde);
-  transition:all .2s;cursor:pointer;font-family:'Poppins',sans-serif;
-}
-.ebook-btn:hover{background:var(--verde);color:#fff}
+    /* Vídeo de fundo */
+    .hero-video-bg {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .hero-video-bg video {
+      width: 100%; height: 100%; object-fit: cover; opacity: .18;
+    }
+    /* Overlay em gradiente para legibilidade — mais denso à esquerda */
+    .hero-video-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        105deg,
+        rgba(5,15,7,.96) 0%,
+        rgba(10,31,14,.88) 45%,
+        rgba(10,31,14,.55) 70%,
+        rgba(10,31,14,.35) 100%
+      );
+    }
 
-/* ── PROGRAMA CULTURAL ── */
-#programa{background:var(--creme);position:relative;overflow:hidden}
-.prog-bg{
-  position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(26,74,46,.04) 0%,transparent 60%);
-}
-.prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:2}
-.prog-passos{display:flex;flex-direction:column;gap:0}
-.prog-passo{display:flex;gap:24px;align-items:flex-start;padding:24px 0;border-bottom:1px solid var(--borda)}
-.prog-passo:last-child{border-bottom:none}
-.prog-num{
-  width:44px;height:44px;flex-shrink:0;
-  border:1.5px solid var(--verde);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Lora',serif;font-size:20px;color:var(--verde);
-}
-.prog-info h3{font-size:16px;font-weight:500;color:var(--tinta);margin-bottom:6px}
-.prog-info p{font-size:15px;color:var(--tinta2);line-height:1.8}
-.prog-premio{
-  background:var(--card);border:1px solid var(--borda-ouro);
-  padding:40px;position:relative;
-}
-.prog-premio::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--verde),transparent);
-}
-.premio-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro-texto);margin-bottom:20px}
-.premio-item{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--borda)}
-.premio-item:last-child{border-bottom:none}
-.premio-pos{font-family:'Lora',serif;font-size:32px;font-weight:600;color:var(--verde);min-width:40px;line-height:1}
-.premio-val{font-size:20px;font-weight:500;color:var(--tinta)}
-.premio-desc{font-size:12px;color:var(--tinta3);margin-top:2px}
-.prog-aviso{margin-top:24px;font-size:11px;color:var(--tinta4);line-height:1.7;border-top:1px solid var(--borda);padding-top:16px}
+    .hero-in {
+      max-width: var(--max); margin: 0 auto; padding: 72px 24px 96px;
+      display: grid; grid-template-columns: 1fr 480px; gap: 64px; align-items: center;
+      position: relative; z-index: 1; width: 100%;
+    }
 
-/* ── MULTIPLICADOR ── */
-.mult-premio{
-  margin-top:24px;background:var(--card);
-  border:1px solid var(--borda-ouro);position:relative;overflow:hidden;
-}
-.mult-premio::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--verde),var(--ouro),transparent);
-}
-.mult-header{padding:20px 24px 16px;border-bottom:1px solid var(--borda)}
-.mult-tag{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro-texto);margin-bottom:8px}
-.mult-titulo{font-family:'Lora',serif;font-size:20px;font-weight:400;color:var(--tinta);line-height:1.2}
-.mult-titulo em{color:var(--verde);font-style:italic}
-.mult-escada{padding:20px 24px;display:flex;flex-direction:column;gap:0}
-.mult-degrau{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--borda);position:relative}
-.mult-degrau:last-child{border-bottom:none}
-.mult-degrau-linha{position:absolute;left:11px;top:0;bottom:-1px;width:1px;background:rgba(26,74,46,.15)}
-.mult-degrau:first-child .mult-degrau-linha{top:50%}
-.mult-degrau:last-child .mult-degrau-linha{bottom:50%}
-.mult-dot{
-  width:22px;height:22px;flex-shrink:0;
-  border:1px solid rgba(26,74,46,.3);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;position:relative;z-index:1;
-  background:var(--creme);transition:all .3s;color:var(--tinta3);
-}
-.mult-degrau.ativo .mult-dot{background:var(--verde);border-color:var(--verde);color:#fff;font-weight:700}
-.mult-degrau.destaque .mult-dot{width:28px;height:28px;font-size:13px;background:var(--ouro);border-color:var(--ouro);color:var(--verde-nav)}
-.mult-degrau-txt{flex:1;font-size:13px;color:var(--tinta3)}
-.mult-degrau.ativo .mult-degrau-txt{color:var(--tinta2)}
-.mult-degrau-val{font-family:'Lora',serif;font-size:16px;font-weight:600;color:var(--tinta4)}
-.mult-degrau.ativo .mult-degrau-val{color:var(--verde)}
-.mult-degrau.destaque .mult-degrau-val{font-size:18px;color:var(--ouro-texto)}
-.mult-rodape{padding:14px 24px;background:rgba(26,74,46,.04);border-top:1px solid var(--borda);font-size:12px;color:var(--tinta3);line-height:1.6}
-.mult-rodape strong{color:var(--tinta2)}
-.mult-sim{padding:16px 24px;border-top:1px solid var(--borda)}
-.mult-sim-titulo{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--tinta3);margin-bottom:12px}
-.mult-sim-redes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.mult-sim-rede{
-  display:flex;align-items:center;gap:6px;padding:7px 12px;
-  font-size:12px;border:1px solid var(--borda);background:var(--card);
-  cursor:pointer;transition:all .2s;user-select:none;color:var(--tinta2);
-}
-.mult-sim-rede.on{border-color:var(--verde);background:rgba(26,74,46,.06);color:var(--verde)}
-.mult-resultado{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;background:var(--verde);border-radius:2px;
-}
-.mult-resultado-label{font-size:10px;color:rgba(255,255,255,.65);letter-spacing:2px;text-transform:uppercase}
-.mult-resultado-val{font-family:'Lora',serif;font-size:28px;font-weight:600;color:#fff;transition:all .3s}
+    .hero-sup { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .hero-sup::before { content: ''; display: block; width: 24px; height: 1px; background: var(--v6); }
+    .hero-sup span { color: var(--v6); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; }
+    h1.hero-t { font-size: clamp(34px, 5.2vw, 62px); font-weight: 200; color: #fff; line-height: 1.08; margin-bottom: 22px; }
+    h1.hero-t em { color: var(--v6); font-style: italic; }
+    .hero-sub { font-size: 16px; color: rgba(255,255,255,.5); line-height: 1.78; max-width: 480px; margin-bottom: 32px; }
+    .hero-btns { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+    .btn-pri { background: var(--v3); color: #fff; padding: 13px 28px; border-radius: 2px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, transform .1s; }
+    .btn-pri:hover { background: var(--v4); }
+    .btn-pri:active { transform: scale(.97); }
+    .btn-ghost { color: rgba(255,255,255,.5); font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(255,255,255,.18); padding-bottom: 1px; transition: all .2s; }
+    .btn-ghost:hover { color: rgba(255,255,255,.9); border-color: rgba(255,255,255,.5); }
 
-/* ── CONTADOR / META ── */
-#contador{background:var(--creme2);padding:80px 48px;text-align:center;position:relative;overflow:hidden}
-.meta-wrapper{max-width:720px;margin:0 auto}
-.meta-frase-topo{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro-texto);margin-bottom:16px}
-.meta-frase-principal{font-family:'Lora',serif;font-size:clamp(22px,3vw,34px);font-weight:400;color:var(--tinta);line-height:1.3;margin-bottom:8px;min-height:80px;transition:opacity .5s}
-.meta-frase-principal em{color:var(--verde);font-style:italic}
-.meta-frase-sub{font-size:15px;color:var(--tinta2);margin-bottom:40px;line-height:1.7;min-height:40px;transition:opacity .5s}
-.barra-container{position:relative;margin-bottom:12px}
-.barra-trilho{height:6px;background:rgba(26,74,46,.1);overflow:hidden;position:relative;border-radius:3px}
-.barra-progresso{height:100%;width:0%;background:linear-gradient(90deg,var(--verde-nav),var(--verde),var(--verde2));transition:width 2s cubic-bezier(.16,1,.3,1);position:relative;border-radius:3px}
-.barra-marcadores{display:flex;justify-content:space-between;margin-top:10px}
-.barra-marca{font-size:10px;letter-spacing:1px;color:var(--tinta4)}
-.barra-marca.ativa{color:var(--verde)}
-.degraus{display:flex;justify-content:space-between;margin-top:32px;gap:8px}
-.degrau{flex:1;padding:14px 8px;border:1px solid var(--borda);background:rgba(26,74,46,.02);font-size:11px;color:var(--tinta4);letter-spacing:1px;text-transform:uppercase;transition:all .4s;position:relative}
-.degrau.ativo{border-color:rgba(26,74,46,.4);background:rgba(26,74,46,.06);color:var(--verde)}
-.degrau.concluido{border-color:rgba(26,74,46,.2);background:rgba(26,74,46,.04);color:rgba(26,74,46,.5)}
-.meta-cta{margin-top:40px}
-.meta-cta a{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:var(--verde);color:#fff;font-size:13px;font-weight:500;transition:background .2s}
-.meta-cta a:hover{background:var(--verde2)}
+    /* Stats inline */
+    .hero-stats-row { display: flex; align-items: center; gap: 24px; }
+    .hsr-item { display: flex; flex-direction: column; }
+    .hsr-n { font-family: var(--serif); font-size: 22px; font-weight: 300; color: #fff; line-height: 1; }
+    .hsr-l { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-top: 3px; }
+    .hsr-sep { width: 1px; height: 28px; background: rgba(255,255,255,.1); }
 
-/* ── DEPOIMENTOS ── */
-#depoimentos{background:var(--creme);overflow:hidden}
-.dep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--borda-ouro);border:1px solid var(--borda-ouro);margin-top:48px}
-.dep-card{background:var(--card);padding:32px 28px}
-.dep-aspas{font-family:'Lora',serif;font-size:64px;color:var(--verde);opacity:.15;line-height:.8;margin-bottom:12px}
-.dep-texto{font-family:'Lora',serif;font-size:17px;font-style:italic;color:var(--tinta2);line-height:1.7;margin-bottom:20px}
-.dep-autor{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--tinta3)}
-.dep-livro{font-size:11px;color:var(--ouro-texto);margin-top:2px}
+    /* ─── MOCKUP SHOWCASE ────────────────────────────────────────────────────── */
+    .showcase {
+      display: flex; flex-direction: column; align-items: center; gap: 28px;
+      position: relative;
+    }
 
-/* ── FAQ ── */
-#faq{background:var(--creme2)}
-.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--borda);border:1px solid var(--borda);margin-top:48px}
-.faq-item{background:var(--card);padding:28px;cursor:pointer}
-.faq-pergunta{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:15px;color:var(--tinta);font-weight:400}
-.faq-icone{color:var(--verde);font-size:18px;flex-shrink:0;transition:transform .3s;font-family:'Lora',serif}
-.faq-item.aberto .faq-icone{transform:rotate(45deg)}
-.faq-item.aberto .faq-pergunta{color:var(--verde)}
-.faq-resposta{font-size:14px;color:var(--tinta2);line-height:1.8;margin-top:16px;max-height:0;overflow:hidden;transition:max-height .4s ease}
-.faq-item.aberto .faq-resposta{max-height:300px}
-.faq-resposta a{color:var(--verde)}
+    /* Perspectiva */
+    .livro-stage {
+      perspective: 1000px;
+      width: 220px; height: 300px;
+      position: relative;
+    }
 
-/* ── SOBRE ── */
-#sobre{background:var(--creme);position:relative;overflow:hidden}
-.sobre-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
-.sobre-texto p{font-size:15px;color:var(--tinta2);line-height:1.9;margin-bottom:16px}
-.sobre-texto p strong{color:var(--tinta)}
-.sobre-texto a{color:var(--verde)}
-.sobre-autor{background:var(--card);border:1px solid var(--borda-ouro);padding:36px;position:relative}
-.sobre-autor::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--noir)}
-.autor-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro-texto);margin-bottom:16px}
-.autor-nome{font-family:'Lora',serif;font-size:32px;font-weight:400;color:var(--tinta);margin-bottom:4px}
-.autor-papel{font-size:13px;color:var(--tinta3);letter-spacing:1px;margin-bottom:20px}
-.autor-bio{font-size:15px;color:var(--tinta2);line-height:1.8}
-.sobre-obras{margin-top:32px}
-.obras-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--tinta4);margin-bottom:16px}
-.obra-item{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--borda);font-size:13px;color:var(--tinta2)}
-.obra-item:last-child{border-bottom:none}
-.obra-marca{font-size:14px;color:var(--ouro-texto)}
+    /* O livro em si */
+    .livro {
+      width: 200px; height: 280px;
+      position: absolute; top: 10px; left: 10px;
+      transform: perspective(1000px) rotateY(-18deg) rotateX(4deg);
+      animation: livro-float 7s ease-in-out infinite;
+      transition: opacity .6s ease, transform .6s ease;
+      filter: drop-shadow(-18px 24px 40px rgba(0,0,0,.6));
+    }
+    @keyframes livro-float {
+      0%,100% { transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(0); }
+      50%      { transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(-14px); }
+    }
+    .livro.saindo { opacity: 0; transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(-8px) scale(.96); }
+    .livro.entrando { opacity: 0; transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(10px) scale(.96); }
 
-/* ── FOOTER ── */
-footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);padding:56px 48px 32px}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:48px}
-.footer-marca{font-family:'Lora',serif;font-size:24px;color:var(--ouro);margin-bottom:12px}
-.footer-desc{font-size:13px;color:rgba(255,255,255,.35);line-height:1.8;max-width:280px}
-.footer-col h4{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px}
-.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.4);margin-bottom:8px;transition:color .2s}
-.footer-col a:hover{color:var(--ouro)}
-.footer-contatos{display:flex;flex-direction:column;gap:10px}
-.footer-contato{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.4);transition:color .2s}
-.footer-contato:hover{color:var(--ouro)}
-.footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.footer-legal{font-size:11px;color:rgba(255,255,255,.18);line-height:1.7}
-.footer-selos{display:flex;gap:16px}
-.footer-selo{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,168,75,.45);border:1px solid rgba(200,168,75,.2);padding:4px 10px}
+    /* Capa: face principal */
+    .capa {
+      width: 200px; height: 280px;
+      border-radius: 2px 5px 5px 2px;
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column; padding: 22px 20px 18px;
+      box-shadow: inset -4px 0 12px rgba(0,0,0,.25);
+    }
 
-/* Player injetado via player.js */
+    /* Lombada ilusória (sombra lateral) */
+    .capa::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 18px;
+      background: linear-gradient(to right, rgba(0,0,0,.5) 0%, rgba(0,0,0,.0) 100%);
+      border-radius: 2px 0 0 2px;
+    }
 
-/* ── REVEAL ── */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
-.reveal.visivel{opacity:1;transform:translateY(0)}
+    /* Brilho superior */
+    .capa::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 60px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.07), transparent);
+      pointer-events: none;
+    }
 
-/* ── WHATSAPP ── */
-#waBtn{
-  position:fixed;bottom:28px;right:28px;z-index:9999;
-  width:48px;height:48px;border-radius:50%;
-  background:var(--verde);display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 12px rgba(0,0,0,.2);transition:transform .2s,box-shadow .2s;
-}
-#waBtn:hover{transform:scale(1.1);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+    /* Ornamento gráfico (único por livro, via CSS) */
+    .capa-ornamento { position: absolute; pointer-events: none; }
 
-/* ── RESPONSIVE ── */
-@media(max-width:960px){
-  nav{padding:0 24px}
-  .nav-links,.nav-cta{display:none}
-  .nav-mobile-btn{display:flex}
-  #inicio{grid-template-columns:1fr;padding:100px 24px 60px;text-align:center}
-  .hero-esquerda{padding-right:0}
-  .hero-desc{margin:0 auto 40px}
-  .hero-acoes{justify-content:center}
-  .hero-tag{justify-content:center}
-  .hero-stats{justify-content:center}
-  .hero-direita{display:none}
-  section{padding:72px 24px}
-  .prog-grid,.sobre-grid{grid-template-columns:1fr;gap:48px}
-  .dep-grid{grid-template-columns:1fr}
-  .faq-grid{grid-template-columns:1fr}
-  .footer-grid{grid-template-columns:1fr}
-  .divisor{margin:0 24px}
-  #contador{padding:48px 24px}
-  footer{padding:48px 24px 24px}
-  .degraus{flex-wrap:wrap}
-  .degrau{min-width:calc(50% - 4px);flex:none}
-}
-@media(max-width:600px){
-  h1.hero-titulo{font-size:38px}
-  .grid-ebooks{grid-template-columns:1fr}
-  .hero-stats{gap:20px}
-  .footer-bottom{flex-direction:column;align-items:flex-start}
-}
-</style>
+    .capa-genero { font-size: 8px; letter-spacing: .2em; text-transform: uppercase; font-family: var(--sans); font-weight: 500; margin-bottom: 14px; opacity: .65; position: relative; z-index: 1; }
+    .capa-titulo { font-family: var(--serif); font-size: 19px; font-weight: 200; color: #fff; line-height: 1.22; flex: 1; position: relative; z-index: 1; }
+    .capa-titulo em { font-style: italic; }
+    .capa-divisor { width: 20px; height: 1px; margin: 14px 0; position: relative; z-index: 1; }
+    .capa-autor { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; font-family: var(--sans); opacity: .45; position: relative; z-index: 1; color: #fff; }
+    .capa-editora { font-size: 8px; letter-spacing: .06em; font-family: var(--sans); opacity: .22; margin-top: 4px; position: relative; z-index: 1; color: #fff; }
+
+    /* ── Capas individuais ─────────────────────────────────────────────────── */
+
+    /* 1 · Justiça(mento) — Verde profundo, linhas finas */
+    .capa-justicamento {
+      background: linear-gradient(155deg, #0d2415 0%, #071a0d 100%);
+    }
+    .capa-justicamento .capa-genero { color: #7ab88a; }
+    .capa-justicamento .capa-divisor { background: #7ab88a; }
+    .capa-justicamento .capa-ornamento {
+      right: -10px; top: 40px;
+      width: 120px; height: 120px;
+      border: 1px solid rgba(122,184,138,.12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 24px rgba(122,184,138,.05), 0 0 0 48px rgba(122,184,138,.03);
+    }
+
+    /* 2 · Vigilante — Azul-escuro, minimalista */
+    .capa-vigilante {
+      background: linear-gradient(160deg, #0d1926 0%, #07101c 100%);
+    }
+    .capa-vigilante .capa-genero { color: #7aaad4; }
+    .capa-vigilante .capa-divisor { background: #7aaad4; }
+    .capa-vigilante .capa-ornamento {
+      right: 14px; bottom: 50px;
+      width: 8px; height: 8px;
+      background: #7aaad4;
+      border-radius: 50%;
+      box-shadow: 0 0 0 16px rgba(122,170,212,.08), 0 0 0 32px rgba(122,170,212,.05), 0 0 0 52px rgba(122,170,212,.03);
+    }
+
+    /* 3 · 3ª GM — Quase preto, grade sutil */
+    .capa-terceiraguerra {
+      background: linear-gradient(150deg, #0e1018 0%, #08090e 100%);
+    }
+    .capa-terceiraguerra .capa-genero { color: #9896b4; }
+    .capa-terceiraguerra .capa-divisor { background: #9896b4; }
+    .capa-terceiraguerra .capa-ornamento {
+      right: 12px; top: 30px;
+      width: 80px; height: 80px;
+      border: 1px solid rgba(152,150,180,.1);
+      transform: rotate(45deg);
+      box-shadow: inset 0 0 0 20px rgba(152,150,180,.04);
+    }
+
+    /* 4 · Antifalência — Chumbo quente */
+    .capa-antifalencia {
+      background: linear-gradient(150deg, #101820 0%, #08101a 100%);
+    }
+    .capa-antifalencia .capa-genero { color: #c9a84c; }
+    .capa-antifalencia .capa-divisor { background: #c9a84c; }
+    .capa-antifalencia .capa-ornamento {
+      right: 14px; bottom: 60px;
+      width: 48px; height: 2px;
+      background: rgba(201,168,76,.3);
+      box-shadow: 0 10px 0 rgba(201,168,76,.15), 0 20px 0 rgba(201,168,76,.08);
+    }
+
+    /* Navegação das capas */
+    .showcase-nav { display: flex; gap: 10px; align-items: center; }
+    .snav-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,.2); border: none; cursor: pointer;
+      transition: all .25s; padding: 0;
+    }
+    .snav-dot.ativo { width: 20px; border-radius: 3px; background: var(--v6); }
+
+    /* Título atual debaixo */
+    .showcase-label {
+      text-align: center; min-height: 36px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .showcase-label-titulo { font-size: 12px; color: rgba(255,255,255,.6); font-family: var(--serif); font-style: italic; }
+    .showcase-label-info { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.25); }
+
+    /* Scroll indicator */
+    .scroll-ind { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; animation: sc-bob 2.4s ease-in-out infinite; }
+    @keyframes sc-bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+    .scroll-ind span { font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.22); }
+    .scroll-line { width: 1px; height: 28px; background: linear-gradient(to bottom, rgba(255,255,255,.22), transparent); }
+
+    /* ── FAIXA CONFIANÇA ─────────────────────────────────────────────────────── */
+    .faixa { background: var(--branco); border-bottom: 1px solid var(--borda); padding: 14px 24px; }
+    .faixa-in { max-width: var(--max); margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 36px; flex-wrap: wrap; }
+    .faixa-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--t2); }
+    .faixa-item strong { color: var(--t1); font-weight: 600; }
+    .faixa-sep { width: 1px; height: 14px; background: var(--borda); }
+
+    /* ── CATÁLOGO ─────────────────────────────────────────────────────────────── */
+    #catalogo { padding: 88px 24px 72px; background: var(--bg); }
+    .sec-in { max-width: var(--max); margin: 0 auto; }
+    .sec-hdr { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 48px; }
+    h2.sec-t { font-size: clamp(26px, 3.8vw, 42px); font-weight: 300; color: var(--t0); }
+    h2.sec-t em { color: var(--v3); }
+    .sec-desc { font-size: 14px; color: var(--t2); margin-top: 8px; max-width: 440px; line-height: 1.65; }
+    .filtros { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fbtn { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--borda); background: transparent; font-size: 11px; color: var(--t2); cursor: pointer; font-family: var(--sans); transition: all .2s; letter-spacing: .04em; }
+    .fbtn:hover, .fbtn.ativo { border-color: var(--v3); color: var(--v3); background: var(--v8); }
+    .prod-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+    /* Cards de produto */
+    .pcard { background: var(--branco); border: 1px solid var(--borda); border-radius: 3px; overflow: hidden; transition: transform .25s, box-shadow .25s; cursor: pointer; }
+    .pcard:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(10,31,14,.1); z-index: 2; }
+    .pcard-cor { height: 4px; }
+
+    /* Miniatura de capa no card */
+    .pcard-capa-mini {
+      float: right; margin: 16px 16px 0 12px;
+      width: 54px; height: 76px; border-radius: 1px 3px 3px 1px;
+      position: relative; overflow: hidden; flex-shrink: 0;
+      box-shadow: -3px 4px 12px rgba(0,0,0,.25);
+      animation: mini-float 5s ease-in-out infinite;
+    }
+    @keyframes mini-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .pcard-capa-mini::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(to right, rgba(0,0,0,.4), transparent); }
+    .pcard-capa-mini-titulo { padding: 6px 5px; font-family: var(--serif); font-size: 7px; font-style: italic; color: rgba(255,255,255,.8); line-height: 1.3; }
+
+    .pcard-corpo { padding: 16px 20px 0; overflow: hidden; }
+    .pcard-genero { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); font-weight: 500; margin-bottom: 6px; }
+    h3.pcard-t { font-size: 19px; font-weight: 400; color: var(--t0); line-height: 1.2; margin-bottom: 4px; }
+    .pcard-autor { font-size: 12px; color: var(--t3); font-style: italic; margin-bottom: 10px; }
+    .pcard-desc { font-size: 13px; color: var(--t1); line-height: 1.65; clear: both; }
+    .pcard-rodape { margin-top: 16px; padding: 14px 20px; border-top: 1px solid var(--borda); display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg); }
+    .pcard-preco { font-family: var(--serif); font-size: 24px; font-weight: 300; color: var(--t0); line-height: 1; }
+    .pcard-preco-sub { font-size: 10px; color: var(--t3); margin-top: 3px; }
+    .pcard-dir { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .cotas-badge { background: var(--v8); border: 1px solid var(--borda-v); color: var(--v3); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
+    .pcard.premium .cotas-badge { animation: badge-shine 2.5s ease-in-out infinite; }
+    @keyframes badge-shine { 0%,100% { background: var(--v8); } 50% { background: #d0ecd0; box-shadow: 0 0 8px rgba(30,92,58,.12); } }
+    .btn-adq { background: var(--v2); color: #fff; padding: 9px 18px; border-radius: 2px; font-size: 12px; font-weight: 600; transition: background .2s; white-space: nowrap; }
+    .btn-adq:hover { background: var(--v3); }
+    .pcard-pc { font-size: 11px; color: var(--v4); padding: 8px 20px; background: var(--v8); border-top: 1px solid rgba(30,92,58,.08); display: flex; align-items: center; gap: 6px; }
+    .pcard-pc::before { content: '✦'; font-size: 9px; }
+
+    /* Garantia */
+    .garantia { background: var(--branco); border: 1px solid var(--borda); border-radius: 3px; padding: 20px 28px; display: flex; align-items: center; gap: 16px; margin-top: 28px; }
+    .garantia-i { font-size: 24px; flex-shrink: 0; }
+    .garantia-t h4 { font-family: var(--serif); font-size: 17px; font-weight: 400; color: var(--t0); margin-bottom: 3px; }
+    .garantia-t p { font-size: 13px; color: var(--t2); line-height: 1.55; }
+
+    /* ── DEPOIMENTOS ─────────────────────────────────────────────────────────── */
+    #depoimentos { padding: 80px 24px; background: var(--branco); border-top: 1px solid var(--borda); }
+    .dep-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+    .dcard { background: var(--bg); border: 1px solid var(--borda); border-radius: 3px; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .dcard-stars { color: var(--ouro); font-size: 11px; letter-spacing: 3px; }
+    .dcard-aspas { font-family: var(--serif); font-size: 34px; color: var(--v7); line-height: 1; }
+    .dcard-texto { font-family: var(--serif); font-size: 15px; font-style: italic; color: var(--t1); line-height: 1.7; flex: 1; }
+    .dcard-rod { border-top: 1px solid var(--borda); padding-top: 12px; }
+    .dcard-nome { font-size: 13px; font-weight: 600; color: var(--t0); }
+    .dcard-livro { font-size: 11px; color: var(--t3); margin-top: 2px; }
+
+    /* ── PROGRAMA CULTURAL ───────────────────────────────────────────────────── */
+    #programa { padding: 88px 24px; background: var(--bg2); border-top: 1px solid var(--borda); }
+    .prog-grid { display: grid; grid-template-columns: 1fr 360px; gap: 72px; align-items: start; margin-top: 56px; }
+    .sistema-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,168,76,.1); border: 1px solid rgba(201,168,76,.3); border-radius: 3px; padding: 8px 14px; margin-bottom: 28px; }
+    .sistema-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ouro); animation: pulse-dot 2s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: .6; } }
+    .sistema-badge span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ouro); font-weight: 500; }
+    .prog-titulo { font-size: clamp(28px, 4vw, 44px); font-weight: 300; color: var(--t0); margin-bottom: 16px; }
+    .prog-titulo em { color: var(--v3); }
+    .prog-sub { font-size: 15px; color: var(--t2); line-height: 1.75; max-width: 480px; margin-bottom: 36px; }
+    .passos { display: flex; flex-direction: column; }
+    .passo { display: flex; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--borda); }
+    .passo:last-child { border-bottom: none; }
+    .passo-n { font-family: var(--serif); font-size: 30px; font-weight: 200; color: var(--v3); line-height: 1; width: 36px; flex-shrink: 0; }
+    .passo-t { font-size: 15px; font-weight: 600; color: var(--t0); margin-bottom: 5px; }
+    .passo-d { font-size: 13px; color: var(--t2); line-height: 1.6; }
+
+    /* Painel prêmios */
+    .premios-painel { background: var(--branco); border: 1px solid var(--borda); border-radius: 3px; overflow: hidden; position: sticky; top: 76px; }
+    .pp-hdr { padding: 18px 22px; border-bottom: 1px solid var(--borda); background: var(--bg); }
+    .pp-hdr-l { color: var(--v3); margin-bottom: 4px; }
+    .pp-hdr-t { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--t0); }
+    .pp-item { display: flex; align-items: center; padding: 14px 22px; border-bottom: 1px solid var(--borda); gap: 12px; }
+    .pp-item:last-of-type { border-bottom: none; }
+    .pp-pos { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); width: 36px; }
+    .pp-val { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--t0); flex: 1; }
+    .pp-item.grande .pp-val { color: var(--v3); font-size: 26px; }
+    .pp-tag { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; background: var(--v8); color: var(--v3); border: 1px solid var(--borda-v); border-radius: 2px; padding: 3px 7px; }
+    .pp-item.grande .pp-tag { background: rgba(201,168,76,.1); color: var(--ouro); border-color: rgba(201,168,76,.3); }
+    .pp-cotas { padding: 16px 22px; border-top: 1px solid var(--borda); background: var(--bg); }
+    .pp-cotas-l { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-bottom: 10px; font-weight: 500; }
+    .cota-linha { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--borda); }
+    .cota-linha:last-child { border-bottom: none; }
+    .cota-linha .cn { color: var(--t2); }
+    .cota-linha .cv { color: var(--v3); font-weight: 600; }
+    .pp-prog { padding: 16px 22px; }
+    .pp-prog-l { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .pp-prog-l .pi { color: var(--t3); }
+    .pp-prog-l .pf { color: var(--v3); font-weight: 600; }
+    .barra { height: 3px; background: var(--borda); border-radius: 2px; overflow: hidden; }
+    .barra-fill { height: 100%; background: linear-gradient(90deg, var(--v3), var(--v5)); border-radius: 2px; width: 0; transition: width 1.8s ease; }
+    .pp-prog-st { font-size: 11px; color: var(--t3); text-align: center; margin-top: 8px; }
+
+    /* ── FAQ ──────────────────────────────────────────────────────────────────── */
+    #faq { padding: 88px 24px; background: var(--branco); border-top: 1px solid var(--borda); }
+    .faq-in { max-width: 740px; margin: 0 auto; }
+    .faq-lista { margin-top: 48px; }
+    .faq-item { border-top: 1px solid var(--borda); }
+    .faq-item:last-child { border-bottom: 1px solid var(--borda); }
+    .faq-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0; background: none; border: none; cursor: pointer; text-align: left; font-family: var(--sans); }
+    .faq-p { font-size: 15px; font-weight: 500; color: var(--t0); line-height: 1.4; }
+    .faq-ic { width: 24px; height: 24px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--t2); flex-shrink: 0; transition: all .25s; border: 1px solid var(--borda); }
+    .faq-item.open .faq-ic { background: var(--v2); color: #fff; border-color: var(--v2); transform: rotate(45deg); }
+    .faq-r { font-size: 14px; color: var(--t1); line-height: 1.78; max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .35s ease; }
+    .faq-item.open .faq-r { max-height: 400px; padding-bottom: 20px; }
+
+    /* ── SOBRE ────────────────────────────────────────────────────────────────── */
+    #sobre { padding: 88px 24px; background: var(--bg); border-top: 1px solid var(--borda); }
+    .sobre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; max-width: var(--max); margin: 0 auto; }
+    .sobre-t { font-size: clamp(26px, 3.5vw, 38px); font-weight: 300; color: var(--t0); margin-bottom: 18px; }
+    .sobre-t em { color: var(--v3); }
+    .sobre-p { font-size: 14px; color: var(--t1); line-height: 1.8; margin-bottom: 14px; }
+    .autor-bloco { background: var(--v2); border-radius: 3px; padding: 28px; }
+    .autor-l { color: var(--v6); margin-bottom: 10px; }
+    .autor-nome { font-family: var(--serif); font-size: 24px; font-weight: 300; color: #fff; margin-bottom: 3px; }
+    .autor-sub { font-size: 12px; color: rgba(255,255,255,.4); font-style: italic; margin-bottom: 18px; }
+    .autor-bio { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.75; }
+
+    /* ── FOOTER ──────────────────────────────────────────────────────────────── */
+    footer { background: var(--v0); padding: 56px 24px 36px; }
+    .ft-in { max-width: var(--max); margin: 0 auto; }
+    .ft-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 44px; }
+    .ft-logo { font-family: var(--serif); font-size: 19px; font-weight: 300; color: rgba(255,255,255,.8); margin-bottom: 10px; }
+    .ft-tag { font-size: 13px; color: rgba(255,255,255,.3); line-height: 1.65; max-width: 260px; margin-bottom: 16px; }
+    .ft-cnpj { font-size: 11px; color: rgba(255,255,255,.2); line-height: 1.65; }
+    .ft-col h5 { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 14px; font-weight: 500; }
+    .ft-links { display: flex; flex-direction: column; gap: 9px; }
+    .ft-links a { font-size: 13px; color: rgba(255,255,255,.4); transition: color .2s; }
+    .ft-links a:hover { color: rgba(255,255,255,.8); }
+    .ft-bottom { border-top: 1px solid rgba(255,255,255,.06); padding-top: 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ft-copy { font-size: 11px; color: rgba(255,255,255,.2); }
+    .ft-badges { display: flex; gap: 10px; align-items: center; }
+    .badge { font-size: 10px; color: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.1); border-radius: 2px; padding: 3px 7px; }
+    .ft-admin { color: rgba(255,255,255,.12); font-size: 16px; transition: color .2s; }
+    .ft-admin:hover { color: rgba(255,255,255,.4); }
+
+    /* WA */
+    .wa { position: fixed; bottom: 24px; right: 24px; width: 50px; height: 50px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(37,211,102,.4); z-index: 90; transition: transform .2s, box-shadow .2s; }
+    .wa:hover { transform: scale(1.08); box-shadow: 0 6px 26px rgba(37,211,102,.5); }
+    .wa svg { width: 25px; height: 25px; fill: #fff; }
+
+    /* Fade-in */
+    .fi { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+    .fi.vis { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .hero-in { grid-template-columns: 1fr; }
+      .showcase { display: none; } /* em mobile, só o vídeo/texto */
+      nav { display: none; }
+      .menu-mob { display: block; }
+      .prog-grid { grid-template-columns: 1fr; }
+      .premios-painel { position: static; }
+      .dep-grid { grid-template-columns: 1fr; }
+      .sobre-grid { grid-template-columns: 1fr; }
+      .ft-grid { grid-template-columns: 1fr; gap: 28px; }
+      .ft-bottom { flex-direction: column; align-items: flex-start; }
+      .sec-hdr { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 620px) {
+      .prod-grid { grid-template-columns: 1fr; }
+      .faixa-sep { display: none; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- BANNER PROMOCIONAL -->
-<div id="site-banner" role="banner" aria-live="polite"></div>
-
-<!-- NAV -->
-<nav id="navbar" role="navigation" aria-label="Navegação principal">
-  <a href="#inicio" class="nav-marca" data-pt="Editora Três Trevo" data-en="Três Trevo Publishing" data-es="Editorial Três Trevo">Editora Três Trevo</a>
-  <ul class="nav-links" role="list">
-    <li><a href="#catalogo" data-pt="Catálogo" data-en="Catalog" data-es="Catálogo">Catálogo</a></li>
-    <li><a href="#programa" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a></li>
-    <li><a href="biblioteca.html">Biblioteca</a></li>
-    <li><a href="/biblioteca-musica.html">Músicas</a></li>
-    <li><a href="#sobre" data-pt="Sobre" data-en="About" data-es="Acerca">Sobre</a></li>
-    <li><a href="/area-cliente.html" data-pt="Minha Biblioteca" data-en="My Library" data-es="Mi Biblioteca">Minha Biblioteca</a></li>
-  </ul>
-  <div class="nav-right">
-    <button class="nav-lang" id="btnLang" onclick="alternarIdioma()" aria-label="Mudar idioma">PT</button>
-    <a href="#catalogo" class="nav-cta" data-pt="Adquirir ebook" data-en="Get ebook" data-es="Obtener ebook">Adquirir ebook</a>
-    <button class="nav-mobile-btn" id="menuBtn" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
+<!-- ── HEADER ───────────────────────────────────────────────────────────────── -->
+<header id="hdr">
+  <div class="hdr-in">
+    <a href="#inicio" class="logo">Editora Três <span>Trevo</span></a>
+    <nav>
+      <a href="#catalogo" data-i18n="nav.catalogo">Catálogo</a>
+      <a href="#programa" data-i18n="nav.programa">Programa Cultural</a>
+      <a href="#faq">FAQ</a>
+      <a href="#sobre" data-i18n="nav.sobre">Sobre</a>
+      <a href="https://3trevo.com.br/area-cliente.html" data-i18n="nav.biblioteca">Minha Biblioteca</a>
+    </nav>
+    <div class="hdr-right">
+      <div class="lang-toggle">
+        <button class="lang-btn ativo" onclick="setLang('pt')">PT</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('es')">ES</button>
+      </div>
+      <a href="#catalogo" class="hdr-cta" data-i18n="nav.cta">Adquirir ebook</a>
+    </div>
+    <button class="menu-mob" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </div>
-</nav>
+</header>
 
-<div class="nav-mobile" id="navMobile" role="navigation" aria-label="Menu mobile">
-  <a href="#catalogo" onclick="toggleMenu()" data-pt="Catálogo" data-en="Catalog" data-es="Catálogo">Catálogo</a>
-  <a href="#programa" onclick="toggleMenu()" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a>
-  <a href="biblioteca.html" onclick="toggleMenu()">Biblioteca</a>
-  <a href="/biblioteca-musica.html" onclick="toggleMenu()">Músicas</a>
-  <a href="#sobre" onclick="toggleMenu()" data-pt="Sobre" data-en="About" data-es="Acerca">Sobre</a>
-  <a href="#faq" onclick="toggleMenu()" data-pt="Perguntas frequentes" data-en="FAQ" data-es="Preguntas">Perguntas frequentes</a>
-  <a href="/area-cliente.html" onclick="toggleMenu()" data-pt="Minha Biblioteca" data-en="My Library" data-es="Mi Biblioteca">Minha Biblioteca</a>
-  <a href="#catalogo" class="nav-cta" style="text-align:center;margin-top:8px" data-pt="Adquirir ebook" data-en="Get ebook" data-es="Obtener ebook">Adquirir ebook</a>
-</div>
+<!-- ── HERO ─────────────────────────────────────────────────────────────────── -->
+<section id="inicio">
 
-<!-- HERO -->
-<section id="inicio" aria-label="Início">
-  <div class="hero-bg" aria-hidden="true"></div>
-  <div class="hero-linhas" aria-hidden="true"></div>
-  <div class="hero-esquerda">
-    <div class="hero-tag reveal" data-pt="Literatura · Conhecimento · Cultura" data-en="Literature · Knowledge · Culture" data-es="Literatura · Conocimiento · Cultura">Literatura · Conhecimento · Cultura</div>
-    <h1 class="hero-titulo reveal" style="transition-delay:.1s" data-pt="Palavras que <em>transformam</em> o mundo real" data-en="Words that <em>transform</em> the real world" data-es="Palabras que <em>transforman</em> el mundo real">Palavras que <em>transformam</em> o mundo real</h1>
-    <p class="hero-subtitulo reveal" style="transition-delay:.2s" data-pt="Editora Três Trevo — Montauri/RS" data-en="Três Trevo Publishing — Montauri/RS" data-es="Editorial Três Trevo — Montauri/RS">Editora Três Trevo — Montauri/RS</p>
-    <p class="hero-desc reveal" style="transition-delay:.3s" data-pt="Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial. E ainda concorra a prêmios em dinheiro pelo Programa Cultural." data-en="We publish ebooks that shift perspectives — from geopolitical fiction to business survival guides. And compete for cash prizes through our Cultural Program." data-es="Publicamos ebooks que cambian perspectivas — desde ficción geopolítica hasta manuales de supervivencia empresarial. Y concursa por premios en dinero.">Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial. E ainda concorra a prêmios em dinheiro pelo Programa Cultural.</p>
-    <div class="hero-acoes reveal" style="transition-delay:.4s">
-      <a href="#catalogo" class="btn-primario" data-pt="Ver catálogo →" data-en="View catalog →" data-es="Ver catálogo →">Ver catálogo →</a>
-      <a href="#programa" class="btn-secundario" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a>
-    </div>
-    <div class="hero-stats reveal" style="transition-delay:.5s">
-      <div>
-        <span class="stat-num" id="statLeitores">247</span>
-        <span class="stat-txt" data-pt="Leitores" data-en="Readers" data-es="Lectores">Leitores</span>
-      </div>
-      <div>
-        <span class="stat-num">4</span>
-        <span class="stat-txt" data-pt="Títulos" data-en="Titles" data-es="Títulos">Títulos</span>
-      </div>
-      <div>
-        <span class="stat-num">R$1.500</span>
-        <span class="stat-txt" data-pt="Em prêmios (até R$3.000)" data-en="In prizes (up to R$3,000)" data-es="En premios (hasta R$3.000)">Em prêmios (até R$3.000)</span>
-      </div>
-    </div>
+  <!-- Vídeo de fundo — substituir src pelo arquivo produzido -->
+  <!-- Recomendado: 1920×1080, H.264, ~15s loop, sem áudio -->
+  <div class="hero-video-bg">
+    <video autoplay muted loop playsinline id="hero-video" poster="assets/hero-poster.jpg">
+      <source src="assets/hero-reel.mp4" type="video/mp4">
+      <!-- Sem vídeo: fundo verde profundo mantido pelo CSS -->
+    </video>
+    <div class="hero-video-overlay"></div>
   </div>
-  <div class="hero-direita reveal" style="transition-delay:.3s">
-    <div class="capas-vitrine" aria-label="Capas dos ebooks">
-      <div class="capa-card">
-        <span class="capa-faixa">Ensaio</span>
-        <div class="livro-mockup" id="mock-justicamento" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="80" data-mockup-h="110"></div>
-        <span class="capa-nome">Justiça(mento) para Orelha</span>
-        <span class="capa-preco">R$15,35</span>
+
+  <div class="hero-in">
+
+    <!-- Texto principal -->
+    <div>
+      <div class="hero-sup"><span data-i18n="hero.label">Editora Três Trevo · Montauri/RS</span></div>
+      <h1 class="hero-t" data-i18n-html="hero.titulo">
+        Palavras que<br><em>transformam</em><br>o mundo real
+      </h1>
+      <p class="hero-sub" data-i18n="hero.sub">
+        Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial. Adquira, leia e concorra a prêmios pelo Programa Cultural.
+      </p>
+      <div class="hero-btns">
+        <a href="#catalogo" class="btn-pri" data-i18n="hero.cta1">Ver catálogo →</a>
+        <a href="#programa" class="btn-ghost" data-i18n="hero.cta2">Programa Cultural</a>
       </div>
-      <div class="capa-card">
-        <span class="capa-faixa">Ficção</span>
-        <div class="livro-mockup" id="mock-terceiraguerra" data-mockup-cor="#1a1a2e" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="80" data-mockup-h="110"></div>
-        <span class="capa-nome">O Nascimento Silencioso da 3ª GM</span>
-        <span class="capa-preco">R$76,74</span>
-      </div>
-      <div class="capa-card">
-        <span class="capa-faixa">Manual</span>
-        <div class="livro-mockup" id="mock-antifalencia" data-mockup-cor="#1a2a3e" data-mockup-titulo="Guia Antifalência" data-mockup-w="80" data-mockup-h="110"></div>
-        <span class="capa-nome">Guia Antifalência Vol.1</span>
-        <span class="capa-preco">R$46,04</span>
+      <!-- Stats inline -->
+      <div class="hero-stats-row">
+        <div class="hsr-item">
+          <span class="hsr-n">247</span>
+          <span class="hsr-l" data-i18n="hero.stat.leitores">leitores</span>
+        </div>
+        <div class="hsr-sep"></div>
+        <div class="hsr-item">
+          <span class="hsr-n">4</span>
+          <span class="hsr-l" data-i18n="hero.stat.titulos">títulos</span>
+        </div>
+        <div class="hsr-sep"></div>
+        <div class="hsr-item">
+          <span class="hsr-n">R$9.500</span>
+          <span class="hsr-l" data-i18n="hero.stat.premios">em prêmios</span>
+        </div>
       </div>
     </div>
+
+    <!-- Showcase de capas 3D -->
+    <div class="showcase" id="showcase">
+      <div class="livro-stage">
+        <div class="livro" id="livro-ativo">
+          <!-- Capa injetada via JS -->
+        </div>
+      </div>
+      <div class="showcase-nav" id="showcase-nav"></div>
+      <div class="showcase-label">
+        <span class="showcase-label-titulo" id="showcase-titulo"></span>
+        <span class="showcase-label-info" id="showcase-info"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="scroll-ind" aria-hidden="true">
+    <span data-i18n="hero.scroll">Catálogo</span>
+    <div class="scroll-line"></div>
   </div>
 </section>
 
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- CATÁLOGO -->
-<section id="catalogo" aria-label="Catálogo de ebooks">
-  <div class="catalogo-header">
-    <div>
-      <div class="sec-label reveal" data-pt="Catálogo completo" data-en="Full catalog" data-es="Catálogo completo">Catálogo completo</div>
-      <h2 class="sec-titulo reveal" style="transition-delay:.1s" data-pt="Todos os <em>títulos</em>" data-en="All <em>titles</em>" data-es="Todos los <em>títulos</em>">Todos os <em>títulos</em></h2>
-    </div>
-    <div class="filtros reveal" role="group" aria-label="Filtrar por categoria">
-      <button class="filtro ativo" onclick="filtrar('todos',this)" data-pt="Todos" data-en="All" data-es="Todos">Todos</button>
-      <button class="filtro" onclick="filtrar('reflexao',this)" data-pt="Reflexão" data-en="Reflection" data-es="Reflexión">Reflexão</button>
-      <button class="filtro" onclick="filtrar('ficcao',this)" data-pt="Ficção" data-en="Fiction" data-es="Ficción">Ficção</button>
-      <button class="filtro" onclick="filtrar('manuais',this)" data-pt="Manuais" data-en="Guides" data-es="Manuales">Manuais</button>
-      <button class="filtro" onclick="filtrar('financas',this)" data-pt="Finanças" data-en="Finance" data-es="Finanzas">Finanças</button>
-    </div>
-  </div>
-  <div class="grid-ebooks" role="list">
-
-    <!-- Card 1 -->
-    <article class="ebook-card reveal" role="listitem" data-genero="reflexao"
-      onclick="location.href='/checkout.html?slug=justicamento'">
-      <div class="livro-mockup" data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Ensaio · Entrada" data-en="Essay · Entry" data-es="Ensayo · Entrada">Ensaio · Entrada</div>
-      <h3 class="ebook-titulo">Justiça(mento) para Orelha</h3>
-      <p class="ebook-autor">Said Anes</p>
-      <p class="ebook-desc" data-pt="Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir." data-en="An essay on justice, language and power. For those who question what they hear before repeating." data-es="Un ensayo sobre justicia, lenguaje y poder. Para quienes cuestionan lo que escuchan.">Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.</p>
-      <div class="ebook-premio-box" data-pt="✦ Participa do Programa Cultural · confirmação após D+7" data-en="✦ Joins the Cultural Program · confirmed after D+7" data-es="✦ Participa del Programa Cultural · confirmación tras D+7">✦ Participa do Programa Cultural · confirmação após D+7</div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco">R$15,35</div>
-          <div class="ebook-cotas" data-pt="1 cota inclusa" data-en="1 ticket included" data-es="1 cuota incluida">1 cota inclusa</div>
-        </div>
-        <a href="/checkout.html?slug=justicamento"
-           class="ebook-btn" onclick="event.stopPropagation()"
-           data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
-      </div>
-    </article>
-
-    <!-- Card 2 -->
-    <article class="ebook-card reveal" role="listitem" data-genero="ficcao" style="transition-delay:.1s"
-      onclick="location.href='/checkout.html?slug=vigilante'">
-      <div class="livro-mockup" data-mockup-cor="#2a1a1a" data-mockup-titulo="Vigilante" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Ficção Literária · Premium" data-en="Literary Fiction · Premium" data-es="Ficción Literaria · Premium">Ficção Literária · Premium</div>
-      <h3 class="ebook-titulo">Vigilante</h3>
-      <p class="ebook-autor">Said Anes</p>
-      <p class="ebook-desc" data-pt="Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão." data-en="A narrative about the boundary between justice and revenge, between law and conscience." data-es="Una narrativa sobre el límite entre justicia y venganza, entre ley y conciencia.">Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão.</p>
-      <div class="ebook-premio-box" data-pt="✦ Participa do Programa Cultural · confirmação após D+7" data-en="✦ Joins the Cultural Program · confirmed after D+7" data-es="✦ Participa del Programa Cultural · confirmación tras D+7">✦ Participa do Programa Cultural · confirmação após D+7</div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco">R$76,74</div>
-          <div class="ebook-cotas" data-pt="10 cotas inclusas" data-en="10 tickets included" data-es="10 cuotas incluidas">10 cotas inclusas</div>
-        </div>
-        <a href="/checkout.html?slug=vigilante"
-           class="ebook-btn" onclick="event.stopPropagation()"
-           data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
-      </div>
-    </article>
-
-    <!-- Card 3 -->
-    <article class="ebook-card reveal" role="listitem" data-genero="ficcao" style="transition-delay:.2s"
-      onclick="location.href='/checkout.html?slug=terceiraguerra'">
-      <div class="livro-mockup" data-mockup-cor="#1a1a2e" data-mockup-titulo="O Nascimento Silencioso da 3ª GM" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Ficção Documental · Premium" data-en="Documentary Fiction · Premium" data-es="Ficción Documental · Premium">Ficção Documental · Premium</div>
-      <h3 class="ebook-titulo">O Nascimento Silencioso da 3ª Guerra Mundial</h3>
-      <p class="ebook-autor">Said Anes</p>
-      <p class="ebook-desc" data-pt="Como guerras modernas acontecem sem disparos — no campo da informação, economia e política. Assustadoramente atual." data-en="How modern wars happen without gunfire — in the fields of information, economy, and politics." data-es="Cómo las guerras modernas ocurren sin disparos — en los campos de la información, economía y política.">Como guerras modernas acontecem sem disparos — no campo da informação, economia e política. Assustadoramente atual.</p>
-      <div class="ebook-premio-box" data-pt="✦ Participa do Programa Cultural · confirmação após D+7" data-en="✦ Joins the Cultural Program · confirmed after D+7" data-es="✦ Participa del Programa Cultural · confirmación tras D+7">✦ Participa do Programa Cultural · confirmação após D+7</div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco">R$76,74</div>
-          <div class="ebook-cotas" data-pt="10 cotas inclusas" data-en="10 tickets included" data-es="10 cuotas incluidas">10 cotas inclusas</div>
-        </div>
-        <a href="/checkout.html?slug=terceiraguerra"
-           class="ebook-btn" onclick="event.stopPropagation()"
-           data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
-      </div>
-    </article>
-
-    <!-- Card 4 -->
-    <article class="ebook-card reveal" role="listitem" data-genero="manuais" style="transition-delay:.3s"
-      onclick="location.href='/checkout.html?slug=antifalencia'">
-      <div class="livro-mockup" data-mockup-cor="#1a2a3e" data-mockup-titulo="Guia Antifalência do Empreendedor" data-mockup-w="80" data-mockup-h="110"></div>
-      <div class="ebook-genero" data-pt="Manual · Intermediário" data-en="Guide · Intermediate" data-es="Manual · Intermedio">Manual · Intermediário</div>
-      <h3 class="ebook-titulo">O Guia Antifalência do Empreendedor Iniciante</h3>
-      <p class="ebook-autor">Said Anes</p>
-      <p class="ebook-desc" data-pt="A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado." data-en="The math nobody forces you to do. Costs, pricing, and break-even for entrepreneurs who want to survive." data-es="La cuenta que nadie te obliga a hacer. Costos, precios y punto de equilibrio.">A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para quem quer sobreviver no mercado.</p>
-      <div class="ebook-premio-box" data-pt="✦ Participa do Programa Cultural · confirmação após D+7" data-en="✦ Joins the Cultural Program · confirmed after D+7" data-es="✦ Participa del Programa Cultural · confirmación tras D+7">✦ Participa do Programa Cultural · confirmação após D+7</div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco">R$46,04</div>
-          <div class="ebook-cotas" data-pt="3 cotas inclusas" data-en="3 tickets included" data-es="3 cuotas incluidas">3 cotas inclusas</div>
-        </div>
-        <a href="/checkout.html?slug=antifalencia"
-           class="ebook-btn" onclick="event.stopPropagation()"
-           data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
-      </div>
-    </article>
-
-    <!-- Card Ático -->
-    <article class="ebook-card reveal" role="listitem" data-genero="financas"
-      onclick="location.href='atico.html'" style="cursor:pointer">
-      <div class="ebook-emoji">⚡</div>
-      <div class="ebook-genero">Finanças · Método</div>
-      <h3 class="ebook-titulo">Antes do App, o Método</h3>
-      <div class="ebook-autor">Said Anes</div>
-      <p class="ebook-desc">Planilha + lista inteligente + Morning Brief. O método manual que o Ático vai automatizar. Early adopters ganham acesso beta garantido.</p>
-      <div class="ebook-premio-box">✦ Participa do Programa Cultural · 3 cotas + acesso beta garantido</div>
-      <div class="ebook-footer">
-        <div>
-          <div class="ebook-preco">R$37,00</div>
-          <div class="ebook-cotas">3 cotas + acesso beta</div>
-        </div>
-        <a href="checkout.html?slug=atico"
-           class="ebook-btn" onclick="event.stopPropagation()"
-           data-pt="Adquirir" data-en="Get" data-es="Obtener">Adquirir</a>
-      </div>
-    </article>
-
-  </div>
-</section>
-
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- PROGRAMA CULTURAL -->
-<section id="programa" aria-label="Programa Cultural">
-  <div class="prog-bg" aria-hidden="true"></div>
-  <div class="prog-grid">
-    <div>
-      <div class="sec-label reveal" data-pt="Como funciona" data-en="How it works" data-es="Cómo funciona">Como funciona</div>
-      <h2 class="sec-titulo reveal" style="transition-delay:.1s" data-pt="Programa <em>Cultural</em>" data-en="Cultural <em>Program</em>" data-es="Programa <em>Cultural</em>">Programa <em>Cultural</em></h2>
-      <p class="sec-sub reveal" style="transition-delay:.2s" data-pt="Adquira um ebook, leia, escreva seu depoimento e concorra a prêmios em dinheiro. Simples assim." data-en="Buy an ebook, read it, write your review, and compete for cash prizes. Simple as that." data-es="Adquiere un ebook, léelo, escribe tu testimonio y concursa por premios. Así de simple.">Adquira um ebook, leia, escreva seu depoimento e concorra a prêmios em dinheiro. Simples assim.</p>
-      <div class="prog-passos" style="margin-top:40px">
-        <div class="prog-passo reveal" style="transition-delay:.1s">
-          <div class="prog-num" aria-hidden="true">1</div>
-          <div class="prog-info">
-            <h3 data-pt="Adquira o ebook" data-en="Buy the ebook" data-es="Adquiere el ebook">Adquira o ebook</h3>
-            <p data-pt="Você está comprando um livro digital em PDF. Após o pagamento, recebe por e-mail e WhatsApp automaticamente." data-en="You are buying a digital PDF book. After payment, you receive it by email and WhatsApp automatically." data-es="Estás comprando un libro digital en PDF. Tras el pago, lo recibes por email y WhatsApp automáticamente.">Você está comprando um livro digital em PDF. Após o pagamento, recebe por e-mail e WhatsApp automaticamente.</p>
-          </div>
-        </div>
-        <div class="prog-passo reveal" style="transition-delay:.2s">
-          <div class="prog-num" aria-hidden="true">2</div>
-          <div class="prog-info">
-            <h3 data-pt="Leia o conteúdo" data-en="Read the content" data-es="Lee el contenido">Leia o conteúdo</h3>
-            <p data-pt="Após 7 dias da compra, seu link de participação é liberado automaticamente — tempo suficiente para uma leitura completa." data-en="After 7 days from purchase, your participation link is released automatically — enough time for a complete read." data-es="Tras 7 días de la compra, tu enlace de participación se libera automáticamente.">Após 7 dias da compra, seu link de participação é liberado automaticamente — tempo suficiente para uma leitura completa.</p>
-          </div>
-        </div>
-        <div class="prog-passo reveal" style="transition-delay:.3s">
-          <div class="prog-num" aria-hidden="true">3</div>
-          <div class="prog-info">
-            <h3 data-pt="Valide suas cotas" data-en="Validate your tickets" data-es="Valida tus cuotas">Valide suas cotas</h3>
-            <p data-pt="Acesse seu link de participação e escreva um depoimento genuíno sobre o que você leu — mínimo 20 palavras. Suas cotas são validadas automaticamente." data-en="Access your participation link and write a genuine review about what you read — minimum 20 words. Your tickets are validated automatically." data-es="Accede a tu enlace de participación y escribe un testimonio genuino sobre lo que leíste — mínimo 20 palabras.">Acesse seu link de participação e escreva um depoimento genuíno sobre o que você leu — mínimo 20 palavras. Suas cotas são validadas automaticamente.</p>
-          </div>
-        </div>
-        <div class="prog-passo reveal" style="transition-delay:.4s">
-          <div class="prog-num" aria-hidden="true">4</div>
-          <div class="prog-info">
-            <h3 data-pt="Concorra ao prêmio" data-en="Compete for the prize" data-es="Concursa al premio">Concorra ao prêmio</h3>
-            <p data-pt="Quando um marco de vendas é atingido, a premiação é desbloqueada — sem data fixa. Suas cotas valem em todas as 6 rodadas da série. Mais cotas, maior a elegibilidade." data-en="When a sales milestone is reached, the award cycle is unlocked — no fixed date. Your tickets are valid across all 6 rounds of the series." data-es="Cuando se alcanza un hito de ventas, la premiación se desbloquea — sin fecha fija. Tus cuotas valen en las 6 rondas de la serie.">Quando um marco de vendas é atingido, a premiação é desbloqueada — sem data fixa. Suas cotas valem em todas as 6 rodadas da série. Mais cotas, maior a elegibilidade.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="prog-premio reveal" style="transition-delay:.2s">
-        <div class="premio-label">✦ Série Cultural — Premiação total</div>
-
-        <div class="premio-item">
-          <div class="premio-pos">1°–4°</div>
-          <div>
-            <div class="premio-val">R$ 500,00 cada</div>
-            <div class="premio-desc">Premiações iniciais · desbloqueadas por vendas · PIX D+7</div>
-          </div>
-        </div>
-        <div class="premio-item">
-          <div class="premio-pos">5°</div>
-          <div>
-            <div class="premio-val">R$ 1.000,00</div>
-            <div class="premio-desc">Premiação Especial · PIX D+7</div>
-          </div>
-        </div>
-        <div class="premio-item" style="border-left:2px solid var(--ouro-texto)">
-          <div class="premio-pos" style="color:var(--ouro-texto)">6°</div>
-          <div>
-            <div class="premio-val" style="color:var(--ouro-texto)">R$ 6.000,00</div>
-            <div class="premio-desc">Grande Premiação · zera a série · nova série inicia imediatamente</div>
-          </div>
-        </div>
-
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--borda)">
-          <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--tinta4);margin-bottom:12px">Cotas por faixa</div>
-          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13px;color:var(--tinta2);padding:8px 0;border-bottom:1px solid var(--borda)">
-            <span>Entrada · R$15,35</span>
-            <span style="color:var(--verde);font-weight:600;text-align:right">1 cota</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13px;color:var(--tinta2);padding:8px 0;border-bottom:1px solid var(--borda)">
-            <span>Intermediário · R$46,04</span>
-            <span style="color:var(--verde);font-weight:600;text-align:right">3 cotas</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13px;color:var(--tinta2);padding:8px 0">
-            <span>Premium · R$76,74</span>
-            <span style="color:var(--verde);font-weight:600;text-align:right">10 cotas</span>
-          </div>
-        </div>
-
-        <div class="prog-aviso">Suas cotas valem em todas as 6 rodadas da série. O Programa Cultural é exclusivo para compras mantidas — o exercício do direito de arrependimento (CDC art. 49) cancela automaticamente a participação.</div>
-      </div>
-
-      <!-- BÔNUS DE MARCO -->
-      <div class="mult-premio reveal" style="transition-delay:.3s">
-        <div class="mult-header">
-          <div class="mult-tag">✦ Bônus de Marco</div>
-          <div class="mult-titulo">
-            <span>A cada marco de vendas,</span><br>
-            <em>premiações imediatas.</em>
-          </div>
-        </div>
-        <div style="padding:0 4px">
-          <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--borda)">
-            <span style="font-size:20px;flex-shrink:0">🏷</span>
-            <div>
-              <div style="font-size:13px;color:var(--tinta2);font-weight:500;margin-bottom:3px">Faixa A — Cupom de desconto</div>
-              <div style="font-size:12px;color:var(--tinta4);line-height:1.6">Desconto para usar na próxima compra na loja</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0">
-            <span style="font-size:20px;flex-shrink:0">🎟</span>
-            <div>
-              <div style="font-size:13px;color:var(--tinta2);font-weight:500;margin-bottom:3px">Faixa B — Cotas extras</div>
-              <div style="font-size:12px;color:var(--tinta4);line-height:1.6">Cotas adicionais creditadas no Programa Cultural — você não sai da corrida</div>
-            </div>
-          </div>
-        </div>
-        <div class="mult-rodape">
-          <span>Beneficiários do Bônus de Marco mantêm participação plena no Programa Cultural. Os marcos são definidos internamente.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- CONTADOR / META -->
-<div id="contador" role="region" aria-label="Progresso da campanha">
-  <div class="meta-wrapper reveal">
-    <div class="meta-frase-topo" data-pt="✦ Programa Cultural — Progresso da campanha" data-en="✦ Cultural Program — Campaign progress" data-es="✦ Programa Cultural — Progreso de la campaña">✦ Programa Cultural — Progresso da campanha</div>
-    <div class="meta-frase-principal" id="metaFrase"></div>
-    <div class="meta-frase-sub" id="metaFraseSub"></div>
-    <div class="barra-container" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-      <div class="barra-trilho">
-        <div class="barra-progresso" id="barraProgresso"></div>
-      </div>
-      <div class="barra-marcadores" aria-hidden="true">
-        <span class="barra-marca" id="marca0">Início</span>
-        <span class="barra-marca" id="marca25">25%</span>
-        <span class="barra-marca" id="marca50">50%</span>
-        <span class="barra-marca" id="marca75">75%</span>
-        <span class="barra-marca" id="marca100">Sorteio</span>
-      </div>
-    </div>
-    <div class="degraus" aria-hidden="true">
-      <div class="degrau" id="degrauMeta1" data-pt="Comunidade formando" data-en="Community forming" data-es="Comunidad formando">Comunidade formando</div>
-      <div class="degrau" id="degrauMeta2" data-pt="Crescendo" data-en="Growing" data-es="Creciendo">Crescendo</div>
-      <div class="degrau" id="degrauMeta3" data-pt="Metade reunida" data-en="Halfway" data-es="A mitad">Metade reunida</div>
-      <div class="degrau" id="degrauMeta4" data-pt="Quase lá" data-en="Almost there" data-es="Casi ahí">Quase lá</div>
-      <div class="degrau" id="degrauMeta5" data-pt="Sorteio garantido" data-en="Draw confirmed" data-es="Sorteo garantizado">Sorteio garantido</div>
-    </div>
-    <div class="meta-cta">
-      <a href="#catalogo" data-pt="Fazer parte da comunidade →" data-en="Join the community →" data-es="Únete a la comunidad →">Fazer parte da comunidade →</a>
-    </div>
+<!-- ── FAIXA ─────────────────────────────────────────────────────────────────── -->
+<div class="faixa">
+  <div class="faixa-in">
+    <div class="faixa-item">✦ <strong data-i18n="trust.concurso">Concurso cultural</strong> <span data-i18n="trust.lei">conforme Lei 5.768/71</span></div>
+    <div class="faixa-sep"></div>
+    <div class="faixa-item">✦ <strong data-i18n="trust.garantia">Garantia de 7 dias</strong> <span data-i18n="trust.cdc">(CDC art. 49)</span></div>
+    <div class="faixa-sep"></div>
+    <div class="faixa-item">✦ <strong>CNPJ</strong> 18.928.966/0001-59</div>
+    <div class="faixa-sep"></div>
+    <div class="faixa-item">✦ <span data-i18n="trust.entrega">Entrega imediata por e-mail + WhatsApp</span></div>
   </div>
 </div>
 
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- DEPOIMENTOS -->
-<section id="depoimentos" aria-label="Depoimentos de leitores">
-  <div class="reveal">
-    <div class="sec-label" data-pt="O que dizem os leitores" data-en="What readers say" data-es="Qué dicen los lectores">O que dizem os leitores</div>
-    <h2 class="sec-titulo"><em data-pt="Depoimentos" data-en="Reviews" data-es="Testimonios">Depoimentos</em></h2>
-  </div>
-  <div class="dep-grid" id="depGrid"></div>
-</section>
-
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- FAQ -->
-<section id="faq" aria-label="Perguntas frequentes">
-  <div class="reveal">
-    <div class="sec-label" data-pt="Perguntas frequentes" data-en="Frequently asked questions" data-es="Preguntas frecuentes">Perguntas frequentes</div>
-    <h2 class="sec-titulo"><em data-pt="Dúvidas" data-en="Questions" data-es="Dudas">Dúvidas</em></h2>
-  </div>
-  <div class="faq-grid" id="faqGrid">
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-pergunta"><span data-pt="O que é o Programa Cultural?" data-en="What is the Cultural Program?" data-es="¿Qué es el Programa Cultural?">O que é o Programa Cultural?</span><span class="faq-icone" aria-hidden="true">+</span></div>
-      <div class="faq-resposta" data-pt="É um concurso cultural onde você adquire um ebook, lê, escreve um depoimento e concorre a prêmios em dinheiro. Não é sorteio puro — sua participação depende de habilidade (leitura e depoimento genuíno), nos termos da legislação de concursos culturais." data-en="It's a cultural contest where you buy an ebook, read it, write a review, and compete for cash prizes. It's not a pure lottery — your participation requires skill (reading and genuine review), under cultural contest regulations." data-es="Es un concurso cultural donde adquieres un ebook, lo lees, escribes un testimonio y concursas por premios en dinero.">É um concurso cultural onde você adquire um ebook, lê, escreve um depoimento e concorre a prêmios em dinheiro. Não é sorteio puro — sua participação depende de habilidade (leitura e depoimento genuíno), nos termos da legislação de concursos culturais.</div>
-    </div>
-    <div class="faq-item reveal" onclick="toggleFaq(this)" style="transition-delay:.05s">
-      <div class="faq-pergunta"><span data-pt="Como recebo meu ebook após a compra?" data-en="How do I receive my ebook after purchase?" data-es="¿Cómo recibo mi ebook tras la compra?">Como recebo meu ebook após a compra?</span><span class="faq-icone" aria-hidden="true">+</span></div>
-      <div class="faq-resposta" data-pt="Após a confirmação do pagamento, você recebe o arquivo por e-mail (sac@3trevo.com.br) e por mensagem de WhatsApp, automaticamente. Sua área do cliente é criada imediatamente — acesse Minha Biblioteca para baixar ou reler seu ebook a qualquer momento. Junto com o PDF você também recebe a nota fiscal e seu link exclusivo de participação no Programa Cultural." data-en="After payment confirmation, you receive the file by email (sac@3trevo.com.br) and by WhatsApp message, automatically. Your customer area is created immediately — access My Library to download or re-read your ebook at any time. Along with the PDF you also receive your invoice and exclusive Cultural Program participation link." data-es="Tras la confirmación del pago, recibes el archivo por email y WhatsApp automáticamente. Tu área de cliente se crea de inmediato — accede a Mi Biblioteca para descargar o releer tu ebook en cualquier momento. Junto con el PDF recibes tu factura y el enlace de participación en el Programa Cultural.">Após a confirmação do pagamento, você recebe o arquivo por e-mail (<a href="mailto:sac@3trevo.com.br">sac@3trevo.com.br</a>) e por mensagem de WhatsApp, automaticamente. Sua área do cliente é criada imediatamente — acesse <a href="/area-cliente.html">Minha Biblioteca</a> para baixar ou reler seu ebook a qualquer momento. Junto com o PDF você também recebe a nota fiscal e seu link exclusivo de participação no Programa Cultural.</div>
-    </div>
-    <div class="faq-item reveal" onclick="toggleFaq(this)" style="transition-delay:.1s">
-      <div class="faq-pergunta"><span data-pt="Por que preciso esperar 7 dias para participar?" data-en="Why do I need to wait 7 days to participate?" data-es="¿Por qué debo esperar 7 días para participar?">Por que preciso esperar 7 dias para participar?</span><span class="faq-icone" aria-hidden="true">+</span></div>
-      <div class="faq-resposta" data-pt="O prazo de 7 dias garante que você teve tempo suficiente para ler o conteúdo antes de escrever o depoimento, e coincide com o prazo legal de direito de arrependimento do CDC para compras digitais." data-en="The 7-day period ensures you had enough time to read the content before writing your review, and coincides with the legal consumer protection cooling-off period for digital purchases." data-es="El plazo de 7 días garantiza que tuviste tiempo suficiente para leer el contenido antes de escribir el testimonio.">O prazo de 7 dias garante que você teve tempo suficiente para ler o conteúdo antes de escrever o depoimento, e coincide com o prazo legal de direito de arrependimento do CDC para compras digitais.</div>
-    </div>
-    <div class="faq-item reveal" onclick="toggleFaq(this)" style="transition-delay:.15s">
-      <div class="faq-pergunta"><span data-pt="Posso participar comprando qualquer título?" data-en="Can I participate by buying any title?" data-es="¿Puedo participar comprando cualquier título?">Posso participar comprando qualquer título?</span><span class="faq-icone" aria-hidden="true">+</span></div>
-      <div class="faq-resposta" data-pt="Sim. Todos os títulos do catálogo participam do Programa Cultural. Títulos de entrada têm 1 cota, intermediários têm 3 cotas, e premium têm 10 cotas. Você pode adquirir múltiplos títulos para acumular cotas." data-en="Yes. All catalog titles participate in the Cultural Program. Entry titles have 1 ticket, intermediate have 3, and premium have 10. You can buy multiple titles to accumulate tickets." data-es="Sí. Todos los títulos del catálogo participan en el Programa Cultural.">Sim. Todos os títulos do catálogo participam do Programa Cultural. Títulos de entrada têm 1 cota, intermediários têm 3 cotas, e premium têm 10 cotas. Você pode adquirir múltiplos títulos para acumular cotas.</div>
-    </div>
-    <div class="faq-item reveal" onclick="toggleFaq(this)" style="transition-delay:.2s">
-      <div class="faq-pergunta"><span data-pt="O que é um depoimento válido?" data-en="What is a valid review?" data-es="¿Qué es un testimonio válido?">O que é um depoimento válido?</span><span class="faq-icone" aria-hidden="true">+</span></div>
-      <div class="faq-resposta" data-pt="Um texto de pelo menos 20 palavras que demonstre leitura genuína do conteúdo — o que você aprendeu, o que te impactou, como o livro se relaciona com sua realidade. Textos genéricos ou copiados são desclassificados." data-en="A text of at least 20 words demonstrating genuine reading of the content — what you learned, what impacted you, how the book relates to your reality. Generic or copied texts are disqualified." data-es="Un texto de al menos 20 palabras que demuestre lectura genuina del contenido.">Um texto de pelo menos 20 palavras que demonstre leitura genuína do conteúdo — o que você aprendeu, o que te impactou, como o livro se relaciona com sua realidade. Textos genéricos ou copiados são desclassificados.</div>
-    </div>
-    <div class="faq-item reveal" onclick="toggleFaq(this)" style="transition-delay:.25s">
-      <div class="faq-pergunta"><span data-pt="Posso pedir reembolso?" data-en="Can I request a refund?" data-es="¿Puedo solicitar reembolso?">Posso pedir reembolso?</span><span class="faq-icone" aria-hidden="true">+</span></div>
-      <div class="faq-resposta" data-pt="Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral, sem necessidade de justificativa. Entre em contato pelo e-mail sac@3trevo.com.br. Ao exercer o direito de arrependimento, o material é removido do seu acervo e o participante é automaticamente desclassificado do Programa Cultural." data-en="Yes. Under Brazilian consumer protection law (CDC Art. 49), you have 7 calendar days after purchase to request a full refund, no reason required. Contact us at sac@3trevo.com.br. Upon refund, the material is removed from your library and the participant is automatically disqualified from the Cultural Program." data-es="Sí. Tienes 7 días corridos tras la compra para solicitar reembolso íntegro. Contacta sac@3trevo.com.br. Al ejercer el derecho de desistimiento, el material es retirado de tu biblioteca y el participante queda descalificado del Programa Cultural.">Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral. Entre em contato pelo e-mail <a href="mailto:sac@3trevo.com.br">sac@3trevo.com.br</a>.<br><br><strong>Atenção:</strong> ao exercer o direito de arrependimento, o material é removido do seu acervo e o participante é automaticamente desclassificado do Programa Cultural.</div>
-    </div>
-  </div>
-</section>
-
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- SOBRE -->
-<section id="sobre" aria-label="Sobre a editora">
-  <div class="sobre-grid">
-    <div class="reveal">
-      <div class="sec-label" data-pt="Quem somos" data-en="Who we are" data-es="Quiénes somos">Quem somos</div>
-      <h2 class="sec-titulo"><em data-pt="Editora" data-en="Publishing" data-es="Editorial">Editora</em><br><span data-pt="Três Trevo" data-en="Três Trevo" data-es="Três Trevo">Três Trevo</span></h2>
-      <div class="sobre-texto" style="margin-top:24px">
-        <p data-pt="A Editora Três Trevo nasceu com um propósito simples e direto: <strong>publicar o que importa</strong>. Literatura que provoca, conhecimento que transforma, conteúdo que respeita a inteligência do leitor." data-en="Editora Três Trevo was founded with a simple, direct purpose: <strong>publish what matters</strong>. Literature that provokes, knowledge that transforms, content that respects the reader's intelligence." data-es="La Editorial Três Trevo nació con un propósito simple: <strong>publicar lo que importa</strong>.">A Editora Três Trevo nasceu com um propósito simples e direto: <strong>publicar o que importa</strong>. Literatura que provoca, conhecimento que transforma, conteúdo que respeita a inteligência do leitor.</p>
-        <p data-pt="Somos uma editora digital independente, sediada em Montauri/RS. Nosso modelo conecta diretamente autor e leitor — sem intermediários que diluem o valor do conteúdo." data-en="We are an independent digital publisher based in Montauri/RS, Brazil. Our model connects author and reader directly — without intermediaries that dilute content value." data-es="Somos una editorial digital independiente, con sede en Montauri/RS. Nuestro modelo conecta directamente autor y lector.">Somos uma editora digital independente, sediada em Montauri/RS. Nosso modelo conecta diretamente autor e leitor — sem intermediários que diluem o valor do conteúdo.</p>
-        <p data-pt="O Programa Cultural é nossa forma de transformar leitura em experiência — e de recompensar quem realmente lê." data-en="The Cultural Program is our way of turning reading into an experience — and rewarding those who truly read." data-es="El Programa Cultural es nuestra forma de convertir la lectura en experiencia — y recompensar a quienes realmente leen.">O Programa Cultural é nossa forma de transformar leitura em experiência — e de recompensar quem realmente lê.</p>
-        <p data-pt="<strong>Para autores:</strong> a Editora Três Trevo está aberta à aquisição de direitos autorais. Se você tem um manuscrito e deseja publicar conosco, entre em contato pelo e-mail sac@3trevo.com.br." data-en="<strong>For authors:</strong> Editora Três Trevo is open to acquiring publishing rights. If you have a manuscript and wish to publish with us, contact us at sac@3trevo.com.br." data-es="<strong>Para autores:</strong> la Editorial Três Trevo está abierta a la adquisición de derechos de autor."><strong>Para autores:</strong> a Editora Três Trevo está aberta à aquisição de direitos autorais. Se você tem um manuscrito e deseja publicar conosco, entre em contato pelo e-mail <a href="mailto:sac@3trevo.com.br">sac@3trevo.com.br</a>.</p>
+<!-- ── CATÁLOGO ──────────────────────────────────────────────────────────────── -->
+<section id="catalogo">
+  <div class="sec-in fi">
+    <div class="sec-hdr">
+      <div>
+        <p class="lbl" style="color:var(--v3);margin-bottom:8px;" data-i18n="cat.label">Catálogo completo</p>
+        <h2 class="sec-t"><em data-i18n="cat.titulo.em">Todos os títulos</em></h2>
+        <p class="sec-desc" data-i18n="cat.desc">Ficção literária, ensaio político e manuais práticos — cada obra qualifica para o Programa Cultural.</p>
       </div>
-      <div class="sobre-obras">
-        <div class="obras-label" data-pt="Catálogo atual" data-en="Current catalog" data-es="Catálogo actual">Catálogo atual</div>
-        <div class="obra-item"><span class="obra-marca">—</span><span data-pt="Justiça(mento) para Orelha — Said Anes" data-en="Justiça(mento) para Orelha — Said Anes" data-es="Justiça(mento) para Orelha — Said Anes">Justiça(mento) para Orelha — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-marca">—</span><span data-pt="Vigilante — Said Anes" data-en="Vigilante — Said Anes" data-es="Vigilante — Said Anes">Vigilante — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-marca">—</span><span data-pt="O Nascimento Silencioso da 3ª GM — Said Anes" data-en="The Silent Birth of WWIII — Said Anes" data-es="El Nacimiento Silencioso de la 3ª GM — Said Anes">O Nascimento Silencioso da 3ª GM — Said Anes</span></div>
-        <div class="obra-item"><span class="obra-marca">—</span><span data-pt="Guia Antifalência Vol.1 — Said Anes" data-en="Anti-Bankruptcy Guide Vol.1 — Said Anes" data-es="Guía Antifalencia Vol.1 — Said Anes">Guia Antifalência Vol.1 — Said Anes</span></div>
+      <div class="filtros">
+        <button class="fbtn ativo" onclick="filtrar(this,'todos')" data-i18n="cat.f.todos">Todos</button>
+        <button class="fbtn" onclick="filtrar(this,'reflexao')" data-i18n="cat.f.reflexao">Reflexão</button>
+        <button class="fbtn" onclick="filtrar(this,'ficcao')" data-i18n="cat.f.ficcao">Ficção</button>
+        <button class="fbtn" onclick="filtrar(this,'manuais')" data-i18n="cat.f.manuais">Manuais</button>
       </div>
     </div>
-    <div class="reveal" style="transition-delay:.15s">
-      <div class="sobre-autor">
-        <div class="autor-label" data-pt="✦ Pseudônimo literário" data-en="✦ Literary pseudonym" data-es="✦ Seudónimo literario">✦ Pseudônimo literário</div>
-        <div class="autor-nome">Said Anes</div>
-        <div class="autor-papel" data-pt="Voz editorial da Editora Três Trevo" data-en="Editorial voice of Editora Três Trevo" data-es="Voz editorial de la Editorial Três Trevo">Voz editorial da Editora Três Trevo</div>
-        <p class="autor-bio" data-pt="Said Anes é o pseudônimo literário sob o qual a Editora Três Trevo publica suas obras de autor. Um espaço onde a escrita encontra a clareza — sem as amarras do nome, apenas a força das ideias. Seus títulos transitam entre o ensaio político, a ficção literária e a narrativa documental, sempre com a marca da precisão e da inconformidade." data-en="Said Anes is the literary pseudonym under which Editora Três Trevo publishes its authored works. A space where writing meets clarity — free from the constraints of name, only the strength of ideas. Titles range from political essays to literary fiction and documentary narrative, always marked by precision and nonconformity." data-es="Said Anes es el seudónimo literario bajo el cual la Editorial Três Trevo publica sus obras de autor.">Said Anes é o pseudônimo literário sob o qual a Editora Três Trevo publica suas obras de autor. Um espaço onde a escrita encontra a clareza — sem as amarras do nome, apenas a força das ideias. Seus títulos transitam entre o ensaio político, a ficção literária e a narrativa documental, sempre com a marca da precisão e da inconformidade.</p>
+    <div class="prod-grid" id="prod-grid"></div>
+    <div class="garantia fi">
+      <div class="garantia-i">⟲</div>
+      <div class="garantia-t">
+        <h4 data-i18n="gar.titulo">Garantia de 7 dias</h4>
+        <p data-i18n="gar.texto">Não gostou? Reembolso integral sem perguntas em até 7 dias corridos (CDC art. 49). Contato: sac@3trevo.com.br · Atenção: o direito de arrependimento desclassifica do Programa Cultural.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ── DEPOIMENTOS ──────────────────────────────────────────────────────────── -->
+<section id="depoimentos">
+  <div class="sec-in fi">
+    <p class="lbl" style="color:var(--v3);margin-bottom:8px;" data-i18n="dep.label">O que dizem os leitores</p>
+    <h2 class="sec-t"><em data-i18n="dep.titulo">Depoimentos</em></h2>
+    <div class="dep-grid">
+      <div class="dcard">
+        <div class="dcard-stars">★★★★★</div>
+        <div class="dcard-aspas">"</div>
+        <p class="dcard-texto">"Mudou a forma como leio notícias. Passei a questionar antes de compartilhar. Um texto denso que exige — e merece — releitura."</p>
+        <div class="dcard-rod"><div class="dcard-nome">Maria S.</div><div class="dcard-livro">Justiça(mento) para Orelha</div></div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-stars">★★★★★</div>
+        <div class="dcard-aspas">"</div>
+        <p class="dcard-texto">"Finalmente alguém explicou ponto de equilíbrio sem enrolação. Fiz a conta do meu negócio ainda lendo o capítulo 4."</p>
+        <div class="dcard-rod"><div class="dcard-nome">Paulo M.</div><div class="dcard-livro">Guia Antifalência Vol.1</div></div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-stars">★★★★★</div>
+        <div class="dcard-aspas">"</div>
+        <p class="dcard-texto">"Assustadoramente atual. Parece que o autor está descrevendo o que acontece hoje nas manchetes. Leitura obrigatória."</p>
+        <div class="dcard-rod"><div class="dcard-nome">Ana P.</div><div class="dcard-livro">O Nascimento Silencioso da 3ª GM</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROGRAMA CULTURAL ─────────────────────────────────────────────────────── -->
+<section id="programa">
+  <div class="sec-in fi">
+    <p class="lbl" style="color:var(--v3);margin-bottom:10px;" data-i18n="prog.label">Como funciona</p>
+    <div class="prog-grid">
+      <div>
+        <div class="sistema-badge">
+          <div class="sistema-badge-dot"></div>
+          <span data-i18n="prog.status">Sistema finalizado · Habilitação em andamento</span>
+        </div>
+        <h2 class="prog-titulo"><em data-i18n="prog.titulo.em">Programa</em> <span data-i18n="prog.titulo.rest">Cultural</span></h2>
+        <p class="prog-sub" data-i18n="prog.sub">Adquira um ebook, leia, escreva seu depoimento genuíno e concorra a prêmios em dinheiro. O vencedor é determinado pelo Sistema Loteria TT — apuração automática com auditoria pública.</p>
+        <div class="passos">
+          <div class="passo"><span class="passo-n">1</span><div><div class="passo-t" data-i18n="passo1.t">Adquira o ebook</div><div class="passo-d" data-i18n="passo1.d">Você está comprando um livro digital em PDF. Após a confirmação do pagamento, recebe por e-mail e WhatsApp imediatamente.</div></div></div>
+          <div class="passo"><span class="passo-n">2</span><div><div class="passo-t" data-i18n="passo2.t">Leia o conteúdo</div><div class="passo-d" data-i18n="passo2.d">Após 7 dias da compra, seu link de participação é liberado automaticamente — tempo suficiente para uma leitura completa.</div></div></div>
+          <div class="passo"><span class="passo-n">3</span><div><div class="passo-t" data-i18n="passo3.t">Valide suas cotas</div><div class="passo-d" data-i18n="passo3.d">Escreva um depoimento genuíno (mín. 40 caracteres) demonstrando leitura real. Validação automática em segundos.</div></div></div>
+          <div class="passo"><span class="passo-n">4</span><div><div class="passo-t" data-i18n="passo4.t">Concorra ao prêmio</div><div class="passo-d" data-i18n="passo4.d">O Sistema Loteria TT apura o vencedor de forma automática e verificável. Resultado registrado com hash SHA-256 — auditoria pública após cada rodada.</div></div></div>
+        </div>
+      </div>
+
+      <!-- Painel de prêmios -->
+      <div>
+        <div class="premios-painel">
+          <div class="pp-hdr"><p class="lbl pp-hdr-l" data-i18n="pp.label">✦ Série Cultural — 6 rodadas</p><p class="pp-hdr-t" data-i18n="pp.titulo">Premiação total</p></div>
+          <div>
+            <div class="pp-item"><span class="pp-pos" data-i18n="pp.r1.pos">1°–4°</span><span class="pp-val">R$ 500,00</span><span class="pp-tag" data-i18n="pp.cada">cada</span></div>
+            <div class="pp-item"><span class="pp-pos">5°</span><span class="pp-val">R$ 1.000,00</span><span class="pp-tag" data-i18n="pp.esp">Especial</span></div>
+            <div class="pp-item grande"><span class="pp-pos">6°</span><span class="pp-val">R$ 6.000,00</span><span class="pp-tag" data-i18n="pp.grande">Grande</span></div>
+          </div>
+          <div class="pp-cotas">
+            <div class="pp-cotas-l lbl" data-i18n="pp.cotas.titulo">Cotas por faixa</div>
+            <div class="cota-linha"><span class="cn" data-i18n="pp.c1.n">Entrada · R$15,35</span><span class="cv" data-i18n="pp.c1.v">1 cota</span></div>
+            <div class="cota-linha"><span class="cn" data-i18n="pp.c2.n">Intermediário · R$46,04</span><span class="cv" data-i18n="pp.c2.v">3 cotas</span></div>
+            <div class="cota-linha"><span class="cn" data-i18n="pp.c3.n">Premium · R$76,74</span><span class="cv" data-i18n="pp.c3.v">10 cotas</span></div>
+          </div>
+          <div class="pp-prog">
+            <div class="pp-prog-l"><span class="pi lbl" data-i18n="pp.prog.ini">Início</span><span class="pf lbl" data-i18n="pp.prog.fim">Sorteio garantido</span></div>
+            <div class="barra"><div class="barra-fill" id="barra-prog"></div></div>
+            <p class="pp-prog-st" id="prog-st" data-i18n="pp.prog.status">Comunidade formando</p>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:14px 18px;border:1px solid var(--borda);border-radius:3px;background:var(--branco);">
+          <p style="font-size:11px;color:var(--t3);line-height:1.65;" data-i18n="pp.nota">✦ Cotas adquiridas agora permanecem válidas para todas as rodadas. Habilitação em processo — sorteios iniciam após certificação legal. Pagamento via PIX em até 7 dias úteis após cada rodada.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ──────────────────────────────────────────────────────────────────── -->
+<section id="faq">
+  <div class="faq-in fi">
+    <p class="lbl" style="color:var(--v3);margin-bottom:8px;" data-i18n="faq.label">Perguntas frequentes</p>
+    <h2 class="sec-t"><em data-i18n="faq.titulo">Dúvidas</em></h2>
+    <div class="faq-lista" id="faq-lista"></div>
+  </div>
+</section>
+
+<!-- ── SOBRE ─────────────────────────────────────────────────────────────────── -->
+<section id="sobre">
+  <div class="sobre-grid fi">
+    <div>
+      <p class="lbl" style="color:var(--v3);margin-bottom:10px;" data-i18n="sobre.label">Quem somos</p>
+      <h2 class="sobre-t"><em data-i18n="sobre.titulo.em">Editora</em> <span data-i18n="sobre.titulo.rest">Três Trevo</span></h2>
+      <p class="sobre-p" data-i18n="sobre.p1">A Editora Três Trevo nasceu com um propósito simples e direto: publicar o que importa. Literatura que provoca, conhecimento que transforma, conteúdo que respeita a inteligência do leitor.</p>
+      <p class="sobre-p" data-i18n="sobre.p2">Somos uma editora digital independente, sediada em Montauri/RS. Nosso modelo conecta diretamente autor e leitor — sem intermediários que diluem o valor do conteúdo.</p>
+      <p class="sobre-p" data-i18n="sobre.p3">O Programa Cultural é nossa forma de transformar leitura em experiência — e de recompensar quem realmente lê.</p>
+      <p class="sobre-p" style="font-size:13px;color:var(--t3);">
+        <strong style="color:var(--t1);" data-i18n="sobre.autores">Para autores:</strong>
+        <span data-i18n="sobre.autores.texto"> A Editora está aberta à aquisição de direitos autorais.</span>
+        <a href="mailto:sac@3trevo.com.br?subject=Manuscrito" style="color:var(--v3);font-weight:500;"> sac@3trevo.com.br →</a>
+      </p>
+    </div>
+    <div>
+      <div class="autor-bloco">
+        <p class="lbl autor-l" data-i18n="autor.label">✦ Pseudônimo literário</p>
+        <h3 class="autor-nome">Said Anes</h3>
+        <p class="autor-sub" data-i18n="autor.sub">Voz editorial da Editora Três Trevo</p>
+        <p class="autor-bio" data-i18n="autor.bio">Said Anes é o pseudônimo literário sob o qual a Editora Três Trevo publica suas obras. Um espaço onde a escrita encontra a clareza — sem as amarras do nome, apenas a força das ideias. Seus títulos transitam entre o ensaio político, a ficção literária e a narrativa documental, sempre com a marca da precisão e da inconformidade.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────────────── -->
 <footer>
-  <div class="footer-grid">
-    <div>
-      <div class="footer-marca">✦ Editora Três Trevo</div>
-      <p class="footer-desc" data-pt="Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê." data-en="Literature and applied knowledge. We publish what matters, for those who truly read." data-es="Literatura y conocimiento aplicado. Publicamos lo que importa, para quienes realmente leen.">Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.</p>
-      <div style="margin-top:20px;font-size:11px;color:rgba(255,255,255,.2)">CNPJ 18.928.966/0001-59<br>Montauri/RS · Brasil</div>
-    </div>
-    <div class="footer-col">
-      <h4 data-pt="Navegação" data-en="Navigation" data-es="Navegación">Navegação</h4>
-      <a href="#inicio" data-pt="Início" data-en="Home" data-es="Inicio">Início</a>
-      <a href="/catalogo.html" data-pt="Catálogo completo" data-en="Full catalog" data-es="Catálogo completo">Catálogo completo</a>
-      <a href="#programa" data-pt="Programa Cultural" data-en="Cultural Program" data-es="Programa Cultural">Programa Cultural</a>
-      <a href="#faq" data-pt="Perguntas frequentes" data-en="FAQ" data-es="Preguntas">Perguntas frequentes</a>
-      <a href="#sobre" data-pt="Sobre a editora" data-en="About" data-es="Acerca">Sobre a editora</a>
-      <a href="/termos-programa-cultural.html" data-pt="Regulamento" data-en="Rules" data-es="Reglamento">Regulamento</a>
-    </div>
-    <div class="footer-col">
-      <h4 data-pt="Contato" data-en="Contact" data-es="Contacto">Contato</h4>
-      <div class="footer-contatos">
-        <a href="mailto:sac@3trevo.com.br" class="footer-contato">
-          <span>✉</span><span>sac@3trevo.com.br</span>
-        </a>
-        <a href="https://wa.me/5554999467085" class="footer-contato" target="_blank" rel="noopener noreferrer">
-          <span>✆</span><span>(54) 99946-7085</span>
-        </a>
-        <a href="https://www.instagram.com/3trevo" class="footer-contato" target="_blank" rel="noopener noreferrer">
-          <span>◈</span><span>@3trevo</span>
-        </a>
+  <div class="ft-in">
+    <div class="ft-grid">
+      <div>
+        <div class="ft-logo">Editora Três Trevo</div>
+        <p class="ft-tag" data-i18n="ft.tag">Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.</p>
+        <p class="ft-cnpj">CNPJ 18.928.966/0001-59<br>Montauri/RS · Brasil</p>
+      </div>
+      <div class="ft-col">
+        <h5 data-i18n="ft.nav">Navegação</h5>
+        <div class="ft-links">
+          <a href="#inicio" data-i18n="ft.inicio">Início</a>
+          <a href="#catalogo" data-i18n="ft.catalogo">Catálogo</a>
+          <a href="#programa" data-i18n="ft.programa">Programa Cultural</a>
+          <a href="#faq">FAQ</a>
+          <a href="#sobre" data-i18n="ft.sobre">Sobre</a>
+          <a href="https://3trevo.com.br/termos-programa-cultural.html" data-i18n="ft.regulamento">Regulamento</a>
+        </div>
+      </div>
+      <div class="ft-col">
+        <h5 data-i18n="ft.contato">Contato</h5>
+        <div class="ft-links">
+          <a href="mailto:sac@3trevo.com.br">✉ sac@3trevo.com.br</a>
+          <a href="https://wa.me/5554999467085">✆ (54) 99946-7085</a>
+          <a href="https://www.instagram.com/3trevo">◈ @3trevo</a>
+          <a href="https://3trevo.com.br/area-cliente.html" data-i18n="ft.biblioteca">Minha Biblioteca</a>
+          <a href="https://3trevo.com.br/auditoria-sorteio.html" data-i18n="ft.auditoria">Auditoria pública</a>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="footer-bottom">
-    <div class="footer-legal" data-pt="© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada · Programa Cultural conforme legislação vigente" data-en="© 2026 Três Trevo Publishing · All rights reserved · Said Anes is a registered trademark · Cultural Program under applicable law" data-es="© 2026 Editorial Três Trevo · Todos los derechos reservados · Said Anes es marca registrada">© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada · Programa Cultural conforme legislação vigente</div>
-    <div class="footer-selos">
-      <span class="footer-selo">CNPJ</span>
-      <span class="footer-selo">SSL</span>
-      <span class="footer-selo">CDC Art.49</span>
-      <a href="/admin.html" aria-hidden="true" tabindex="-1" style="color:rgba(255,255,255,.08);font-size:11px;text-decoration:none;margin-left:12px;transition:color .3s;user-select:none" onmouseover="this.style.color='rgba(255,255,255,.35)'" onmouseout="this.style.color='rgba(255,255,255,.08)'">◈</a>
+    <div class="ft-bottom">
+      <p class="ft-copy" data-i18n="ft.copy">© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada · Programa Cultural conforme legislação vigente</p>
+      <div class="ft-badges">
+        <span class="badge">CNPJ</span><span class="badge">SSL</span><span class="badge">CDC Art.49</span>
+        <a href="https://3trevo.com.br/admin.html" class="ft-admin">◈</a>
+      </div>
     </div>
   </div>
 </footer>
 
-<!-- Player musical carregado via player.js -->
-
-<!-- WHATSAPP -->
-<a id="waBtn" href="https://wa.me/5554999467085?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20ebooks%20da%20Editora%20Três%20Trevo."
-   target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp">
-  <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M16 2C8.268 2 2 8.268 2 16c0 2.46.664 4.763 1.822 6.74L2 30l7.463-1.793A13.94 13.94 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2z" fill="#fff"/>
-    <path d="M22.5 19.5c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01s-.52.07-.79.37c-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z" fill="#25d366"/>
-  </svg>
+<a href="https://wa.me/5554999467085?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20ebooks%20da%20Editora%20Três%20Trevo." class="wa" aria-label="WhatsApp" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
 <script>
-// ── MOCKUP 3D ──
-function gerarMockup(cor,titulo,w,h){
-  cor=cor||'#1a4a2e';
-  var r=parseInt(cor.slice(1,3),16),g=parseInt(cor.slice(3,5),16),b=parseInt(cor.slice(5,7),16);
-  var shadow='rgb('+Math.max(0,r-60)+','+Math.max(0,g-60)+','+Math.max(0,b-60)+')';
-  var lombada='rgb('+Math.max(0,r-30)+','+Math.max(0,g-30)+','+Math.max(0,b-30)+')';
-  var destaque='rgb('+Math.min(255,r+40)+','+Math.min(255,g+40)+','+Math.min(255,b+40)+')';
-  var cw=w*0.72,ch=h*0.88,lw=w*0.18,depth=h*0.04;
-  var cx=lw,cy=depth,lx=0,ly=depth;
-  var palavras=titulo.split(' '),linhas=[],linha='';
-  palavras.forEach(function(p){if((linha+' '+p).trim().length>14){if(linha)linhas.push(linha);linha=p;}else linha=(linha+' '+p).trim();});
-  if(linha)linhas.push(linha);
-  linhas=linhas.slice(0,4);
-  var fs=Math.max(6,Math.round(cw*0.13));
-  var midY=cy+ch/2-(linhas.length-1)*fs*0.65;
-  var esc=function(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
-  var textLines=linhas.map(function(l,i){return '<text x="'+(cx+cw/2)+'" y="'+(midY+i*fs*1.3)+'" text-anchor="middle" font-family="serif" font-size="'+fs+'" font-weight="bold" fill="#fff" fill-opacity="0.92">'+esc(l)+'</text>';}).join('');
-  return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'+
-    '<ellipse cx="'+(cx+cw*.55)+'" cy="'+(cy+ch+4)+'" rx="'+(cw*.45)+'" ry="4" fill="rgba(0,0,0,.25)"/>'+
-    '<polygon points="'+lw+',0 '+(lw+cw)+',0 '+(cx+cw)+','+cy+' '+cx+','+cy+'" fill="'+destaque+'"/>'+
-    '<rect x="'+lx+'" y="'+ly+'" width="'+lw+'" height="'+ch+'" fill="'+lombada+'"/>'+
-    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="'+cor+'"/>'+
-    '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+(ch*.18)+'" fill="rgba(255,255,255,.06)"/>'+
-    textLines+
-    '<line x1="'+(cx+cw*.15)+'" y1="'+(cy+ch*.78)+'" x2="'+(cx+cw*.85)+'" y2="'+(cy+ch*.78)+'" stroke="rgba(200,168,75,.6)" stroke-width=".8"/>'+
-  '</svg>';
+// ── CAPAS ──────────────────────────────────────────────────────────────────────
+const CAPAS = [
+  {
+    slug: 'justicamento',
+    classe: 'capa-justicamento',
+    genero: 'Ensaio',
+    titulo: 'Justiça(mento)<br><em>para Orelha</em>',
+    autor: 'Said Anes',
+    infoEN: 'Essay · Entry level',
+    infoES: 'Ensayo · Nivel entrada',
+    infoPT: 'Ensaio · Nível entrada',
+    preco: 'R$15,35',
+    cotas: 1,
+    cat: 'reflexao',
+  },
+  {
+    slug: 'vigilante',
+    classe: 'capa-vigilante',
+    genero: 'Ficção Literária',
+    titulo: '<em>Vigilante</em>',
+    autor: 'Said Anes',
+    infoPT: 'Ficção Literária · Premium · 10 cotas',
+    infoEN: 'Literary Fiction · Premium · 10 entries',
+    infoES: 'Ficción Literaria · Premium · 10 participaciones',
+    preco: 'R$76,74',
+    cotas: 10,
+    cat: 'ficcao',
+    premium: true,
+  },
+  {
+    slug: 'terceiraguerra',
+    classe: 'capa-terceiraguerra',
+    genero: 'Ficção Documental',
+    titulo: 'O Nascimento<br>Silencioso da<br><em>3ª Guerra Mundial</em>',
+    autor: 'Said Anes',
+    infoPT: 'Ficção Documental · Premium · 10 cotas',
+    infoEN: 'Documentary Fiction · Premium · 10 entries',
+    infoES: 'Ficción Documental · Premium · 10 participaciones',
+    preco: 'R$76,74',
+    cotas: 10,
+    cat: 'ficcao',
+    premium: true,
+  },
+  {
+    slug: 'antifalencia',
+    classe: 'capa-antifalencia',
+    genero: 'Manual',
+    titulo: 'Guia<br><em>Antifalência</em><br>Vol. 1',
+    autor: 'Said Anes',
+    infoPT: 'Manual · Intermediário · 3 cotas',
+    infoEN: 'Business Guide · Mid-tier · 3 entries',
+    infoES: 'Guía · Intermedio · 3 participaciones',
+    preco: 'R$46,04',
+    cotas: 3,
+    cat: 'manuais',
+  },
+];
+
+let capaAtual = 0;
+let capaInterval;
+
+function renderCapa(idx) {
+  const c = CAPAS[idx];
+  const el = document.getElementById('livro-ativo');
+  const tituloEl = document.getElementById('showcase-titulo');
+  const infoEl = document.getElementById('showcase-info');
+  if (!el) return;
+
+  el.innerHTML = `
+    <div class="capa ${c.classe}">
+      <div class="capa-ornamento"></div>
+      <div class="capa-genero">${c.genero}</div>
+      <div class="capa-titulo">${c.titulo}</div>
+      <div class="capa-divisor"></div>
+      <div class="capa-autor">${c.autor}</div>
+      <div class="capa-editora">Editora Três Trevo</div>
+    </div>
+  `;
+
+  const infoKey = 'info' + langAtual.toUpperCase();
+  if (tituloEl) tituloEl.innerHTML = c.titulo.replace(/<br>/g,' ').replace(/<\/?em>/g,'');
+  if (infoEl) infoEl.textContent = c[infoKey] || c.infoPT || '';
+
+  // Dots
+  const nav = document.getElementById('showcase-nav');
+  if (nav) {
+    nav.querySelectorAll('.snav-dot').forEach((d,i) => d.classList.toggle('ativo', i === idx));
+  }
 }
 
-// ── IDIOMA ──
-var idioma='pt';
-function alternarIdioma(){
-  var ciclo={'pt':'en','en':'es','es':'pt'};
-  idioma=ciclo[idioma];
-  var btn=document.getElementById('btnLang');
-  btn.textContent=idioma.toUpperCase();
-  document.documentElement.lang=idioma==='pt'?'pt-BR':idioma==='es'?'es':idioma;
-  document.querySelectorAll('[data-'+idioma+']').forEach(function(el){
-    var txt=el.getAttribute('data-'+idioma);
-    if(txt)el.innerHTML=txt;
+function trocarCapa(idx, direcao = 'next') {
+  const el = document.getElementById('livro-ativo');
+  if (!el) return;
+  el.classList.add('saindo');
+  setTimeout(() => {
+    capaAtual = idx;
+    renderCapa(idx);
+    el.classList.remove('saindo');
+    el.classList.add('entrando');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { el.classList.remove('entrando'); });
+    });
+  }, 500);
+}
+
+function iniciarShowcase() {
+  const nav = document.getElementById('showcase-nav');
+  if (!nav) return;
+  CAPAS.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'snav-dot' + (i === 0 ? ' ativo' : '');
+    btn.onclick = () => { clearInterval(capaInterval); trocarCapa(i); resetInterval(); };
+    btn.setAttribute('aria-label', `Livro ${i+1}`);
+    nav.appendChild(btn);
   });
-  if(metaAtivada)carregarProgresso();
+  renderCapa(0);
+  resetInterval();
 }
 
-// ── FILTROS ──
-function filtrar(genero,btn){
-  document.querySelectorAll('.filtro').forEach(function(b){b.classList.remove('ativo');});
+function resetInterval() {
+  clearInterval(capaInterval);
+  capaInterval = setInterval(() => {
+    trocarCapa((capaAtual + 1) % CAPAS.length);
+  }, 4500);
+}
+
+// ── i18n ──────────────────────────────────────────────────────────────────────
+const LANG = {
+  pt: {
+    'nav.catalogo':'Catálogo','nav.programa':'Programa Cultural','nav.sobre':'Sobre',
+    'nav.biblioteca':'Minha Biblioteca','nav.cta':'Adquirir ebook',
+    'hero.label':'Editora Três Trevo · Montauri/RS',
+    'hero.titulo':'Palavras que<br><em>transformam</em><br>o mundo real',
+    'hero.sub':'Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial. Adquira, leia e concorra a prêmios pelo Programa Cultural.',
+    'hero.cta1':'Ver catálogo →','hero.cta2':'Programa Cultural',
+    'hero.stat.leitores':'leitores','hero.stat.titulos':'títulos','hero.stat.premios':'em prêmios',
+    'hero.scroll':'Catálogo',
+    'trust.concurso':'Concurso cultural','trust.lei':'conforme Lei 5.768/71',
+    'trust.garantia':'Garantia de 7 dias','trust.cdc':'(CDC art. 49)',
+    'trust.entrega':'Entrega imediata por e-mail + WhatsApp',
+    'cat.label':'Catálogo completo','cat.titulo.em':'Todos os títulos',
+    'cat.desc':'Ficção literária, ensaio político e manuais práticos — cada obra qualifica para o Programa Cultural.',
+    'cat.f.todos':'Todos','cat.f.reflexao':'Reflexão','cat.f.ficcao':'Ficção','cat.f.manuais':'Manuais',
+    'gar.titulo':'Garantia de 7 dias',
+    'gar.texto':'Não gostou? Reembolso integral sem perguntas em até 7 dias corridos (CDC art. 49). Contato: sac@3trevo.com.br · Atenção: o direito de arrependimento desclassifica do Programa Cultural.',
+    'dep.label':'O que dizem os leitores','dep.titulo':'Depoimentos',
+    'prog.label':'Como funciona','prog.status':'Sistema finalizado · Habilitação em andamento',
+    'prog.titulo.em':'Programa','prog.titulo.rest':'Cultural',
+    'prog.sub':'Adquira um ebook, leia, escreva seu depoimento genuíno e concorra a prêmios em dinheiro. O vencedor é determinado pelo Sistema Loteria TT — apuração automática com auditoria pública.',
+    'passo1.t':'Adquira o ebook','passo1.d':'Você está comprando um livro digital em PDF. Após a confirmação do pagamento, recebe por e-mail e WhatsApp imediatamente.',
+    'passo2.t':'Leia o conteúdo','passo2.d':'Após 7 dias da compra, seu link de participação é liberado automaticamente — tempo suficiente para uma leitura completa.',
+    'passo3.t':'Valide suas cotas','passo3.d':'Escreva um depoimento genuíno (mín. 40 caracteres) demonstrando leitura real. Validação automática em segundos.',
+    'passo4.t':'Concorra ao prêmio','passo4.d':'O Sistema Loteria TT apura o vencedor de forma automática e verificável. Resultado registrado com hash SHA-256 — auditoria pública após cada rodada.',
+    'pp.label':'✦ Série Cultural — 6 rodadas','pp.titulo':'Premiação total',
+    'pp.r1.pos':'1°–4°','pp.cada':'cada','pp.esp':'Especial','pp.grande':'Grande',
+    'pp.cotas.titulo':'Cotas por faixa',
+    'pp.c1.n':'Entrada · R$15,35','pp.c1.v':'1 cota',
+    'pp.c2.n':'Intermediário · R$46,04','pp.c2.v':'3 cotas',
+    'pp.c3.n':'Premium · R$76,74','pp.c3.v':'10 cotas',
+    'pp.prog.ini':'Início','pp.prog.fim':'Sorteio garantido','pp.prog.status':'Comunidade formando',
+    'pp.nota':'✦ Cotas adquiridas agora permanecem válidas para todas as rodadas. Habilitação em processo — sorteios iniciam após certificação legal. Pagamento via PIX em até 7 dias úteis após cada rodada.',
+    'faq.label':'Perguntas frequentes','faq.titulo':'Dúvidas',
+    'sobre.label':'Quem somos','sobre.titulo.em':'Editora','sobre.titulo.rest':'Três Trevo',
+    'sobre.p1':'A Editora Três Trevo nasceu com um propósito simples e direto: publicar o que importa. Literatura que provoca, conhecimento que transforma, conteúdo que respeita a inteligência do leitor.',
+    'sobre.p2':'Somos uma editora digital independente, sediada em Montauri/RS. Nosso modelo conecta diretamente autor e leitor — sem intermediários que diluem o valor do conteúdo.',
+    'sobre.p3':'O Programa Cultural é nossa forma de transformar leitura em experiência — e de recompensar quem realmente lê.',
+    'sobre.autores':'Para autores:','sobre.autores.texto':' A Editora está aberta à aquisição de direitos autorais.',
+    'autor.label':'✦ Pseudônimo literário','autor.sub':'Voz editorial da Editora Três Trevo',
+    'autor.bio':'Said Anes é o pseudônimo literário sob o qual a Editora Três Trevo publica suas obras. Um espaço onde a escrita encontra a clareza — sem as amarras do nome, apenas a força das ideias. Seus títulos transitam entre o ensaio político, a ficção literária e a narrativa documental, sempre com a marca da precisão e da inconformidade.',
+    'ft.tag':'Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.',
+    'ft.nav':'Navegação','ft.inicio':'Início','ft.catalogo':'Catálogo','ft.programa':'Programa Cultural',
+    'ft.sobre':'Sobre','ft.regulamento':'Regulamento','ft.contato':'Contato','ft.biblioteca':'Minha Biblioteca',
+    'ft.auditoria':'Auditoria pública',
+    'ft.copy':'© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada · Programa Cultural conforme legislação vigente',
+  },
+  en: {
+    'nav.catalogo':'Catalog','nav.programa':'Cultural Program','nav.sobre':'About',
+    'nav.biblioteca':'My Library','nav.cta':'Get ebook',
+    'hero.label':'Editora Três Trevo · Montauri/RS · Brazil',
+    'hero.titulo':'Words that<br><em>transform</em><br>the real world',
+    'hero.sub':'We publish ebooks that shift perspectives — from geopolitical fiction to practical business guides. Buy, read, and enter our Cultural Program.',
+    'hero.cta1':'View catalog →','hero.cta2':'Cultural Program',
+    'hero.stat.leitores':'readers','hero.stat.titulos':'titles','hero.stat.premios':'in prizes',
+    'hero.scroll':'Catalog',
+    'trust.concurso':'Cultural contest','trust.lei':'under Brazilian Law 5.768/71',
+    'trust.garantia':'7-day guarantee','trust.cdc':'(consumer code)',
+    'trust.entrega':'Instant delivery via email + WhatsApp',
+    'cat.label':'Full catalog','cat.titulo.em':'All titles',
+    'cat.desc':'Literary fiction, political essays and practical guides — every title qualifies for the Cultural Program.',
+    'cat.f.todos':'All','cat.f.reflexao':'Essays','cat.f.ficcao':'Fiction','cat.f.manuais':'Guides',
+    'gar.titulo':'7-day guarantee',
+    'gar.texto':'Not satisfied? Full refund, no questions, within 7 days. Contact: sac@3trevo.com.br · Note: exercising the right of withdrawal disqualifies from the Cultural Program.',
+    'dep.label':'What readers say','dep.titulo':'Reviews',
+    'prog.label':'How it works','prog.status':'System complete · Legal certification in progress',
+    'prog.titulo.em':'Cultural','prog.titulo.rest':'Program',
+    'prog.sub':'Buy an ebook, read it, write a genuine review, and compete for cash prizes. The winner is determined by the Loteria TT System — automatic draw with public audit.',
+    'passo1.t':'Buy the ebook','passo1.d':'You\'re buying a digital PDF book. Upon payment confirmation, you receive it instantly by email and WhatsApp.',
+    'passo2.t':'Read the content','passo2.d':'After 7 days from purchase, your participation link is automatically unlocked — enough time for a complete read.',
+    'passo3.t':'Validate your entries','passo3.d':'Write a genuine review (min. 40 characters) showing real reading. Automatic validation in seconds.',
+    'passo4.t':'Compete for the prize','passo4.d':'The Loteria TT System determines the winner automatically and verifiably. Result recorded with SHA-256 hash — public audit after each round.',
+    'pp.label':'✦ Cultural Series — 6 rounds','pp.titulo':'Total prizes',
+    'pp.r1.pos':'1st–4th','pp.cada':'each','pp.esp':'Special','pp.grande':'Grand',
+    'pp.cotas.titulo':'Entries by tier',
+    'pp.c1.n':'Entry · R$15.35','pp.c1.v':'1 entry',
+    'pp.c2.n':'Mid-tier · R$46.04','pp.c2.v':'3 entries',
+    'pp.c3.n':'Premium · R$76.74','pp.c3.v':'10 entries',
+    'pp.prog.ini':'Start','pp.prog.fim':'Draw guaranteed','pp.prog.status':'Community forming',
+    'pp.nota':'✦ Entries acquired now remain valid for all rounds. Certification in progress — draws begin after legal approval. Payment via PIX within 7 business days.',
+    'faq.label':'Frequently asked questions','faq.titulo':'FAQs',
+    'sobre.label':'Who we are','sobre.titulo.em':'Editora','sobre.titulo.rest':'Três Trevo',
+    'sobre.p1':'Editora Três Trevo was born with a simple and direct purpose: to publish what matters. Literature that provokes, knowledge that transforms, content that respects the reader\'s intelligence.',
+    'sobre.p2':'We are an independent digital publisher based in Montauri, RS, Brazil. Our model connects authors directly with readers — no intermediaries diluting the value of content.',
+    'sobre.p3':'The Cultural Program is our way of turning reading into an experience — and rewarding those who truly read.',
+    'sobre.autores':'For authors:','sobre.autores.texto':' We are open to acquiring publishing rights.',
+    'autor.label':'✦ Literary pseudonym','autor.sub':'Editorial voice of Editora Três Trevo',
+    'autor.bio':'Said Anes is the literary pseudonym under which Editora Três Trevo publishes its works. A space where writing meets clarity — free from the constraints of a name, only the force of ideas.',
+    'ft.tag':'Literature and applied knowledge. We publish what matters, for those who truly read.',
+    'ft.nav':'Navigation','ft.inicio':'Home','ft.catalogo':'Catalog','ft.programa':'Cultural Program',
+    'ft.sobre':'About','ft.regulamento':'Terms','ft.contato':'Contact','ft.biblioteca':'My Library',
+    'ft.auditoria':'Public audit',
+    'ft.copy':'© 2026 Editora Três Trevo · All rights reserved · Said Anes is a registered trademark',
+  },
+  es: {
+    'nav.catalogo':'Catálogo','nav.programa':'Programa Cultural','nav.sobre':'Sobre nosotros',
+    'nav.biblioteca':'Mi Biblioteca','nav.cta':'Obtener ebook',
+    'hero.label':'Editora Três Trevo · Montauri/RS · Brasil',
+    'hero.titulo':'Palabras que<br><em>transforman</em><br>el mundo real',
+    'hero.sub':'Publicamos ebooks que cambian perspectivas — de ficción geopolítica a guías prácticas de supervivencia empresarial.',
+    'hero.cta1':'Ver catálogo →','hero.cta2':'Programa Cultural',
+    'hero.stat.leitores':'lectores','hero.stat.titulos':'títulos','hero.stat.premios':'en premios',
+    'hero.scroll':'Catálogo',
+    'trust.concurso':'Concurso cultural','trust.lei':'Ley 5.768/71',
+    'trust.garantia':'Garantía de 7 días','trust.cdc':'(código consumidor)',
+    'trust.entrega':'Entrega inmediata por e-mail + WhatsApp',
+    'cat.label':'Catálogo completo','cat.titulo.em':'Todos los títulos',
+    'cat.desc':'Ficción literaria, ensayo político y guías prácticas — cada obra participa en el Programa Cultural.',
+    'cat.f.todos':'Todos','cat.f.reflexao':'Ensayos','cat.f.ficcao':'Ficción','cat.f.manuais':'Guías',
+    'gar.titulo':'Garantía de 7 días',
+    'gar.texto':'¿No te gustó? Reembolso total sin preguntas en 7 días. Contacto: sac@3trevo.com.br',
+    'dep.label':'Lo que dicen los lectores','dep.titulo':'Testimonios',
+    'prog.label':'Cómo funciona','prog.status':'Sistema finalizado · Habilitación en proceso',
+    'prog.titulo.em':'Programa','prog.titulo.rest':'Cultural',
+    'prog.sub':'Compra un ebook, léelo, escribe tu testimonio genuino y compite por premios en efectivo. El ganador es determinado por el Sistema Lotería TT.',
+    'passo1.t':'Compra el ebook','passo1.d':'Estás comprando un libro digital en PDF. Tras la confirmación del pago, lo recibes por e-mail y WhatsApp inmediatamente.',
+    'passo2.t':'Lee el contenido','passo2.d':'Después de 7 días, tu enlace de participación se activa automáticamente.',
+    'passo3.t':'Valida tus participaciones','passo3.d':'Escribe un testimonio genuino (mín. 40 caracteres) que demuestre lectura real.',
+    'passo4.t':'Compite por el premio','passo4.d':'El Sistema Lotería TT determina el ganador de forma automática y verificable, con registro SHA-256.',
+    'pp.label':'✦ Serie Cultural — 6 rondas','pp.titulo':'Premiación total',
+    'pp.r1.pos':'1°–4°','pp.cada':'cada uno','pp.esp':'Especial','pp.grande':'Grande',
+    'pp.cotas.titulo':'Participaciones por nivel',
+    'pp.c1.n':'Entrada · R$15.35','pp.c1.v':'1 participación',
+    'pp.c2.n':'Intermedio · R$46.04','pp.c2.v':'3 participaciones',
+    'pp.c3.n':'Premium · R$76.74','pp.c3.v':'10 participaciones',
+    'pp.prog.ini':'Inicio','pp.prog.fim':'Sorteo garantizado','pp.prog.status':'Comunidad formándose',
+    'pp.nota':'✦ Las participaciones adquiridas ahora son válidas para todas las rondas. Habilitación en proceso.',
+    'faq.label':'Preguntas frecuentes','faq.titulo':'Dudas',
+    'sobre.label':'Quiénes somos','sobre.titulo.em':'Editora','sobre.titulo.rest':'Três Trevo',
+    'sobre.p1':'Editora Três Trevo nació con un propósito simple y directo: publicar lo que importa.',
+    'sobre.p2':'Somos una editorial digital independiente, con sede en Montauri/RS, Brasil.',
+    'sobre.p3':'El Programa Cultural es nuestra forma de convertir la lectura en experiencia.',
+    'sobre.autores':'Para autores:','sobre.autores.texto':' Estamos abiertos a adquirir derechos de autor.',
+    'autor.label':'✦ Seudónimo literario','autor.sub':'Voz editorial de Editora Três Trevo',
+    'autor.bio':'Said Anes es el seudónimo literario bajo el cual Editora Três Trevo publica sus obras.',
+    'ft.tag':'Literatura y conocimiento aplicado. Publicamos lo que importa.',
+    'ft.nav':'Navegación','ft.inicio':'Inicio','ft.catalogo':'Catálogo','ft.programa':'Programa Cultural',
+    'ft.sobre':'Sobre nosotros','ft.regulamento':'Reglamento','ft.contato':'Contacto','ft.biblioteca':'Mi Biblioteca',
+    'ft.auditoria':'Auditoría pública',
+    'ft.copy':'© 2026 Editora Três Trevo · Todos los derechos reservados',
+  }
+};
+
+let langAtual = 'pt';
+
+function setLang(lang) {
+  langAtual = lang;
+  document.documentElement.setAttribute('lang', lang === 'pt' ? 'pt-BR' : lang);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('ativo', b.textContent.toLowerCase() === lang));
+  const d = LANG[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => { const v = d[el.dataset.i18n]; if(v) el.textContent = v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { const v = d[el.dataset.i18nHtml]; if(v) el.innerHTML = v; });
+  renderFaq();
+  renderProdutos(prodCache, filtroAtual);
+  // Atualizar info do showcase
+  const infoEl = document.getElementById('showcase-info');
+  if (infoEl) {
+    const c = CAPAS[capaAtual];
+    const k = 'info' + lang.toUpperCase();
+    infoEl.textContent = c[k] || c.infoPT || '';
+  }
+}
+
+// ── Produtos ──────────────────────────────────────────────────────────────────
+const PROD_BASE = [
+  {
+    slug:'justicamento', cat:'reflexao', cor:'#0d2415', corCapa:'capa-justicamento',
+    titulo:{pt:'Justiça(mento) para Orelha',en:'Justice For Your Ears',es:'Justicia(mento) para el Oído'},
+    genero:{pt:'Ensaio · Entrada',en:'Essay · Entry',es:'Ensayo · Entrada'},
+    desc:{pt:'Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.',en:'An essay on justice, language and power. For those who question what they hear before repeating it.',es:'Un ensayo sobre justicia, lenguaje y poder.'},
+    preco:'R$15,35',cotas:1,autor:'Said Anes',
+    pc:{pt:'Sorteio · participação após D+7',en:'Draw · participation after D+7',es:'Sorteo · participación tras D+7'}
+  },
+  {
+    slug:'vigilante', cat:'ficcao', cor:'#0d1926', corCapa:'capa-vigilante', premium:true,
+    titulo:{pt:'Vigilante',en:'Vigilante',es:'Vigilante'},
+    genero:{pt:'Ficção Literária · Premium',en:'Literary Fiction · Premium',es:'Ficción Literaria · Premium'},
+    desc:{pt:'Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão.',en:'A narrative about the line between justice and revenge. High-tension literary fiction.',es:'Una narrativa sobre el límite entre justicia y venganza. Ficción literaria de alta tensión.'},
+    preco:'R$76,74',cotas:10,autor:'Said Anes',
+    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
+  },
+  {
+    slug:'terceiraguerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-terceiraguerra', premium:true,
+    titulo:{pt:'O Nascimento Silencioso da 3ª Guerra Mundial',en:'The Silent Birth of WWIII',es:'El Nacimiento Silencioso de la 3ª GM'},
+    genero:{pt:'Ficção Documental · Premium',en:'Documentary Fiction · Premium',es:'Ficción Documental · Premium'},
+    desc:{pt:'Como guerras modernas acontecem sem disparos. Assustadoramente atual.',en:'How modern wars happen without a shot fired. Frighteningly current.',es:'Cómo las guerras modernas ocurren sin disparos. Aterradoramente actual.'},
+    preco:'R$76,74',cotas:10,autor:'Said Anes',
+    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
+  },
+  {
+    slug:'antifalencia', cat:'manuais', cor:'#101820', corCapa:'capa-antifalencia',
+    titulo:{pt:'O Guia Antifalência do Empreendedor Iniciante',en:'The Anti-Bankruptcy Guide for New Entrepreneurs',es:'La Guía Antiquiebra del Emprendedor Principiante'},
+    genero:{pt:'Manual · Intermediário',en:'Business Guide · Mid-tier',es:'Guía · Intermedio'},
+    desc:{pt:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio.',en:'The math nobody makes you do. Costs, pricing and break-even for survival.',es:'Las cuentas que nadie te obliga a hacer. Costos, precios y punto de equilibrio.'},
+    preco:'R$46,04',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · sorteio principal',en:'3 entries · main draw',es:'3 participaciones · sorteo principal'}
+  },
+];
+
+let prodCache = [...PROD_BASE];
+let filtroAtual = 'todos';
+
+function filtrar(btn, cat) {
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('ativo'));
   btn.classList.add('ativo');
-  document.querySelectorAll('.ebook-card').forEach(function(card){
-    var visivel=genero==='todos'||card.dataset.genero===genero;
-    card.style.display=visivel?'flex':'none';
-    if(visivel){
-      requestAnimationFrame(function(){card.style.opacity='1';card.style.transform='translateY(0)';});
-    }
+  filtroAtual = cat;
+  renderProdutos(prodCache, cat);
+}
+
+function renderProdutos(prods, filtro) {
+  const grid = document.getElementById('prod-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const l = langAtual;
+  const lista = filtro === 'todos' ? prods : prods.filter(p => p.cat === filtro);
+  const adqLabel = l === 'en' ? 'Get it →' : l === 'es' ? 'Obtener →' : 'Adquirir →';
+  const entregaLabel = l === 'en' ? 'Instant delivery' : l === 'es' ? 'Entrega inmediata' : 'Entrega imediata';
+  const cotaLabel = n => {
+    if (n === 1) return l === 'en' ? '1 entry' : l === 'es' ? '1 participación' : '1 cota';
+    return l === 'en' ? `${n} entries` : l === 'es' ? `${n} participaciones` : `${n} cotas`;
+  };
+  lista.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = `pcard fi${p.premium ? ' premium' : ''}`;
+    card.style.transitionDelay = `${i * 0.07}s`;
+    card.innerHTML = `
+      <div class="pcard-cor" style="background:${p.cor}"></div>
+      <div class="pcard-corpo">
+        <div class="pcard-capa-mini ${p.corCapa}" style="animation-delay:${i*0.4}s">
+          <div class="pcard-capa-mini-titulo">${p.titulo[l] || p.titulo.pt}</div>
+        </div>
+        <div class="pcard-genero">${p.genero[l] || p.genero.pt}</div>
+        <h3 class="pcard-t">${p.titulo[l] || p.titulo.pt}</h3>
+        <div class="pcard-autor">${p.autor}</div>
+        <p class="pcard-desc">${p.desc[l] || p.desc.pt}</p>
+      </div>
+      <div class="pcard-rodape">
+        <div>
+          <div class="pcard-preco">${p.preco}</div>
+          <div class="pcard-preco-sub">PDF · ${entregaLabel}</div>
+        </div>
+        <div class="pcard-dir">
+          <span class="cotas-badge">✦ ${cotaLabel(p.cotas)}</span>
+          <a href="/checkout.html?slug=${p.slug}" class="btn-adq">${adqLabel}</a>
+        </div>
+      </div>
+      <div class="pcard-pc">${p.pc[l] || p.pc.pt}</div>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => card.classList.add('vis'), 60 + i * 80);
   });
 }
 
-// ── FAQ ──
-function toggleFaq(item){
-  var aberto=item.classList.contains('aberto');
-  document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('aberto');});
-  if(!aberto)item.classList.add('aberto');
-}
-
-// ── SIMULADOR MULTIPLICADOR ──
-var PESOS_HOME={whatsapp:25,instagram:25,facebook:20,tiktok:15,youtube:15};
-var redesSelecionadas={};
-
-function toggleRedeHome(el,rede){
-  redesSelecionadas[rede]=!redesSelecionadas[rede];
-  el.classList.toggle('on',redesSelecionadas[rede]);
-  calcularSimHome();
-  atualizarEscada();
-}
-
-function calcularSimHome(){
-  var pct=0;
-  Object.keys(redesSelecionadas).forEach(function(r){if(redesSelecionadas[r]&&PESOS_HOME[r])pct+=PESOS_HOME[r];});
-  var mult=Math.min(1+(pct/50),3);
-  var val=mult.toFixed(1).replace(/\.0$/,'');
-  var el=document.getElementById('simResultadoHome');
-  if(el)el.textContent=val+'× cotas';
-}
-
-function atualizarEscada(){
-  var qtd=Object.values(redesSelecionadas).filter(Boolean).length;
-  document.querySelectorAll('#multPremio .mult-degrau, .mult-escada .mult-degrau').forEach(function(d,i){
-    d.classList.toggle('ativo',i<=qtd);
-  });
-}
-
-// ── META / PROGRESSO ──
-// META_TOTAL é lido do banco (draws.meta_valor) em carregarProgresso()
-// O valor aqui é apenas fallback visual temporário enquanto a API carrega
-var META_TOTAL=0;  // será sobrescrito pela API
-var ARRECADADO_FALLBACK=0;
-var FRASES={
-  pt:[
-    {frase:'A comunidade está <em>se formando.</em>',sub:'Cada leitor que chega nos aproxima da premiação. Faça parte agora.'},
-    {frase:'Já reunimos <em>parte da nossa comunidade.</em>',sub:'A premiação ocorre quando atingirmos nossa meta.'},
-    {frase:'Estamos a <em>um quarto do caminho.</em>',sub:'Falta pouco para chegarmos à metade. Cada ebook adquirido conta.'},
-    {frase:'Metade da comunidade <em>já está reunida.</em>',sub:'Estamos na segunda metade da jornada. A premiação se aproxima.'},
-    {frase:'<em>Falta pouco</em> para a premiação.',sub:'A comunidade está quase completa.'},
-    {frase:'Estamos <em>na reta final.</em>',sub:'Já estamos a menos de 10% da premiação. Não fique de fora.'},
-    {frase:'A comunidade está <em>completa. Premiação garantida!</em>',sub:'Parabéns a todos os participantes.'}
+// ── FAQ ───────────────────────────────────────────────────────────────────────
+const FAQ = {
+  pt: [
+    {q:'O que é o Programa Cultural?',r:'É um concurso cultural onde você adquire um ebook, lê, escreve um depoimento genuíno e concorre a prêmios em dinheiro. A participação depende de habilidade real (leitura e depoimento autêntico), nos termos da legislação de concursos culturais (Lei 5.768/71). O vencedor é determinado pelo Sistema Loteria TT com auditoria pública.'},
+    {q:'Como recebo meu ebook?',r:'Imediatamente após a confirmação do pagamento, você recebe o arquivo PDF por e-mail (sac@3trevo.com.br) e por WhatsApp, automaticamente. Junto você recebe o seu link de participação no Programa Cultural.'},
+    {q:'Por que preciso esperar 7 dias para participar?',r:'O prazo garante tempo suficiente para leitura antes do depoimento, e coincide com o prazo legal de arrependimento do CDC para compras digitais — protegendo a integridade do programa.'},
+    {q:'Posso participar comprando qualquer título?',r:'Sim. Todos os títulos do catálogo participam. Ebooks de entrada têm 1 cota, intermediários 3 cotas, premium 10 cotas. Cada título gera uma participação independente — você pode acumular cotas adquirindo múltiplos títulos.'},
+    {q:'O que é um depoimento válido?',r:'Um texto (mín. 40 caracteres) que demonstre leitura genuína do conteúdo — o que você aprendeu, o que te impactou, como o livro se relaciona com sua realidade. Textos genéricos ou copiados são automaticamente reprovados. Você pode tentar novamente se for reprovado.'},
+    {q:'Como funciona o Sistema Loteria TT?',r:'O Sistema Loteria TT apura o vencedor de forma automática e certificada. Todo o processo é registrado com hash SHA-256 para auditoria pública verificável após cada rodada. O resultado é imutável e transparente.'},
+    {q:'Quando começam os sorteios?',r:'O sistema está integralmente construído e testado. Os sorteios iniciam após a conclusão do processo de habilitação legal. As cotas adquiridas agora permanecem válidas para todas as rodadas.'},
+    {q:'Posso pedir reembolso?',r:'Sim. Nos termos do art. 49 do CDC, você tem 7 dias corridos após a compra para solicitar reembolso integral. Entre em contato pelo sac@3trevo.com.br. Atenção: ao exercer o direito de arrependimento, você é automaticamente desclassificado do Programa Cultural.'},
   ],
-  en:[
-    {frase:'The community is <em>forming.</em>',sub:'Every reader brings us closer to the draw. Join now.'},
-    {frase:'Part of our community <em>is already here.</em>',sub:'The draw happens when we reach our goal.'},
-    {frase:'A <em>quarter of the way there.</em>',sub:'Almost halfway. Every ebook purchased counts.'},
-    {frase:'Half the community <em>has gathered.</em>',sub:'In the second half of the journey. The draw approaches.'},
-    {frase:'<em>Almost there</em> — the draw is near.',sub:'The community is almost complete.'},
-    {frase:'In the <em>final stretch.</em>',sub:'Less than 10% to go. Do not miss out.'},
-    {frase:'Community complete. <em>Draw confirmed!</em>',sub:'Congratulations to all participants.'}
+  en: [
+    {q:'What is the Cultural Program?',r:'A cultural contest where you buy an ebook, read it, write a genuine review, and compete for cash prizes. Participation requires real skill (genuine reading and authentic review), per Brazilian cultural contest law (5.768/71). The winner is determined by the Loteria TT System with public audit.'},
+    {q:'How do I receive my ebook?',r:'Immediately after payment confirmation, you receive the PDF by email (sac@3trevo.com.br) and WhatsApp, automatically.'},
+    {q:'Why wait 7 days?',r:'The period ensures enough time for reading before the review, and coincides with the legal consumer withdrawal period for digital purchases.'},
+    {q:'Can I participate by buying any title?',r:'Yes. All catalog titles participate. Entry titles: 1 entry. Mid-tier: 3 entries. Premium: 10 entries. You can accumulate entries by buying multiple titles.'},
+    {q:'What is a valid review?',r:'Text (min. 40 characters) demonstrating genuine reading — what you learned, what impacted you. Generic or copied texts are automatically rejected.'},
+    {q:'How does the Loteria TT System work?',r:'The Loteria TT System determines the winner automatically and in a certified manner. The entire process is recorded with a SHA-256 hash for verifiable public audit after each round.'},
+    {q:'When do draws start?',r:'The system is fully built and tested. Draws begin after legal certification is complete. Entries purchased now remain valid for all rounds.'},
+    {q:'Can I get a refund?',r:'Yes. You have 7 calendar days to request a full refund. Note: exercising the right of withdrawal disqualifies you from the Cultural Program.'},
   ],
-  es:[
-    {frase:'La comunidad está <em>formándose.</em>',sub:'Cada lector nos acerca a la premiación. Únete ahora.'},
-    {frase:'Parte de nuestra comunidad <em>ya está aquí.</em>',sub:'La premiación ocurre cuando alcancemos nuestra meta.'},
-    {frase:'Estamos a <em>un cuarto del camino.</em>',sub:'Casi a la mitad. Cada ebook adquirido cuenta.'},
-    {frase:'La mitad de la comunidad <em>ya está reunida.</em>',sub:'En la segunda mitad del viaje. La premiación se acerca.'},
-    {frase:'<em>Falta poco</em> para la premiación.',sub:'La comunidad está casi completa.'},
-    {frase:'Estamos en <em>la recta final.</em>',sub:'Menos del 10% para la premiación. No te quedes fuera.'},
-    {frase:'¡Comunidad completa. <em>Premiación garantizada!</em>',sub:'Felicidades a todos los participantes.'}
+  es: [
+    {q:'¿Qué es el Programa Cultural?',r:'Un concurso cultural donde compras un ebook, lo lees, escribes un testimonio genuino y compites por premios en efectivo. El ganador es determinado por el Sistema Lotería TT con auditoría pública.'},
+    {q:'¿Cómo recibo mi ebook?',r:'Inmediatamente tras la confirmación del pago, recibes el PDF por e-mail y WhatsApp automáticamente.'},
+    {q:'¿Por qué esperar 7 días?',r:'El plazo garantiza tiempo suficiente para leer antes de escribir el testimonio, y coincide con el plazo legal de arrepentimiento para compras digitales.'},
+    {q:'¿Puedo participar con cualquier título?',r:'Sí. Todos los títulos participan. Entrada: 1 participación. Intermedio: 3. Premium: 10. Puedes acumular comprando múltiples títulos.'},
+    {q:'¿Qué es un testimonio válido?',r:'Un texto (mín. 40 caracteres) que demuestre lectura genuina del contenido. Los textos genéricos son rechazados automáticamente.'},
+    {q:'¿Cómo funciona el Sistema Lotería TT?',r:'El Sistema Lotería TT determina el ganador de forma automática y certificada. El proceso queda registrado con hash SHA-256 para auditoría pública verificable.'},
+    {q:'¿Cuándo empiezan los sorteos?',r:'El sistema está completamente construido y probado. Los sorteos inician tras la certificación legal. Las participaciones adquiridas ahora son válidas para todas las rondas.'},
+    {q:'¿Puedo pedir reembolso?',r:'Sí. Tienes 7 días naturales para solicitar reembolso total. Nota: el desistimiento te descalifica del Programa Cultural.'},
   ]
 };
 
-function fraseParaPercentual(pct){
-  var f=FRASES[idioma]||FRASES.pt;
-  if(pct>=100)return f[6];if(pct>=90)return f[5];if(pct>=75)return f[4];
-  if(pct>=50)return f[3];if(pct>=25)return f[2];if(pct>=10)return f[1];
-  return f[0];
+function renderFaq() {
+  const lista = document.getElementById('faq-lista');
+  if (!lista) return;
+  lista.innerHTML = '';
+  (FAQ[langAtual] || FAQ.pt).forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'faq-item fi';
+    div.innerHTML = `
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        <span class="faq-p">${item.q}</span>
+        <span class="faq-ic">+</span>
+      </button>
+      <div class="faq-r">${item.r}</div>
+    `;
+    lista.appendChild(div);
+    setTimeout(() => div.classList.add('vis'), 50);
+  });
 }
 
-function renderizarMeta(arrecadado){
-  var pct=Math.min((arrecadado/META_TOTAL)*100,100);
-  document.getElementById('barraProgresso').style.width=pct+'%';
-  var f=fraseParaPercentual(pct);
-  document.getElementById('metaFrase').innerHTML=f.frase;
-  document.getElementById('metaFraseSub').textContent=f.sub;
-  ['marca0','marca25','marca50','marca75','marca100'].forEach(function(id,i){
-    var el=document.getElementById(id);
-    if(el)el.classList.toggle('ativa',pct>=[0,25,50,75,100][i]);
-  });
-  var ativo=pct>=100?5:pct>=75?4:pct>=50?3:pct>=25?2:1;
-  for(var i=1;i<=5;i++){
-    var d=document.getElementById('degrauMeta'+i);
-    if(!d)continue;
-    d.classList.remove('ativo','concluido');
-    if(i===ativo)d.classList.add('ativo');
-    else if(i<ativo)d.classList.add('concluido');
-  }
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const was = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!was) item.classList.add('open');
 }
 
-async function carregarProgresso(){
-  try{
-    // Usa o Worker — retorna apenas progresso_pct, nunca expõe marcos internos
-    var r=await fetch('https://serie-tt.al-kbhal.workers.dev/api/serie');
-    var d=await r.json();
-    if(d&&d.ok){
-      // Progresso_pct já calculado pelo Worker (marcos são segredo comercial)
-      var pct=d.progresso_pct||0;
-      document.getElementById('barraProgresso').style.width=pct+'%';
-      var f=fraseParaPercentual(pct);
-      document.getElementById('metaFrase').innerHTML=f.frase;
-      document.getElementById('metaFraseSub').textContent=f.sub;
-      ['marca0','marca25','marca50','marca75','marca100'].forEach(function(id,i){
-        var el=document.getElementById(id);
-        if(el)el.classList.toggle('ativa',pct>=[0,25,50,75,100][i]);
-      });
-      var ativo=pct>=100?5:pct>=75?4:pct>=50?3:pct>=25?2:1;
-      for(var i=1;i<=5;i++){
-        var dg=document.getElementById('degrauMeta'+i);
-        if(!dg)continue;
-        dg.classList.remove('ativo','concluido');
-        if(i===ativo)dg.classList.add('ativo');
-        else if(i<ativo)dg.classList.add('concluido');
-      }
-    } else renderizarMeta(0);
-  }catch(e){renderizarMeta(0);}
+// ── Observer ──────────────────────────────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+function observeAll() {
+  document.querySelectorAll('.fi').forEach(el => { if (!el.classList.contains('vis')) obs.observe(el); });
 }
 
-var metaAtivada=false;
-function ativarMeta(){
-  if(metaAtivada)return;
-  metaAtivada=true;
-  carregarProgresso();
-}
+const barraObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ setTimeout(()=>{ const b=document.getElementById('barra-prog'); if(b) b.style.width='15%'; },400); barraObs.unobserve(e.target); } });
+}, { threshold: 0.5 });
 
-// ── INIT ──
-document.addEventListener('DOMContentLoaded',function(){
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  iniciarShowcase();
+  renderProdutos(PROD_BASE, 'todos');
+  renderFaq();
+  observeAll();
+  const b = document.getElementById('barra-prog');
+  if (b) barraObs.observe(b.parentElement);
 
-  // Mockups 3D
-  document.querySelectorAll('[data-mockup-cor]').forEach(function(el){
-    el.innerHTML=gerarMockup(
-      el.dataset.mockupCor,
-      el.dataset.mockupTitulo||'',
-      parseInt(el.dataset.mockupW)||80,
-      parseInt(el.dataset.mockupH)||110
-    );
-  });
-
-  // NAV scroll
-  var navbar=document.getElementById('navbar');
-  window.addEventListener('scroll',function(){
-    navbar.classList.toggle('scrolled',window.scrollY>60);
-  },{passive:true});
-
-  // Menu mobile
-  window.toggleMenu=function(){
-    var nav=document.getElementById('navMobile');
-    var btn=document.getElementById('menuBtn');
-    var aberto=nav.classList.toggle('aberto');
-    btn.setAttribute('aria-expanded',String(aberto));
-  };
-
-  // Scroll suave com offset da nav
-  document.querySelectorAll('a[href^="#"]').forEach(function(a){
-    a.addEventListener('click',function(e){
-      var id=a.getAttribute('href').slice(1);
-      var el=document.getElementById(id);
-      if(!el)return;
-      e.preventDefault();
-      var top=el.getBoundingClientRect().top+window.scrollY-70;
-      window.scrollTo({top:top,behavior:'smooth'});
-    });
-  });
-
-  // Reveal on scroll
-  var observer=new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        entry.target.classList.add('visivel');
-        if(entry.target.closest('#contador'))ativarMeta();
-      }
-    });
-  },{threshold:0.1});
-  window._revealObserver = observer;
-  document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
-
-  // Hero visível imediatamente
-  setTimeout(function(){
-    document.querySelectorAll('#inicio .reveal').forEach(function(el){el.classList.add('visivel');});
-  },100);
-
-  // Fechar menu ao pressionar Esc
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){
-      var nav=document.getElementById('navMobile');
-      if(nav.classList.contains('aberto')){
-        nav.classList.remove('aberto');
-        document.getElementById('menuBtn').setAttribute('aria-expanded','false');
-      }
-    }
-  });
-
-});
-</script>
-
-
-<script>
-/* ── DADOS DINÂMICOS DO BANCO ─────────────────────────────────
-   Lê catálogo e prêmios do Supabase a cada visita.
-   Somente leitura pública — sem dados sensíveis expostos.
-   ──────────────────────────────────────────────────────────── */
-(function() {
-  var SB = 'https://xfkepekffdyrtcgagwqo.supabase.co';
-  var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
-  var HDR = {'apikey': KEY, 'Authorization': 'Bearer '+KEY};
-
-
-  // ── Carregar banner promocional ───────────────────────────
-  async function carregarBanner() {
-    try {
-      var r = await fetch(SB+'/rest/v1/config?chave=eq.banner&select=valor', {headers: HDR});
-      var d = await r.json();
-      if (!d || !d[0] || !d[0].valor) return;
-      var b = d[0].valor;
-      if (!b.ativo) return;
-      if (b.expira_em && new Date(b.expira_em) < new Date()) return;
-      var el = document.getElementById('site-banner');
-      if (!el) return;
-      el.style.background = b.cor || '#1a4a2e';
-      var html = '<span class="banner-texto">' + (b.texto||'') + '</span>';
-      if (b.cta_texto && b.cta_url) {
-        html += '<a href="' + b.cta_url + '" class="banner-cta">' + b.cta_texto + '</a>';
-      }
-      html += '<button class="banner-fechar" onclick="this.parentElement.classList.remove(\'ativo\')" aria-label="Fechar">×</button>';
-      el.innerHTML = html;
-      el.classList.add('ativo');
-    } catch(e) { console.warn('Banner:', e); }
-  }
-
-  // ── Carregar hero text dinamicamente ──────────────────────
-  async function carregarHero() {
-    try {
-      var r = await fetch(SB+'/rest/v1/config?chave=eq.hero&select=valor', {headers: HDR});
-      var d = await r.json();
-      if (!d || !d[0] || !d[0].valor) return;
-      var h = d[0].valor;
-      if (h.titulo_pt) {
-        var elT = document.querySelector('h1.hero-titulo');
-        if (elT) { elT.textContent = h.titulo_pt; elT.setAttribute('data-pt', h.titulo_pt); }
-      }
-      if (h.subtitulo_pt) {
-        var elS = document.querySelector('.hero-subtitulo');
-        if (elS) { elS.textContent = h.subtitulo_pt; elS.setAttribute('data-pt', h.subtitulo_pt); }
-      }
-      if (h.desc_pt) {
-        var elD = document.querySelector('.hero-desc');
-        if (elD) { elD.textContent = h.desc_pt; elD.setAttribute('data-pt', h.desc_pt); }
-      }
-    } catch(e) { console.warn('Hero:', e); }
-  }
-
-  // ── Carregar FAQ dinamicamente ─────────────────────────────
-  async function carregarFaq() {
-    try {
-      var r = await fetch(SB+'/rest/v1/config?chave=eq.faq&select=valor', {headers: HDR});
-      var d = await r.json();
-      if (!d || !d[0] || !Array.isArray(d[0].valor) || !d[0].valor.length) return;
-      var itens = d[0].valor;
-      var grid = document.getElementById('faqGrid');
-      if (!grid) return;
-      // visivel direto — items dinâmicos não passam pelo IntersectionObserver
-      grid.innerHTML = itens.map(function(item) {
-        return '<div class="faq-item reveal visivel" onclick="toggleFaq(this)">' +
-          '<div class="faq-pergunta"><span>' + escapeHtml(item.p||'') + '</span><span class="faq-icone" aria-hidden="true">+</span></div>' +
-          '<div class="faq-resposta">' + escapeHtml(item.r||'') + '</div>' +
-          '</div>';
-      }).join('');
-    } catch(e) { console.warn('FAQ:', e); }
-  }
-  function escapeHtml(s) {
-    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── Carregar stats do hero dinamicamente ──────────────────
-  async function carregarStatsBanner() {
-    try {
-      // Worker retorna cotas, participantes e sorteio sem expor marcos
-      var rW = await fetch('https://serie-tt.al-kbhal.workers.dev/api/serie');
-      var w  = await rW.json();
-
-      if (w && w.ok) {
-        // Participantes reais
-        var elL = document.getElementById('statLeitores');
-        if (elL && w.participantes >= 0) elL.textContent = w.participantes;
-
-        // Prêmio do sorteio atual
-        var els2 = document.querySelectorAll('.hero-stats .stat-num');
-        if (els2[2] && w.sorteio_atual && w.sorteio_atual.premio)
-          els2[2].textContent = w.sorteio_atual.premio;
-      }
-
-      // Títulos = produtos ativos (via Supabase público)
-      var rT = await fetch(SB+'/rest/v1/products?ativo=eq.true&select=id', {
-        headers: Object.assign({}, HDR, {'Prefer': 'count=exact', 'Range': '0-0'})
-      });
-      var cT = rT.headers.get('Content-Range');
-      if (cT) {
-        var titulos = parseInt(cT.split('/')[1]);
-        var els = document.querySelectorAll('.hero-stats .stat-num');
-        if (els[1] && !isNaN(titulos) && titulos > 0) els[1].textContent = titulos;
-      }
-    } catch(e) { console.warn('Stats banner:', e); }
-  }
-
-  // ── Carregar meta/progresso dinamicamente ──────────────────
-  async function carregarMetaBanco() {
-    try {
-      var r = await fetch(SB+'/rest/v1/config?chave=eq.meta&select=valor', {headers: HDR});
-      var d = await r.json();
-      if (d && d[0] && d[0].valor) {
-        window._metaBanco = d[0].valor;
-      }
-    } catch(e) { console.warn('Meta banco:', e); }
-  }
-
-  // ── Carregar prêmios dinamicamente ─────────────────────────
-  async function carregarPremiosBanco() {
-    try {
-      var r = await fetch(SB+'/rest/v1/premios?ativo=eq.true&order=posicao.asc&select=posicao,descricao_pt,descricao_en,descricao_es,conectado_pt,conectado_en,conectado_es', {headers: HDR});
-      var premios = await r.json();
-      if (!premios || !premios.length) return;
-
-      // Atualizar painel de prêmios no DOM
-      var container = document.querySelector('.prog-premio');
-      if (!container) return;
-
-      // Remover itens antigos de prêmio
-      container.querySelectorAll('.premio-item').forEach(el => el.remove());
-
-      // Inserir novos do banco
-      var label = container.querySelector('.premio-label');
-      premios.forEach(function(p) {
-        var div = document.createElement('div');
-        div.className = 'premio-item';
-        div.innerHTML =
-          '<div class="premio-pos" aria-label="'+p.posicao+'° lugar">'+p.posicao+'°</div>'+
-          '<div>'+
-            '<div class="premio-val" data-pt="'+p.descricao_pt+'" data-en="'+(p.descricao_en||p.descricao_pt)+'" data-es="'+(p.descricao_es||p.descricao_pt)+'">'+p.descricao_pt+'</div>'+
-            (p.conectado_pt ? '<div class="premio-desc" style="color:var(--ouro-texto)" data-pt="Conectado: '+p.conectado_pt+'" data-en="Connected: '+(p.conectado_en||p.conectado_pt)+'" data-es="Conectado: '+(p.conectado_es||p.conectado_pt)+'">Conectado: '+p.conectado_pt+'</div>' : '')+
-          '</div>';
-        if (label && label.nextSibling) {
-          container.insertBefore(div, label.nextSibling);
-        } else {
-          container.appendChild(div);
+  // Enriquecer com Worker API
+  fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/public/catalogo')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!Array.isArray(data) || !data.length) return;
+      data.forEach(api => {
+        const local = PROD_BASE.find(p => p.slug === api.slug);
+        if (local) {
+          local.preco = 'R$' + parseFloat(api.preco).toFixed(2).replace('.',',');
+          local.cotas = api.cotas || local.cotas;
         }
       });
-    } catch(e) { console.warn('Prêmios banco:', e); }
-  }
-
-  // ── Carregar catálogo dinamicamente ───────────────────────
-  async function carregarCatalogoBanco() {
-    try {
-      var r = await fetch(SB+'/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,preco,cotas', {headers: HDR});
-      var livros = await r.json();
-      if (!livros || !livros.length) return;
-
-      // Atualizar preços e cotas dos cards com dados do banco
-      livros.forEach(function(livro) {
-        if (!livro.slug) return;
-        var url = '/checkout.html?slug=' + livro.slug;
-
-        // Encontrar o card pelo link existente e atualizar
-        document.querySelectorAll('.ebook-card').forEach(function(card) {
-          var btn = card.querySelector('.ebook-btn');
-          if (!btn || !btn.href || !btn.href.includes('slug='+livro.slug)) return;
-
-          // Atualizar onclick do card para checkout interno
-          card.onclick = function(e) {
-            if (!e.target.closest('a') && !e.target.closest('.ebook-btn'))
-              location.href = url;
-          };
-          // Atualizar botão adquirir
-          btn.href = url; btn.removeAttribute('target'); btn.removeAttribute('rel');
-          // Atualizar preço
-          var preco = card.querySelector('.ebook-preco');
-          if (preco && livro.preco) preco.textContent = 'R$'+parseFloat(livro.preco).toFixed(2).replace('.',',');
-          // Atualizar cotas
-          var cotas = card.querySelector('.ebook-cotas');
-          if (cotas && livro.cotas) cotas.textContent = livro.cotas + (livro.cotas==1?' cota inclusa':' cotas inclusas');
-        });
-      });
-    } catch(e) { console.warn('Catálogo banco:', e); }
-  }
-
-  async function carregarDepoimentos() {
-    var grid = document.getElementById('depGrid');
-    var secao = document.getElementById('depoimentos');
-    if (!grid) return;
-    try {
-      var r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/public/depoimentos');
-      if (!r.ok) throw new Error('upstream ' + r.status);
-      var lista = await r.json();
-      if (!Array.isArray(lista) || !lista.length) {
-        if (secao) secao.style.display = 'none';
-        return;
-      }
-      lista.slice(0, 3).forEach(function(dep, i) {
-        var card = document.createElement('div');
-        card.className = 'dep-card reveal';
-        if (i > 0) card.style.transitionDelay = (i * 0.1) + 's';
-        card.innerHTML =
-          '<div class="dep-aspas" aria-hidden="true">“</div>' +
-          '<p class="dep-texto">' + escHtml(dep.texto) + '</p>' +
-          '<div class="dep-autor">' + escHtml(dep.nome_autor || 'Leitor') + '</div>' +
-          (dep.ebook_slug ? '<div class="dep-livro">' + escHtml(dep.ebook_slug) + '</div>' : '');
-        grid.appendChild(card);
-      });
-      // reativar observer para novos cards
-      if (window._revealObserver) {
-        grid.querySelectorAll('.reveal').forEach(function(el) { window._revealObserver.observe(el); });
-      }
-    } catch(e) {
-      if (secao) secao.style.display = 'none';
-      console.warn('Depoimentos:', e);
-    }
-  }
-
-  function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // Executar após DOM pronto
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      carregarBanner();
-      carregarHero();
-      carregarFaq();
-      carregarStatsBanner();
-      carregarMetaBanco();
-      carregarPremiosBanco();
-      carregarCatalogoBanco();
-      carregarDepoimentos();
-    });
-  } else {
-    carregarBanner();
-    carregarHero();
-    carregarFaq();
-    carregarMetaBanco();
-    carregarPremiosBanco();
-    carregarCatalogoBanco();
-    carregarDepoimentos();
-  }
-})();
+      prodCache = [...PROD_BASE];
+      renderProdutos(prodCache, filtroAtual);
+    })
+    .catch(() => {});
+});
 </script>
-
-<script src="/js/player.js"></script>
-<script>
-// Abrir player automaticamente após 40% de scroll
-window.addEventListener('scroll', function() {
-  if (window.TTPlayer && !window.TTPlayer.isPlaying()) {
-    var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-    if (pct > 0.4) {
-      window.TTPlayer.show();
-      window.removeEventListener('scroll', arguments.callee);
-    }
-  }
-}, { passive: true });
-</script>
-
 </body>
 </html>

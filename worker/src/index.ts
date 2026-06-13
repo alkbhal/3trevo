@@ -22,6 +22,31 @@ import {
   handleModerar,
 } from './routes/apuracao';
 import { handleCronLF } from './cron/lf-apuracao';
+import {
+  handleAdminCatalogoGet,
+  handleAdminCatalogoCreate,
+  handleAdminCatalogoUpdate,
+  handleAdminCatalogoDelete,
+} from './routes/admin-catalog';
+import {
+  handleHeroConfigGet,
+  handleHeroConfigPut,
+} from './routes/admin-hero';
+import { handleAiStudio } from './routes/admin-ai-studio';
+import {
+  handleAdminDepoimentosList,
+  handleAdminDepoimentoUpdate,
+} from './routes/admin-depoimentos-ext';
+import {
+  handleHealthBasic,
+  handleHealthStatus,
+  handleAdminHealth,
+  handleAdminHealthLog,
+  logError,
+  registrarFalhaLogin,
+  registrarFalhaHMAC,
+} from './routes/health';
+import { handleHealthMonitor } from './cron/health-monitor';
 
 // ─── CORS helper ──────────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
@@ -67,27 +92,22 @@ export default {
 
     // ── Rotas públicas ─────────────────────────────────────────────────────
     if (path === '/health' || path === '/') {
-      return json({ ok: true, version: '2.0.0', ts: new Date().toISOString() });
+      return handleHealthBasic();
     }
 
-    // Depoimentos aprovados (leitura pública)
+    if (path === '/api/health/status' && method === 'GET') {
+      return handleHealthStatus(env);
+    }
+
+    // Depoimentos públicos (aprovados — para o site)
     if (path === '/api/public/depoimentos' && method === 'GET') {
-      const resp = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/depoimentos?estado=eq.aprovado&order=criado_em.desc&limit=10&select=texto,nome_autor,ebook_slug`,
-        {
-          headers: {
-            apikey: env.SUPABASE_SERVICE_KEY,
-            Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-          },
-        }
+      const r = await fetch(
+        `${env.SUPABASE_URL}/rest/v1/depoimentos?estado=eq.aprovado&order=aprovado_em.desc&limit=20&select=id,texto,nome,slug`,
+        { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
       );
-      const data = await resp.json();
+      const data = await r.json();
       return new Response(JSON.stringify(data), {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Cache-Control': 'public, max-age=600',
-          ...corsHeaders(origin),
-        },
+        headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=120', ...corsHeaders(origin) },
       });
     }
 
@@ -158,16 +178,65 @@ export default {
       return handleAdminStats(request, env);
     }
 
+    // ── Admin Catálogo ─────────────────────────────────────────────────────
+    if (path === '/api/admin/catalogo' && method === 'GET') {
+      return handleAdminCatalogoGet(request, env);
+    }
+    if (path === '/api/admin/catalogo' && method === 'POST') {
+      return handleAdminCatalogoCreate(request, env);
+    }
+    if (path.startsWith('/api/admin/catalogo/') && method === 'PUT') {
+      const slug = path.replace('/api/admin/catalogo/', '');
+      return handleAdminCatalogoUpdate(request, env, slug);
+    }
+    if (path.startsWith('/api/admin/catalogo/') && method === 'DELETE') {
+      const slug = path.replace('/api/admin/catalogo/', '');
+      return handleAdminCatalogoDelete(request, env, slug);
+    }
+
+    // ── Admin Hero Config ──────────────────────────────────────────────────
+    if (path === '/api/admin/hero-config' && method === 'GET') {
+      return handleHeroConfigGet(request, env);
+    }
+    if (path === '/api/admin/hero-config' && method === 'PUT') {
+      return handleHeroConfigPut(request, env);
+    }
+
+    // ── Admin IA Studio ────────────────────────────────────────────────────
+    if (path === '/api/admin/ai-studio' && method === 'POST') {
+      return handleAiStudio(request, env);
+    }
+
+    // ── Admin Depoimentos extendidos ───────────────────────────────────────
+    if (path === '/api/admin/depoimentos' && method === 'GET') {
+      return handleAdminDepoimentosList(request, env);
+    }
+    if (path.startsWith('/api/admin/depoimentos/') && method === 'PATCH') {
+      const id = path.replace('/api/admin/depoimentos/', '');
+      return handleAdminDepoimentoUpdate(request, env, id);
+    }
+
     // ── 404 ────────────────────────────────────────────────────────────────
+    // ── Admin Health ───────────────────────────────────────────────────────
+    if (path === '/api/admin/health' && method === 'GET') {
+      return handleAdminHealth(request, env);
+    }
+    if (path === '/api/admin/health/log' && method === 'GET') {
+      return handleAdminHealthLog(request, env);
+    }
+
     return json({ ok: false, erro: 'rota_nao_encontrada', path }, 404, origin);
   },
 
   // Cron triggers
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
     console.log(`[cron] disparado: ${event.cron}`);
-    // "0 23 * * 5" = sextas às 23:00 UTC (20:00 BRT)
     if (event.cron === '0 23 * * 5') {
       ctx.waitUntil(handleCronLF(env));
+    }
+    // Health monitor — toda hora
+    if (event.cron === '0 * * * *') {
+      ctx.waitUntil(handleHealthMonitor(env));
     }
   },
 };
@@ -180,15 +249,16 @@ async function handleAdminLogin(request: Request, env: Env): Promise<Response> {
   const { pin } = body ?? {};
   if (!pin) return Response.json({ ok: false }, { status: 400 });
 
-  // Rate limit: máx 5 tentativas por IP por hora
+  // Rate limit: 5 tentativas/IP/hora
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  const rlKey = `rl:login:${ip}`;
   if (env.TT_KV) {
-    const rlKey = `rl:admin-login:${ip}:${Math.floor(Date.now() / 3600000)}`;
-    const count = parseInt((await env.TT_KV.get(rlKey)) ?? '0', 10);
-    if (count >= 5) {
+    const attempts = parseInt((await env.TT_KV.get(rlKey)) ?? '0', 10);
+    if (attempts >= 5) {
+      await registrarFalhaLogin(env, ip);
       return Response.json({ ok: false, erro: 'muitas_tentativas' }, { status: 429 });
     }
-    await env.TT_KV.put(rlKey, String(count + 1), { expirationTtl: 7200 });
+    await env.TT_KV.put(rlKey, String(attempts + 1), { expirationTtl: 3600 });
   }
 
   const pinHash = await sha256(pin);
@@ -204,7 +274,10 @@ async function handleAdminLogin(request: Request, env: Env): Promise<Response> {
     }
   );
   const users = (await userResp.json()) as any[];
-  if (!users.length) return Response.json({ ok: false, erro: 'pin_invalido' }, { status: 401 });
+  if (!users.length) {
+    await registrarFalhaLogin(env, ip);
+    return Response.json({ ok: false, erro: 'pin_invalido' }, { status: 401 });
+  }
 
   // Criar sessão
   const sessaoResp = await fetch(`${env.SUPABASE_URL}/rest/v1/admin_sessoes`, {
