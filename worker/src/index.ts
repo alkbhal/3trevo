@@ -102,7 +102,7 @@ export default {
     // Depoimentos públicos (aprovados — para o site)
     if (path === '/api/public/depoimentos' && method === 'GET') {
       const r = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/depoimentos?estado=eq.aprovado&order=aprovado_em.desc&limit=20&select=id,texto,nome,slug`,
+        `${env.SUPABASE_URL}/rest/v1/depoimentos?estado=eq.aprovado&order=criado_em.desc&limit=20&select=id,texto,nome:nome_autor,slug:ebook_slug`,
         { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
       );
       const data = await r.json();
