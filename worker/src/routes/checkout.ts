@@ -104,6 +104,25 @@ async function enviarEmailDownload(
             Acessar participação →
           </a>
         </td></tr></table>
+
+        <!-- Biblioteca Clássica -->
+        <hr style="border:none;border-top:1px solid #e8e8e4;margin:32px 0;">
+        <p style="color:#0f2d1a;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin:0 0 12px;">
+          📚 Biblioteca Clássica TT
+        </p>
+        <p style="color:#4a4a4a;font-size:15px;line-height:1.7;margin:0 0 20px;">
+          Sua compra inclui acesso à Biblioteca Clássica TT — um acervo exclusivo de clássicos
+          da literatura brasileira em domínio público. Leia Dom Casmurro, Memórias Póstumas e muito mais,
+          com leitor integrado e até 3 leituras simultâneas.
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding-bottom:8px;">
+          <a href="https://3trevo.com.br/minha-biblioteca.html"
+             style="display:inline-block;background:#0f2d1a;color:#c9a84c;text-decoration:none;
+                    padding:13px 32px;border-radius:3px;font-size:14px;">
+            Acessar minha biblioteca →
+          </a>
+        </td></tr></table>
+        <p style="color:#888;font-size:12px;text-align:center;margin:8px 0 0;">Use o email desta compra para entrar.</p>
       </td></tr>
 
       <!-- Rodapé -->
