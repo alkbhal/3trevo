@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net sdk.mercadopago.com; connect-src 'self' *.supabase.co *.mercadopago.com api.resend.com serie-tt.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co; media-src 'self' blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev serie-tt.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co; media-src 'self' blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
 <title>Editora Três Trevo — Literatura, Conhecimento e Cultura | Montauri RS</title>
 <meta name="description" content="Editora digital independente de Montauri/RS. Ebooks de ficção, ensaio e negócios. Programa Cultural com prêmios em dinheiro. Adquira, leia e concorra.">
 <meta name="keywords" content="editora digital, ebooks brasileiros, programa cultural, concurso literário, Said Anes, Montauri RS">
@@ -871,26 +871,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
     <div class="sec-label" data-pt="O que dizem os leitores" data-en="What readers say" data-es="Qué dicen los lectores">O que dizem os leitores</div>
     <h2 class="sec-titulo"><em data-pt="Depoimentos" data-en="Reviews" data-es="Testimonios">Depoimentos</em></h2>
   </div>
-  <div class="dep-grid">
-    <div class="dep-card reveal">
-      <div class="dep-aspas" aria-hidden="true">"</div>
-      <p class="dep-texto" data-pt="Mudou a forma como leio notícias. Passei a questionar antes de compartilhar. Um texto denso que exige — e merece — releitura." data-en="It changed how I read the news. I started questioning before sharing. A dense text that demands — and deserves — rereading." data-es="Cambió la forma en que leo noticias. Empecé a cuestionar antes de compartir.">Mudou a forma como leio notícias. Passei a questionar antes de compartilhar. Um texto denso que exige — e merece — releitura.</p>
-      <div class="dep-autor">Maria S.</div>
-      <div class="dep-livro">Justiça(mento) para Orelha</div>
-    </div>
-    <div class="dep-card reveal" style="transition-delay:.1s">
-      <div class="dep-aspas" aria-hidden="true">"</div>
-      <p class="dep-texto" data-pt="Finalmente alguém explicou ponto de equilíbrio sem enrolação. Fiz a conta do meu negócio ainda lendo o capítulo 4." data-en="Finally someone explained break-even without the fluff. I ran my business numbers while reading chapter 4." data-es="Por fin alguien explicó el punto de equilibrio sin rodeos. Hice las cuentas de mi negocio leyendo el capítulo 4.">Finalmente alguém explicou ponto de equilíbrio sem enrolação. Fiz a conta do meu negócio ainda lendo o capítulo 4.</p>
-      <div class="dep-autor">Paulo M.</div>
-      <div class="dep-livro" data-pt="Guia Antifalência Vol.1" data-en="Anti-Bankruptcy Guide Vol.1" data-es="Guía Antifalencia Vol.1">Guia Antifalência Vol.1</div>
-    </div>
-    <div class="dep-card reveal" style="transition-delay:.2s">
-      <div class="dep-aspas" aria-hidden="true">"</div>
-      <p class="dep-texto" data-pt="Assustadoramente atual. Parece que o autor está descrevendo o que acontece hoje nas manchetes. Leitura obrigatória." data-en="Frighteningly current. It feels like the author is describing today's headlines. Required reading." data-es="Aterradoramente actual. Parece que el autor está describiendo lo que pasa hoy en los titulares.">Assustadoramente atual. Parece que o autor está descrevendo o que acontece hoje nas manchetes. Leitura obrigatória.</p>
-      <div class="dep-autor">Ana P.</div>
-      <div class="dep-livro" data-pt="O Nascimento Silencioso da 3ª GM" data-en="The Silent Birth of WWIII" data-es="El Nacimiento Silencioso de la 3ª GM">O Nascimento Silencioso da 3ª GM</div>
-    </div>
-  </div>
+  <div class="dep-grid" id="depGrid"></div>
 </section>
 
 <div class="divisor" aria-hidden="true"></div>
@@ -1252,6 +1233,7 @@ document.addEventListener('DOMContentLoaded',function(){
       }
     });
   },{threshold:0.1});
+  window._revealObserver = observer;
   document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
 
   // Hero visível imediatamente
@@ -1462,6 +1444,43 @@ document.addEventListener('DOMContentLoaded',function(){
     } catch(e) { console.warn('Catálogo banco:', e); }
   }
 
+  async function carregarDepoimentos() {
+    var grid = document.getElementById('depGrid');
+    var secao = document.getElementById('depoimentos');
+    if (!grid) return;
+    try {
+      var r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/public/depoimentos');
+      if (!r.ok) throw new Error('upstream ' + r.status);
+      var lista = await r.json();
+      if (!Array.isArray(lista) || !lista.length) {
+        if (secao) secao.style.display = 'none';
+        return;
+      }
+      lista.slice(0, 3).forEach(function(dep, i) {
+        var card = document.createElement('div');
+        card.className = 'dep-card reveal';
+        if (i > 0) card.style.transitionDelay = (i * 0.1) + 's';
+        card.innerHTML =
+          '<div class="dep-aspas" aria-hidden="true">“</div>' +
+          '<p class="dep-texto">' + escHtml(dep.texto) + '</p>' +
+          '<div class="dep-autor">' + escHtml(dep.nome_autor || 'Leitor') + '</div>' +
+          (dep.ebook_slug ? '<div class="dep-livro">' + escHtml(dep.ebook_slug) + '</div>' : '');
+        grid.appendChild(card);
+      });
+      // reativar observer para novos cards
+      if (window._revealObserver) {
+        grid.querySelectorAll('.reveal').forEach(function(el) { window._revealObserver.observe(el); });
+      }
+    } catch(e) {
+      if (secao) secao.style.display = 'none';
+      console.warn('Depoimentos:', e);
+    }
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   // Executar após DOM pronto
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
@@ -1472,6 +1491,7 @@ document.addEventListener('DOMContentLoaded',function(){
       carregarMetaBanco();
       carregarPremiosBanco();
       carregarCatalogoBanco();
+      carregarDepoimentos();
     });
   } else {
     carregarBanner();
@@ -1480,6 +1500,7 @@ document.addEventListener('DOMContentLoaded',function(){
     carregarMetaBanco();
     carregarPremiosBanco();
     carregarCatalogoBanco();
+    carregarDepoimentos();
   }
 })();
 </script>

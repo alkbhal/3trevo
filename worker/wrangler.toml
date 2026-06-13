@@ -10,3 +10,8 @@ SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 [[r2_buckets]]
 binding = "FORGE_STORAGE"
 bucket_name = "forge-storage"
+
+# Cron: verifica draws pendentes toda sexta as 22h BRT (01:00 UTC sabado)
+# Alerta admin se houver rodadas abertas com data de apuracao vencida
+[triggers]
+crons = ["0 1 * * 6"]

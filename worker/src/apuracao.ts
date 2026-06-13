@@ -127,6 +127,32 @@ export async function handleApuracao(env: Env, req: Request): Promise<Response> 
 
   console.log(`[APURACAO] draw=${draw_id} lf=${lf_concurso} cota=${cota_vencedora} emitida=${cota_emitida} hash=${payloadHash}`);
 
+  // Notificar vencedor por email
+  if (cota_emitida && vencedor_user_id && env.RESEND_API_KEY) {
+    try {
+      const perfilRows = await sbGet(env, `profiles?id=eq.${vencedor_user_id}&select=email,full_name`);
+      const vencedorPerfil = perfilRows[0] as { email?: string; full_name?: string } | undefined;
+      const drawRows = await sbGet(env, `draws?id=eq.${draw_id}&select=titulo`);
+      const drawTitulo = (drawRows[0] as { titulo?: string } | undefined)?.titulo || draw_id;
+
+      if (vencedorPerfil?.email) {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${env.RESEND_API_KEY}` },
+          body: JSON.stringify({
+            from: 'Editora Tres Trevo <sac@3trevo.com.br>',
+            to: [vencedorPerfil.email],
+            subject: `Voce venceu o Programa Cultural — ${drawTitulo}`,
+            html: `<p>Ola, ${vencedorPerfil.full_name || 'participante'}!</p><p>Sua cota <strong>${cota_vencedora}</strong> foi sorteada na rodada <strong>${drawTitulo}</strong> (Loteria Federal n. ${lf_concurso}).</p><p>Nossa equipe entrara em contato em breve para entregar o premio. Em caso de duvidas: sac@3trevo.com.br</p><p>Resultado auditavel publicamente em: https://www.3trevo.com.br/auditoria-sorteio.html</p>`,
+          }),
+        });
+        console.log(`[APURACAO] email vencedor enviado para ${vencedorPerfil.email}`);
+      }
+    } catch (emailErr) {
+      console.warn('[APURACAO] falha ao enviar email vencedor:', emailErr);
+    }
+  }
+
   return corsResponse({
     ok: true,
     draw_id,

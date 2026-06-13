@@ -176,12 +176,12 @@ footer {
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// Registrar acesso ao ebook (webhook Make.com)
-const WEBHOOK = 'SEU_WEBHOOK_AQUI';
+// Registrar acesso ao ebook via Worker
+const WEBHOOK = '';
 const params = new URLSearchParams(window.location.search);
 const pedido = params.get('pedido') || 'direto';
 
-if (WEBHOOK !== 'SEU_WEBHOOK_AQUI') {
+if (WEBHOOK !== '') {
   fetch(WEBHOOK, {
     method: 'POST',
     headers: { 'Content-Typ

@@ -456,6 +456,10 @@ audio{width:100%;margin-top:10px;filter:invert(.8) hue-rotate(120deg)}
           <div class="secao-titulo">Dashboard</div>
           <div class="secao-sub">Visão geral da plataforma</div>
         </div>
+        <div id="banner-migracao" style="display:none;background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.3);padding:14px 18px;margin-bottom:16px;border-radius:6px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <span style="color:rgba(200,168,75,.9);font-size:13px;flex:1">⚠ Tabelas de créditos Loteria-TT não encontradas no banco.</span>
+          <button class="btn btn-ouro btn-sm" onclick="executarMigracao()">Verificar / Migrar</button>
+        </div>
         <div class="stat-grid" id="stat-grid">
           <div class="stat-card"><div class="stat-icon">◻</div><div class="stat-label">Produtos Ativos</div><div class="stat-valor" id="st-produtos">—</div><div class="stat-sub">publicados</div></div>
           <div class="stat-card"><div class="stat-icon">◇</div><div class="stat-label">Rodadas Abertas</div><div class="stat-valor" id="st-rodadas">—</div><div class="stat-sub">em andamento</div></div>
@@ -1639,6 +1643,8 @@ function mostrarAdmin() {
   if (podeVer('manuscritos'))  carregarManuscritos();
   if (podeVer('vendas-dash'))  carregarVendasDash();
   if (podeVer('afiliados'))    carregarAfiliados();
+  // Verificar migração de banco silenciosamente
+  if (currentRole === 'gestor') verificarMigracao();
 }
 
 async function logout() {
@@ -1721,6 +1727,30 @@ function irPara(sec, el) {
   if (sec === 'vendas-dash')   carregarVendasDash();
   if (sec === 'afiliados')     carregarAfiliados();
   if (sec === 'depoimentos')   carregarDepoimentos('revisao_manual');
+}
+
+// ── MIGRAÇÃO ──────────────────────────────────────────────────────
+async function verificarMigracao() {
+  try {
+    const token = (await sb.auth.getSession()).data.session?.access_token || '';
+    const res = await fetch(FORGE_API + '/api/admin/migrate/creditos-loteria', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token }
+    });
+    const data = await res.json();
+    const banner = document.getElementById('banner-migracao');
+    if (data.status === 'tables_missing' && banner) banner.style.display = 'flex';
+    return data;
+  } catch { return null; }
+}
+
+async function executarMigracao() {
+  const data = await verificarMigracao();
+  if (!data) { toast('Erro ao verificar banco','erro'); return; }
+  if (data.status === 'tables_exist') { toast('Tabelas já existem — OK','ok'); return; }
+  // Abrir painel Supabase em nova aba com o SQL copiado
+  navigator.clipboard.writeText(data.sql || '').catch(() => {});
+  window.open(data.sql_editor_url, '_blank');
+  toast('SQL copiado para a área de transferência. Cole no editor Supabase que abriu.', 'ok');
 }
 
 // ── DEPOIMENTOS ───────────────────────────────────────────────────

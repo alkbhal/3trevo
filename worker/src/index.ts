@@ -282,6 +282,99 @@ async function handlePublicDepoimentos(env: Env): Promise<Response> {
   return corsResponse(rows);
 }
 
+// POST /api/pedido/novo — checkout interno (Pix manual)
+// Cria pedido com status pendente_pagamento. Admin confirma em /api/admin/pedido/:id/confirmar.
+async function handlePedidoNovo(env: Env, req: Request): Promise<Response> {
+  const body = await req.json<{ nome?: string; email?: string; ebook_slug?: string; aff_slug?: string }>();
+  const { nome, email, ebook_slug, aff_slug } = body;
+
+  if (!nome || !email || !ebook_slug) {
+    return errorResponse('Campos obrigatórios: nome, email, ebook_slug.', 400);
+  }
+  if (!email.includes('@')) return errorResponse('E-mail inválido.', 400);
+
+  // Buscar produto
+  const produtos = await sbGet(env, `products?slug=eq.${encodeURIComponent(ebook_slug)}&ativo=eq.true&select=id,titulo,preco,slug`);
+  if (!produtos.length) return errorResponse('Produto não encontrado ou inativo.', 404);
+  const prod = produtos[0] as { id: string; titulo: string; preco: string; slug: string };
+  const valor = parseFloat(prod.preco) || 0;
+
+  // Buscar chave Pix da config
+  const cfgs = await sbGet(env, `config?chave=eq.pix_chave&select=valor`);
+  const pixChave = cfgs.length > 0 ? (cfgs[0] as { valor: string }).valor : 'sac@3trevo.com.br';
+
+  // Criar ou buscar cliente
+  const clientes = await sbGet(env, `clientes?email=eq.${encodeURIComponent(email)}&select=id`);
+  let clienteId: string;
+  if (clientes.length > 0) {
+    clienteId = (clientes[0] as { id: string }).id;
+    await sbPatch(env, `clientes?id=eq.${clienteId}`, { nome });
+  } else {
+    const novoCliente = await sbPost(env, 'clientes', { nome, email }, 'return=representation');
+    clienteId = (novoCliente[0] as { id: string }).id;
+  }
+
+  // Verificar idempotência: pedido pendente para este cliente+ebook
+  const idExterno = `interno-${clienteId}-${ebook_slug}`;
+  const pedidosExist = await sbGet(env, `pedidos?id_externo=eq.${idExterno}&select=id,status`);
+  if (pedidosExist.length > 0) {
+    const p = pedidosExist[0] as { id: string; status: string };
+    if (p.status === 'paid') return errorResponse('Este ebook já foi adquirido nesta conta.', 409);
+    return corsResponse({ ok: true, pedido_id: p.id, valor, pix_chave: pixChave });
+  }
+
+  // Criar pedido pendente
+  const novoPedido = await sbPost(env, 'pedidos', {
+    cliente_id: clienteId,
+    ebook_slug,
+    ebook_titulo: prod.titulo,
+    valor_pago: valor,
+    id_externo: idExterno,
+    status: 'pendente_pagamento',
+    aff_slug: aff_slug || null,
+  }, 'return=representation');
+  const pedidoId = (novoPedido[0] as { id: string }).id;
+
+  await registrarAuditoria(env, 'pedidos', 'INSERT', idExterno, null, { email, ebook_slug, valor, origem: 'checkout_interno' });
+
+  return corsResponse({ ok: true, pedido_id: pedidoId, valor, pix_chave: pixChave });
+}
+
+// POST /api/admin/pedido/:id/confirmar — confirma pagamento manual e envia email de download
+async function handleConfirmarPedido(env: Env, pedidoId: string): Promise<Response> {
+  const pedidos = await sbGet(env, `pedidos?id=eq.${pedidoId}&select=id,status,ebook_slug,valor_pago,cliente_id`);
+  if (!pedidos.length) return errorResponse('Pedido não encontrado.', 404);
+  const pedido = pedidos[0] as { id: string; status: string; ebook_slug: string; valor_pago: number; cliente_id: string };
+
+  if (pedido.status === 'paid') return corsResponse({ ok: true, msg: 'Pedido já confirmado.' });
+
+  // Marcar como pago
+  await sbPatch(env, `pedidos?id=eq.${pedidoId}`, { status: 'paid' });
+
+  // Buscar dados do cliente
+  const clientes = await sbGet(env, `clientes?id=eq.${pedido.cliente_id}&select=nome,email`);
+  const cli = clientes[0] as { nome: string; email: string } | undefined;
+
+  if (cli?.email && env.RESEND_API_KEY) {
+    const downloadUrl = `https://xfkepekffdyrtcgagwqo.supabase.co/functions/v1/get-download?pedido_id=${pedidoId}&slug=${pedido.ebook_slug}`;
+    const participacaoUrl = `https://www.3trevo.com.br/participacao-cultural.html?pedido_id=${pedidoId}&slug=${pedido.ebook_slug}`;
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${env.RESEND_API_KEY}` },
+      body: JSON.stringify({
+        from: 'Editora Tres Trevo <sac@3trevo.com.br>',
+        to: [cli.email],
+        subject: 'Seu ebook esta pronto — Tres Trevo',
+        html: `<p>Ola, ${cli.nome}!</p><p>Seu pagamento foi confirmado. Acesse seu ebook:</p><p><a href="${downloadUrl}">Baixar ebook</a></p><p>Apos a leitura, participe do Programa Cultural:<br><a href="${participacaoUrl}">Enviar depoimento e concorrer</a></p><p>Em caso de duvidas: sac@3trevo.com.br</p>`,
+      }),
+    });
+  }
+
+  await registrarAuditoria(env, 'pedidos', 'UPDATE', pedidoId, null, { status: 'paid', confirmado_por: 'admin' });
+
+  return corsResponse({ ok: true, pedido_id: pedidoId, email: cli?.email });
+}
+
 const CREDITO_POR_DEPOIMENTO = 10.00; // R$ por depoimento aprovado → 2 cotas Loteria-TT
 
 async function handlePatchDepoimento(env: Env, req: Request, id: string): Promise<Response> {
@@ -580,6 +673,55 @@ async function handleWebhookForge(env: Env, req: Request): Promise<Response> {
   }
 }
 
+// ── MIGRAÇÃO (one-time, admin-only) ──────────────────────────
+
+async function handleMigrateCreditos(env: Env): Promise<Response> {
+  // Verifica se as tabelas existem via REST
+  const checkR = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/creditos_loteria?select=id&limit=1`,
+    { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } },
+  );
+
+  if (checkR.ok || checkR.status === 416) {
+    return corsResponse({ ok: true, status: 'tables_exist', message: 'Tabelas já existem.' });
+  }
+
+  // Tabelas não existem — retornar SQL para o admin executar no painel Supabase
+  const sql = `
+-- Execute no SQL Editor: https://supabase.com/dashboard/project/xfkepekffdyrtcgagwqo/sql
+CREATE TABLE IF NOT EXISTS creditos_loteria (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  saldo         numeric(10,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),
+  atualizado_em timestamptz DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS creditos_loteria_log (
+  id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id   uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  valor     numeric(10,2) NOT NULL,
+  tipo      text NOT NULL CHECK (tipo IN ('credito','debito')),
+  origem    text,
+  ref_id    text,
+  criado_em timestamptz DEFAULT now()
+);
+ALTER TABLE creditos_loteria      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE creditos_loteria_log  ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "creditos_loteria: own select"     ON creditos_loteria;
+DROP POLICY IF EXISTS "creditos_loteria_log: own select" ON creditos_loteria_log;
+CREATE POLICY "creditos_loteria: own select"     ON creditos_loteria     FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "creditos_loteria_log: own select" ON creditos_loteria_log FOR SELECT USING (auth.uid() = user_id);
+`.trim();
+
+  return corsResponse({
+    ok: false,
+    status: 'tables_missing',
+    message: 'Execute o SQL abaixo no painel Supabase (link no campo sql_editor_url).',
+    sql_editor_url: 'https://supabase.com/dashboard/project/xfkepekffdyrtcgagwqo/sql',
+    sql,
+    http_status: checkR.status,
+  }, 200);
+}
+
 // ── CRÉDITOS LOTERIA (service-to-service) ────────────────────
 
 function requerServiceKey(env: Env, req: Request): Response | null {
@@ -682,6 +824,7 @@ export default {
       if (path === '/api/creditos/saldo' && method === 'GET') return await handleCreditosSaldo(env, req);
       if (path === '/api/creditos/debitar' && method === 'POST') return await handleCreditosDebitar(env, req);
       if (path === '/api/checkout/webhook' && method === 'POST') return await handleCheckoutWebhook(env, req, gatewayPlaceholder);
+      if (path === '/api/pedido/novo' && method === 'POST') return await handlePedidoNovo(env, req);
       if (path === '/api/webhook/forge' && method === 'POST') return await handleWebhookForge(env, req);
       if (path === '/api/health' && method === 'GET') return corsResponse({ ok: true, ts: new Date().toISOString() });
       if (path.startsWith('/api/forge/preview/') && method === 'GET') return await handleForgePreview(env, path.split('/').pop() ?? '');
@@ -738,10 +881,13 @@ export default {
       if (path === '/api/admin/vendas' && method === 'GET') return await handleGetVendas(env);
 
       if (path === '/api/admin/creditos/creditar' && method === 'POST') return await handleAdminCreditosCreditar(env, req);
+      if (path === '/api/admin/migrate/creditos-loteria' && method === 'POST') return await handleMigrateCreditos(env);
 
       // Apuração LF (admin-only, já após requerAuth)
       if (path === '/api/admin/apuracao' && method === 'POST') return await handleApuracao(env, req);
       if (path === '/api/admin/acervo-forge' && method === 'POST') return await handleForgePublicar(env, req);
+      const confirmarMatch = path.match(/^\/api\/admin\/pedido\/([^/]+)\/confirmar$/);
+      if (confirmarMatch && method === 'POST') return await handleConfirmarPedido(env, confirmarMatch[1]);
       const forgeChapterMatch = path.match(/^\/api\/forge\/chapter\/([0-9a-f-]{36})\/(\d+)$/i);
       if (forgeChapterMatch && method === 'PUT') return await handleForgeSaveChapter(env, req, forgeChapterMatch[1], forgeChapterMatch[2]);
 
@@ -749,6 +895,36 @@ export default {
     } catch (err) {
       console.error('Erro interno:', err instanceof Error ? err.message : String(err));
       return errorResponse('Erro interno do servidor.', 500);
+    }
+  },
+
+  // Cron semanal: verifica draws abertos com apuracao vencida e alerta admin
+  async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
+    try {
+      const hoje = new Date().toISOString().split('T')[0];
+      const pendentes = await sbGet(env, `draws?status=eq.open&data_apuracao=lt.${hoje}&select=id,titulo,data_apuracao`);
+      if (!pendentes.length) return;
+
+      if (!env.RESEND_API_KEY) return;
+
+      const lista = pendentes.map((d: { titulo: string; data_apuracao: string }) =>
+        `• ${d.titulo} — apuracao prevista: ${d.data_apuracao}`
+      ).join('\n');
+
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${env.RESEND_API_KEY}` },
+        body: JSON.stringify({
+          from: 'Sistema Tres Trevo <sac@3trevo.com.br>',
+          to: ['sac@3trevo.com.br'],
+          subject: `[ACAO NECESSARIA] ${pendentes.length} rodada(s) aguardando apuracao`,
+          text: `Rodadas abertas com data de apuracao vencida:\n\n${lista}\n\nAcesse o admin para realizar a apuracao:\nhttps://www.3trevo.com.br/admin.html`,
+        }),
+      });
+
+      console.log(`[CRON] alerta enviado — ${pendentes.length} draw(s) pendente(s)`);
+    } catch (err) {
+      console.error('[CRON] erro no scheduled handler:', err);
     }
   },
 };
