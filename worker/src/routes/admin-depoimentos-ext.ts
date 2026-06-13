@@ -32,7 +32,7 @@ export async function handleAdminDepoimentosList(request: Request, env: Env): Pr
 
   const r = await sb(
     env,
-    `depoimentos?estado=eq.${estado}&order=criado_em.desc&limit=50&select=id,texto,nome:nome_autor,slug:ebook_slug,estado,criado_em`
+    `depoimentos?estado=eq.${estado}&order=aprovado_em.desc&limit=50&select=id,texto,nome,email,slug,estado,aprovado_em,criado_em`
   );
   const data = await r.json();
   return Response.json(data);
@@ -51,7 +51,7 @@ export async function handleAdminDepoimentoUpdate(
 
   const updates: Record<string, any> = {};
   if (body.texto !== undefined) updates.texto = String(body.texto).trim();
-  if (body.nome !== undefined) updates.nome_autor = String(body.nome).trim();
+  if (body.nome !== undefined) updates.nome = String(body.nome).trim();
   if (body.estado !== undefined) {
     const allowed = ['aprovado', 'reprovado', 'pendente', 'revisao_manual'];
     if (!allowed.includes(body.estado)) return Response.json({ ok: false, erro: 'estado_invalido' }, { status: 400 });
