@@ -158,10 +158,10 @@ VALUES
     1857,
     'Romance',
     'Peri, o nobre índio, e Ceci, a filha do fidalgo português — uma história de amor e fidelidade no Brasil colonial. Marco do Romantismo nacional.',
-    'https://www.gutenberg.org/ebooks/37869.epub.images',
+    'https://www.gutenberg.org/ebooks/67724.epub.images',
     400,
     'Projeto Gutenberg',
-    'https://www.gutenberg.org/ebooks/37869',
+    'https://www.gutenberg.org/ebooks/67724',
     'pt',
     false
   )
