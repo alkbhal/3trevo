@@ -196,7 +196,7 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   if (rpc.novo_pedido && env.RESEND_API_KEY) {
     try {
       // Gerar token de download (gravar em downloads via supabase se houver user_id, senão usar pedido_id como token temporário)
-      const download_url = `https://tres-trevo-api.al-kbhal.workers.dev/api/download?pedido_id=${rpc.pedido_id}&token=${await gerarTokenDownload(rpc.pedido_id)}`;
+      const download_url = `https://tres-trevo-api.al-kbhal.workers.dev/api/download?pedido_id=${rpc.pedido_id}&token=${await gerarTokenDownload(rpc.pedido_id, env.WEBHOOK_HMAC_SECRET)}`;
 
       await enviarEmailDownload(env, {
         email,
@@ -244,9 +244,10 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
     return new Response('Link inválido', { status: 400 });
   }
 
-  // Verificar token
-  const expected = await gerarTokenDownload(pedido_id);
-  if (token !== expected) {
+  // Verificar token (tenta com segredo primeiro; fallback sem segredo para links legados)
+  const expectedNew = await gerarTokenDownload(pedido_id, env.WEBHOOK_HMAC_SECRET);
+  const expectedLegacy = await gerarTokenDownload(pedido_id);
+  if (token !== expectedNew && token !== expectedLegacy) {
     return new Response('Link expirado ou inválido', { status: 401 });
   }
 
@@ -290,14 +291,20 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-async function gerarTokenDownload(pedido_id: string): Promise<string> {
+async function gerarTokenDownload(pedido_id: string, secret?: string): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode('tt-download-' + pedido_id);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-    .slice(0, 32);
+  if (secret) {
+    // HMAC-SHA256 com segredo — token não previsível sem a chave
+    const key = await crypto.subtle.importKey(
+      'raw', encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const sig = await crypto.subtle.sign('HMAC', key, encoder.encode('tt-dl:' + pedido_id));
+    return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 40);
+  }
+  // Fallback sem segredo (deploy sem WEBHOOK_HMAC_SECRET configurado)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode('tt-download-' + pedido_id));
+  return Array.from(new Uint8Array(hashBuffer)).map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
 }
 
 async function registrarAuditoria(env: Env, action: string, details: object): Promise<void> {

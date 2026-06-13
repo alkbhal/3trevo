@@ -70,6 +70,27 @@ export default {
       return json({ ok: true, version: '2.0.0', ts: new Date().toISOString() });
     }
 
+    // Depoimentos aprovados (leitura pública)
+    if (path === '/api/public/depoimentos' && method === 'GET') {
+      const resp = await fetch(
+        `${env.SUPABASE_URL}/rest/v1/depoimentos?estado=eq.aprovado&order=criado_em.desc&limit=10&select=texto,nome_autor,ebook_slug`,
+        {
+          headers: {
+            apikey: env.SUPABASE_SERVICE_KEY,
+            Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+          },
+        }
+      );
+      const data = await resp.json();
+      return new Response(JSON.stringify(data), {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, max-age=600',
+          ...corsHeaders(origin),
+        },
+      });
+    }
+
     // Catálogo (leitura pública)
     if (path === '/api/public/catalogo' && method === 'GET') {
       const resp = await fetch(
@@ -158,6 +179,17 @@ async function handleAdminLogin(request: Request, env: Env): Promise<Response> {
 
   const { pin } = body ?? {};
   if (!pin) return Response.json({ ok: false }, { status: 400 });
+
+  // Rate limit: máx 5 tentativas por IP por hora
+  const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  if (env.TT_KV) {
+    const rlKey = `rl:admin-login:${ip}:${Math.floor(Date.now() / 3600000)}`;
+    const count = parseInt((await env.TT_KV.get(rlKey)) ?? '0', 10);
+    if (count >= 5) {
+      return Response.json({ ok: false, erro: 'muitas_tentativas' }, { status: 429 });
+    }
+    await env.TT_KV.put(rlKey, String(count + 1), { expirationTtl: 7200 });
+  }
 
   const pinHash = await sha256(pin);
 

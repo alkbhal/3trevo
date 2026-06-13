@@ -11,6 +11,10 @@ SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 binding = "FORGE_STORAGE"
 bucket_name = "forge-storage"
 
+[[kv_namespaces]]
+binding = "TT_KV"
+id = "CONFIGURE_KV_ID_HERE"
+
 # Cron: busca resultado LF + apuração automática toda sexta 20h BRT (23:00 UTC)
 [triggers]
 crons = ["0 23 * * 5"]
