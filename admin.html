@@ -616,8 +616,8 @@
       <div class="panel" id="panel-sorteio">
         <div class="section-hdr">
           <div>
-            <div class="section-titulo">Sistema Loteria TT</div>
-            <div class="section-sub">Acompanhe draws ativos e acione apuração manual.</div>
+            <div class="section-titulo">Sorteio TT</div>
+            <div class="section-sub">Acompanhe draws ativos e execute o sorteio puro (RNG).</div>
           </div>
         </div>
         <div class="card" style="margin-bottom:16px;">
@@ -627,21 +627,25 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-hdr"><span class="card-titulo">Apuração manual</span></div>
+          <div class="card-hdr"><span class="card-titulo">Executar sorteio</span></div>
           <div class="card-body" style="padding:16px;">
-            <p style="font-size:13px;color:var(--t2);margin-bottom:14px;">Use apenas se o cron automático (sextas 20h BRT) não disparar. Requer draw com status <code>open</code> e evidência LF disponível.</p>
-            <div style="display:flex;gap:10px;align-items:flex-end;">
-              <div class="field" style="flex:1;">
+            <p style="font-size:13px;color:var(--t2);margin-bottom:14px;">Sorteio por RNG criptográfico (Web Crypto API). Requer draw com status <code>open</code>. Todas as execuções são auditadas com hash SHA-256.</p>
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+              <div class="field" style="flex:1;min-width:200px;">
                 <label>Draw ID</label>
-                <input type="text" id="apuracao-draw-id" placeholder="uuid do draw">
+                <input type="text" id="sorteio-draw-id" placeholder="uuid do draw">
               </div>
-              <div class="field" style="flex:1;">
-                <label>Resultado LF (JSON)</label>
-                <input type="text" id="apuracao-lf-json" placeholder='{"p1":12345,...}'>
+              <div class="field" style="flex:1;min-width:150px;">
+                <label>Testemunha 1 (opcional)</label>
+                <input type="text" id="sorteio-testemunha1" placeholder="Nome ou identificação">
               </div>
-              <button class="btn btn-p" onclick="dispararApuracao()">Apurar</button>
+              <div class="field" style="flex:1;min-width:150px;">
+                <label>Testemunha 2 (opcional)</label>
+                <input type="text" id="sorteio-testemunha2" placeholder="Nome ou identificação">
+              </div>
+              <button class="btn btn-p" onclick="dispararSorteio()">Sortear</button>
             </div>
-            <div id="apuracao-resultado" style="margin-top:12px;font-size:13px;"></div>
+            <div id="sorteio-resultado" style="margin-top:12px;font-size:13px;"></div>
           </div>
         </div>
       </div>
@@ -1244,25 +1248,35 @@ function renderSorteio(d) {
       </div>
       <p style="font-size:12px;color:var(--t3);margin-top:14px;">ID: <code>${d.draw_ativo.id}</code></p>
     `;
-    document.getElementById('apuracao-draw-id').value = d.draw_ativo.id;
+    document.getElementById('sorteio-draw-id').value = d.draw_ativo.id;
   } else {
     el.innerHTML = '<p style="font-size:13px;color:var(--t3);">Nenhum draw aberto no momento.</p>';
   }
 }
 
-async function dispararApuracao() {
-  const drawId = document.getElementById('apuracao-draw-id').value.trim();
-  const lfJson = document.getElementById('apuracao-lf-json').value.trim();
+async function dispararSorteio() {
+  const drawId = document.getElementById('sorteio-draw-id').value.trim();
   if (!drawId) return toast('Informe o Draw ID.', 'warn');
-  let resultado_lf;
-  try { resultado_lf = lfJson ? JSON.parse(lfJson) : null; } catch { return toast('JSON inválido.', 'err'); }
-  const res = document.getElementById('apuracao-resultado');
-  res.textContent = 'Apurando…';
+  const t1 = document.getElementById('sorteio-testemunha1').value.trim();
+  const t2 = document.getElementById('sorteio-testemunha2').value.trim();
+  const res = document.getElementById('sorteio-resultado');
+  res.textContent = 'Sorteando…';
   try {
-    const r = await api('/api/admin/apuracao', 'POST', { draw_id: drawId, resultado_lf });
+    const body = { draw_id: drawId };
+    if (t1) body.testemunha_1 = t1;
+    if (t2) body.testemunha_2 = t2;
+    const r = await api('/api/admin/sorteio', 'POST', body);
     const d = await r.json();
-    if (d.ok) { res.innerHTML = `<span style="color:var(--ok)">✓ Apurado. Cota vencedora: <strong>${d.cota_vencedora}</strong> · Hash: <code>${d.hash?.substring(0,20)}…</code></span>`; }
-    else { res.innerHTML = `<span style="color:var(--danger)">Erro: ${d.erro}</span>`; }
+    if (d.ok) {
+      res.innerHTML = `<span style="color:var(--ok)">✓ Sorteio concluído.<br>
+        Número sorteado: <strong>${d.numero_sorteado}</strong> ·
+        Vencedor: <strong>${d.winner_email || d.winner_user_id}</strong><br>
+        Hash SHA-256: <code>${(d.hash_sha256 || '').substring(0,20)}…</code> ·
+        Participantes: ${d.total_participantes}
+      </span>`;
+    } else {
+      res.innerHTML = `<span style="color:var(--danger)">Erro: ${d.erro}${d.detalhe ? ' — ' + d.detalhe : ''}</span>`;
+    }
   } catch(e) { res.innerHTML = `<span style="color:var(--danger)">${e.message}</span>`; }
 }
 
