@@ -92,6 +92,14 @@ function json(data: unknown, status = 200, origin: string | null = null): Respon
 }
 
 // ─── Roteador principal ───────────────────────────────────────────────────────
+// ─── CORS wrapper — aplicado a TODAS as respostas ───────────────────────────
+function withCors(response: Response, origin: string | null): Response {
+  const headers = new Headers(response.headers);
+  const cors = corsHeaders(origin) as Record<string, string>;
+  for (const [k, v] of Object.entries(cors)) headers.set(k, v);
+  return new Response(response.body, { status: response.status, headers });
+}
+
 export default {
   // Requisições HTTP
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -105,6 +113,30 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
 
+    // Todas as respostas passam por withCors + global error handler
+    try {
+      return withCors(await dispatch(request, env, path, method, origin), origin);
+    } catch (err) {
+      console.error('[worker] erro não capturado:', err);
+      return withCors(
+        Response.json({ ok: false, erro: 'internal_error', detalhe: String(err) }, { status: 500 }),
+        origin
+      );
+    }
+  },
+
+  // Cron triggers
+  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    console.log(`[cron] disparado: ${event.cron}`);
+    // Health monitor — toda hora
+    if (event.cron === '0 * * * *') {
+      ctx.waitUntil(handleHealthMonitor(env));
+    }
+  },
+};
+
+// ─── Roteador ─────────────────────────────────────────────────────────────────
+async function dispatch(request: Request, env: Env, path: string, method: string, origin: string | null): Promise<Response> {
     // ── Rotas públicas ─────────────────────────────────────────────────────
     if (path === '/health' || path === '/') {
       return handleHealthBasic();
@@ -291,17 +323,7 @@ export default {
     }
 
     return json({ ok: false, erro: 'rota_nao_encontrada', path }, 404, origin);
-  },
-
-  // Cron triggers
-  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
-    console.log(`[cron] disparado: ${event.cron}`);
-    // Health monitor — toda hora
-    if (event.cron === '0 * * * *') {
-      ctx.waitUntil(handleHealthMonitor(env));
-    }
-  },
-};
+}
 
 // ─── Admin Login ──────────────────────────────────────────────────────────────
 async function handleAdminLogin(request: Request, env: Env, origin: string | null = null): Promise<Response> {

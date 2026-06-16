@@ -39,12 +39,21 @@ function sb(env: Env, path: string, opts: RequestInit = {}) {
 // ─── Listar todos (admin — inclui inativos) ───────────────────────────────────
 export async function handleAdminCatalogoGet(request: Request, env: Env): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
-  const r = await sb(
-    env,
-    'catalogo?order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,accent_color,ordem,ativo'
-  );
-  const data = await r.json();
-  return Response.json(data);
+  try {
+    const r = await sb(
+      env,
+      'catalogo?order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,accent_color,ordem,ativo'
+    );
+    if (!r.ok) {
+      const err = await r.text();
+      console.error('[admin-catalogo] supabase error:', r.status, err);
+      return Response.json({ ok: false, erro: 'supabase_error', status: r.status, detalhe: err }, { status: 502 });
+    }
+    return Response.json(await r.json());
+  } catch (err) {
+    console.error('[admin-catalogo] get falhou:', err);
+    return Response.json({ ok: false, erro: 'catalogo_indisponivel', detalhe: String(err) }, { status: 503 });
+  }
 }
 
 // ─── Criar livro ──────────────────────────────────────────────────────────────
