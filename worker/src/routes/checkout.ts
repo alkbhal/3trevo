@@ -1,144 +1,510 @@
 /**
  * checkout.ts — Três Trevo Worker
- * Webhook de pagamento confirmado
+ * Integração completa com Mercado Pago:
+ *   POST /api/checkout/preferencia  — cria preferência MP + retorna init_point
+ *   POST /api/webhook/pagamento     — recebe notificação MP, processa compra
+ *   GET  /api/download              — entrega PDF via token UUID
  *
- * POST /api/webhook/pagamento  — recebe notificação de pagamento, cria pedido + draw_entry, envia email
- *
- * Deploy: copiar/substituir worker/src/routes/checkout.ts
- * Secrets necessários: SUPABASE_URL, SUPABASE_SERVICE_KEY, RESEND_API_KEY, WEBHOOK_HMAC_SECRET
+ * Secrets necessários:
+ *   MP_ACCESS_TOKEN       — APP_USR-... do Mercado Pago (produção)
+ *   WEBHOOK_HMAC_SECRET   — secret configurado no painel MP → Webhooks
+ *   SUPABASE_URL, SUPABASE_SERVICE_KEY, RESEND_API_KEY
  */
 
 import type { Env } from '../types';
 
-// ─── Verificação HMAC (Mercado Pago / Rifei / qualquer webhook) ──────────────
-async function verificarHMAC(request: Request, secret: string): Promise<boolean> {
-  const signature = request.headers.get('x-signature') ||
-                    request.headers.get('x-hub-signature-256') ||
-                    request.headers.get('x-webhook-signature') || '';
+const MP_API = 'https://api.mercadopago.com';
+const SITE_URL = 'https://3trevo.com.br';
+const WORKER_URL = 'https://tres-trevo-api.al-kbhal.workers.dev';
 
-  const body = await request.clone().text();
+// ─── 1. Criar Preferência MP ─────────────────────────────────────────────────
+export async function handleCriarPreferencia(request: Request, env: Env): Promise<Response> {
+  if (!env.MP_ACCESS_TOKEN) {
+    return Response.json({ ok: false, erro: 'gateway_nao_configurado' }, { status: 503 });
+  }
+
+  let body: any;
+  try { body = await request.json(); } catch { return new Response('Bad Request', { status: 400 }); }
+
+  const { slug, email } = body;
+  if (!slug || !email) {
+    return Response.json({ ok: false, erro: 'slug e email obrigatórios' }, { status: 400 });
+  }
+
+  // Buscar produto no Supabase
+  const prodResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/products?slug=eq.${slug}&ativo=eq.true&select=id,titulo,preco,cotas,autor,arquivo_url`,
+    { headers: supabaseHeaders(env) }
+  );
+  const [produto] = (await prodResp.json()) as any[];
+  if (!produto) {
+    return Response.json({ ok: false, erro: 'produto_nao_encontrado' }, { status: 404 });
+  }
+
+  // Criar preferência no MP
+  const prefBody = {
+    items: [{
+      id: slug,
+      title: produto.titulo,
+      quantity: 1,
+      unit_price: Number(produto.preco),
+      currency_id: 'BRL',
+    }],
+    payer: { email },
+    external_reference: slug,
+    notification_url: `${WORKER_URL}/api/webhook/pagamento`,
+    back_urls: {
+      success: `${SITE_URL}/area-cliente.html?status=success&slug=${slug}`,
+      failure: `${SITE_URL}/checkout.html?slug=${slug}&status=failed`,
+      pending: `${SITE_URL}/area-cliente.html?status=pending`,
+    },
+    auto_return: 'approved',
+    statement_descriptor: 'EDITORA TRES TREVO',
+  };
+
+  const mpResp = await fetch(`${MP_API}/checkout/preferences`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.MP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(prefBody),
+  });
+
+  if (!mpResp.ok) {
+    const err = await mpResp.text();
+    console.error('[preferencia] erro MP:', err);
+    return Response.json({ ok: false, erro: 'falha_ao_criar_preferencia' }, { status: 502 });
+  }
+
+  const pref = (await mpResp.json()) as any;
+  return Response.json({
+    ok: true,
+    init_point: pref.init_point,       // URL de checkout MP (produção)
+    sandbox_init_point: pref.sandbox_init_point,
+    preference_id: pref.id,
+  });
+}
+
+// ─── 2. Webhook MP ───────────────────────────────────────────────────────────
+export async function handleWebhookPagamento(request: Request, env: Env): Promise<Response> {
+  // MP envia GET para validação inicial da URL
+  if (request.method === 'GET') return new Response('ok', { status: 200 });
+
+  // Verificar assinatura MP (opcional mas recomendado)
+  if (env.WEBHOOK_HMAC_SECRET) {
+    const valido = await verificarAssinaturaMP(request, env.WEBHOOK_HMAC_SECRET);
+    if (!valido) {
+      console.warn('[webhook] assinatura inválida');
+      return new Response('Unauthorized', { status: 401 });
+    }
+  }
+
+  let body: any;
+  try { body = await request.clone().json(); } catch {
+    return new Response('ok', { status: 200 }); // MP não deve retentar se for inválido
+  }
+
+  console.log('[webhook] recebido:', JSON.stringify(body));
+
+  // Suporta IPN (?type=payment&id=) e Notifications (body.action + body.data.id)
+  const topic = body?.type || body?.topic || body?.action?.split('.')?.[0] || '';
+  const mpPaymentId = body?.data?.id || body?.id || null;
+
+  if (!mpPaymentId || !['payment'].includes(topic)) {
+    return new Response('ignored', { status: 200 });
+  }
+
+  // Buscar pagamento completo na API MP
+  const mpPayment = await buscarPagamentoMP(String(mpPaymentId), env.MP_ACCESS_TOKEN ?? '');
+  if (!mpPayment) {
+    console.error('[webhook] falha ao buscar pagamento MP:', mpPaymentId);
+    return new Response('mp_error', { status: 200 });
+  }
+
+  // Só processar aprovados
+  if (mpPayment.status !== 'approved') {
+    console.log('[webhook] status ignorado:', mpPayment.status);
+    return new Response('not_approved', { status: 200 });
+  }
+
+  const productSlug = mpPayment.external_reference ?? '';
+  const emailPagador = mpPayment.payer?.email ?? '';
+  const nomePagador = mpPayment.payer?.first_name
+    ? `${mpPayment.payer.first_name} ${mpPayment.payer.last_name ?? ''}`.trim()
+    : emailPagador.split('@')[0];
+  const valor = Number(mpPayment.transaction_amount ?? 0);
+  const metodo = mpPayment.payment_type_id ?? 'unknown';
+
+  if (!emailPagador || !productSlug) {
+    console.error('[webhook] dados ausentes:', { emailPagador, productSlug });
+    return new Response('dados_ausentes', { status: 200 });
+  }
+
+  // Encontrar ou criar usuário em auth.users
+  const userId = await buscarOuCriarUsuario(emailPagador, nomePagador, env);
+
+  // Registrar compra via RPC
+  const rpc = await registrarCompraMp({
+    env,
+    userId: userId ?? null,
+    mpPaymentId: String(mpPaymentId),
+    productSlug,
+    valor,
+    metodo,
+    rawMp: mpPayment,
+  });
+
+  if (!rpc.ok) {
+    console.error('[webhook] rpc falhou:', rpc.erro);
+    await registrarAuditoria(env, 'webhook_erro', { mpPaymentId, erro: rpc.erro });
+    return new Response('rpc_error', { status: 200 });
+  }
+
+  // Novo pedido: distribuir números + enviar email
+  if (rpc.novo) {
+    await distribuirNumeros(env, {
+      userId: userId!,
+      purchaseId: rpc.purchase_id,
+      quantidade: rpc.cotas_base ?? 0,
+    });
+
+    if (env.RESEND_API_KEY) {
+      await enviarEmailCompra(env, {
+        email: emailPagador,
+        nome: nomePagador,
+        ebookTitulo: rpc.ebook_titulo ?? productSlug,
+        downloadToken: rpc.download_token,
+        productSlug,
+        cotas: rpc.cotas_base ?? 0,
+        valor,
+      }).catch(err => console.error('[webhook] email falhou:', err));
+    }
+  }
+
+  await registrarAuditoria(env, 'webhook_pagamento', {
+    mp_payment_id: mpPaymentId,
+    purchase_id: rpc.purchase_id,
+    novo: rpc.novo,
+  });
+
+  return Response.json({ ok: true });
+}
+
+// ─── 3. Download (UUID token) ─────────────────────────────────────────────────
+export async function handleDownload(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  const token = url.searchParams.get('token');
+
+  if (!token) return new Response('Link inválido', { status: 400 });
+
+  // Buscar token na tabela downloads
+  const resp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/downloads?token=eq.${token}&select=id,product_id,expira_em,usado_em`,
+    { headers: supabaseHeaders(env) }
+  );
+  const [dl] = (await resp.json()) as any[];
+
+  if (!dl) return new Response('Link inválido ou expirado', { status: 404 });
+  if (new Date(dl.expira_em) < new Date()) {
+    return new Response('Link expirado. Contate sac@3trevo.com.br para renovação.', { status: 410 });
+  }
+
+  // Buscar arquivo do produto
+  const prodResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/products?id=eq.${dl.product_id}&select=arquivo_url,titulo`,
+    { headers: supabaseHeaders(env) }
+  );
+  const [produto] = (await prodResp.json()) as any[];
+  if (!produto?.arquivo_url) {
+    return new Response('Arquivo não configurado', { status: 404 });
+  }
+
+  // Registrar uso (não bloquear re-download dentro do prazo)
+  fetch(`${env.SUPABASE_URL}/rest/v1/downloads?id=eq.${dl.id}`, {
+    method: 'PATCH',
+    headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ usado_em: new Date().toISOString(), ip: request.headers.get('cf-connecting-ip') }),
+  }).catch(() => {});
+
+  // Redirecionar para R2 público (ou URL pré-assinada)
+  const pdfUrl = produto.arquivo_url.startsWith('http')
+    ? produto.arquivo_url
+    : `https://pub-${env.R2_PUBLIC_BUCKET_ID ?? 'CONFIGURE'}.r2.dev/${produto.arquivo_url}`;
+
+  return Response.redirect(pdfUrl, 302);
+}
+
+// ─── Helpers: MP API ─────────────────────────────────────────────────────────
+async function buscarPagamentoMP(paymentId: string, accessToken: string): Promise<any | null> {
+  try {
+    const resp = await fetch(`${MP_API}/v1/payments/${paymentId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch {
+    return null;
+  }
+}
+
+// Verifica assinatura MP x-signature: ts=...,v1=...
+async function verificarAssinaturaMP(request: Request, secret: string): Promise<boolean> {
+  const xSig = request.headers.get('x-signature') ?? '';
+  const xReqId = request.headers.get('x-request-id') ?? '';
+  const body = await request.clone().json() as any;
+  const mpId = body?.data?.id ?? body?.id ?? '';
+
+  // Extrair ts e v1 do header
+  const ts = xSig.match(/ts=([^,]+)/)?.[1] ?? '';
+  const v1 = xSig.match(/v1=([^,]+)/)?.[1] ?? '';
+
+  if (!ts || !v1 || !mpId) {
+    // Fallback: aceitar se secret não está configurado (dev)
+    return !secret;
+  }
+
+  const message = `id:${mpId};request-id:${xReqId};ts:${ts}`;
   const key = await crypto.subtle.importKey(
     'raw', new TextEncoder().encode(secret),
     { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
   );
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
-  const expected = 'sha256=' + Array.from(new Uint8Array(sig))
-    .map((b) => b.toString(16).padStart(2, '0')).join('');
+  const sigBuf = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
+  const expected = Array.from(new Uint8Array(sigBuf))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
 
-  // Comparação timing-safe simplificada
-  if (signature.length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < signature.length; i++) {
-    diff |= signature.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  return diff === 0;
+  return v1 === expected;
 }
 
-// ─── Email de download via Resend ────────────────────────────────────────────
-async function enviarEmailDownload(
+// ─── Helpers: Supabase Auth ───────────────────────────────────────────────────
+async function buscarOuCriarUsuario(email: string, nome: string, env: Env): Promise<string | null> {
+  const authUrl = `${env.SUPABASE_URL}/auth/v1/admin/users`;
+  const headers = {
+    apikey: env.SUPABASE_SERVICE_KEY,
+    Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+    'Content-Type': 'application/json',
+  };
+
+  // Tentar criar (idempotente — retorna 422 se já existe)
+  const createResp = await fetch(authUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      email,
+      email_confirm: true,
+      user_metadata: { nome },
+    }),
+  });
+
+  if (createResp.ok) {
+    const user = (await createResp.json()) as any;
+    return user.id;
+  }
+
+  // Usuário já existe — buscar pelo email
+  const listResp = await fetch(`${authUrl}?email=${encodeURIComponent(email)}`, { headers });
+  if (!listResp.ok) {
+    console.error('[auth] falha ao buscar usuário:', await listResp.text());
+    return null;
+  }
+  const data = (await listResp.json()) as any;
+  const users: any[] = data.users ?? (Array.isArray(data) ? data : []);
+  const found = users.find((u: any) => u.email === email);
+  return found?.id ?? null;
+}
+
+// ─── Helpers: RPC registrar_compra_mp ────────────────────────────────────────
+async function registrarCompraMp(opts: {
+  env: Env;
+  userId: string | null;
+  mpPaymentId: string;
+  productSlug: string;
+  valor: number;
+  metodo: string;
+  rawMp: object;
+}): Promise<any> {
+  const { env, userId, mpPaymentId, productSlug, valor, metodo, rawMp } = opts;
+  const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/registrar_compra_mp`, {
+    method: 'POST',
+    headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      p_user_id: userId,
+      p_mp_payment_id: mpPaymentId,
+      p_product_slug: productSlug,
+      p_valor: valor,
+      p_metodo: metodo,
+      p_raw_mp: rawMp,
+    }),
+  });
+  return (await resp.json()) as any;
+}
+
+// ─── Helpers: Draw numbers ────────────────────────────────────────────────────
+async function distribuirNumeros(
+  env: Env,
+  opts: { userId: string; purchaseId: string; quantidade: number }
+): Promise<void> {
+  if (opts.quantidade <= 0) return;
+
+  // Buscar draw ativo
+  const drawResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/draws?status=eq.open&order=criado_em.desc&limit=1`,
+    { headers: supabaseHeaders(env) }
+  );
+  const [draw] = (await drawResp.json()) as any[];
+  if (!draw) return;
+
+  // Criar draw_entry
+  await fetch(`${env.SUPABASE_URL}/rest/v1/draw_entries`, {
+    method: 'POST',
+    headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json', Prefer: 'resolution=ignore-duplicates' },
+    body: JSON.stringify({
+      draw_id: draw.id,
+      user_id: opts.userId,
+      purchase_id: opts.purchaseId,
+      cotas_base: opts.quantidade,
+      cotas_bonus: 0,
+      qualificado: false,
+    }),
+  });
+
+  // Buscar números já atribuídos
+  const existResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/draw_numbers?draw_id=eq.${draw.id}&select=numero`,
+    { headers: supabaseHeaders(env) }
+  );
+  const existentes = (await existResp.json()) as any[];
+  const ocupados = new Set(existentes.map((n: any) => n.numero));
+
+  const max = draw.max_numeros ?? 100000;
+  const novos: number[] = [];
+  let tentativas = 0;
+  while (novos.length < opts.quantidade && tentativas < opts.quantidade * 100) {
+    tentativas++;
+    const buf = new Uint32Array(1);
+    crypto.getRandomValues(buf);
+    const n = (buf[0] % max) + 1;
+    if (!ocupados.has(n) && !novos.includes(n)) {
+      novos.push(n);
+      ocupados.add(n);
+    }
+  }
+
+  if (novos.length > 0) {
+    const rows = novos.map(n => ({
+      draw_id: draw.id,
+      numero: n,
+      user_id: opts.userId,
+      origem: 'purchase',
+      purchase_id: opts.purchaseId,
+    }));
+    await fetch(`${env.SUPABASE_URL}/rest/v1/draw_numbers`, {
+      method: 'POST',
+      headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify(rows),
+    });
+  }
+}
+
+// ─── Email de compra ───────────────────────────────────────────────────────────
+async function enviarEmailCompra(
   env: Env,
   opts: {
     email: string;
     nome: string;
-    ebook_titulo: string;
-    ebook_slug: string;
-    pedido_id: string;
-    download_url: string;
+    ebookTitulo: string;
+    downloadToken: string;
+    productSlug: string;
+    cotas: number;
+    valor: number;
   }
 ): Promise<void> {
-  const participacao_url =
-    `https://3trevo.com.br/participacao-cultural.html?pedido_id=${opts.pedido_id}&slug=${opts.ebook_slug}`;
+  const downloadUrl = `${WORKER_URL}/api/download?token=${opts.downloadToken}`;
+  const participacaoUrl = `${SITE_URL}/participacao-cultural.html?slug=${opts.productSlug}`;
+  const valorFmt = 'R$ ' + opts.valor.toFixed(2).replace('.', ',');
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f8f8f6;font-family:Georgia,serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f8f6;">
-  <tr><td align="center" style="padding:40px 20px;">
-    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:4px;overflow:hidden;">
-      <!-- Cabeçalho -->
-      <tr><td style="background:#0f2d1a;padding:32px 40px;">
-        <p style="margin:0;color:#a8c5a0;font-size:11px;letter-spacing:3px;text-transform:uppercase;">Editora Três Trevo</p>
-        <h1 style="margin:8px 0 0;color:#fff;font-size:22px;font-weight:400;">Seu ebook chegou.</h1>
-      </td></tr>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f0ebe0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0ebe0;padding:40px 0">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fdfbf7;border:1px solid rgba(26,74,46,.12)">
+  <tr><td style="height:4px;background:linear-gradient(90deg,#1a4a2e,#c8a84b)"></td></tr>
+  <tr><td style="padding:32px 48px 24px;border-bottom:1px solid rgba(26,74,46,.08)">
+    <p style="margin:0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#1a4a2e">✦ Editora Três Trevo</p>
+  </td></tr>
+  <tr><td style="padding:36px 48px 0">
+    <h1 style="margin:0 0 12px;font-size:28px;font-weight:300;color:#0f2d1a">
+      Olá, <em style="font-style:italic;color:#1a4a2e">${opts.nome.split(' ')[0]}</em> —
+    </h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#555;line-height:1.7">
+      Seu pagamento foi aprovado. <strong>${opts.ebookTitulo}</strong> está pronto para leitura.
+    </p>
+    <p style="margin:0 0 8px;font-size:13px;color:#888">
+      Valor pago: <strong style="color:#1a4a2e">${valorFmt}</strong> &nbsp;·&nbsp;
+      ${opts.cotas} cota${opts.cotas !== 1 ? 's' : ''} no Programa Cultural
+    </p>
+  </td></tr>
 
-      <!-- Corpo -->
-      <tr><td style="padding:40px;">
-        <p style="color:#2d2d2d;font-size:16px;line-height:1.7;margin:0 0 24px;">
-          Olá, <strong>${opts.nome.split(' ')[0]}</strong> —
-        </p>
-        <p style="color:#2d2d2d;font-size:16px;line-height:1.7;margin:0 0 32px;">
-          <strong>${opts.ebook_titulo}</strong> está pronto para leitura.
-          O link abaixo é exclusivo e expira em 72 horas.
-        </p>
+  <!-- Download CTA -->
+  <tr><td style="padding:28px 48px">
+    <p style="margin:0 0 12px;font-size:12px;color:#888">Link válido por 72 horas:</p>
+    <a href="${downloadUrl}"
+       style="display:block;padding:18px;background:#1a4a2e;color:#f0ebe0;text-decoration:none;
+              text-align:center;font-size:15px;font-weight:500">
+      Baixar ${opts.ebookTitulo} →
+    </a>
+  </td></tr>
 
-        <!-- CTA Download -->
-        <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 32px;">
-          <a href="${opts.download_url}"
-             style="display:inline-block;background:#1e5c3a;color:#fff;text-decoration:none;
-                    padding:16px 40px;border-radius:3px;font-size:15px;letter-spacing:0.5px;">
-            Baixar ebook →
-          </a>
-        </td></tr></table>
-
-        <!-- Divisor -->
-        <hr style="border:none;border-top:1px solid #e8e8e4;margin:0 0 32px;">
-
-        <!-- Programa Cultural -->
-        <p style="color:#0f2d1a;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin:0 0 12px;">
-          ✦ Programa Cultural
-        </p>
-        <p style="color:#4a4a4a;font-size:15px;line-height:1.7;margin:0 0 20px;">
-          Após a leitura (7 dias), você recebe o link de participação automaticamente.
-          Escreva um depoimento genuíno e concorra a prêmios em dinheiro.
-        </p>
-        <p style="color:#4a4a4a;font-size:15px;line-height:1.7;margin:0 0 32px;">
-          Suas cotas valem em todas as 6 rodadas desta série.
-        </p>
-
-        <!-- CTA Participação (disponível após 7 dias) -->
-        <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-          <a href="${participacao_url}"
-             style="display:inline-block;border:1px solid #1e5c3a;color:#1e5c3a;text-decoration:none;
-                    padding:13px 32px;border-radius:3px;font-size:14px;">
-            Acessar participação →
-          </a>
-        </td></tr></table>
-
-        <!-- Biblioteca Clássica -->
-        <hr style="border:none;border-top:1px solid #e8e8e4;margin:32px 0;">
-        <p style="color:#0f2d1a;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin:0 0 12px;">
-          📚 Biblioteca Clássica TT
-        </p>
-        <p style="color:#4a4a4a;font-size:15px;line-height:1.7;margin:0 0 20px;">
-          Sua compra inclui acesso à Biblioteca Clássica TT — um acervo exclusivo de clássicos
-          da literatura brasileira em domínio público. Leia Dom Casmurro, Memórias Póstumas e muito mais,
-          com leitor integrado e até 3 leituras simultâneas.
-        </p>
-        <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding-bottom:8px;">
-          <a href="https://3trevo.com.br/minha-biblioteca.html"
-             style="display:inline-block;background:#0f2d1a;color:#c9a84c;text-decoration:none;
-                    padding:13px 32px;border-radius:3px;font-size:14px;">
-            Acessar minha biblioteca →
-          </a>
-        </td></tr></table>
-        <p style="color:#888;font-size:12px;text-align:center;margin:8px 0 0;">Use o email desta compra para entrar.</p>
-      </td></tr>
-
-      <!-- Rodapé -->
-      <tr><td style="background:#f0f0ec;padding:24px 40px;">
-        <p style="color:#888;font-size:12px;line-height:1.6;margin:0;">
-          Editora Três Trevo · CNPJ 18.928.966/0001-59 · Montauri/RS<br>
-          Dúvidas: <a href="mailto:sac@3trevo.com.br" style="color:#1e5c3a;">sac@3trevo.com.br</a> ·
-          WhatsApp: <a href="https://wa.me/5554999467085" style="color:#1e5c3a;">(54) 99946-7085</a><br>
-          <a href="https://3trevo.com.br/termos-programa-cultural.html" style="color:#888;">Regulamento do Programa Cultural</a>
-        </p>
-      </td></tr>
+  <!-- Biblioteca TT -->
+  <tr><td style="padding:0 48px 24px">
+    <table width="100%" cellpadding="0" cellspacing="0"
+           style="background:#f5f0e8;border:1px solid rgba(26,74,46,.1);border-left:3px solid #c8a84b">
+    <tr><td style="padding:16px 20px">
+      <p style="margin:0 0 4px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6f28">📚 Biblioteca Clássica TT</p>
+      <p style="margin:0 0 10px;font-size:13px;color:#444;line-height:1.6">
+        Sua compra inclui acesso ao acervo de clássicos — Dom Casmurro, Memórias Póstumas e mais,
+        com leitor integrado e até 3 leituras simultâneas.
+      </p>
+      <a href="${SITE_URL}/minha-biblioteca.html"
+         style="font-size:13px;color:#1a4a2e;font-weight:600;text-decoration:none">
+        Acessar biblioteca → (use este e-mail para entrar)
+      </a>
+    </td></tr>
     </table>
   </td></tr>
+
+  <!-- Programa Cultural -->
+  <tr><td style="padding:0 48px 28px">
+    <table width="100%" cellpadding="0" cellspacing="0"
+           style="background:#f0f7f2;border:1px solid rgba(26,74,46,.15)">
+    <tr><td style="padding:16px 20px">
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a4a2e">✦ Programa Cultural</p>
+      <p style="margin:0;font-size:13px;color:#444;line-height:1.6">
+        Após 7 dias, acesse
+        <a href="${participacaoUrl}" style="color:#1a4a2e;font-weight:600;text-decoration:none">
+          sua página de participação →
+        </a>
+        , escreva um depoimento sobre o livro e suas cotas são liberadas para o sorteio.
+      </p>
+    </td></tr>
+    </table>
+  </td></tr>
+
+  <!-- Rodapé -->
+  <tr><td style="padding:20px 48px;border-top:1px solid rgba(26,74,46,.08)">
+    <p style="margin:0;font-size:11px;color:#999;line-height:1.6">
+      <a href="${SITE_URL}" style="color:#1a4a2e;text-decoration:none">3trevo.com.br</a> ·
+      <a href="mailto:sac@3trevo.com.br" style="color:#1a4a2e;text-decoration:none">sac@3trevo.com.br</a> ·
+      WhatsApp: <a href="https://wa.me/5554999467085" style="color:#1a4a2e;text-decoration:none">(54) 99946-7085</a><br>
+      CNPJ 18.928.966/0001-59 · Montauri/RS · © ${new Date().getFullYear()} Editora Três Trevo
+    </p>
+  </td></tr>
 </table>
-</body>
-</html>`;
+</td></tr>
+</table>
+</body></html>`;
 
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -149,199 +515,28 @@ async function enviarEmailDownload(
     body: JSON.stringify({
       from: 'Editora Três Trevo <sac@3trevo.com.br>',
       to: opts.email,
-      subject: `Seu ebook "${opts.ebook_titulo}" chegou — Editora Três Trevo`,
+      subject: `✦ Seu ebook "${opts.ebookTitulo}" chegou — Editora Três Trevo`,
       html,
     }),
   });
 }
 
-// ─── Handler principal ────────────────────────────────────────────────────────
-export async function handleWebhookPagamento(request: Request, env: Env): Promise<Response> {
-  // Verificar HMAC se secret configurado
-  if (env.WEBHOOK_HMAC_SECRET) {
-    const valid = await verificarHMAC(request, env.WEBHOOK_HMAC_SECRET);
-    if (!valid) {
-      return new Response('Unauthorized', { status: 401 });
-    }
-  }
-
-  let payload: any;
-  try {
-    payload = await request.json();
-  } catch {
-    return new Response('Bad Request', { status: 400 });
-  }
-
-  // Extrair campos comuns entre gateways (Mercado Pago, Kiwify, Hotmart)
-  const nome       = payload.buyer?.name       ?? payload.customer?.name       ?? payload.nome       ?? '';
-  const email      = payload.buyer?.email      ?? payload.customer?.email      ?? payload.email      ?? '';
-  const telefone   = payload.buyer?.phone      ?? payload.customer?.phone      ?? payload.telefone   ?? '';
-  const ebook_slug = payload.product?.slug     ?? payload.ebook_slug           ?? payload.slug       ?? '';
-  const valor_pago = payload.payment?.amount   ?? payload.amount               ?? payload.valor      ?? 0;
-  const id_externo = payload.id                ?? payload.payment?.id          ?? payload.order_id   ?? '';
-
-  if (!email || !ebook_slug || !id_externo) {
-    return Response.json({ ok: false, erro: 'campos obrigatórios ausentes' }, { status: 400 });
-  }
-
-  // Criar pedido + draw_entry via RPC
-  const rpcResp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/upsert_cliente_pedido`, {
-    method: 'POST',
-    headers: {
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      p_nome: nome,
-      p_email: email,
-      p_telefone: telefone,
-      p_ebook_slug: ebook_slug,
-      p_valor_pago: valor_pago,
-      p_id_externo: id_externo,
-    }),
-  });
-
-  const rpc = (await rpcResp.json()) as any;
-
-  if (!rpc.ok) {
-    // Log falha mas responde 200 para não reenviar o webhook
-    console.error('[webhook] upsert falhou:', rpc.erro);
-    await registrarAuditoria(env, 'webhook_erro', { id_externo, erro: rpc.erro });
-    return Response.json({ ok: false, erro: rpc.erro }, { status: 200 });
-  }
-
-  // Novo pedido: gerar link de download e enviar email
-  if (rpc.novo_pedido && env.RESEND_API_KEY) {
-    try {
-      // Gerar token de download (gravar em downloads via supabase se houver user_id, senão usar pedido_id como token temporário)
-      const download_url = `https://tres-trevo-api.al-kbhal.workers.dev/api/download?pedido_id=${rpc.pedido_id}&token=${await gerarTokenDownload(rpc.pedido_id)}`;
-
-      await enviarEmailDownload(env, {
-        email,
-        nome,
-        ebook_titulo: rpc.ebook_titulo ?? ebook_slug,
-        ebook_slug,
-        pedido_id: rpc.pedido_id,
-        download_url,
-      });
-
-      // Marcar email como enviado
-      await fetch(`${env.SUPABASE_URL}/rest/v1/pedidos?id=eq.${rpc.pedido_id}`, {
-        method: 'PATCH',
-        headers: {
-          apikey: env.SUPABASE_SERVICE_KEY,
-          Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email_enviado: true, email_enviado_em: new Date().toISOString() }),
-      });
-    } catch (err) {
-      console.error('[webhook] email falhou:', err);
-      // Alertar Dias sobre falha de email
-      await alertarFalhaEmail(env, { email, ebook_slug, pedido_id: rpc.pedido_id, erro: String(err) }).catch(() => {});
-    }
-  }
-
-  await registrarAuditoria(env, 'webhook_pagamento', {
-    pedido_id: rpc.pedido_id,
-    draw_entry_id: rpc.draw_entry_id,
-    novo: rpc.novo_pedido,
-    cotas: rpc.cotas_base,
-  });
-
-  return Response.json({ ok: true, pedido_id: rpc.pedido_id, draw_entry_id: rpc.draw_entry_id });
-}
-
-// ─── Handler: GET /api/download ───────────────────────────────────────────────
-export async function handleDownload(request: Request, env: Env): Promise<Response> {
-  const url = new URL(request.url);
-  const pedido_id = url.searchParams.get('pedido_id');
-  const token = url.searchParams.get('token');
-
-  if (!pedido_id || !token) {
-    return new Response('Link inválido', { status: 400 });
-  }
-
-  // Verificar token
-  const expected = await gerarTokenDownload(pedido_id);
-  if (token !== expected) {
-    return new Response('Link expirado ou inválido', { status: 401 });
-  }
-
-  // Buscar ebook_slug do pedido
-  const pedidoResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/pedidos?id=eq.${pedido_id}&select=ebook_slug,criado_em`,
-    {
-      headers: {
-        apikey: env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      },
-    }
-  );
-  const [pedido] = (await pedidoResp.json()) as any[];
-
-  if (!pedido) return new Response('Pedido não encontrado', { status: 404 });
-
-  // Verificar expiração (72h)
-  const criado = new Date(pedido.criado_em).getTime();
-  if (Date.now() - criado > 72 * 3600 * 1000) {
-    return new Response('Link expirado. Contate sac@3trevo.com.br para renovação.', { status: 410 });
-  }
-
-  // Buscar URL do PDF via catalogo
-  const catalogoResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/catalogo?slug=eq.${pedido.ebook_slug}&select=pdf_nome`,
-    {
-      headers: {
-        apikey: env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      },
-    }
-  );
-  const [produto] = (await catalogoResp.json()) as any[];
-  const pdf_nome = produto?.pdf_nome;
-  if (!pdf_nome) return new Response('Arquivo não configurado', { status: 404 });
-
-  // Redirecionar para R2 (URL pré-assinada ou direta)
-  const pdf_url = `https://pub-${env.R2_PUBLIC_BUCKET_ID ?? 'CONFIGURE'}.r2.dev/${pdf_nome}`;
-  return Response.redirect(pdf_url, 302);
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-async function gerarTokenDownload(pedido_id: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode('tt-download-' + pedido_id);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-    .slice(0, 32);
+// ─── Utilitários ─────────────────────────────────────────────────────────────
+function supabaseHeaders(env: Env): Record<string, string> {
+  return {
+    apikey: env.SUPABASE_SERVICE_KEY,
+    Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+  };
 }
 
 async function registrarAuditoria(env: Env, action: string, details: object): Promise<void> {
   await fetch(`${env.SUPABASE_URL}/rest/v1/audit_log`, {
     method: 'POST',
     headers: {
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      ...supabaseHeaders(env),
       'Content-Type': 'application/json',
       Prefer: 'return=minimal',
     },
     body: JSON.stringify({ action_type: action, actor: 'worker', status: 'ok', details }),
-  });
-}
-
-async function alertarFalhaEmail(env: Env, ctx: any): Promise<void> {
-  if (!env.RESEND_API_KEY) return;
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: 'sistema@3trevo.com.br',
-      to: 'rogerio.kbhal@gmail.com',
-      subject: '[ALERTA] Falha ao enviar email de download',
-      html: `<p>Pedido: ${ctx.pedido_id}<br>Email: ${ctx.email}<br>Ebook: ${ctx.ebook_slug}<br>Erro: ${ctx.erro}</p>`,
-    }),
-  });
+  }).catch(() => {});
 }

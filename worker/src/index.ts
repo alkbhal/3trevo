@@ -13,6 +13,7 @@ import {
   handleQuestionario,
 } from './routes/participacao';
 import {
+  handleCriarPreferencia,
   handleWebhookPagamento,
   handleDownload,
 } from './routes/checkout';
@@ -192,8 +193,12 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleQuestionario(request, env);
     }
 
-    // ── Webhook de pagamento ───────────────────────────────────────────────
-    if (path === '/api/webhook/pagamento' && method === 'POST') {
+    // ── Checkout / Pagamento ──────────────────────────────────────────────
+    if (path === '/api/checkout/preferencia' && (method === 'POST' || method === 'OPTIONS')) {
+      return handleCriarPreferencia(request, env);
+    }
+
+    if (path === '/api/webhook/pagamento' && (method === 'POST' || method === 'GET')) {
       return handleWebhookPagamento(request, env);
     }
 

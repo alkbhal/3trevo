@@ -19,6 +19,9 @@ export interface Env {
   // IA
   ANTHROPIC_KEY: string;
 
+  // Pagamentos — Mercado Pago
+  MP_ACCESS_TOKEN?: string;  // APP_USR-... (wrangler secret put MP_ACCESS_TOKEN)
+
   // R2 (downloads de PDFs)
   R2_PUBLIC_BUCKET_ID?: string;
 
