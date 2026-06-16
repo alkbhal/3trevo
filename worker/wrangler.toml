@@ -25,7 +25,7 @@ binding = "BIBLIOTECA_R2"
 bucket_name = "tt-biblioteca"
 
 # Crons:
-# - Sexta 23:00 UTC (20:00 BRT): apuração Sistema Loteria TT
 # - Toda hora: health monitor (checa componentes, detecta ataques, alerta via email)
+# Sorteio puro RNG: disparado manualmente via POST /api/admin/sorteio (sem data fixa)
 [triggers]
-crons = ["0 23 * * 5", "0 * * * *"]
+crons = ["0 * * * *"]

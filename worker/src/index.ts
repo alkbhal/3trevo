@@ -17,11 +17,10 @@ import {
   handleDownload,
 } from './routes/checkout';
 import {
-  handleApuracao,
   handleFilaRevisao,
   handleModerar,
 } from './routes/apuracao';
-import { handleCronLF } from './cron/lf-apuracao';
+import { handleSorteio } from './routes/sorteio';
 import {
   handleAdminCatalogoGet,
   handleAdminCatalogoCreate,
@@ -172,8 +171,8 @@ export default {
     }
 
     // ── Admin ──────────────────────────────────────────────────────────────
-    if (path === '/api/admin/apuracao' && method === 'POST') {
-      return handleApuracao(request, env);
+    if (path === '/api/admin/sorteio' && method === 'POST') {
+      return handleSorteio(request, env);
     }
 
     if (path === '/api/admin/fila' && method === 'GET') {
@@ -186,7 +185,7 @@ export default {
 
     // Login admin (geração de sessão)
     if (path === '/api/admin/login' && method === 'POST') {
-      return handleAdminLogin(request, env);
+      return handleAdminLogin(request, env, origin);
     }
 
     // Stats (admin)
@@ -297,9 +296,6 @@ export default {
   // Cron triggers
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
     console.log(`[cron] disparado: ${event.cron}`);
-    if (event.cron === '0 23 * * 5') {
-      ctx.waitUntil(handleCronLF(env));
-    }
     // Health monitor — toda hora
     if (event.cron === '0 * * * *') {
       ctx.waitUntil(handleHealthMonitor(env));
@@ -308,21 +304,21 @@ export default {
 };
 
 // ─── Admin Login ──────────────────────────────────────────────────────────────
-async function handleAdminLogin(request: Request, env: Env): Promise<Response> {
+async function handleAdminLogin(request: Request, env: Env, origin: string | null = null): Promise<Response> {
   let body: any;
-  try { body = await request.json(); } catch { return new Response('Bad Request', { status: 400 }); }
+  try { body = await request.json(); } catch { return json({ ok: false, erro: 'bad_request' }, 400, origin); }
 
   const { pin } = body ?? {};
-  if (!pin) return Response.json({ ok: false }, { status: 400 });
+  if (!pin) return json({ ok: false }, 400, origin);
 
-  // Rate limit: 5 tentativas/IP/hora
+  // Rate limit: 20 tentativas/IP/hora
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   const rlKey = `rl:login:${ip}`;
   if (env.TT_KV) {
     const attempts = parseInt((await env.TT_KV.get(rlKey)) ?? '0', 10);
-    if (attempts >= 5) {
+    if (attempts >= 20) {
       await registrarFalhaLogin(env, ip);
-      return Response.json({ ok: false, erro: 'muitas_tentativas' }, { status: 429 });
+      return json({ ok: false, erro: 'muitas_tentativas' }, 429, origin);
     }
     await env.TT_KV.put(rlKey, String(attempts + 1), { expirationTtl: 3600 });
   }
@@ -342,7 +338,7 @@ async function handleAdminLogin(request: Request, env: Env): Promise<Response> {
   const users = (await userResp.json()) as any[];
   if (!users.length) {
     await registrarFalhaLogin(env, ip);
-    return Response.json({ ok: false, erro: 'pin_invalido' }, { status: 401 });
+    return json({ ok: false, erro: 'pin_invalido' }, 401, origin);
   }
 
   // Criar sessão
@@ -358,7 +354,7 @@ async function handleAdminLogin(request: Request, env: Env): Promise<Response> {
   });
   const [sessao] = (await sessaoResp.json()) as any[];
 
-  return Response.json({ ok: true, token: sessao.token, expira_em: sessao.expira_em });
+  return json({ ok: true, token: sessao.token, expira_em: sessao.expira_em }, 200, origin);
 }
 
 // ─── Admin Stats ──────────────────────────────────────────────────────────────
