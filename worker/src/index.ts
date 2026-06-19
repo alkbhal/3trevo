@@ -22,6 +22,7 @@ import {
   handleModerar,
 } from './routes/apuracao';
 import { handleSorteio } from './routes/sorteio';
+import { handleAdminUploadCapa, handlePublicCapa } from './routes/admin-upload';
 import {
   handleAdminCatalogoGet,
   handleAdminCatalogoCreate,
@@ -76,7 +77,7 @@ function corsHeaders(origin: string | null): HeadersInit {
   const allowed = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowed,
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
   };
@@ -162,7 +163,7 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // Catálogo (leitura pública)
     if (path === '/api/public/catalogo' && method === 'GET') {
       const resp = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,ordem`,
+        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,accent_color,capa_url,ordem`,
         {
           headers: {
             apikey: env.SUPABASE_SERVICE_KEY,
@@ -228,6 +229,17 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // Stats (admin)
     if (path === '/api/admin/stats' && method === 'GET') {
       return handleAdminStats(request, env);
+    }
+
+    // ── Upload de capas (admin) ────────────────────────────────────────────
+    if (path === '/api/admin/upload/capa' && method === 'POST') {
+      return handleAdminUploadCapa(request, env);
+    }
+
+    // ── Serve capas públicas (sem auth, cache longo) ───────────────────────
+    if (path.startsWith('/api/public/capas/') && method === 'GET') {
+      const filename = path.replace('/api/public/capas/', '');
+      return handlePublicCapa(request, env, filename);
     }
 
     // ── Admin Catálogo ─────────────────────────────────────────────────────

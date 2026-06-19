@@ -289,6 +289,44 @@
     /* ── Sortable drag ghost ───────────────────────────────────────────────── */
     .sortable-ghost { opacity:.4; background:rgba(30,92,58,.1) !important; }
     .sortable-chosen { box-shadow:0 4px 16px rgba(0,0,0,.15); }
+
+    /* ── Cover image preview ───────────────────────────────────────────────── */
+    .capa-preview {
+      width:64px; height:96px; border-radius:1px 3px 3px 1px; flex-shrink:0;
+      box-shadow:-3px 4px 14px rgba(0,0,0,.45);
+      background-size:cover; background-position:center;
+      position:relative; overflow:hidden;
+    }
+    .capa-preview::before { content:''; position:absolute; left:0; top:0; bottom:0; width:6px; background:rgba(0,0,0,.35); border-radius:1px 0 0 1px; }
+    .upload-area { display:flex; gap:14px; align-items:flex-start; background:var(--bg); border:1px solid var(--borda); border-radius:3px; padding:14px; }
+    .upload-ctrl { flex:1; display:flex; flex-direction:column; gap:7px; }
+    .upload-status { font-size:11px; color:var(--t3); min-height:16px; }
+
+    /* ── 3D book for carousel ──────────────────────────────────────────────── */
+    .book3d-wrap { perspective:320px; flex-shrink:0; }
+    .book3d {
+      width:28px; height:42px; position:relative;
+      transform-style:preserve-3d;
+      transform:rotateY(-20deg) rotateX(3deg);
+    }
+    .book3d-front {
+      position:absolute; inset:0;
+      border-radius:0 2px 2px 0;
+      background-size:cover; background-position:center;
+      box-shadow:3px 3px 10px rgba(0,0,0,.5);
+    }
+    .book3d-spine {
+      position:absolute; top:0; left:-8px; width:8px; height:100%;
+      transform-origin:right center; transform:rotateY(-90deg);
+      border-radius:2px 0 0 2px;
+      filter:brightness(.5);
+    }
+    .book3d-pages {
+      position:absolute; top:1px; right:-3px; width:3px; height:calc(100% - 2px);
+      background:linear-gradient(to right,#cfc5aa,#f0ead5);
+      border-radius:0 1px 1px 0;
+      transform-origin:left center; transform:rotateY(90deg);
+    }
   </style>
 </head>
 <body>
@@ -595,7 +633,18 @@
             </div>
             <div class="form-group"><label>Sinopse</label><textarea id="bib-sinopse" class="input" rows="3" style="resize:vertical"></textarea></div>
             <div class="form-group"><label>URL do EPUB <small style="color:var(--t3)">(Gutenberg, R2, etc.)</small></label><input id="bib-epub-url" class="input" placeholder="https://..."></div>
-            <div class="form-group"><label>URL da capa</label><input id="bib-capa-url" class="input" placeholder="https://..."></div>
+            <div class="form-group">
+              <label>Capa da obra</label>
+              <div style="display:flex;gap:10px;align-items:flex-start;margin-top:4px;">
+                <div class="capa-preview" id="bib-capa-preview" style="background:#1a2a1a;width:48px;height:72px;"></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                  <button type="button" class="btn btn-s btn-sm" id="btn-upload-bib-capa" onclick="document.getElementById('bib-capa-file').click()">↑ Upload capa</button>
+                  <input type="file" id="bib-capa-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="uploadCapaImagem(this,{slugId:'bib-slug',urlId:'bib-capa-url',previewId:'bib-capa-preview',statusId:'bib-capa-status',btnId:'btn-upload-bib-capa'})">
+                  <input id="bib-capa-url" class="input" placeholder="https://... (preenchida após upload)" oninput="sincronizarPreviewCapa(this,'bib-capa-preview',null)">
+                  <div class="upload-status" id="bib-capa-status"></div>
+                </div>
+              </div>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div class="form-group"><label>Páginas estimadas</label><input id="bib-paginas" class="input" type="number" placeholder="250"></div>
               <div class="form-group"><label>Idioma</label><input id="bib-idioma" class="input" value="pt" placeholder="pt"></div>
@@ -721,6 +770,19 @@
         <div class="field">
           <label>Ordem</label>
           <input type="number" id="livro-ordem" value="99">
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);font-weight:500;margin-bottom:10px;">Imagem da Capa</div>
+        <div class="upload-area">
+          <div class="capa-preview" id="livro-capa-preview" style="background:#0d2415;"></div>
+          <div class="upload-ctrl">
+            <button type="button" class="btn btn-s" id="btn-upload-livro-capa" onclick="document.getElementById('livro-capa-file').click()">↑ Fazer upload da capa</button>
+            <input type="file" id="livro-capa-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="uploadCapaImagem(this,{slugId:'livro-slug',urlId:'livro-capa-url',previewId:'livro-capa-preview',statusId:'livro-capa-status',btnId:'btn-upload-livro-capa'})">
+            <div class="upload-status" id="livro-capa-status"></div>
+            <input type="text" id="livro-capa-url" placeholder="URL da imagem (preenchida após upload ou cole externa)" oninput="sincronizarPreviewCapa(this,'livro-capa-preview','livro-bg-color')">
+            <div class="field-sub">JPEG · PNG · WebP · máx. 5 MB. Substitui a cor de fundo no site e nas capas 3D.</div>
+          </div>
         </div>
       </div>
       <div class="form-grid" style="margin-bottom:16px;">
@@ -955,7 +1017,7 @@ function renderTabelaCatalogo(livros) {
   tbody.innerHTML = livros.map((l, i) => `
     <tr>
       <td><span class="drag-handle" title="Arrastar">⠿</span></td>
-      <td><div class="livro-thumb" style="background:${l.bg_color || '#0d2415'}"></div></td>
+      <td><div class="livro-thumb" style="${l.capa_url ? `background:url('${l.capa_url}') center/cover` : `background:${l.bg_color||'#0d2415'}`}"></div></td>
       <td>
         <div style="font-weight:600;color:var(--t0);">${l.titulo || l.slug}</div>
         <div style="font-size:11px;color:var(--t3);">${l.slug}</div>
@@ -997,6 +1059,14 @@ function abrirModalLivro(slug) {
   document.getElementById('livro-utm').value = livro?.utm_campaign || '';
   document.getElementById('livro-ativo').checked = livro?.ativo !== false;
   document.getElementById('btn-deletar-livro').style.display = livro ? '' : 'none';
+  // Capa
+  const capaUrl = livro?.capa_url || '';
+  document.getElementById('livro-capa-url').value = capaUrl;
+  document.getElementById('livro-capa-status').textContent = '';
+  const capaPreview = document.getElementById('livro-capa-preview');
+  capaPreview.style.background = livro?.bg_color || '#0d2415';
+  capaPreview.style.backgroundSize = capaUrl ? 'cover' : '';
+  capaPreview.style.backgroundImage = capaUrl ? `url('${capaUrl}')` : '';
   // Sync color inputs
   document.getElementById('livro-bg-color').oninput = e => document.getElementById('livro-bg-color-txt').value = e.target.value;
   document.getElementById('livro-bg-color-txt').oninput = e => { document.getElementById('livro-bg-color').value = e.target.value; };
@@ -1035,6 +1105,7 @@ async function salvarLivro() {
     utm_campaign: document.getElementById('livro-utm').value.trim(),
     bg_color: document.getElementById('livro-bg-color').value,
     accent_color: document.getElementById('livro-accent-color').value,
+    capa_url: document.getElementById('livro-capa-url').value.trim() || null,
     ordem: parseInt(document.getElementById('livro-ordem').value) || 99,
     ativo: document.getElementById('livro-ativo').checked,
   };
@@ -1095,17 +1166,28 @@ function renderCarouselOrder(slugs) {
   const ordered = slugs.map(s => todosOsLivros.find(l => l.slug === s)).filter(Boolean);
   // Adicionar livros não listados ao final
   todosOsLivros.forEach(l => { if (!ordered.find(o => o.slug === l.slug)) ordered.push(l); });
-  container.innerHTML = ordered.map((l, i) => `
+  container.innerHTML = ordered.map((l, i) => {
+    const bg = l.bg_color || '#0d2415';
+    const frontStyle = l.capa_url
+      ? `background-image:url('${l.capa_url}');background-size:cover;background-position:center;background-color:${bg};`
+      : `background-color:${bg};`;
+    return `
     <div class="carousel-item" draggable="true" data-slug="${l.slug}">
       <span class="carousel-item-num">${i+1}</span>
-      <div class="carousel-item-thumb" style="background:${l.bg_color||'#0d2415'}"></div>
+      <div class="book3d-wrap">
+        <div class="book3d">
+          <div class="book3d-front" style="${frontStyle}"></div>
+          <div class="book3d-spine" style="background-color:${bg};"></div>
+          <div class="book3d-pages"></div>
+        </div>
+      </div>
       <div class="carousel-item-info">
         <div class="carousel-item-t">${l.titulo || l.slug}</div>
-        <div class="carousel-item-s">${l.slug}</div>
+        <div class="carousel-item-s">${l.capa_url ? '🖼 com capa' : '⬜ cor chapada'} · ${l.slug}</div>
       </div>
       <span style="color:var(--t3);font-size:16px;cursor:grab;">⠿</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
   // Drag-to-reorder simples
   let dragged = null;
   container.querySelectorAll('.carousel-item').forEach(el => {
@@ -1454,7 +1536,12 @@ function editarObra(slug) {
   document.getElementById('bib-genero').value = l.genero ?? '';
   document.getElementById('bib-sinopse').value = l.sinopse ?? '';
   document.getElementById('bib-epub-url').value = l.epub_url ?? '';
-  document.getElementById('bib-capa-url').value = l.capa_url ?? '';
+  const bibCapa = l.capa_url ?? '';
+  document.getElementById('bib-capa-url').value = bibCapa;
+  const bibCapaPreview = document.getElementById('bib-capa-preview');
+  bibCapaPreview.style.backgroundImage = bibCapa ? `url('${bibCapa}')` : '';
+  bibCapaPreview.style.backgroundSize = bibCapa ? 'cover' : '';
+  document.getElementById('bib-capa-status').textContent = '';
   document.getElementById('bib-paginas').value = l.paginas_estimadas ?? '';
   document.getElementById('bib-idioma').value = l.idioma ?? 'pt';
   document.getElementById('bib-ativo').checked = !!l.ativo;
@@ -1525,6 +1612,68 @@ async function desativarObra(slug, atualAtivo) {
 document.getElementById('bib-modal').addEventListener('click', function(e) {
   if (e.target === this) fecharFormObra();
 });
+
+// ── UPLOAD DE CAPA ────────────────────────────────────────────────────────────
+async function uploadCapaImagem(inputEl, opts) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  const status  = document.getElementById(opts.statusId);
+  const urlEl   = document.getElementById(opts.urlId);
+  const preview = document.getElementById(opts.previewId);
+  const btn     = document.getElementById(opts.btnId);
+
+  if (status) { status.textContent = 'Enviando…'; status.style.color = 'var(--t3)'; }
+  if (btn) btn.disabled = true;
+
+  const form = new FormData();
+  form.append('capa', file);
+  const slug = (document.getElementById(opts.slugId)?.value || 'livro').trim();
+  form.append('slug', slug);
+
+  try {
+    const r = await fetch(`${API}/api/admin/upload/capa`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    const d = await r.json();
+    if (d.ok) {
+      urlEl.value = d.url;
+      if (preview) {
+        preview.style.backgroundImage = `url('${d.url}')`;
+        preview.style.backgroundSize  = 'cover';
+      }
+      if (status) { status.textContent = '✓ Capa enviada'; status.style.color = 'var(--ok)'; }
+      toast('Capa enviada com sucesso.', 'ok');
+    } else {
+      if (status) { status.textContent = 'Erro: ' + (d.erro || 'upload falhou'); status.style.color = 'var(--danger)'; }
+      toast('Erro no upload: ' + (d.erro || '—'), 'err');
+    }
+  } catch(e) {
+    if (status) { status.textContent = 'Erro: ' + e.message; status.style.color = 'var(--danger)'; }
+    toast('Erro: ' + e.message, 'err');
+  } finally {
+    if (btn) btn.disabled = false;
+    inputEl.value = '';
+  }
+}
+
+// Atualiza preview quando URL é digitada/colada manualmente
+function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
+  const url = inputEl.value.trim();
+  const preview = document.getElementById(previewId);
+  if (!preview) return;
+  if (url) {
+    preview.style.backgroundImage = `url('${url}')`;
+    preview.style.backgroundSize  = 'cover';
+  } else {
+    preview.style.backgroundImage = '';
+    if (bgColorId) {
+      const cor = document.getElementById(bgColorId)?.value || '#0d2415';
+      preview.style.background = cor;
+    }
+  }
+}
 </script>
 </body>
 </html>
