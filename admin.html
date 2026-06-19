@@ -290,6 +290,12 @@
     .sortable-ghost { opacity:.4; background:rgba(30,92,58,.1) !important; }
     .sortable-chosen { box-shadow:0 4px 16px rgba(0,0,0,.15); }
 
+    /* ── Aliases de botão (Biblioteca) ────────────────────────────────────── */
+    .btn-primary { background:var(--v3); color:#fff; border:none; font-family:var(--sans); font-size:13px; font-weight:600; padding:8px 16px; border-radius:3px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:background .15s; }
+    .btn-primary:hover { background:var(--v4); }
+    .btn-ghost { background:var(--branco); color:var(--t1); border:1px solid var(--borda); font-family:var(--sans); font-size:13px; font-weight:500; padding:7px 14px; border-radius:3px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all .15s; }
+    .btn-ghost:hover { border-color:var(--v3); color:var(--v3); }
+
     /* ── Cover image preview ───────────────────────────────────────────────── */
     .capa-preview {
       width:64px; height:96px; border-radius:1px 3px 3px 1px; flex-shrink:0;
@@ -1482,12 +1488,14 @@ async function carregarBiblioteca() {
       api('/api/admin/biblioteca/acervo'),
       api('/api/admin/biblioteca/stats'),
     ]);
-    bibAcervoCache = Array.isArray(acervoR) ? acervoR : [];
+    bibAcervoCache = await acervoR.json();
+    if (!Array.isArray(bibAcervoCache)) bibAcervoCache = [];
     renderTabelaBib(bibAcervoCache);
-    if (statsR && statsR.ok) {
-      document.getElementById('bib-stat-obras').textContent = statsR.total_obras ?? '—';
-      document.getElementById('bib-stat-ativas').textContent = statsR.leituras_ativas ?? '—';
-      document.getElementById('bib-stat-concluidas').textContent = statsR.leituras_concluidas ?? '—';
+    const statsData = await statsR.json();
+    if (statsData) {
+      document.getElementById('bib-stat-obras').textContent = statsData.total_obras ?? '—';
+      document.getElementById('bib-stat-ativas').textContent = statsData.leituras_ativas ?? '—';
+      document.getElementById('bib-stat-concluidas').textContent = statsData.leituras_concluidas ?? '—';
     }
   } catch(e) { toast('Erro ao carregar biblioteca: ' + e.message, 'err'); }
 }
@@ -1521,6 +1529,9 @@ function abrirFormObra() {
   document.getElementById('bib-ativo').checked = true;
   document.getElementById('bib-featured').checked = false;
   document.getElementById('bib-slug').disabled = false;
+  const bibCapaPreview = document.getElementById('bib-capa-preview');
+  if (bibCapaPreview) { bibCapaPreview.style.backgroundImage = ''; bibCapaPreview.style.background = '#1a2a1a'; }
+  document.getElementById('bib-capa-status').textContent = '';
   document.getElementById('bib-modal').style.display = 'flex';
 }
 

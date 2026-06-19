@@ -808,8 +808,12 @@ function renderCapa(idx) {
   const infoEl = document.getElementById('showcase-info');
   if (!el) return;
 
+  const imgStyle = c.capa_url
+    ? ` style="background-image:url('${c.capa_url}');background-size:cover;background-position:center;background-color:${c.bg_color||'#0d2415'}"`
+    : '';
+
   el.innerHTML = `
-    <div class="capa ${c.classe}">
+    <div class="capa ${c.classe}"${imgStyle}>
       <div class="capa-ornamento"></div>
       <div class="capa-genero">${c.genero}</div>
       <div class="capa-titulo">${c.titulo}</div>
@@ -1096,8 +1100,8 @@ function renderProdutos(prods, filtro) {
     card.innerHTML = `
       <div class="pcard-cor" style="background:${p.cor}"></div>
       <div class="pcard-corpo">
-        <div class="pcard-capa-mini ${p.corCapa}" style="animation-delay:${i*0.4}s">
-          <div class="pcard-capa-mini-titulo">${p.titulo[l] || p.titulo.pt}</div>
+        <div class="pcard-capa-mini ${p.corCapa}" style="animation-delay:${i*0.4}s${p.capa_url ? `;background-image:url('${p.capa_url}');background-size:cover;background-position:center` : ''}">
+          <div class="pcard-capa-mini-titulo">${p.capa_url ? '' : (p.titulo[l] || p.titulo.pt)}</div>
         </div>
         <div class="pcard-genero">${p.genero[l] || p.genero.pt}</div>
         <h3 class="pcard-t">${p.titulo[l] || p.titulo.pt}</h3>
@@ -1213,10 +1217,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (local) {
           local.preco = 'R$' + parseFloat(api.preco).toFixed(2).replace('.',',');
           local.cotas = api.cotas || local.cotas;
+          if (api.capa_url) local.capa_url = api.capa_url;
+          if (api.bg_color) local.cor = api.bg_color;
+        }
+        // Enriquece showcase hero com imagem real
+        const ci = CAPAS.findIndex(c => c.slug === api.slug);
+        if (ci !== -1) {
+          if (api.capa_url) CAPAS[ci].capa_url = api.capa_url;
+          if (api.bg_color) CAPAS[ci].bg_color = api.bg_color;
         }
       });
       prodCache = [...PROD_BASE];
       renderProdutos(prodCache, filtroAtual);
+      renderCapa(capaAtual);
     })
     .catch(() => {});
 });
