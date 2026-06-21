@@ -345,6 +345,138 @@ DROP POLICY IF EXISTS "bonus: own select" ON bonus;
 CREATE POLICY "bonus: own select" ON bonus
   FOR SELECT USING (auth.uid() = user_id);
 
+-- ── CLIENTES (checkout proprio) ─────────────────────────────
+CREATE TABLE IF NOT EXISTS clientes (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome        text NOT NULL,
+  email       text UNIQUE NOT NULL,
+  telefone    text,
+  criado_em   timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS clientes_email_idx ON clientes(email);
+
+-- ── PEDIDOS (checkout proprio) ──────────────────────────────
+CREATE TABLE IF NOT EXISTS pedidos (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  cliente_id    uuid REFERENCES clientes(id) ON DELETE SET NULL,
+  ebook_slug    text,
+  ebook_titulo  text,
+  valor_pago    numeric(10,2),
+  id_externo    text UNIQUE,
+  status        text DEFAULT 'pending',
+  criado_em     timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS pedidos_cliente_id_idx ON pedidos(cliente_id);
+CREATE INDEX IF NOT EXISTS pedidos_id_externo_idx ON pedidos(id_externo);
+CREATE INDEX IF NOT EXISTS pedidos_status_idx ON pedidos(status);
+
+-- ── CATALOGO (view/tabela de produtos ativos) ───────────────
+CREATE TABLE IF NOT EXISTS catalogo (
+  slug          text PRIMARY KEY,
+  titulo        text NOT NULL,
+  titulo_en     text,
+  titulo_es     text,
+  descricao     text,
+  descricao_en  text,
+  descricao_es  text,
+  genero        text,
+  genero_pt     text,
+  genero_en     text,
+  genero_es     text,
+  autor         text,
+  preco         numeric(10,2) NOT NULL,
+  cotas         int DEFAULT 0,
+  utm_campaign  text,
+  bg_color      text DEFAULT '#1a4a2e',
+  accent_color  text,
+  capa_url      text,
+  ordem         int DEFAULT 0,
+  ativo         boolean DEFAULT true,
+  criado_em     timestamptz DEFAULT now()
+);
+
+ALTER TABLE catalogo ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "catalogo: public read" ON catalogo
+  FOR SELECT USING (true);
+
+-- ── DEPOIMENTOS ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS depoimentos (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  texto        text NOT NULL,
+  nome         text,
+  email        text,
+  slug         text,
+  estado       text DEFAULT 'revisao_manual',
+  aprovado_em  timestamptz,
+  criado_em    timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS depoimentos_estado_idx ON depoimentos(estado);
+
+ALTER TABLE depoimentos ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "depoimentos: public read approved" ON depoimentos
+  FOR SELECT USING (estado = 'aprovado');
+
+-- ── ADMIN_SESSOES ───────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS admin_sessoes (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  token       text UNIQUE NOT NULL,
+  ativa       boolean DEFAULT true,
+  expira_em   timestamptz NOT NULL,
+  criado_em   timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS admin_sessoes_token_idx ON admin_sessoes(token);
+
+ALTER TABLE admin_sessoes ENABLE ROW LEVEL SECURITY;
+
+-- ── BIBLIOTECA_SLOTS (leitura ativa) ────────────────────────
+CREATE TABLE IF NOT EXISTS biblioteca_slots (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email       text NOT NULL,
+  slot_numero int NOT NULL,
+  acervo_id   uuid,
+  status      text DEFAULT 'lendo',
+  criado_em   timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS bib_slots_email_idx ON biblioteca_slots(email);
+
+ALTER TABLE biblioteca_slots ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "bib_slots: public select" ON biblioteca_slots
+  FOR SELECT USING (true);
+
+-- ── BIBLIOTECA_HISTORICO (leituras concluidas) ──────────────
+CREATE TABLE IF NOT EXISTS biblioteca_historico (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email         text NOT NULL,
+  slug          text,
+  titulo        text,
+  autor         text,
+  concluido_em  timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS bib_hist_email_idx ON biblioteca_historico(email);
+
+ALTER TABLE biblioteca_historico ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "bib_hist: own select" ON biblioteca_historico
+  FOR SELECT USING (true);
+
+-- ── PESQUISA_RESPOSTAS ──────────────────────────────────────
+CREATE TABLE IF NOT EXISTS pesquisa_respostas (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  respostas   jsonb,
+  criado_em   timestamptz DEFAULT now()
+);
+
+ALTER TABLE pesquisa_respostas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "pesquisa: anon insert" ON pesquisa_respostas
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "pesquisa: anon select" ON pesquisa_respostas
+  FOR SELECT USING (true);
+
 -- ============================================================
 -- SEED: Catálogo inicial (produtos)
 -- ============================================================
