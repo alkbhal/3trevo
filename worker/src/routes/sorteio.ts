@@ -13,19 +13,7 @@
  */
 
 import type { Env } from '../types';
-
-async function verificarAdmin(request: Request, env: Env): Promise<boolean> {
-  const auth = request.headers.get('Authorization') ?? '';
-  const token = auth.replace('Bearer ', '').trim();
-  if (!token) return false;
-
-  const resp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/admin_sessoes?token=eq.${encodeURIComponent(token)}&ativa=eq.true&select=expira_em`,
-    { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
-  );
-  const rows = (await resp.json()) as any[];
-  return rows.length > 0 && Date.now() < new Date(rows[0].expira_em).getTime();
-}
+import { verificarToken } from './admin-catalog';
 
 async function sha256hex(data: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
@@ -131,7 +119,7 @@ async function enviarEmailVencedor(env: Env, opts: {
 
 // ─── POST /api/admin/sorteio ──────────────────────────────────────────────────
 export async function handleSorteio(request: Request, env: Env): Promise<Response> {
-  if (!(await verificarAdmin(request, env))) {
+  if (!(await verificarToken(request, env))) {
     return new Response('Unauthorized', { status: 401 });
   }
 

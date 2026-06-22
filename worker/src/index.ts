@@ -24,6 +24,7 @@ import {
 import { handleSorteio } from './routes/sorteio';
 import { handleAdminUploadCapa, handlePublicCapa } from './routes/admin-upload';
 import {
+  verificarToken,
   handleAdminCatalogoGet,
   handleAdminCatalogoCreate,
   handleAdminCatalogoUpdate,
@@ -398,21 +399,7 @@ async function handleAdminLogin(request: Request, env: Env, origin: string | nul
 
 // ─── Admin Stats ──────────────────────────────────────────────────────────────
 async function handleAdminStats(request: Request, env: Env): Promise<Response> {
-  const auth = request.headers.get('Authorization') ?? '';
-  const token = auth.replace('Bearer ', '').trim();
-
-  // Verificar sessão
-  const sessaoResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/admin_sessoes?token=eq.${encodeURIComponent(token)}&ativa=eq.true&select=expira_em`,
-    {
-      headers: {
-        apikey: env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      },
-    }
-  );
-  const sessoes = (await sessaoResp.json()) as any[];
-  if (!sessoes.length || new Date(sessoes[0].expira_em) < new Date()) {
+  if (!(await verificarToken(request, env))) {
     return new Response('Unauthorized', { status: 401 });
   }
 

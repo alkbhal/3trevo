@@ -207,7 +207,7 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
 
   // Buscar token na tabela downloads
   const resp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/downloads?token=eq.${token}&select=id,product_id,expira_em,usado_em`,
+    `${env.SUPABASE_URL}/rest/v1/downloads?token=eq.${token}&select=id,product_id,expira_em,usado_em,download_count`,
     { headers: supabaseHeaders(env) }
   );
   const [dl] = (await resp.json()) as any[];
@@ -215,6 +215,11 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
   if (!dl) return new Response('Link inválido ou expirado', { status: 404 });
   if (new Date(dl.expira_em) < new Date()) {
     return new Response('Link expirado. Contate sac@3trevo.com.br para renovação.', { status: 410 });
+  }
+
+  const MAX_DOWNLOADS = 5;
+  if ((dl.download_count ?? 0) >= MAX_DOWNLOADS) {
+    return new Response('Limite de downloads atingido. Contate sac@3trevo.com.br.', { status: 403 });
   }
 
   // Buscar arquivo do produto
@@ -227,17 +232,20 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
     return new Response('Arquivo não configurado', { status: 404 });
   }
 
-  // Registrar uso (não bloquear re-download dentro do prazo)
-  fetch(`${env.SUPABASE_URL}/rest/v1/downloads?id=eq.${dl.id}`, {
-    method: 'PATCH',
+  // Registrar uso e incrementar contador
+  await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/increment_download_count`, {
+    method: 'POST',
     headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ usado_em: new Date().toISOString(), ip: request.headers.get('cf-connecting-ip') }),
-  }).catch(() => {});
+    body: JSON.stringify({ dl_id: dl.id, dl_ip: request.headers.get('cf-connecting-ip') ?? '' }),
+  }).catch((e) => console.error('[download] increment error:', e));
 
   // Redirecionar para R2 público (ou URL pré-assinada)
+  if (!env.R2_PUBLIC_BUCKET_ID) {
+    return Response.json({ ok: false, erro: 'r2_not_configured' }, { status: 500 });
+  }
   const pdfUrl = produto.arquivo_url.startsWith('http')
     ? produto.arquivo_url
-    : `https://pub-${env.R2_PUBLIC_BUCKET_ID ?? 'CONFIGURE'}.r2.dev/${produto.arquivo_url}`;
+    : `https://pub-${env.R2_PUBLIC_BUCKET_ID}.r2.dev/${produto.arquivo_url}`;
 
   return Response.redirect(pdfUrl, 302);
 }
@@ -384,6 +392,10 @@ async function distribuirNumeros(
   const ocupados = new Set(existentes.map((n: any) => n.numero));
 
   const max = draw.max_numeros ?? 100000;
+  if (ocupados.size >= max) {
+    console.error(`[draw] All ${max} numbers allocated for draw ${draw.id}`);
+    return;
+  }
   const novos: number[] = [];
   let tentativas = 0;
   while (novos.length < opts.quantidade && tentativas < opts.quantidade * 100) {
@@ -391,7 +403,7 @@ async function distribuirNumeros(
     const buf = new Uint32Array(1);
     crypto.getRandomValues(buf);
     const n = (buf[0] % max) + 1;
-    if (!ocupados.has(n) && !novos.includes(n)) {
+    if (!ocupados.has(n)) {
       novos.push(n);
       ocupados.add(n);
     }

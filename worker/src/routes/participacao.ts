@@ -126,8 +126,12 @@ Critérios:
   }
 }
 
-// ─── Handler: GET/POST /api/participacao/status ───────────────────────────────
+// ─── Handler: GET /api/participacao/status ────────────────────────────────────
 export async function handleParticipacaoStatus(request: Request, env: Env): Promise<Response> {
+  if (request.method !== 'GET') {
+    return new Response('Method Not Allowed', { status: 405 });
+  }
+
   const url = new URL(request.url);
   const pedido_id = url.searchParams.get('pedido_id');
 
