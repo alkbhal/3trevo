@@ -281,36 +281,37 @@
     .prod-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
     /* Cards de produto */
-    .pcard { background: var(--branco); border: 1px solid var(--borda); border-radius: 3px; overflow: hidden; transition: transform .25s, box-shadow .25s; cursor: pointer; }
-    .pcard:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(10,31,14,.1); z-index: 2; }
-    .pcard-cor { height: 4px; }
+    .pcard { background: var(--branco); border: 1px solid var(--borda); border-radius: 16px; overflow: hidden; transition: transform .3s cubic-bezier(.25,.1,.25,1), box-shadow .3s; cursor: pointer; box-shadow: 0 2px 12px rgba(10,31,14,.06); }
+    .pcard:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 16px 48px rgba(10,31,14,.12); z-index: 2; }
+    .pcard:active { transform: scale(0.985); }
+    .pcard-cor { height: 5px; border-radius: 16px 16px 0 0; }
 
     /* Miniatura de capa no card */
     .pcard-capa-mini {
-      float: right; margin: 16px 16px 0 12px;
-      width: 54px; height: 76px; border-radius: 1px 3px 3px 1px;
+      float: right; margin: 20px 20px 0 16px;
+      width: 72px; height: 102px; border-radius: 2px 6px 6px 2px;
       position: relative; overflow: hidden; flex-shrink: 0;
-      box-shadow: -3px 4px 12px rgba(0,0,0,.25);
+      box-shadow: -4px 6px 20px rgba(0,0,0,.3);
       animation: mini-float 5s ease-in-out infinite;
     }
     @keyframes mini-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     .pcard-capa-mini::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(to right, rgba(0,0,0,.4), transparent); }
-    .pcard-capa-mini-titulo { padding: 6px 5px; font-family: var(--serif); font-size: 7px; font-style: italic; color: rgba(255,255,255,.8); line-height: 1.3; }
+    .pcard-capa-mini-titulo { padding: 8px 6px; font-family: var(--serif); font-size: 8px; font-style: italic; color: rgba(255,255,255,.85); line-height: 1.3; }
 
-    .pcard-corpo { padding: 16px 20px 0; overflow: hidden; }
-    .pcard-genero { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); font-weight: 500; margin-bottom: 6px; }
-    h3.pcard-t { font-size: 19px; font-weight: 400; color: var(--t0); line-height: 1.2; margin-bottom: 4px; }
-    .pcard-autor { font-size: 12px; color: var(--t3); font-style: italic; margin-bottom: 10px; }
-    .pcard-desc { font-size: 13px; color: var(--t1); line-height: 1.65; clear: both; }
-    .pcard-rodape { margin-top: 16px; padding: 14px 20px; border-top: 1px solid var(--borda); display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg); }
-    .pcard-preco { font-family: var(--serif); font-size: 24px; font-weight: 300; color: var(--t0); line-height: 1; }
-    .pcard-preco-sub { font-size: 10px; color: var(--t3); margin-top: 3px; }
+    .pcard-corpo { padding: 20px 24px 0; overflow: hidden; }
+    .pcard-genero { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--v4); font-weight: 600; margin-bottom: 8px; }
+    h3.pcard-t { font-size: 20px; font-weight: 500; color: var(--t0); line-height: 1.25; margin-bottom: 6px; font-family: var(--serif); }
+    .pcard-autor { font-size: 12px; color: var(--t3); font-style: italic; margin-bottom: 12px; }
+    .pcard-desc { font-size: 13.5px; color: var(--t1); line-height: 1.7; clear: both; }
+    .pcard-rodape { margin-top: 16px; padding: 16px 24px; border-top: 1px solid var(--borda); display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--bg); }
+    .pcard-preco { font-family: var(--serif); font-size: 26px; font-weight: 400; color: var(--t0); line-height: 1; }
+    .pcard-preco-sub { font-size: 10px; color: var(--t3); margin-top: 4px; }
     .pcard-dir { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .cotas-badge { background: var(--v8); border: 1px solid var(--borda-v); color: var(--v3); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
     .pcard.premium .cotas-badge { animation: badge-shine 2.5s ease-in-out infinite; }
     @keyframes badge-shine { 0%,100% { background: var(--v8); } 50% { background: #d0ecd0; box-shadow: 0 0 8px rgba(30,92,58,.12); } }
-    .btn-adq { background: var(--v2); color: #fff; padding: 9px 18px; border-radius: 2px; font-size: 12px; font-weight: 600; transition: background .2s; white-space: nowrap; }
-    .btn-adq:hover { background: var(--v3); }
+    .btn-adq { background: var(--v2); color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: background .2s, transform .15s; white-space: nowrap; box-shadow: 0 2px 8px rgba(26,92,56,.25); }
+    .btn-adq:hover { background: var(--v3); transform: scale(1.04); }
     .pcard-pc { font-size: 11px; color: var(--v4); padding: 8px 20px; background: var(--v8); border-top: 1px solid rgba(30,92,58,.08); display: flex; align-items: center; gap: 6px; }
     .pcard-pc::before { content: '✦'; font-size: 9px; }
 
@@ -1109,6 +1110,8 @@ function renderProdutos(prods, filtro) {
     const card = document.createElement('div');
     card.className = `pcard fi${p.premium ? ' premium' : ''}`;
     card.style.transitionDelay = `${i * 0.07}s`;
+    card.style.cursor = 'pointer';
+    card.onclick = function(e) { if (e.target.closest('.btn-adq')) return; window.location.href = '/checkout.html?slug=' + p.slug; };
     card.innerHTML = `
       <div class="pcard-cor" style="background:${p.cor}"></div>
       <div class="pcard-corpo">
