@@ -355,6 +355,7 @@
       if (!playlist.length) { playTrack(0); return; }
       if (audio.paused) {
         if (!audio.src) { playTrack(currentIdx >= 0 ? currentIdx : 0); return; }
+        if (signedUrl && Date.now() > urlExpiry) { if (window._ttRetryCount > 3) { console.warn('TTPlayer: max URL retries'); return; } window._ttRetryCount = (window._ttRetryCount || 0) + 1; playTrack(currentIdx); return; }
         audio.play().then(() => setPlayIcon(true));
       } else {
         audio.pause();

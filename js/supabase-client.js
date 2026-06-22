@@ -22,3 +22,27 @@ const CATALOGO = {
   antifalencia:   { titulo: 'O Guia Antifalência do Empreendedor',      autor: 'Said Anes', genero: 'Manual',           emoji: '📘', cor: '#1a2a3e', cotas: 3,  preco: 46.04 },
   atico:          { titulo: 'Antes do App, o Método',                   autor: 'Said Anes', genero: 'Finanças · Método', emoji: '⚡', cor: '#1a2a1a', cotas: 3,  preco: 37.00 },
 };
+
+// Catálogo live do Supabase (sobrepõe hardcoded quando disponível)
+window.CATALOGO_LIVE = null;
+
+async function carregarCatalogo() {
+  try {
+    const { data } = await sb.from('catalogo').select('slug,titulo,preco,cotas_total,ativo').eq('ativo', true);
+    if (data && data.length) {
+      window.CATALOGO_LIVE = {};
+      data.forEach(p => {
+        if (typeof p.slug === 'string' && p.slug.length > 0 && typeof p.preco === 'number' && p.preco >= 0) {
+          window.CATALOGO_LIVE[p.slug] = p;
+        }
+      });
+      if (!Object.keys(window.CATALOGO_LIVE).length) window.CATALOGO_LIVE = null;
+    }
+  } catch (e) { /* fallback to hardcoded CATALOGO */ }
+}
+
+function getCatalogo() {
+  return window.CATALOGO_LIVE || CATALOGO;
+}
+
+carregarCatalogo();

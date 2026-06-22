@@ -61,3 +61,7 @@ ruvector.db
 # ── Scripts de setup temporários ────────────────────────────
 setup-*.ps1
 .gstack/
+
+.dev.vars*
+!.dev.vars.example
+!.env.example

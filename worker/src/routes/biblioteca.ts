@@ -49,9 +49,15 @@ async function sessaoLeitor(request: Request, env: Env): Promise<string | null> 
 
 // ─── Verificar acesso (email com pelo menos 1 pedido pago) ───────────────────
 async function temAcesso(email: string, env: Env): Promise<boolean> {
-  const r = await sb(env, `pedidos?email=eq.${encodeURIComponent(email)}&status=eq.pago&select=id&limit=1`);
-  const data = (await r.json()) as any[];
-  return data.length > 0;
+  // 1. Busca cliente pelo email
+  const rc = await sb(env, `clientes?email=eq.${encodeURIComponent(email)}&select=id&limit=1`);
+  const clientes = (await rc.json()) as any[];
+  if (!clientes.length) return false;
+  // 2. Verifica pedido pago (status 'pago' ou 'paid')
+  const clienteId = clientes[0].id;
+  const rp = await sb(env, `pedidos?cliente_id=eq.${clienteId}&status=in.(pago,paid)&select=id&limit=1`);
+  const pedidos = (await rp.json()) as any[];
+  return pedidos.length > 0;
 }
 
 // ─── Token aleatório ──────────────────────────────────────────────────────────
@@ -170,8 +176,8 @@ export async function handleBibliotecaSelecionar(request: Request, env: Env): Pr
   let body: any;
   try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
 
-  const { slug } = body;
-  if (!slug) return Response.json({ ok: false, erro: 'slug_obrigatorio' }, { status: 400 });
+  const slug = typeof body.slug === 'string' ? body.slug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '') : '';
+  if (!slug || slug.length > 80) return Response.json({ ok: false, erro: 'slug_invalido' }, { status: 400 });
 
   const obraR = await sb(env, `biblioteca_acervo?slug=eq.${encodeURIComponent(slug)}&ativo=eq.true&select=id,titulo&limit=1`);
   const [obra] = (await obraR.json()) as any[];
@@ -245,10 +251,12 @@ export async function handleBibliotecaProgresso(request: Request, env: Env): Pro
 
   const { slot_id, pagina_atual = 0, progresso_percentual = 0 } = body;
   if (!slot_id) return Response.json({ ok: false, erro: 'slot_id_obrigatorio' }, { status: 400 });
+  const pag = Math.max(0, Math.floor(Number(pagina_atual) || 0));
+  const prog = Math.max(0, Math.min(100, Number(progresso_percentual) || 0));
 
   await sb(env, `biblioteca_slots?id=eq.${slot_id}&email=eq.${encodeURIComponent(email)}`, {
     method: 'PATCH',
-    body: JSON.stringify({ pagina_atual, progresso_percentual }),
+    body: JSON.stringify({ pagina_atual: pag, progresso_percentual: prog }),
   });
 
   return Response.json({ ok: true });
