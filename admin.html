@@ -870,6 +870,9 @@
 </div>
 
 <script>
+// ── SECURITY ─────────────────────────────────────────────────────────────────
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 const API = 'https://tres-trevo-api.al-kbhal.workers.dev';
 let token = sessionStorage.getItem('tt_admin_token') || '';
@@ -985,7 +988,7 @@ async function carregarStats() {
     if (d.draw_ativo) {
       drawArea.innerHTML = `
         <div class="draw-card" style="margin-bottom:16px;">
-          <div><div class="draw-card-t">Draw ativo: ${d.draw_ativo.titulo || d.draw_ativo.id}</div><div class="draw-card-s">Status: ${d.draw_ativo.status}</div></div>
+          <div><div class="draw-card-t">Draw ativo: ${escapeHtml(d.draw_ativo.titulo || d.draw_ativo.id)}</div><div class="draw-card-s">Status: ${escapeHtml(d.draw_ativo.status)}</div></div>
           <div class="draw-card-stat"><div class="draw-card-n">${d.total_entries || '—'}</div><div class="draw-card-nl">cotas válidas</div></div>
         </div>`;
     } else {
@@ -996,7 +999,7 @@ async function carregarStats() {
     atl.innerHTML = `
       <div class="activity-item"><div class="activity-dot activity-dot-ok"></div><div class="activity-text"><strong>${d.total_pedidos}</strong> pedidos totais · <strong>${d.depoimentos_aprovados}</strong> depoimentos aprovados</div><div class="activity-ts">${new Date(d.ts).toLocaleTimeString('pt-BR')}</div></div>
       ${d.revisao_pendente > 0 ? `<div class="activity-item"><div class="activity-dot activity-dot-warn"></div><div class="activity-text"><strong>${d.revisao_pendente}</strong> depoimentos aguardando revisão manual</div><div class="activity-ts">—</div></div>` : ''}
-      <div class="activity-item"><div class="activity-dot activity-dot-info"></div><div class="activity-text">Sistema Loteria TT · ${d.draw_ativo ? 'Draw aberto: ' + (d.draw_ativo.titulo || d.draw_ativo.id) : 'Nenhum draw aberto'}</div><div class="activity-ts">—</div></div>
+      <div class="activity-item"><div class="activity-dot activity-dot-info"></div><div class="activity-text">Sistema Loteria TT · ${d.draw_ativo ? 'Draw aberto: ' + escapeHtml(d.draw_ativo.titulo || d.draw_ativo.id) : 'Nenhum draw aberto'}</div><div class="activity-ts">—</div></div>
     `;
   } catch(e) { toast('Erro ao carregar stats: ' + e.message, 'err'); }
 }
@@ -1023,14 +1026,14 @@ function renderTabelaCatalogo(livros) {
   tbody.innerHTML = livros.map((l, i) => `
     <tr>
       <td><span class="drag-handle" title="Arrastar">⠿</span></td>
-      <td><div class="livro-thumb" style="${l.capa_url ? `background:url('${l.capa_url}') center/cover` : `background:${l.bg_color||'#0d2415'}`}"></div></td>
+      <td><div class="livro-thumb" style="${l.capa_url ? `background:url('${escapeHtml(l.capa_url)}') center/cover` : `background:${escapeHtml(l.bg_color||'#0d2415')}`}"></div></td>
       <td>
-        <div style="font-weight:600;color:var(--t0);">${l.titulo || l.slug}</div>
-        <div style="font-size:11px;color:var(--t3);">${l.slug}</div>
+        <div style="font-weight:600;color:var(--t0);">${escapeHtml(l.titulo || l.slug)}</div>
+        <div style="font-size:11px;color:var(--t3);">${escapeHtml(l.slug)}</div>
       </td>
       <td>R$${parseFloat(l.preco||0).toFixed(2)}</td>
       <td>${l.cotas} cota${l.cotas>1?'s':''}</td>
-      <td><span style="font-size:11px;color:var(--t3);">${l.utm_campaign||l.slug||'—'}</span></td>
+      <td><span style="font-size:11px;color:var(--t3);">${escapeHtml(l.utm_campaign||l.slug||'—')}</span></td>
       <td><span class="badge ${l.ativo?'badge-ok':'badge-cinza'}">${l.ativo?'Ativo':'Inativo'}</span></td>
       <td style="text-align:right;">
         <button class="btn btn-icon btn-sm" onclick="abrirModalLivro('${l.slug}')" title="Editar">✎</button>
@@ -1178,18 +1181,18 @@ function renderCarouselOrder(slugs) {
       ? `background-image:url('${l.capa_url}');background-size:cover;background-position:center;background-color:${bg};`
       : `background-color:${bg};`;
     return `
-    <div class="carousel-item" draggable="true" data-slug="${l.slug}">
+    <div class="carousel-item" draggable="true" data-slug="${escapeHtml(l.slug)}">
       <span class="carousel-item-num">${i+1}</span>
       <div class="book3d-wrap">
         <div class="book3d">
           <div class="book3d-front" style="${frontStyle}"></div>
-          <div class="book3d-spine" style="background-color:${bg};"></div>
+          <div class="book3d-spine" style="background-color:${escapeHtml(bg)};"></div>
           <div class="book3d-pages"></div>
         </div>
       </div>
       <div class="carousel-item-info">
-        <div class="carousel-item-t">${l.titulo || l.slug}</div>
-        <div class="carousel-item-s">${l.capa_url ? '🖼 com capa' : '⬜ cor chapada'} · ${l.slug}</div>
+        <div class="carousel-item-t">${escapeHtml(l.titulo || l.slug)}</div>
+        <div class="carousel-item-s">${l.capa_url ? '🖼 com capa' : '⬜ cor chapada'} · ${escapeHtml(l.slug)}</div>
       </div>
       <span style="color:var(--t3);font-size:16px;cursor:grab;">⠿</span>
     </div>`;
@@ -1272,10 +1275,10 @@ async function carregarDepoimentos() {
     container.innerHTML = lista.map(dep => `
       <div class="dep-row">
         <div class="dep-content">
-          <div class="dep-texto">"${dep.texto || dep.depoimento_texto || '—'}"</div>
+          <div class="dep-texto">"${escapeHtml(dep.texto || dep.depoimento_texto || '—')}"</div>
           <div class="dep-meta">
-            <strong>${dep.nome || dep.comprador_nome || dep.email || '—'}</strong>
-            · ${dep.slug || dep.produto_slug || dep.ebook_slug || '—'}
+            <strong>${escapeHtml(dep.nome || dep.comprador_nome || dep.email || '—')}</strong>
+            · ${escapeHtml(dep.slug || dep.produto_slug || dep.ebook_slug || '—')}
             · <span class="badge ${dep.estado === 'aprovado' ? 'badge-ok' : dep.estado === 'reprovado' ? 'badge-perigo' : 'badge-warn'}">${dep.estado || 'pendente'}</span>
           </div>
         </div>
@@ -1288,7 +1291,7 @@ async function carregarDepoimentos() {
         </div>
       </div>
     `).join('');
-  } catch(e) { container.innerHTML = `<div class="empty-state"><div class="empty-state-s">Erro: ${e.message}</div></div>`; }
+  } catch(e) { container.innerHTML = `<div class="empty-state"><div class="empty-state-s">Erro: ${escapeHtml(e.message)}</div></div>`; }
 }
 
 async function moderarDep(id, acao) {
@@ -1330,11 +1333,11 @@ function renderSorteio(d) {
   if (d.draw_ativo) {
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
-        <div class="kpi"><div class="kpi-v">${d.draw_ativo.status}</div><div class="kpi-l">Status</div></div>
+        <div class="kpi"><div class="kpi-v">${escapeHtml(d.draw_ativo.status)}</div><div class="kpi-l">Status</div></div>
         <div class="kpi"><div class="kpi-v">${d.total_entries}</div><div class="kpi-l">Cotas totais</div></div>
         <div class="kpi"><div class="kpi-v">${d.depoimentos_aprovados}</div><div class="kpi-l">Depoimentos aprovados</div></div>
       </div>
-      <p style="font-size:12px;color:var(--t3);margin-top:14px;">ID: <code>${d.draw_ativo.id}</code></p>
+      <p style="font-size:12px;color:var(--t3);margin-top:14px;">ID: <code>${escapeHtml(d.draw_ativo.id)}</code></p>
     `;
     document.getElementById('sorteio-draw-id').value = d.draw_ativo.id;
   } else {
@@ -1357,15 +1360,15 @@ async function dispararSorteio() {
     const d = await r.json();
     if (d.ok) {
       res.innerHTML = `<span style="color:var(--ok)">✓ Sorteio concluído.<br>
-        Número sorteado: <strong>${d.numero_sorteado}</strong> ·
-        Vencedor: <strong>${d.winner_email || d.winner_user_id}</strong><br>
-        Hash SHA-256: <code>${(d.hash_sha256 || '').substring(0,20)}…</code> ·
-        Participantes: ${d.total_participantes}
+        Número sorteado: <strong>${escapeHtml(d.numero_sorteado)}</strong> ·
+        Vencedor: <strong>${escapeHtml(d.winner_email || d.winner_user_id)}</strong><br>
+        Hash SHA-256: <code>${escapeHtml((d.hash_sha256 || '').substring(0,20))}…</code> ·
+        Participantes: ${escapeHtml(d.total_participantes)}
       </span>`;
     } else {
-      res.innerHTML = `<span style="color:var(--danger)">Erro: ${d.erro}${d.detalhe ? ' — ' + d.detalhe : ''}</span>`;
+      res.innerHTML = `<span style="color:var(--danger)">Erro: ${escapeHtml(d.erro)}${d.detalhe ? ' — ' + escapeHtml(d.detalhe) : ''}</span>`;
     }
-  } catch(e) { res.innerHTML = `<span style="color:var(--danger)">${e.message}</span>`; }
+  } catch(e) { res.innerHTML = `<span style="color:var(--danger)">${escapeHtml(e.message)}</span>`; }
 }
 
 // ── IA STUDIO ─────────────────────────────────────────────────────────────────
@@ -1404,7 +1407,7 @@ function adicionarMsgIA(texto, tipo='ai', acaoJson=null) {
   if (acaoJson && acaoJson.tipo && acaoJson.tipo !== 'nenhuma') {
     acaoHtml = `
       <div class="ia-acao-card">
-        <div class="ia-acao-titulo">✦ Ação sugerida: ${acaoJson.tipo}</div>
+        <div class="ia-acao-titulo">✦ Ação sugerida: ${escapeHtml(acaoJson.tipo)}</div>
         <div class="ia-acao-payload">${JSON.stringify(acaoJson.payload, null, 2)}</div>
         <div class="ia-acao-btns">
           <button class="btn btn-p btn-sm" onclick="executarAcaoIA(${JSON.stringify(acaoJson).replace(/"/g,'&quot;')},this)">Confirmar e executar</button>
@@ -1508,14 +1511,14 @@ function renderTabelaBib(livros) {
   }
   el.innerHTML = livros.map(l => `
     <tr>
-      <td><strong>${l.titulo}</strong><div style="font-size:11px;color:var(--t3)">${l.slug}</div></td>
-      <td>${l.autor}</td>
-      <td>${l.ano_publicacao ?? '—'}</td>
-      <td>${l.genero ?? '—'}</td>
+      <td><strong>${escapeHtml(l.titulo)}</strong><div style="font-size:11px;color:var(--t3)">${escapeHtml(l.slug)}</div></td>
+      <td>${escapeHtml(l.autor)}</td>
+      <td>${escapeHtml(l.ano_publicacao ?? '—')}</td>
+      <td>${escapeHtml(l.genero ?? '—')}</td>
       <td><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${l.ativo ? '#e8f5e9' : '#ffebee'};color:${l.ativo ? '#2e7d32' : '#c62828'}">${l.ativo ? 'Ativo' : 'Inativo'}${l.featured ? ' ★' : ''}</span></td>
       <td>
-        <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="editarObra('${l.slug}')">Editar</button>
-        <button class="btn-ghost" style="padding:4px 10px;font-size:12px;color:#c62828" onclick="desativarObra('${l.slug}','${l.ativo}')">${l.ativo ? 'Desativar' : 'Ativar'}</button>
+        <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="editarObra('${escapeHtml(l.slug)}')">Editar</button>
+        <button class="btn-ghost" style="padding:4px 10px;font-size:12px;color:#c62828" onclick="desativarObra('${escapeHtml(l.slug)}','${l.ativo}')">${l.ativo ? 'Desativar' : 'Ativar'}</button>
       </td>
     </tr>
   `).join('');

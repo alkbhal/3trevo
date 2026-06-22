@@ -11,6 +11,12 @@
 
 import type { Env } from '../types';
 
+const ALLOWED_ORIGINS = ['https://3trevo.com.br', 'https://www.3trevo.com.br', 'http://localhost:5500', 'http://127.0.0.1:5500'];
+function getCorsOrigin(request: Request): string {
+  const origin = request.headers.get('Origin');
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+}
+
 // ─── Rate limiting simples via KV ─────────────────────────────────────────────
 async function checkRateLimit(env: Env, key: string, maxPerHour = 5): Promise<boolean> {
   const now = Math.floor(Date.now() / 1000);
@@ -141,13 +147,13 @@ export async function handleParticipacaoStatus(request: Request, env: Env): Prom
 
   const data = await resp.json();
   return Response.json(data, {
-    headers: { 'Access-Control-Allow-Origin': 'https://www.3trevo.com.br' },
+    headers: { 'Access-Control-Allow-Origin': getCorsOrigin(request) },
   });
 }
 
 // ─── Handler: POST /api/participacao/depoimento ──────────────────────────────
 export async function handleDepoimento(request: Request, env: Env): Promise<Response> {
-  const corsHeaders = { 'Access-Control-Allow-Origin': 'https://www.3trevo.com.br' };
+  const corsHeaders = { 'Access-Control-Allow-Origin': getCorsOrigin(request) };
 
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -272,7 +278,7 @@ export async function handleDepoimento(request: Request, env: Env): Promise<Resp
 
 // ─── Handler: POST /api/participacao/questionario ────────────────────────────
 export async function handleQuestionario(request: Request, env: Env): Promise<Response> {
-  const corsHeaders = { 'Access-Control-Allow-Origin': 'https://www.3trevo.com.br' };
+  const corsHeaders = { 'Access-Control-Allow-Origin': getCorsOrigin(request) };
 
   if (request.method === 'OPTIONS') {
     return new Response(null, {

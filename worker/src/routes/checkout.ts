@@ -13,6 +13,10 @@
 
 import type { Env } from '../types';
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 const MP_API = 'https://api.mercadopago.com';
 const SITE_URL = 'https://3trevo.com.br';
 const WORKER_URL = 'https://tres-trevo-api.al-kbhal.workers.dev';
@@ -436,10 +440,10 @@ async function enviarEmailCompra(
   </td></tr>
   <tr><td style="padding:36px 48px 0">
     <h1 style="margin:0 0 12px;font-size:28px;font-weight:300;color:#0f2d1a">
-      Olá, <em style="font-style:italic;color:#1a4a2e">${opts.nome.split(' ')[0]}</em> —
+      Olá, <em style="font-style:italic;color:#1a4a2e">${escapeHtml(opts.nome.split(' ')[0])}</em> —
     </h1>
     <p style="margin:0 0 24px;font-size:15px;color:#555;line-height:1.7">
-      Seu pagamento foi aprovado. <strong>${opts.ebookTitulo}</strong> está pronto para leitura.
+      Seu pagamento foi aprovado. <strong>${escapeHtml(opts.ebookTitulo)}</strong> está pronto para leitura.
     </p>
     <p style="margin:0 0 8px;font-size:13px;color:#888">
       Valor pago: <strong style="color:#1a4a2e">${valorFmt}</strong> &nbsp;·&nbsp;
@@ -453,7 +457,7 @@ async function enviarEmailCompra(
     <a href="${downloadUrl}"
        style="display:block;padding:18px;background:#1a4a2e;color:#f0ebe0;text-decoration:none;
               text-align:center;font-size:15px;font-weight:500">
-      Baixar ${opts.ebookTitulo} →
+      Baixar ${escapeHtml(opts.ebookTitulo)} →
     </a>
   </td></tr>
 

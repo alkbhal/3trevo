@@ -121,7 +121,7 @@ export default {
     } catch (err) {
       console.error('[worker] erro não capturado:', err);
       return withCors(
-        Response.json({ ok: false, erro: 'internal_error', detalhe: String(err) }, { status: 500 }),
+        Response.json({ ok: false, erro: 'internal_error' }, { status: 500 }),
         origin
       );
     }
