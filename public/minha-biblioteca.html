@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Biblioteca — Editora Três Trevo</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- epub.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+  <style>
+    :root {
+      --verde: #1e5c3a;
+      --verde-escuro: #0f2d1a;
+      --creme: #f8f5ef;
+      --dourado: #c9a84c;
+      --cinza: #666;
+      --borda: #e0dbd0;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Instrument Sans', sans-serif; background: var(--creme); color: #222; min-height: 100vh; }
+
+    /* ── Topo ── */
+    .topo {
+      background: var(--verde-escuro);
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .topo-marca { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; letter-spacing: 1px; }
+    .topo-marca span { color: var(--dourado); }
+    .topo-email { font-size: 13px; color: #aaa; }
+
+    /* ── Layout ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* ── Auth ── */
+    #tela-login { max-width: 440px; margin: 60px auto; }
+    .card { background: #fff; border: 1px solid var(--borda); border-radius: 6px; padding: 40px 36px; }
+    .card h1 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 26px; color: var(--verde-escuro); margin-bottom: 8px; }
+    .card p { color: var(--cinza); font-size: 14px; line-height: 1.7; margin-bottom: 28px; }
+    .campo { margin-bottom: 16px; }
+    .campo label { display: block; font-size: 12px; font-weight: 600; color: #444; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .campo input { width: 100%; padding: 11px 14px; border: 1px solid var(--borda); border-radius: 4px; font-size: 15px; font-family: inherit; outline: none; transition: border-color .2s; }
+    .campo input:focus { border-color: var(--verde); }
+    .btn { display: inline-block; background: var(--verde); color: #fff; border: none; border-radius: 4px; padding: 12px 28px; font-size: 15px; font-family: inherit; font-weight: 500; cursor: pointer; width: 100%; transition: background .2s; }
+    .btn:hover { background: var(--verde-escuro); }
+    .btn:disabled { background: #aaa; cursor: default; }
+    .msg { margin-top: 14px; padding: 12px 16px; border-radius: 4px; font-size: 14px; display: none; }
+    .msg.ok { background: #e8f5e9; color: #2e7d32; }
+    .msg.erro { background: #ffebee; color: #c62828; }
+
+    /* ── Biblioteca ── */
+    #tela-biblioteca { display: none; }
+    .secao-titulo {
+      font-family: 'Fraunces', serif;
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--verde-escuro);
+      margin: 40px 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--borda);
+    }
+    .secao-titulo small { font-family: 'Instrument Sans', sans-serif; font-size: 13px; color: var(--cinza); font-weight: 400; margin-left: 8px; }
+
+    /* Slots */
+    .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 8px; }
+    .slot-vazio, .slot-livro {
+      border: 1.5px dashed var(--borda);
+      border-radius: 6px;
+      padding: 20px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      background: #fff;
+    }
+    .slot-livro {
+      border-style: solid;
+      border-color: var(--verde);
+      align-items: flex-start;
+      text-align: left;
+    }
+    .slot-num { font-size: 11px; font-weight: 600; color: var(--cinza); text-transform: uppercase; letter-spacing: 1px; }
+    .slot-vazio .slot-icone { font-size: 28px; opacity: .4; }
+    .slot-vazio p { font-size: 13px; color: var(--cinza); }
+    .slot-titulo { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 400; color: var(--verde-escuro); line-height: 1.3; }
+    .slot-autor { font-size: 12px; color: var(--cinza); margin-bottom: 4px; }
+    .progresso-bar { width: 100%; height: 4px; background: var(--borda); border-radius: 2px; overflow: hidden; margin: 8px 0; }
+    .progresso-fill { height: 100%; background: var(--verde); transition: width .3s; }
+    .progresso-txt { font-size: 11px; color: var(--cinza); }
+    .slot-acoes { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .btn-sm {
+      padding: 6px 14px; font-size: 12px; border-radius: 3px; border: 1px solid var(--verde);
+      background: transparent; color: var(--verde); cursor: pointer; font-family: inherit; font-weight: 500;
+      transition: all .2s;
+    }
+    .btn-sm:hover { background: var(--verde); color: #fff; }
+    .btn-sm.destaque { background: var(--verde); color: #fff; }
+    .btn-sm.perigo { border-color: #999; color: #666; }
+    .btn-sm.perigo:hover { background: #eee; color: #333; }
+
+    /* Acervo */
+    .acervo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+    .livro-card {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow .2s, transform .15s;
+    }
+    .livro-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.1); transform: translateY(-2px); }
+    .livro-capa {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: 'Fraunces', serif;
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+    }
+    .livro-info { padding: 14px; }
+    .livro-titulo { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 400; color: var(--verde-escuro); line-height: 1.3; margin-bottom: 4px; }
+    .livro-autor { font-size: 12px; color: var(--cinza); }
+    .livro-badge {
+      display: inline-block; margin-top: 8px;
+      padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      background: var(--creme); color: var(--verde); border: 1px solid var(--verde);
+    }
+
+    /* Histórico */
+    .historico-lista { display: flex; flex-direction: column; gap: 10px; }
+    .hist-item {
+      display: flex; align-items: center; gap: 16px;
+      background: #fff; border: 1px solid var(--borda); border-radius: 4px; padding: 14px 16px;
+    }
+    .hist-icone { font-size: 24px; flex-shrink: 0; }
+    .hist-titulo { font-family: 'Fraunces', serif; font-size: 15px; color: var(--verde-escuro); }
+    .hist-meta { font-size: 12px; color: var(--cinza); }
+    .hist-vazio { color: var(--cinza); font-size: 14px; padding: 20px 0; }
+
+    /* ── Leitor ── */
+    #tela-leitura { display: none; position: fixed; inset: 0; background: #fff; z-index: 1000; flex-direction: column; }
+    .leitor-topo {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px; border-bottom: 1px solid var(--borda);
+      background: var(--verde-escuro); color: #fff; flex-shrink: 0;
+    }
+    .leitor-titulo { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; }
+    .leitor-controles { display: flex; gap: 10px; align-items: center; }
+    .btn-leitor { background: rgba(255,255,255,.15); border: none; color: #fff; border-radius: 3px; padding: 6px 14px; cursor: pointer; font-family: inherit; font-size: 13px; }
+    .btn-leitor:hover { background: rgba(255,255,255,.25); }
+    #viewer { flex: 1; overflow: hidden; }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-overlay.ativo { display: flex; }
+    .modal { background: #fff; border-radius: 6px; padding: 32px; max-width: 420px; width: 90%; }
+    .modal h3 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 400; color: var(--verde-escuro); margin-bottom: 12px; }
+    .modal p { font-size: 14px; color: var(--cinza); line-height: 1.7; margin-bottom: 20px; }
+    .modal-acoes { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* Spinner */
+    .spinner { display: none; border: 3px solid var(--borda); border-top-color: var(--verde); border-radius: 50%; width: 28px; height: 28px; animation: spin .7s linear infinite; margin: 40px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsivo */
+    @media (max-width: 600px) {
+      .acervo-grid { grid-template-columns: repeat(2, 1fr); }
+      .slots { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Topo -->
+<header class="topo">
+  <div class="topo-marca">Editora <span>Três Trevo</span></div>
+  <div class="topo-email" id="topo-email" style="display:none"></div>
+</header>
+
+<!-- ── Tela Login ── -->
+<div id="tela-login">
+  <div class="container">
+    <div class="card">
+      <h1>📚 Biblioteca Clássica TT</h1>
+      <p>Acesso exclusivo para compradores. Informe o email usado na compra e enviaremos um link de acesso imediato.</p>
+      <form id="form-login">
+        <div class="campo">
+          <label>Email da compra</label>
+          <input type="email" id="input-email" placeholder="seu@email.com" required autocomplete="email">
+        </div>
+        <button type="submit" class="btn" id="btn-enviar">Receber link de acesso</button>
+      </form>
+      <div class="msg" id="msg-login"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tela Biblioteca ── -->
+<div id="tela-biblioteca">
+  <div class="container">
+
+    <!-- Slots ativos -->
+    <div class="secao-titulo">Leituras abertas <small id="slots-contador">0/3</small></div>
+    <div class="slots" id="lista-slots">
+      <div class="spinner" id="spinner-slots" style="display:block"></div>
+    </div>
+
+    <!-- Acervo -->
+    <div class="secao-titulo">Acervo de clássicos</div>
+    <div class="acervo-grid" id="lista-acervo">
+      <div class="spinner" id="spinner-acervo" style="display:block"></div>
+    </div>
+
+    <!-- Histórico -->
+    <div class="secao-titulo">Leituras concluídas</div>
+    <div class="historico-lista" id="lista-historico">
+      <p class="hist-vazio">Nenhuma leitura concluída ainda.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Leitor ── -->
+<div id="tela-leitura">
+  <div class="leitor-topo">
+    <div class="leitor-titulo" id="leitor-titulo-texto">—</div>
+    <div class="leitor-controles">
+      <button class="btn-leitor" id="btn-ant">‹ Anterior</button>
+      <span id="leitor-pagina" style="font-size:12px;color:#ccc">p. 0</span>
+      <button class="btn-leitor" id="btn-prox">Próxima ›</button>
+      <button class="btn-leitor" onclick="fecharLeitor()">✕ Fechar</button>
+    </div>
+  </div>
+  <div id="viewer"></div>
+</div>
+
+<!-- ── Modal Confirmar Lida ── -->
+<div class="modal-overlay" id="modal-lida">
+  <div class="modal">
+    <h3>Concluir leitura?</h3>
+    <p>Ao marcar como lida, o slot será liberado para outra obra. Você não poderá desfazer.</p>
+    <div class="modal-acoes">
+      <button class="btn-sm perigo" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-sm destaque" id="btn-confirmar-lida">Sim, concluí!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Selecionar Obra ── -->
+<div class="modal-overlay" id="modal-selecionar">
+  <div class="modal">
+    <h3 id="modal-livro-titulo">Adicionar ao slot?</h3>
+    <p id="modal-livro-sinopse" style="max-height:120px;overflow-y:auto"></p>
+    <div class="modal-acoes">
+      <button class="btn-sm perigo" onclick="fecharModalSelecionar()">Cancelar</button>
+      <button class="btn-sm destaque" id="btn-confirmar-selecionar">Adicionar à leitura</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://tres-trevo-api.al-kbhal.workers.dev';
+let sessaoToken = localStorage.getItem('bib_token') || '';
+let sessaoEmail = localStorage.getItem('bib_email') || '';
+let slotParaMarcar = null;
+let slugParaSelecionar = null;
+let livroAtual = null;
+let book = null;
+let rendition = null;
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const magicToken = params.get('token');
+
+  // Trocar magic token por sessão
+  if (magicToken) {
+    try {
+      const r = await fetch(`${API}/api/biblioteca/verificar?token=${magicToken}`);
+      const d = await r.json();
+      if (d.ok) {
+        sessaoToken = d.token;
+        sessaoEmail = d.email;
+        localStorage.setItem('bib_token', sessaoToken);
+        localStorage.setItem('bib_email', sessaoEmail);
+        // Limpar token da URL
+        history.replaceState({}, '', location.pathname);
+      } else {
+        mostrarMsgLogin('Link expirado. Solicite um novo.', false);
+      }
+    } catch { mostrarMsgLogin('Erro ao verificar link. Tente novamente.', false); }
+  }
+
+  if (sessaoToken) {
+    entrarBiblioteca();
+  } else {
+    document.getElementById('tela-login').style.display = 'block';
+  }
+}
+
+// ── Login ────────────────────────────────────────────────────────────────────
+document.getElementById('form-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('input-email').value.trim();
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const r = await fetch(`${API}/api/biblioteca/acesso`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const d = await r.json();
+    if (r.status === 429) {
+      mostrarMsgLogin('Muitas tentativas. Aguarde 1 hora.', false);
+    } else {
+      mostrarMsgLogin(d.msg || 'Link enviado! Verifique seu email.', true);
+    }
+  } catch { mostrarMsgLogin('Erro de conexão. Tente novamente.', false); }
+
+  btn.disabled = false;
+  btn.textContent = 'Receber link de acesso';
+});
+
+function mostrarMsgLogin(texto, ok) {
+  const el = document.getElementById('msg-login');
+  el.textContent = texto;
+  el.className = 'msg ' + (ok ? 'ok' : 'erro');
+  el.style.display = 'block';
+}
+
+// ── Biblioteca ───────────────────────────────────────────────────────────────
+function entrarBiblioteca() {
+  document.getElementById('tela-login').style.display = 'none';
+  document.getElementById('tela-biblioteca').style.display = 'block';
+  document.getElementById('topo-email').style.display = 'block';
+  document.getElementById('topo-email').textContent = sessaoEmail;
+  carregarDados();
+}
+
+async function carregarDados() {
+  await Promise.all([carregarSlots(), carregarAcervo()]);
+}
+
+async function carregarSlots() {
+  try {
+    const r = await fetch(`${API}/api/biblioteca/minha`, {
+      headers: { Authorization: `Bearer ${sessaoToken}` },
+    });
+    if (r.status === 401) { sair(); return; }
+    const d = await r.json();
+    renderSlots(d.slots, d.slots_max);
+    renderHistorico(d.historico);
+  } catch { document.getElementById('lista-slots').innerHTML = '<p style="color:#c00;font-size:13px">Erro ao carregar slots.</p>'; }
+}
+
+async function carregarAcervo() {
+  try {
+    const r = await fetch(`${API}/api/biblioteca/acervo`);
+    const livros = await r.json();
+    renderAcervo(livros);
+  } catch { document.getElementById('lista-acervo').innerHTML = '<p style="color:#c00;font-size:13px">Erro ao carregar acervo.</p>'; }
+}
+
+// ── Render Slots ──────────────────────────────────────────────────────────────
+function renderSlots(slots, max = 3) {
+  document.getElementById('slots-contador').textContent = `${slots.length}/${max}`;
+  const el = document.getElementById('lista-slots');
+
+  const itens = [];
+
+  // Slots ocupados
+  for (const s of slots) {
+    const pct = Math.round(s.progresso_percentual ?? 0);
+    itens.push(`
+      <div class="slot-livro" data-slot-id="${s.id}">
+        <div class="slot-num">Slot ${s.slot_numero}</div>
+        <div class="slot-titulo">${s.titulo}</div>
+        <div class="slot-autor">${s.autor}</div>
+        <div class="progresso-bar"><div class="progresso-fill" style="width:${pct}%"></div></div>
+        <div class="progresso-txt">${pct}% lido</div>
+        <div class="slot-acoes">
+          <button class="btn-sm destaque" onclick="abrirLeitor('${s.slug}','${s.titulo}','${s.id}')">Ler</button>
+          <button class="btn-sm perigo" onclick="confirmarLida('${s.id}')">Marcar como lida</button>
+        </div>
+      </div>
+    `);
+  }
+
+  // Slots vazios
+  for (let i = slots.length; i < max; i++) {
+    itens.push(`
+      <div class="slot-vazio">
+        <div class="slot-num">Slot ${i + 1}</div>
+        <div class="slot-icone">📖</div>
+        <p>Slot livre — escolha uma obra do acervo</p>
+      </div>
+    `);
+  }
+
+  el.innerHTML = itens.join('');
+}
+
+// ── Render Acervo ─────────────────────────────────────────────────────────────
+function renderAcervo(livros) {
+  const el = document.getElementById('lista-acervo');
+  if (!livros.length) { el.innerHTML = '<p style="color:#999;font-size:14px">Nenhuma obra disponível no momento.</p>'; return; }
+
+  el.innerHTML = livros.map(l => `
+    <div class="livro-card" onclick="abrirModalSelecionar('${l.slug}','${l.titulo}','${(l.sinopse||'').replace(/'/g,"&#39;")}')">
+      <div class="livro-capa">${l.capa_url ? `<img src="${l.capa_url}" alt="${l.titulo}" style="width:100%;height:100%;object-fit:cover">` : l.titulo}</div>
+      <div class="livro-info">
+        <div class="livro-titulo">${l.titulo}</div>
+        <div class="livro-autor">${l.autor} · ${l.ano_publicacao ?? ''}</div>
+        ${l.featured ? '<span class="livro-badge">Destaque</span>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Render Histórico ──────────────────────────────────────────────────────────
+function renderHistorico(hist) {
+  const el = document.getElementById('lista-historico');
+  if (!hist.length) { el.innerHTML = '<p class="hist-vazio">Nenhuma leitura concluída ainda. Leia sua primeira obra!</p>'; return; }
+
+  el.innerHTML = hist.map(h => `
+    <div class="hist-item">
+      <div class="hist-icone">✅</div>
+      <div>
+        <div class="hist-titulo">${h.titulo}</div>
+        <div class="hist-meta">${h.autor} · concluído em ${fmtData(h.concluido_em)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Modal Selecionar ──────────────────────────────────────────────────────────
+function abrirModalSelecionar(slug, titulo, sinopse) {
+  slugParaSelecionar = slug;
+  document.getElementById('modal-livro-titulo').textContent = titulo;
+  document.getElementById('modal-livro-sinopse').textContent = sinopse || '';
+  document.getElementById('modal-selecionar').classList.add('ativo');
+}
+function fecharModalSelecionar() {
+  slugParaSelecionar = null;
+  document.getElementById('modal-selecionar').classList.remove('ativo');
+}
+document.getElementById('btn-confirmar-selecionar').addEventListener('click', async () => {
+  if (!slugParaSelecionar) return;
+  const btn = document.getElementById('btn-confirmar-selecionar');
+  btn.disabled = true; btn.textContent = 'Adicionando...';
+  try {
+    const r = await fetch(`${API}/api/biblioteca/selecionar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessaoToken}` },
+      body: JSON.stringify({ slug: slugParaSelecionar }),
+    });
+    const d = await r.json();
+    fecharModalSelecionar();
+    if (d.ok) { await carregarSlots(); }
+    else { alert(d.msg || d.erro || 'Erro ao adicionar obra.'); }
+  } catch { alert('Erro de conexão.'); }
+  btn.disabled = false; btn.textContent = 'Adicionar à leitura';
+});
+
+// ── Modal Marcar Lida ─────────────────────────────────────────────────────────
+function confirmarLida(slotId) {
+  slotParaMarcar = slotId;
+  document.getElementById('modal-lida').classList.add('ativo');
+}
+function fecharModal() {
+  slotParaMarcar = null;
+  document.getElementById('modal-lida').classList.remove('ativo');
+}
+document.getElementById('btn-confirmar-lida').addEventListener('click', async () => {
+  if (!slotParaMarcar) return;
+  const btn = document.getElementById('btn-confirmar-lida');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  try {
+    const r = await fetch(`${API}/api/biblioteca/marcar-lida`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessaoToken}` },
+      body: JSON.stringify({ slot_id: slotParaMarcar }),
+    });
+    const d = await r.json();
+    fecharModal();
+    if (d.ok) { await carregarDados(); }
+    else { alert(d.erro || 'Erro.'); }
+  } catch { alert('Erro de conexão.'); }
+  btn.disabled = false; btn.textContent = 'Sim, concluí!';
+});
+
+// ── Leitor EPUB ───────────────────────────────────────────────────────────────
+async function abrirLeitor(slug, titulo, slotId) {
+  livroAtual = { slug, titulo, slotId };
+
+  // Solicitar URL de stream
+  let streamUrl;
+  try {
+    const r = await fetch(`${API}/api/biblioteca/ler`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessaoToken}` },
+      body: JSON.stringify({ slug }),
+    });
+    const d = await r.json();
+    if (!d.ok) { alert(d.msg || 'Não foi possível abrir o livro.'); return; }
+    streamUrl = d.stream_url;
+  } catch { alert('Erro de conexão.'); return; }
+
+  document.getElementById('tela-leitura').style.display = 'flex';
+  document.getElementById('leitor-titulo-texto').textContent = titulo;
+  document.getElementById('viewer').innerHTML = '';
+
+  book = ePub(streamUrl, { openAs: 'epub' });
+  rendition = book.renderTo('viewer', { width: '100%', height: '100%', spread: 'none' });
+  rendition.display();
+
+  book.ready.then(() => {
+    book.locations.generate(1600).then(() => {
+      salvarProgresso(slotId);
+    });
+  });
+
+  rendition.on('relocated', (location) => {
+    const pct = book.locations.percentageFromCfi(location.start.cfi) * 100;
+    document.getElementById('leitor-pagina').textContent = `${Math.round(pct)}%`;
+    salvarProgresso(slotId, null, pct);
+  });
+
+  document.getElementById('btn-ant').onclick = () => rendition?.prev();
+  document.getElementById('btn-prox').onclick = () => rendition?.next();
+
+  // Navegação por teclas
+  document.onkeydown = (e) => {
+    if (e.key === 'ArrowRight') rendition?.next();
+    if (e.key === 'ArrowLeft') rendition?.prev();
+    if (e.key === 'Escape') fecharLeitor();
+  };
+}
+
+async function salvarProgresso(slotId, paginaAtual, pct) {
+  try {
+    await fetch(`${API}/api/biblioteca/progresso`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessaoToken}` },
+      body: JSON.stringify({ slot_id: slotId, pagina_atual: paginaAtual ?? 0, progresso_percentual: pct ?? 0 }),
+    });
+  } catch { /* silencioso */ }
+}
+
+function fecharLeitor() {
+  document.getElementById('tela-leitura').style.display = 'none';
+  if (rendition) { rendition.destroy(); rendition = null; }
+  if (book) { book.destroy(); book = null; }
+  document.onkeydown = null;
+  livroAtual = null;
+  carregarSlots();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmtData(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('pt-BR');
+}
+
+function sair() {
+  localStorage.removeItem('bib_token');
+  localStorage.removeItem('bib_email');
+  location.reload();
+}
+
+// Fechar modais ao clicar fora
+document.getElementById('modal-lida').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+document.getElementById('modal-selecionar').addEventListener('click', function(e) {
+  if (e.target === this) fecharModalSelecionar();
+});
+
+init();
+</script>
+</body>
+</html>

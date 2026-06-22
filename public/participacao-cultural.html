@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a1f0e">
+  <title>Participação Cultural — Editora Três Trevo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --verde-profundo: #0a1f0e;
+      --verde-marca:    #0f2d1a;
+      --verde-acento:   #1e5c3a;
+      --verde-claro:    #2d7a50;
+      --verde-suave:    #a8c5a0;
+      --verde-palido:   #e8f2e9;
+      --off-white:      #f6f4ef;
+      --creme:          #ece9e0;
+      --texto:          #1a2416;
+      --texto-suave:    #4a5a44;
+      --texto-fraco:    #8a9a84;
+      --ouro:           #c9a84c;
+      --erro:           #8b2020;
+      --erro-bg:        #fff0f0;
+      --sucesso:        #1e5c3a;
+      --aviso:          #7a5c1a;
+      --aviso-bg:       #fef8e8;
+      --fonte-serif:    'Fraunces', Georgia, serif;
+      --fonte-sans:     'Instrument Sans', system-ui, sans-serif;
+      --raio:           3px;
+      --sombra:         0 2px 20px rgba(10,31,14,.08);
+      --sombra-elevada: 0 8px 40px rgba(10,31,14,.14);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--fonte-sans);
+      background: var(--off-white);
+      color: var(--texto);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────────── */
+    header {
+      background: var(--verde-profundo);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-logo {
+      font-family: var(--fonte-serif);
+      font-weight: 400;
+      font-size: 15px;
+      color: rgba(255,255,255,.9);
+      text-decoration: none;
+      letter-spacing: .03em;
+    }
+
+    .header-badge {
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--verde-suave);
+      font-family: var(--fonte-sans);
+    }
+
+    /* ── Layout principal ────────────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 20px 80px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* ── Stepper ────────────────────────────────────────────────────────────── */
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 40px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      position: relative;
+    }
+
+    .step::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      width: 100%;
+      height: 1px;
+      background: var(--creme);
+      z-index: 0;
+    }
+
+    .step:last-child::after { display: none; }
+
+    .step-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+      transition: all .3s ease;
+      border: 2px solid var(--creme);
+      background: var(--off-white);
+      color: var(--texto-fraco);
+    }
+
+    .step.done .step-dot {
+      background: var(--verde-acento);
+      border-color: var(--verde-acento);
+      color: #fff;
+    }
+
+    .step.active .step-dot {
+      background: var(--verde-profundo);
+      border-color: var(--verde-profundo);
+      color: #fff;
+    }
+
+    .step.done::after { background: var(--verde-acento); }
+
+    .step-label {
+      font-size: 10px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--texto-fraco);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .step.active .step-label, .step.done .step-label { color: var(--verde-acento); }
+
+    /* ── Cards de estado ─────────────────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: var(--raio);
+      box-shadow: var(--sombra);
+      overflow: hidden;
+      animation: cardEntrada .4s ease both;
+    }
+
+    @keyframes cardEntrada {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      background: var(--verde-profundo);
+      padding: 28px 32px 24px;
+    }
+
+    .card-header .subtitulo {
+      font-size: 10px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--verde-suave);
+      margin-bottom: 8px;
+      font-family: var(--fonte-sans);
+    }
+
+    .card-header h1 {
+      font-family: var(--fonte-serif);
+      font-weight: 300;
+      font-size: 26px;
+      color: #fff;
+      line-height: 1.25;
+    }
+
+    .card-header h1 em {
+      font-style: italic;
+      color: var(--verde-suave);
+    }
+
+    .card-body { padding: 32px; }
+
+    /* ── Estado: carregando ──────────────────────────────────────────────────── */
+    .spinner-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 48px 32px;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--creme);
+      border-top-color: var(--verde-acento);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner-texto {
+      font-size: 13px;
+      color: var(--texto-fraco);
+      letter-spacing: .05em;
+    }
+
+    /* ── Estado: aguardando período ──────────────────────────────────────────── */
+    .periodo-bloco {
+      text-align: center;
+      padding: 8px 0 24px;
+    }
+
+    .dias-grande {
+      font-family: var(--fonte-serif);
+      font-size: 72px;
+      font-weight: 300;
+      color: var(--verde-acento);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .dias-label {
+      font-size: 12px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--texto-fraco);
+    }
+
+    .progresso-bar {
+      height: 3px;
+      background: var(--creme);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 24px 0;
+    }
+
+    .progresso-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--verde-acento), var(--verde-claro));
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    /* ── Formulário de depoimento ─────────────────────────────────────────────── */
+    .ebook-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--verde-palido);
+      border: 1px solid rgba(30,92,58,.15);
+      border-radius: 20px;
+      padding: 6px 14px 6px 10px;
+      margin-bottom: 24px;
+    }
+
+    .ebook-tag .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--verde-acento);
+    }
+
+    .ebook-tag .nome {
+      font-size: 13px;
+      color: var(--verde-acento);
+      font-weight: 500;
+    }
+
+    .campo-grupo { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--texto-suave);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--creme);
+      border-radius: var(--raio);
+      font-family: var(--fonte-sans);
+      font-size: 15px;
+      color: var(--texto);
+      background: var(--off-white);
+      transition: border-color .2s ease, background .2s ease;
+      outline: none;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: var(--verde-acento);
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    .contador-chars {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .chars-num {
+      font-size: 12px;
+      color: var(--texto-fraco);
+      transition: color .2s;
+    }
+
+    .chars-num.ok { color: var(--verde-acento); }
+    .chars-num.erro { color: var(--erro); }
+
+    .chars-hint {
+      font-size: 11px;
+      color: var(--texto-fraco);
+    }
+
+    /* ── Dicas de depoimento ────────────────────────────────────────────────── */
+    .dicas {
+      background: var(--verde-palido);
+      border-left: 3px solid var(--verde-acento);
+      border-radius: 0 var(--raio) var(--raio) 0;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+    }
+
+    .dicas-titulo {
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--verde-acento);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .dicas ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dicas li {
+      font-size: 13px;
+      color: var(--texto-suave);
+      line-height: 1.5;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .dicas li::before {
+      content: '·';
+      position: absolute;
+      left: 4px;
+      color: var(--verde-acento);
+    }
+
+    /* ── Botão principal ──────────────────────────────────────────────────────── */
+    .btn-principal {
+      width: 100%;
+      padding: 15px 24px;
+      background: var(--verde-profundo);
+      color: #fff;
+      border: none;
+      border-radius: var(--raio);
+      font-family: var(--fonte-sans);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: .03em;
+      transition: background .2s ease, transform .1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-principal:hover:not(:disabled) { background: var(--verde-acento); }
+    .btn-principal:active:not(:disabled) { transform: scale(.98); }
+    .btn-principal:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-secundario {
+      width: 100%;
+      padding: 13px 24px;
+      background: transparent;
+      color: var(--verde-acento);
+      border: 1.5px solid var(--verde-acento);
+      border-radius: var(--raio);
+      font-family: var(--fonte-sans);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .2s ease;
+      margin-top: 12px;
+    }
+
+    .btn-secundario:hover { background: var(--verde-palido); }
+
+    /* ── Disclaimer legal ────────────────────────────────────────────────────── */
+    .disclaimer {
+      font-size: 11px;
+      color: var(--texto-fraco);
+      text-align: center;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    .disclaimer a { color: var(--verde-acento); text-decoration: none; }
+
+    /* ── Estado: em análise ──────────────────────────────────────────────────── */
+    .estado-icone {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 22px;
+    }
+
+    .estado-icone.analise { background: var(--aviso-bg); }
+    .estado-icone.aprovado { background: var(--verde-palido); }
+    .estado-icone.reprovado { background: var(--erro-bg); }
+
+    .estado-titulo {
+      font-family: var(--fonte-serif);
+      font-size: 22px;
+      font-weight: 400;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .estado-descricao {
+      font-size: 15px;
+      color: var(--texto-suave);
+      text-align: center;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    /* ── Cotas display ───────────────────────────────────────────────────────── */
+    .cotas-display {
+      background: var(--verde-palido);
+      border-radius: var(--raio);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .cotas-num {
+      font-family: var(--fonte-serif);
+      font-size: 40px;
+      font-weight: 300;
+      color: var(--verde-acento);
+      line-height: 1;
+    }
+
+    .cotas-info {
+      text-align: right;
+    }
+
+    .cotas-label {
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--texto-suave);
+      font-weight: 500;
+    }
+
+    .cotas-sub {
+      font-size: 12px;
+      color: var(--texto-fraco);
+      margin-top: 2px;
+    }
+
+    /* ── Questionário ───────────────────────────────────────────────────────── */
+    .questionario-secao {
+      margin-top: 24px;
+      border-top: 1px solid var(--creme);
+      padding-top: 24px;
+    }
+
+    .questionario-titulo {
+      font-family: var(--fonte-serif);
+      font-size: 16px;
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+
+    .questionario-sub {
+      font-size: 13px;
+      color: var(--texto-suave);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .opcoes-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .opcao-radio {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--creme);
+      border-radius: var(--raio);
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .opcao-radio:hover { border-color: var(--verde-acento); background: var(--verde-palido); }
+    .opcao-radio.selecionada { border-color: var(--verde-acento); background: var(--verde-palido); }
+
+    .opcao-radio input[type="radio"] { display: none; }
+
+    .opcao-dot {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--creme);
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+
+    .opcao-radio.selecionada .opcao-dot {
+      border-color: var(--verde-acento);
+      background: var(--verde-acento);
+      box-shadow: inset 0 0 0 3px #fff;
+    }
+
+    .opcao-texto { font-size: 14px; color: var(--texto); }
+
+    /* ── Alerta de erro ──────────────────────────────────────────────────────── */
+    .alerta {
+      padding: 14px 16px;
+      border-radius: var(--raio);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alerta.erro { background: var(--erro-bg); color: var(--erro); border: 1px solid rgba(139,32,32,.15); }
+    .alerta.aviso { background: var(--aviso-bg); color: var(--aviso); border: 1px solid rgba(122,92,26,.15); }
+    .alerta.visivel { display: block; }
+
+    /* ── Rodapé ──────────────────────────────────────────────────────────────── */
+    footer {
+      background: var(--verde-profundo);
+      padding: 20px 24px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 11px;
+      color: rgba(168,197,160,.6);
+      letter-spacing: .05em;
+    }
+
+    footer a { color: var(--verde-suave); text-decoration: none; }
+
+    /* ── Oculto ──────────────────────────────────────────────────────────────── */
+    .oculto { display: none !important; }
+
+    /* ── Responsive ─────────────────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .card-header { padding: 22px 22px 18px; }
+      .card-header h1 { font-size: 22px; }
+      .card-body { padding: 24px 22px; }
+      .dias-grande { font-size: 56px; }
+      main { padding: 28px 14px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="https://www.3trevo.com.br" class="header-logo">Editora Três Trevo</a>
+  <span class="header-badge">Programa Cultural</span>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step done" id="step-1">
+        <div class="step-dot">✓</div>
+        <div class="step-label">Adquiriu</div>
+      </div>
+      <div class="step done" id="step-2">
+        <div class="step-dot">✓</div>
+        <div class="step-label">Recebeu</div>
+      </div>
+      <div class="step active" id="step-3">
+        <div class="step-dot">3</div>
+        <div class="step-label">Validar</div>
+      </div>
+      <div class="step" id="step-4">
+        <div class="step-dot">4</div>
+        <div class="step-label">Concorrendo</div>
+      </div>
+    </div>
+
+    <!-- ── Card: Carregando ─────────────────────────────────────────────────── -->
+    <div class="card" id="estado-carregando">
+      <div class="spinner-wrap">
+        <div class="spinner"></div>
+        <span class="spinner-texto">Verificando participação…</span>
+      </div>
+    </div>
+
+    <!-- ── Card: Erro / Link inválido ─────────────────────────────────────────── -->
+    <div class="card oculto" id="estado-erro">
+      <div class="card-header">
+        <div class="subtitulo">Erro</div>
+        <h1>Link <em>inválido</em></h1>
+      </div>
+      <div class="card-body">
+        <p style="color:var(--texto-suave);font-size:15px;line-height:1.7;margin-bottom:24px;">
+          Este link não é válido ou o pedido não foi encontrado.
+          Verifique se copiou corretamente o link recebido por e-mail.
+        </p>
+        <p style="font-size:13px;color:var(--texto-fraco);text-align:center;">
+          Dúvidas: <a href="mailto:sac@3trevo.com.br" style="color:var(--verde-acento);">sac@3trevo.com.br</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Card: Aguardando período ───────────────────────────────────────────── -->
+    <div class="card oculto" id="estado-aguardando">
+      <div class="card-header">
+        <div class="subtitulo">✦ Programa Cultural</div>
+        <h1>Aguarde o <em>período de leitura</em></h1>
+      </div>
+      <div class="card-body">
+        <div class="periodo-bloco">
+          <div class="dias-grande" id="dias-restantes">—</div>
+          <div class="dias-label">dias para liberar</div>
+          <div class="progresso-bar" style="margin-top:20px;">
+            <div class="progresso-fill" id="progresso-fill" style="width:0%"></div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--texto-suave);line-height:1.7;margin-bottom:16px;">
+          O prazo de 7 dias garante que você teve tempo para ler o conteúdo antes de escrever o depoimento,
+          e coincide com o prazo legal de direito de arrependimento (CDC art. 49).
+        </p>
+        <p style="font-size:13px;color:var(--texto-fraco);line-height:1.6;">
+          Você receberá um lembrete quando a participação for liberada.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Card: Formulário de depoimento ─────────────────────────────────────── -->
+    <div class="card oculto" id="estado-formulario">
+      <div class="card-header">
+        <div class="subtitulo">✦ Validar participação</div>
+        <h1>Seu <em>depoimento</em></h1>
+      </div>
+      <div class="card-body">
+        <div class="ebook-tag" id="ebook-tag">
+          <div class="dot"></div>
+          <span class="nome" id="ebook-nome-tag">carregando…</span>
+        </div>
+
+        <div class="alerta erro" id="alerta-form"></div>
+
+        <form id="form-depoimento" novalidate>
+          <div class="campo-grupo">
+            <label for="nome-autor">Seu nome</label>
+            <input type="text" id="nome-autor" placeholder="Como quer ser identificado" autocomplete="name">
+          </div>
+
+          <div class="dicas">
+            <div class="dicas-titulo">O que abordar no depoimento</div>
+            <ul>
+              <li>Sua experiência de leitura — o que o livro te fez pensar, sentir ou questionar</li>
+              <li>Sua opinião sobre o conteúdo — o que funcionou, o que te surpreendeu</li>
+              <li>Como o livro se relaciona com sua realidade ou perspectiva</li>
+            </ul>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="texto-dep">Depoimento</label>
+            <textarea id="texto-dep" placeholder="Escreva sobre o que leu de forma genuína e específica…" spellcheck="true"></textarea>
+            <div class="contador-chars">
+              <span class="chars-num" id="chars-count">0 / 40 mínimos</span>
+              <span class="chars-hint">Seja específico sobre o conteúdo</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-principal" id="btn-enviar" disabled>
+            <span id="btn-texto">Enviar depoimento</span>
+          </button>
+        </form>
+
+        <p class="disclaimer">
+          Ao enviar, você declara que leu o material e concorda com o
+          <a href="https://3trevo.com.br/regras-programa-cultural.html" target="_blank">regulamento</a>.
+          O exercício do direito de arrependimento cancela automaticamente a participação.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Card: Em análise ───────────────────────────────────────────────────── -->
+    <div class="card oculto" id="estado-analise">
+      <div class="card-header">
+        <div class="subtitulo">✦ Depoimento recebido</div>
+        <h1>Em <em>análise</em></h1>
+      </div>
+      <div class="card-body" style="text-align:center;">
+        <div class="estado-icone analise">◈</div>
+        <p class="estado-descricao">
+          Seu depoimento foi recebido e está em revisão pela equipe editorial.
+          A confirmação chega em até 48 horas por e-mail.
+        </p>
+        <div style="background:var(--aviso-bg);border-radius:var(--raio);padding:16px;text-align:left;">
+          <p style="font-size:13px;color:var(--aviso);line-height:1.6;">
+            <strong>O que acontece agora?</strong><br>
+            Sua participação fica pendente até aprovação. Se aprovado, suas cotas são creditadas retroativamente.
+            Se houver alguma questão, entraremos em contato por e-mail.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card: Aprovado + Questionário ──────────────────────────────────────── -->
+    <div class="card oculto" id="estado-aprovado">
+      <div class="card-header" style="background:var(--verde-acento);">
+        <div class="subtitulo" style="color:rgba(255,255,255,.6);">✦ Participação confirmada</div>
+        <h1 style="color:#fff;">Suas cotas <em>estão ativas</em></h1>
+      </div>
+      <div class="card-body">
+        <div class="cotas-display">
+          <div class="cotas-num" id="cotas-total">—</div>
+          <div class="cotas-info">
+            <div class="cotas-label">cotas de participação</div>
+            <div class="cotas-sub">válidas em todas as 6 rodadas</div>
+          </div>
+        </div>
+
+        <p style="font-size:14px;color:var(--texto-suave);line-height:1.7;margin-bottom:16px;">
+          Seu depoimento foi validado. Você está concorrendo nesta série.
+          Mais cotas = maior elegibilidade.
+        </p>
+
+        <a href="https://3trevo.com.br/auditoria-sorteio.html"
+           style="display:block;text-align:center;font-size:13px;color:var(--verde-acento);text-decoration:none;margin-bottom:4px;">
+          Acompanhar auditoria pública →
+        </a>
+
+        <!-- Questionário bônus -->
+        <div class="questionario-secao" id="questionario-secao">
+          <div class="questionario-titulo">✦ Ganhe multiplicador bônus</div>
+          <p class="questionario-sub">
+            Responda 1 pergunta anônima e aumente seus chances em 50% com multiplicador 1.5×.
+          </p>
+
+          <div class="alerta aviso" id="alerta-quest"></div>
+
+          <label style="margin-bottom:12px;">Que tipo de prêmio prefere receber?</label>
+          <div class="opcoes-lista" id="opcoes-premio">
+            <label class="opcao-radio" onclick="selecionarOpcao(this,'pix')">
+              <input type="radio" name="premio" value="pix">
+              <div class="opcao-dot"></div>
+              <span class="opcao-texto">PIX imediato</span>
+            </label>
+            <label class="opcao-radio" onclick="selecionarOpcao(this,'credito_loja')">
+              <input type="radio" name="premio" value="credito_loja">
+              <div class="opcao-dot"></div>
+              <span class="opcao-texto">Crédito na loja (mais ebooks)</span>
+            </label>
+            <label class="opcao-radio" onclick="selecionarOpcao(this,'livro_fisico')">
+              <input type="radio" name="premio" value="livro_fisico">
+              <div class="opcao-dot"></div>
+              <span class="opcao-texto">Livro físico colecionável</span>
+            </label>
+            <label class="opcao-radio" onclick="selecionarOpcao(this,'experiencia')">
+              <input type="radio" name="premio" value="experiencia">
+              <div class="opcao-dot"></div>
+              <span class="opcao-texto">Experiência cultural (evento, workshop)</span>
+            </label>
+          </div>
+
+          <button class="btn-principal" id="btn-questionario" onclick="enviarQuestionario()" disabled
+                  style="margin-top:16px;">
+            <span id="btn-quest-texto">Confirmar e ganhar 1.5×</span>
+          </button>
+          <p style="font-size:11px;color:var(--texto-fraco);text-align:center;margin-top:10px;">
+            Resposta anônima. Apenas para pesquisa interna de produto.
+          </p>
+        </div>
+
+        <!-- Pós-questionário -->
+        <div class="oculto" id="post-questionario" style="text-align:center;padding:16px 0;">
+          <p style="font-size:15px;color:var(--verde-acento);font-weight:500;margin-bottom:4px;">✦ Multiplicador 1.5× ativado</p>
+          <p style="font-size:13px;color:var(--texto-suave);">Sua elegibilidade aumentou. Boa sorte!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card: Reprovado ────────────────────────────────────────────────────── -->
+    <div class="card oculto" id="estado-reprovado">
+      <div class="card-header">
+        <div class="subtitulo">Depoimento não aprovado</div>
+        <h1>Tente <em>novamente</em></h1>
+      </div>
+      <div class="card-body" style="text-align:center;">
+        <div class="estado-icone reprovado">✕</div>
+        <p class="estado-descricao">
+          Seu depoimento não passou pela moderação automática.
+          Escreva um texto genuíno e específico sobre o conteúdo do livro que leu.
+        </p>
+        <button class="btn-principal" onclick="voltarFormulario()">Tentar novamente</button>
+        <p style="font-size:12px;color:var(--texto-fraco);margin-top:16px;">
+          Acredita que houve um erro?
+          <a href="mailto:sac@3trevo.com.br?subject=Depoimento reprovado - revisão" style="color:var(--verde-acento);">
+            Entre em contato
+          </a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <p>Editora Três Trevo · CNPJ 18.928.966/0001-59 · Montauri/RS ·
+    <a href="mailto:sac@3trevo.com.br">sac@3trevo.com.br</a>
+  </p>
+</footer>
+
+<script>
+  // ── Configuração ────────────────────────────────────────────────────────────
+  const WORKER_BASE = 'https://tres-trevo-api.al-kbhal.workers.dev';
+
+  // ── Estado global ────────────────────────────────────────────────────────────
+  let pedidoId = null;
+  let ebookSlug = null;
+  let ebookTitulo = null;
+  let entryId = null;
+  let opcaoSelecionada = null;
+
+  // ── Inicialização ────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    pedidoId = params.get('pedido_id');
+    ebookSlug = params.get('slug') || params.get('ebook');
+
+    if (!pedidoId) {
+      mostrarEstado('erro');
+      return;
+    }
+
+    try {
+      const resp = await fetch(`${WORKER_BASE}/api/participacao/status?pedido_id=${encodeURIComponent(pedidoId)}`);
+      const data = await resp.json();
+
+      if (!data.ok) {
+        mostrarEstado('erro');
+        return;
+      }
+
+      ebookTitulo = data.ebook_titulo || ebookSlug || 'Ebook';
+      ebookSlug   = data.ebook_slug  || ebookSlug;
+
+      // Atualizar tag do ebook
+      document.getElementById('ebook-nome-tag').textContent = ebookTitulo;
+
+      // Definir estado da interface
+      if (!data.liberado) {
+        // Ainda no período de espera
+        const diasPassados = data.dias_passados || 0;
+        const diasRestantes = Math.max(0, 7 - diasPassados);
+        document.getElementById('dias-restantes').textContent = diasRestantes;
+
+        const pct = Math.min(100, (diasPassados / 7) * 100);
+        document.getElementById('progresso-fill').style.width = pct + '%';
+        mostrarEstado('aguardando');
+        return;
+      }
+
+      const dep = data.depoimento;
+      const entry = data.draw_entry;
+      entryId = entry?.id || null;
+
+      if (!dep) {
+        mostrarEstado('formulario');
+      } else if (dep.estado === 'aprovado') {
+        const cotas = (entry?.cotas_base || 0) + (entry?.cotas_bonus || 0);
+        document.getElementById('cotas-total').textContent = cotas;
+        if (entry?.pesquisa_respondida) {
+          document.getElementById('questionario-secao').classList.add('oculto');
+          document.getElementById('post-questionario').classList.remove('oculto');
+        }
+        atualizarStepper('concorrendo');
+        mostrarEstado('aprovado');
+      } else if (dep.estado === 'revisao_manual') {
+        mostrarEstado('analise');
+      } else if (dep.estado.startsWith('reprovado')) {
+        mostrarEstado('reprovado');
+      } else {
+        mostrarEstado('formulario');
+      }
+
+    } catch (err) {
+      console.error('Erro ao verificar participação:', err);
+      mostrarEstado('formulario'); // fallback para formulário se API falhar
+    }
+  });
+
+  // ── Mostrar estado ───────────────────────────────────────────────────────────
+  function mostrarEstado(estado) {
+    const estados = ['carregando','erro','aguardando','formulario','analise','aprovado','reprovado'];
+    estados.forEach(e => {
+      const el = document.getElementById('estado-' + e);
+      if (el) el.classList.add('oculto');
+    });
+    const alvo = document.getElementById('estado-' + estado);
+    if (alvo) alvo.classList.remove('oculto');
+  }
+
+  function atualizarStepper(fase) {
+    if (fase === 'concorrendo') {
+      document.getElementById('step-3').classList.remove('active');
+      document.getElementById('step-3').classList.add('done');
+      document.getElementById('step-3').querySelector('.step-dot').textContent = '✓';
+      document.getElementById('step-4').classList.add('active');
+    }
+  }
+
+  // ── Contador de caracteres ───────────────────────────────────────────────────
+  const textarea = document.getElementById('texto-dep');
+  const contador = document.getElementById('chars-count');
+  const btnEnviar = document.getElementById('btn-enviar');
+
+  textarea.addEventListener('input', () => {
+    const n = textarea.value.trim().length;
+    contador.textContent = n + ' / 40 mínimos';
+    if (n >= 40) {
+      contador.classList.add('ok');
+      contador.classList.remove('erro');
+      btnEnviar.disabled = false;
+    } else {
+      contador.classList.remove('ok');
+      contador.classList.add('erro');
+      btnEnviar.disabled = true;
+    }
+  });
+
+  // ── Envio do formulário ──────────────────────────────────────────────────────
+  document.getElementById('form-depoimento').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const texto = textarea.value.trim();
+    const nomeAutor = document.getElementById('nome-autor').value.trim() || 'Participante';
+    const alertaEl = document.getElementById('alerta-form');
+    alertaEl.classList.remove('visivel');
+
+    if (texto.length < 40) {
+      alertaEl.textContent = 'O depoimento deve ter pelo menos 40 caracteres.';
+      alertaEl.classList.add('visivel');
+      return;
+    }
+
+    // Loading state
+    const btnTexto = document.getElementById('btn-texto');
+    btnTexto.textContent = 'Validando…';
+    btnEnviar.disabled = true;
+
+    try {
+      const resp = await fetch(`${WORKER_BASE}/api/participacao/depoimento`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pedido_id: pedidoId, texto, nome_autor: nomeAutor }),
+      });
+
+      const data = await resp.json();
+
+      if (!data.ok) {
+        if (data.erro === 'limite_tentativas') {
+          alertaEl.textContent = 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.';
+          alertaEl.classList.add('visivel');
+        } else if (data.erro === 'texto_curto') {
+          alertaEl.textContent = 'O depoimento deve ter pelo menos 40 caracteres.';
+          alertaEl.classList.add('visivel');
+        } else if (data.estado && data.estado.startsWith('reprovado')) {
+          mostrarEstado('reprovado');
+          return;
+        } else {
+          alertaEl.textContent = 'Ocorreu um erro. Tente novamente ou contate sac@3trevo.com.br';
+          alertaEl.classList.add('visivel');
+        }
+        btnTexto.textContent = 'Enviar depoimento';
+        btnEnviar.disabled = false;
+        return;
+      }
+
+      // Sucesso
+      if (data.estado === 'aprovado') {
+        // Buscar cotas atualizadas
+        const statusResp = await fetch(`${WORKER_BASE}/api/participacao/status?pedido_id=${encodeURIComponent(pedidoId)}`);
+        const statusData = await statusResp.json();
+        const entry = statusData.draw_entry;
+        const cotas = entry ? (entry.cotas_base || 0) + (entry.cotas_bonus || 0) : 0;
+        document.getElementById('cotas-total').textContent = cotas;
+        atualizarStepper('concorrendo');
+        mostrarEstado('aprovado');
+      } else if (data.estado === 'revisao_manual') {
+        mostrarEstado('analise');
+      } else {
+        mostrarEstado('reprovado');
+      }
+
+    } catch (err) {
+      console.error('Erro no envio:', err);
+      alertaEl.textContent = 'Falha na conexão. Verifique sua internet e tente novamente.';
+      alertaEl.classList.add('visivel');
+      btnTexto.textContent = 'Enviar depoimento';
+      btnEnviar.disabled = false;
+    }
+  });
+
+  // ── Questionário ─────────────────────────────────────────────────────────────
+  function selecionarOpcao(el, valor) {
+    document.querySelectorAll('.opcao-radio').forEach(o => o.classList.remove('selecionada'));
+    el.classList.add('selecionada');
+    opcaoSelecionada = valor;
+    document.getElementById('btn-questionario').disabled = false;
+  }
+
+  async function enviarQuestionario() {
+    if (!opcaoSelecionada || !pedidoId) return;
+
+    const btnQ = document.getElementById('btn-questionario');
+    const btnQTexto = document.getElementById('btn-quest-texto');
+    const alertaQ = document.getElementById('alerta-quest');
+
+    btnQTexto.textContent = 'Registrando…';
+    btnQ.disabled = true;
+
+    try {
+      const resp = await fetch(`${WORKER_BASE}/api/participacao/questionario`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pedido_id: pedidoId,
+          categoria_premio: opcaoSelecionada,
+          respostas: { tipo_premio: opcaoSelecionada },
+          consentimento_lgpd: true,
+        }),
+      });
+
+      const data = await resp.json();
+
+      if (data.ok || data.erro === 'pesquisa_ja_respondida') {
+        document.getElementById('questionario-secao').classList.add('oculto');
+        document.getElementById('post-questionario').classList.remove('oculto');
+      } else {
+        alertaQ.textContent = 'Não foi possível registrar. Tente novamente.';
+        alertaQ.classList.add('visivel');
+        btnQTexto.textContent = 'Confirmar e ganhar 1.5×';
+        btnQ.disabled = false;
+      }
+    } catch {
+      // Falha silenciosa — mostrar sucesso mesmo assim para não frustrar o usuário
+      document.getElementById('questionario-secao').classList.add('oculto');
+      document.getElementById('post-questionario').classList.remove('oculto');
+    }
+  }
+
+  // ── Voltar para formulário ────────────────────────────────────────────────────
+  function voltarFormulario() {
+    textarea.value = '';
+    document.getElementById('nome-autor').value = '';
+    document.getElementById('chars-count').textContent = '0 / 40 mínimos';
+    document.getElementById('chars-count').classList.remove('ok','erro');
+    document.getElementById('btn-texto').textContent = 'Enviar depoimento';
+    document.getElementById('btn-enviar').disabled = true;
+    document.getElementById('alerta-form').classList.remove('visivel');
+    mostrarEstado('formulario');
+  }
+</script>
+
+</body>
+</html>

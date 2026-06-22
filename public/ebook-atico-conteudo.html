@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antes do App, o Método — Said Anes · Ático</title>
+<meta name="description" content="O método financeiro que antecede qualquer app. 8 capítulos para organizar, estabilizar e crescer.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FEFCF7;--s1:#F9F5EC;--tinta:#1A1714;--t2:#4A443C;--t3:#8B8278;
+  --ouro:#C87B1B;--verde:#1A5C38;--borda:rgba(26,23,20,.10);
+  --ourobg:rgba(200,123,27,.08);--ouroborder:rgba(200,123,27,.20);
+  --sombra:0 2px 16px rgba(26,23,20,.07);
+  --sidebar:260px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tinta);font-size:16px;line-height:1.72;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--ouro)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--ouro);outline-offset:3px}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;height:52px;background:var(--bg);border-bottom:1px solid var(--borda);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--sombra)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--tinta);white-space:nowrap}
+.nav-logo span{color:var(--ouro)}
+.nav-title{font-size:12px;color:var(--t3);letter-spacing:.3px;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-progress{width:80px;height:2px;background:var(--borda);border-radius:2px;flex-shrink:0}
+.nav-progress-bar{height:100%;background:var(--ouro);border-radius:2px;transition:width .3s ease;width:0%}
+
+/* MOBILE CHAPTER SELECT */
+.mobile-select{display:none;margin-left:auto;flex-shrink:0}
+.mobile-select select{border:1px solid var(--ouroborder);background:var(--s1);color:var(--tinta);font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 10px;border-radius:4px;cursor:pointer}
+
+/* LAYOUT */
+.layout{display:flex;margin-top:52px;min-height:calc(100vh - 52px)}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);flex-shrink:0;position:fixed;top:52px;left:0;bottom:0;background:var(--s1);border-right:1px solid var(--borda);overflow-y:auto;padding:28px 0}
+.sidebar-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--t3);padding:0 24px;margin-bottom:16px}
+.sidebar-item{display:flex;align-items:flex-start;gap:10px;padding:11px 24px;cursor:pointer;border-left:2px solid transparent;transition:all .18s;position:relative}
+.sidebar-item:hover{background:rgba(200,123,27,.06);border-left-color:rgba(200,123,27,.3)}
+.sidebar-item.active{background:var(--ourobg);border-left-color:var(--ouro)}
+.sidebar-num{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--t3);flex-shrink:0;width:18px;line-height:1.5}
+.sidebar-item.active .sidebar-num{color:var(--ouro)}
+.sidebar-text{font-size:12.5px;color:var(--t2);line-height:1.4}
+.sidebar-item.active .sidebar-text{color:var(--tinta);font-weight:500}
+.sidebar-item.done::after{content:'';position:absolute;right:20px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--ouro);opacity:.5}
+.sidebar-divider{height:1px;background:var(--borda);margin:16px 24px}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;max-width:720px;padding:56px 48px 120px;min-height:calc(100vh - 52px)}
+
+/* CHAPTER */
+.chapter{display:none}
+.chapter.active{display:block}
+.ch-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:16px}
+.ch-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,42px);font-weight:400;line-height:1.15;color:var(--tinta);margin-bottom:8px}
+.ch-subtitle{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;font-style:italic;color:var(--t2);margin-bottom:36px;padding-bottom:36px;border-bottom:1px solid var(--borda)}
+.chapter p{font-size:16.5px;color:var(--t2);margin-bottom:20px;line-height:1.78}
+.chapter p strong{color:var(--tinta);font-weight:500}
+.chapter h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--tinta);margin:36px 0 14px}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;margin:28px 0;border:1px solid var(--borda);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{background:var(--s1);padding:11px 16px;text-align:left;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-weight:500;border-bottom:1px solid var(--borda)}
+tbody td{padding:10px 16px;border-bottom:1px solid var(--borda);color:var(--t2);line-height:1.5}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(200,123,27,.03)}
+
+/* CALLOUT */
+.callout{background:var(--ourobg);border:1px solid var(--ouroborder);border-left:3px solid var(--ouro);padding:20px 24px;margin:28px 0;border-radius:0 4px 4px 0}
+.callout p{color:var(--t2);margin-bottom:0;font-size:15.5px}
+.callout p:not(:last-child){margin-bottom:12px}
+.callout strong{color:var(--tinta)}
+
+/* PLAN BOX */
+.plan-box{background:var(--s1);border:1px solid var(--borda);padding:24px 28px;margin:28px 0;border-radius:4px}
+.plan-box h4{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--ouro);margin-bottom:12px}
+.plan-box ul{list-style:none;padding:0}
+.plan-box ul li{font-size:14.5px;color:var(--t2);padding:6px 0;border-bottom:1px solid var(--borda);display:flex;gap:10px;line-height:1.5}
+.plan-box ul li:last-child{border-bottom:none}
+.plan-box ul li::before{content:'—';color:var(--ouro);flex-shrink:0}
+
+/* CTA BETA */
+.cta-beta{background:linear-gradient(135deg,var(--ourobg),var(--s1));border:1px solid var(--ouroborder);padding:32px 36px;margin:40px 0;text-align:center;border-radius:4px}
+.cta-beta .cta-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:12px}
+.cta-beta h3{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--tinta);margin-bottom:10px}
+.cta-beta p{font-size:15px;color:var(--t2);max-width:420px;margin:0 auto 24px;line-height:1.7}
+.btn-cta{display:inline-block;background:var(--ouro);color:var(--bg);font-size:14px;font-weight:500;padding:13px 32px;border-radius:3px;letter-spacing:.3px;transition:opacity .18s}
+.btn-cta:hover{opacity:.87}
+
+/* NAV BUTTONS */
+.ch-nav{display:flex;justify-content:space-between;margin-top:56px;padding-top:32px;border-top:1px solid var(--borda);gap:12px}
+.ch-nav-btn{display:flex;flex-direction:column;gap:4px;max-width:45%;cursor:pointer;padding:14px 20px;border:1px solid var(--borda);border-radius:4px;background:none;font-family:'DM Sans',sans-serif;text-align:left;transition:all .18s;color:var(--tinta)}
+.ch-nav-btn:hover{border-color:var(--ouroborder);background:var(--ourobg)}
+.ch-nav-btn.next{text-align:right;margin-left:auto}
+.ch-nav-btn .dir{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t3)}
+.ch-nav-btn .label{font-size:13.5px;color:var(--t2);line-height:1.4}
+.ch-nav-btn:hover .label{color:var(--ouro)}
+
+/* FLOAT CTA */
+.float-cta{position:fixed;bottom:24px;right:24px;z-index:200;background:var(--ouro);color:var(--bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:12px 22px;border-radius:40px;box-shadow:0 4px 20px rgba(200,123,27,.35);transition:opacity .2s;white-space:nowrap}
+.float-cta:hover{opacity:.88}
+
+/* RESPONSIVE */
+@media(max-width:800px){
+  :root{--sidebar:0px}
+  .sidebar{display:none}
+  .main{margin-left:0;padding:36px 22px 100px}
+  .mobile-select{display:block}
+  .nav-title{display:none}
+  .float-cta{bottom:16px;right:16px;font-size:12px;padding:10px 18px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="ebook-atico.html" class="nav-logo" style="text-decoration:none"><span>⚡</span> Ático</a>
+  <div class="nav-title" id="navTitle">Antes do App, o Método</div>
+  <div class="nav-progress"><div class="nav-progress-bar" id="progressBar"></div></div>
+  <div class="mobile-select">
+    <select id="mobileChapterSelect" onchange="goTo(parseInt(this.value))">
+      <option value="0">1 — Por que o método</option>
+      <option value="1">2 — Diagnóstico</option>
+      <option value="2">3 — A Planilha Viva</option>
+      <option value="3">4 — A Lista Inteligente</option>
+      <option value="4">5 — Morning Brief</option>
+      <option value="5">6 — Primeiro investimento</option>
+      <option value="6">7 — O Assistente Ático</option>
+      <option value="7">8 — Plano 90 dias</option>
+    </select>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Sumário</div>
+    <div class="sidebar-item active" onclick="goTo(0)" data-idx="0">
+      <span class="sidebar-num">1</span>
+      <span class="sidebar-text">Por que o método antes do app</span>
+    </div>
+    <div class="sidebar-item" onclick="goTo(1)" data-idx="1">
+      <span class="sidebar-num">2</span>
+      <span class="sidebar-text">Diagnóstico: por onde o dinheiro some</span>
+    </div>
+    <div class="sidebar-item" onclick="goTo(2)" data-idx="2">
+      <span class="sidebar-num">3</span>
+      <span class="sidebar-text">Pilar 1 — A Planilha Viva</span>
+    </div>
+    <div class="sidebar-item" onclick="goTo(3)" data-idx="3">
+      <span class="sidebar-num">4</span>
+      <span class="sidebar-text">Pilar 2 — A Lista Inteligente</span>
+    </div>
+    <div class="sidebar-item" onclick="goTo(4)" data-idx="4">
+      <span class="sidebar-num">5</span>
+      <span class="sidebar-text">Pilar 3 — O Morning Brief</span>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-item" onclick="goTo(5)" data-idx="5">
+      <span class="sidebar-num">6</span>
+      <span class="sidebar-text">Da sobrevivência ao primeiro investimento</span>
+    </div>
+    <div class="sidebar-item" onclick="goTo(6)" data-idx="6">
+      <span class="sidebar-num">7</span>
+      <span class="sidebar-text">O Assistente Ático: o próximo nível</span>
+    </div>
+    <div class="sidebar-item" onclick="goTo(7)" data-idx="7">
+      <span class="sidebar-num">8</span>
+      <span class="sidebar-text">Seu plano dos próximos 90 dias</span>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main">
+
+    <!-- CAPÍTULO 1 -->
+    <article class="chapter active" id="ch0">
+      <div class="ch-eyebrow">Capítulo 1</div>
+      <h1 class="ch-title">Por que o método antes do app</h1>
+      <div class="ch-subtitle">A ferramenta certa nas mãos erradas continua sendo a ferramenta errada</div>
+
+      <p>Você já baixou um app de finanças pessoais. Provavelmente mais de um. Gastou alguns dias configurando categorias, conectando contas, ajustando notificações. Na primeira semana, olhou os números com aquela mistura de susto e esperança. Na segunda semana, começou a ignorar os alertas. Na terceira, parou de abrir o app. Seis meses depois, ele ainda está instalado no telefone — e você ainda não sabe para onde vai o seu dinheiro.</p>
+
+      <p>Isso não é falha de tecnologia. Os apps que existem hoje são bons. Alguns são excelentes. O problema é que tecnologia resolve problema de <strong>execução</strong>, não de <strong>intenção</strong>. Um app pode registrar automaticamente que você gastou R$340 em iFood no mês. Ele não pode, sozinho, fazer você se importar com isso de forma consistente. Para que a ferramenta funcione, precisa existir um método anterior — uma forma de pensar sobre o dinheiro que o app apenas acelera e automatiza.</p>
+
+      <p>O método é o que transforma uma sequência de transações em decisões. É ele que define o que você considera "gasto aceitável" e o que é desvio. É ele que determina com que frequência você revisa os números, quais perguntas você faz quando algo sai do planejado, e qual ação concreta você toma em resposta. Sem método, qualquer app é apenas um espelho caro — útil para constatar o problema, inútil para resolvê-lo.</p>
+
+      <p>Este livro existe porque o Ático vai automatizar um método específico: planilha estruturada, lista de ações financeiras prioritárias e um briefing diário de cinco minutos. Antes de entregar o app, precisamos garantir que você entende o método que está por trás dele. Porque quando o app chegar às suas mãos, você vai saber exatamente o que está sendo automatizado — e por quê cada parte existe.</p>
+
+      <div class="ch-nav">
+        <div></div>
+        <button class="ch-nav-btn next" onclick="goTo(1)">
+          <span class="dir">Próximo capítulo</span>
+          <span class="label">Diagnóstico: por onde o dinheiro some</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- CAPÍTULO 2 -->
+    <article class="chapter" id="ch1">
+      <div class="ch-eyebrow">Capítulo 2</div>
+      <h1 class="ch-title">Diagnóstico: por onde o dinheiro some</h1>
+      <div class="ch-subtitle">Antes de cortar, você precisa enxergar</div>
+
+      <p>A maioria das pessoas que sente que "o dinheiro não fecha" não tem um problema de renda — tem um problema de visibilidade. O dinheiro some porque ninguém o acompanha com precisão suficiente para identificar o ponto exato do vazamento. Você sabe, em linhas gerais, onde estão os grandes gastos. O que escapa são os pequenos, os recorrentes invisíveis e os impulsivos que somam mais do que qualquer conta fixa.</p>
+
+      <p>O diagnóstico financeiro não é uma lista de cortes. É um exercício de honestidade descritiva: o que aconteceu com o dinheiro que entrou no último mês? A resposta completa raramente cabe em cinco categorias. O erro mais comum é agregar demais — colocar tudo em "alimentação" sem separar supermercado de delivery, ou agrupar streaming, academia e plataformas de cursos sob "assinaturas" sem saber o total exato de cada uma.</p>
+
+      <p>Existe um fenômeno que chamamos de <strong>vazamento invisível</strong>: gastos que, individualmente, parecem irrelevantes, mas que juntos consomem entre 15% e 25% da renda líquida de pessoas com renda mediana. Um café aqui, uma taxa de conveniência ali, um produto por impulso em promoção relâmpago, uma renovação automática esquecida. O problema não é o valor unitário — é a frequência multiplicada pela quantidade de fontes diferentes.</p>
+
+      <p>Para fazer o diagnóstico, você precisa de dados reais — não estimativas. Isso significa abrir o extrato bancário e o histórico do cartão dos últimos 60 dias e categorizar cada lançamento. É um trabalho de uma a duas horas. Chato, mas insubstituível. Nenhum app substitui essa primeira leitura manual, porque você é a única pessoa capaz de saber se aquela compra de R$89 foi necessária ou impulsiva.</p>
+
+      <p>A tabela abaixo serve como ponto de partida para a categorização. Use como base e adapte para a sua realidade — o que importa é que cada real tenha uma categoria, e que nenhuma categoria seja tão ampla a ponto de esconder variações importantes.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Categoria</th><th>Subcategorias principais</th><th>Alerta se passar de</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Moradia</td><td>Aluguel, condomínio, IPTU, manutenção</td><td>30% da renda líquida</td></tr>
+            <tr><td>Alimentação</td><td>Supermercado, feira, açougue</td><td>15% da renda líquida</td></tr>
+            <tr><td>Delivery e restaurantes</td><td>Apps, refeições fora, cafés</td><td>8% da renda líquida</td></tr>
+            <tr><td>Transporte</td><td>Combustível, apps de mobilidade, manutenção do carro</td><td>12% da renda líquida</td></tr>
+            <tr><td>Saúde</td><td>Plano, medicamentos, consultas, academia</td><td>10% da renda líquida</td></tr>
+            <tr><td>Assinaturas</td><td>Streaming, software, publicações, apps</td><td>3% da renda líquida</td></tr>
+            <tr><td>Vestuário</td><td>Roupas, calçados, acessórios</td><td>5% da renda líquida</td></tr>
+            <tr><td>Lazer e cultura</td><td>Shows, viagens, livros, jogos</td><td>5% da renda líquida</td></tr>
+            <tr><td>Educação</td><td>Cursos, materiais, escola</td><td>Definido por meta</td></tr>
+            <tr><td>Impulso / não categorizado</td><td>Compras sem planejamento</td><td>Menos de 2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <p><strong>O exercício do diagnóstico:</strong> Baixe seu extrato dos últimos 60 dias. Para cada lançamento, atribua uma categoria da tabela acima. Some os totais por categoria e calcule o percentual em relação à sua renda líquida. Anote os três maiores desvios em relação às referências da tabela — esses são seus pontos de atenção prioritários antes de qualquer outra ação.</p>
+      </div>
+
+      <div class="ch-nav">
+        <button class="ch-nav-btn" onclick="goTo(0)">
+          <span class="dir">Capítulo anterior</span>
+          <span class="label">Por que o método antes do app</span>
+        </button>
+        <button class="ch-nav-btn next" onclick="goTo(2)">
+          <span class="dir">Próximo capítulo</span>
+          <span class="label">Pilar 1 — A Planilha Viva</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- CAPÍTULO 3 -->
+    <article class="chapter" id="ch2">
+      <div class="ch-eyebrow">Capítulo 3 · Pilar 1</div>
+      <h1 class="ch-title">A Planilha Viva</h1>
+      <div class="ch-subtitle">Não um controle do passado — um mapa do presente</div>
+
+      <p>Existe uma confusão comum sobre o que é uma planilha financeira. A maioria das pessoas usa planilha como arquivo histórico: registra o que aconteceu, olha os totais no fim do mês, constata o problema e fecha. Isso é contabilidade doméstica, não gestão. A Planilha Viva funciona de forma diferente: ela é atualizada continuamente e consultada antes de decisões, não depois. É um instrumento preditivo, não retrospectivo.</p>
+
+      <p>A lógica central é simples: separe seus gastos em <strong>fixos comprometidos</strong> (aqueles que você não controla no curto prazo — aluguel, parcelas, plano de saúde) e <strong>variáveis gerenciáveis</strong> (aqueles que respondem às suas escolhas — alimentação, lazer, vestuário). Os fixos entram na planilha uma vez por mês e não mudam. Os variáveis são acompanhados semana a semana. Essa distinção é fundamental porque a ansiedade financeira vem da confusão entre o que você pode e o que não pode controlar agora.</p>
+
+      <p>Para cada categoria variável, você define um limite mensal — não como meta ambiciosa, mas como teto realista baseado no seu diagnóstico. A planilha mostra, a qualquer momento, quanto do teto você já usou. Isso cria um tipo de consciência financeira passiva: você não precisa calcular mentalmente se "dá para gastar" — a planilha responde em dois segundos. Com o Ático, esse olhar de dois segundos vai ser ainda mais imediato.</p>
+
+      <p>O erro que mata a maioria das planilhas é o excesso de granularidade. Quando você cria 40 categorias, qualquer saída do dia a dia gera atrito. O registro vira obrigação pesada e você para de fazer. O ideal é entre 10 e 15 categorias — granular o suficiente para enxergar o comportamento, agregado o suficiente para não virar carga cognitiva. Se você hesitar mais de 3 segundos para classificar um gasto, a categoria está errada.</p>
+
+      <p>Por fim, a planilha não precisa ser perfeita para ser útil. Um registro que captura 85% dos gastos com consistência é muito mais valioso do que um registro que tenta capturar 100% e é abandonado na segunda semana. Comece pelos maiores volumes. Adicione categorias menores conforme o hábito de registro se consolida. O método evolui com você.</p>
+
+      <div class="ch-nav">
+        <button class="ch-nav-btn" onclick="goTo(1)">
+          <span class="dir">Capítulo anterior</span>
+          <span class="label">Diagnóstico: por onde o dinheiro some</span>
+        </button>
+        <button class="ch-nav-btn next" onclick="goTo(3)">
+          <span class="dir">Próximo capítulo</span>
+          <span class="label">Pilar 2 — A Lista Inteligente</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- CAPÍTULO 4 -->
+    <article class="chapter" id="ch3">
+      <div class="ch-eyebrow">Capítulo 4 · Pilar 2</div>
+      <h1 class="ch-title">A Lista Inteligente</h1>
+      <div class="ch-subtitle">Transformar intenção em ação, uma tarefa de cada vez</div>
+
+      <p>Finanças pessoais geram uma quantidade absurda de tarefas: pagar boleto, renegociar contrato, cancelar assinatura esquecida, pesquisar plano de saúde mais barato, transferir dinheiro para reserva, ligar para o banco sobre tarifa. Essas tarefas existem em paralelo com a vida normal, têm prazos diferentes, consequências diferentes e graus de urgência que mudam ao longo do mês. Sem um sistema, elas ficam na cabeça, gerando ruído constante sem virar ação.</p>
+
+      <p>A Lista Inteligente não é um to-do genérico. É um sistema de priorização financeira baseado em dois eixos: <strong>urgência</strong> (existe prazo ou consequência imediata?) e <strong>impacto</strong> (resolve um problema relevante ou melhora sua posição de forma significativa?). Cada tarefa financeira se encaixa em um dos quatro quadrantes: urgente e de alto impacto (faça hoje), urgente e de baixo impacto (delegue ou minimize), não urgente e de alto impacto (agende com data), não urgente e de baixo impacto (elimine ou ignore).</p>
+
+      <p>O sistema funciona melhor quando você separa três tipos de tarefa: <strong>"pagar agora"</strong> (vencimento em até 72 horas), <strong>"resolver esta semana"</strong> (vencimento ou oportunidade nos próximos 7 dias) e <strong>"planejar depois"</strong> (ações importantes mas sem prazo imediato). Essa separação evita um erro clássico — misturar o urgente com o importante e acabar respondendo só ao urgente, ignorando as mudanças estruturais que realmente melhoram sua situação financeira.</p>
+
+      <p>A regra das 3 ações financeiras por dia é o coração do sistema: toda manhã, você identifica no máximo 3 tarefas financeiras que vai executar naquele dia. Não mais. Isso pode parecer pouco, mas são 90 ações por mês — mais do que a maioria das pessoas executa em um ano. A limitação não é preguiça, é foco. Quem tenta fazer 10 coisas por dia financeiras ou não faz nada, ou faz tudo pela metade.</p>
+
+      <p>Com o Ático, a lista será gerada automaticamente a partir dos seus dados: o app vai identificar vencimentos próximos, oportunidades de otimização detectadas no padrão de gastos, e metas que precisam de ação esta semana. Você vai chegar ao dia com as 3 ações já sugeridas — e vai poder confirmar, ajustar ou substituir. O método manual que você está aprendendo aqui é exatamente o que o app vai automatizar.</p>
+
+      <div class="ch-nav">
+        <button class="ch-nav-btn" onclick="goTo(2)">
+          <span class="dir">Capítulo anterior</span>
+          <span class="label">Pilar 1 — A Planilha Viva</span>
+        </button>
+        <button class="ch-nav-btn next" onclick="goTo(4)">
+          <span class="dir">Próximo capítulo</span>
+          <span class="label">Pilar 3 — O Morning Brief</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- CAPÍTULO 5 -->
+    <article class="chapter" id="ch4">
+      <div class="ch-eyebrow">Capítulo 5 · Pilar 3</div>
+      <h1 class="ch-title">O Morning Brief</h1>
+      <div class="ch-subtitle">Cinco minutos que mudam a qualidade das suas decisões do dia</div>
+
+      <p>Hábitos financeiros não são construídos em sessões mensais de revisão. São construídos em micro-rotinas diárias — pequenos momentos de contato com os dados que mantêm sua atenção calibrada. O Morning Brief é isso: uma checagem estruturada de cinco minutos, toda manhã, antes de qualquer decisão financeira do dia. Não é análise profunda. É orientação: onde estou, o que muda hoje, o que precisa de atenção.</p>
+
+      <p>A ordem importa. Primeiro, você confere o saldo disponível — não o saldo da conta, mas o saldo livre após subtrair os comprometimentos do mês que ainda vão sair. Segundo, você olha quanto falta para o fim do ciclo mensal e compara com o ritmo de gasto atual. Terceiro, você confirma se há algum vencimento nas próximas 48 horas. Quarto, você abre a lista e confirma as 3 ações do dia. Em cinco minutos, você sabe exatamente em que posição financeira está ao começar o dia.</p>
+
+      <p>O brief vira hábito quando está ancorado a outro ritual já estabelecido. Acordou, fez café, abriu o brief. Chegou no trabalho, sentou, abriu o brief. A âncora não importa — o que importa é que seja sempre o mesmo momento, todos os dias, sem exceção. Nos primeiros 30 dias, o esforço é consciente. Do dia 31 em diante, é automático. Isso é como qualquer hábito funciona: repetição até que o esforço desapareça.</p>
+
+      <p>O Ático vai entregar o Morning Brief na forma que faz mais sentido para você: notificação às 7h com resumo já calculado, sem precisar abrir planilha ou fazer conta nenhuma. Você vai ver: saldo livre, ritmo de gasto, próximos vencimentos, ações do dia. Clicou, leu, fechou. O método que você está treinando manualmente agora é o que torna essa notificação útil — porque você vai saber interpretar cada número que aparecer.</p>
+
+      <div class="ch-nav">
+        <button class="ch-nav-btn" onclick="goTo(3)">
+          <span class="dir">Capítulo anterior</span>
+          <span class="label">Pilar 2 — A Lista Inteligente</span>
+        </button>
+        <button class="ch-nav-btn next" onclick="goTo(5)">
+          <span class="dir">Próximo capítulo</span>
+          <span class="label">Da sobrevivência ao primeiro investimento</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- CAPÍTULO 6 -->
+    <article class="chapter" id="ch5">
+      <div class="ch-eyebrow">Capítulo 6</div>
+      <h1 class="ch-title">Da sobrevivência ao primeiro investimento</h1>
+      <div class="ch-subtitle">Existe uma ordem correta. Pular etapas custa caro.</div>
+
+      <p>Existe uma pressão cultural enorme para começar a investir o quanto antes. Isso é verdade em tese — mas aplicado sem critério vira armadilha. Começar a investir enquanto você tem dívidas com juros acima de 15% ao ano, ou enquanto não tem nenhuma reserva para emergências, não é construção de patrimônio: é performance de investidor sem a substância financeira que sustenta a posição.</p>
+
+      <p>A régua da liquidez é simples: antes de qualquer investimento, você precisa de um colchão de emergência equivalente a 3 meses de despesas totais (essenciais, não o total que você gasta hoje). Esse valor fica em renda fixa de alta liquidez — Tesouro Selic, CDB com liquidez diária, fundo DI. Não é investimento no sentido estrito: é segurança operacional. Sem ele, qualquer imprevisto — saúde, carro, demissão — desestabiliza tudo que você construiu.</p>
+
+      <p>O <strong>ponto de equilíbrio</strong> é o momento em que suas receitas cobrem confortavelmente suas despesas, sua reserva está formada e você tem margem mensal positiva consistente. Só a partir desse ponto faz sentido pensar em rendimento, em prazo e em risco. Antes disso, o foco é inteiramente em estabilidade: fechar o mês no azul, crescer a reserva, reduzir dívidas de custo alto.</p>
+
+      <p>A ordem correta é: (1) quitar dívidas com juros acima de 12% ao ano, (2) construir reserva de 3 meses, (3) começar a investir com o excedente após o orçamento equilibrado. Quem pula a etapa 2 e vai direto para a 3 inevitavelmente resgata o investimento na primeira emergência — e perde o rendimento, paga come-cotas ou imposto antecipado, e volta à estaca zero com a sensação de que investir não funciona. Funciona. A sequência é que importa.</p>
+
+      <p>Quando você chegar ao ponto de equilíbrio, a decisão de onde investir depende de três perguntas: qual o prazo? qual o objetivo? qual minha tolerância a oscilação? Com essas respostas, a alocação adequada já está bem delimitada para a maioria das pessoas. O Ático vai ajudar a identificar esse momento e sugerir os próximos passos com base nos seus dados reais — não em cenários genéricos.</p>
+
+      <div class="ch-nav">
+        <button class="ch-nav-btn" onclick="goTo(4)">
+          <span class="dir">Capítulo anterior</span>
+          <span class="label">Pilar 3 — O Morning Brief</span>
+        </button>
+        <button class="ch-nav-btn next" onclick="goTo(6)">
+          <span class="dir">Próximo capítulo</span>
+          <span class="label">O Assistente Ático: o próximo nível</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- CAPÍTULO 7 -->
+    <article class="chapter" id="ch6">
+      <div class="ch-eyebrow">Capítulo 7</div>
+      <h1 class="ch-title">O Assistente Ático: o próximo nível</h1>
+      <div class="ch-subtitle">O app que aprende com você — não apenas registra</div>
+
+      <p>O que diferencia o Ático de qualquer planilha automatizada ou app de controle comum é o Assistente: uma camada de inteligência que lê seus dados ao longo do tempo, identifica padrões de comportamento e sugere ações concretas com base no que aprende sobre o seu ciclo financeiro específico. Não é análise de médias genéricas. É reconhecimento do seu comportamento — quando você gasta mais, em quais categorias você costuma estourar, qual semana do mês é mais crítica para você.</p>
+
+      <p>Na prática, o Assistente vai funcionar em três camadas. A primeira é a <strong>leitura contínua</strong>: processamento dos dados que você registra (ou que chegam automaticamente via integração bancária) para manter a planilha e a lista sempre atualizadas. A segunda é a <strong>detecção de padrões</strong>: identificação de desvios do seu comportamento habitual, vencimentos recorrentes que você ainda não cadastrou, categorias que estão crescendo mais rápido do que nos ciclos anteriores. A terceira é a <strong>sugestão de ação</strong>: o Assistente não apenas aponta o problema — ele sugere o próximo passo específico.</p>
+
+      <p>O Ático também vai aprender com o que você faz com as sugestões. Se você consistentemente ignora uma categoria de alerta, o Assistente recalibra. Se você tem um comportamento de recuperação forte na última semana do mês, ele passa a considerar isso na projeção. É um sistema que melhora à medida que você o usa — o oposto de uma planilha estática que você abandona porque não evolui.</p>
+
+      <p>Como early adopter, você não está apenas recebendo o app: você está influenciando o que ele vai se tornar. Cada comportamento registrado, cada sugestão aceita ou ignorada, cada categoria que você cria ou ajusta alimenta o desenvolvimento da próxima versão. Os primeiros usuários definem o caráter do produto — e esse é um privilégio real, não marketing.</p>
+
+      <div class="cta-beta">
+        <div class="cta-eyebrow">Seu acesso está garantido</div>
+        <h3>Você já faz parte do beta</h3>
+        <p>Ao comprar este método, você garantiu seu lugar entre os primeiros usuários do Assistente Ático. Você receberá acesso assim que o beta abrir — sem custo adicional, com prioridade na fila.</p>
+        <a href="checkout.html?slug=atico" class="btn-cta">Confirmar meu acesso beta</a>
+      </div>
+
+      <div class="ch-nav">
+        <button class="ch-nav-btn" onclick="goTo(5)">
+          <span class="dir">Capítulo anterior</span>
+          <span class="label">Da sobrevivência ao primeiro investimento</span>
+        </button>
+        <button class="ch-nav-btn next" onclick="goTo(7)">
+          <span class="dir">Próximo capítulo</span>
+          <span class="label">Seu plano dos próximos 90 dias</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- CAPÍTULO 8 -->
+    <article class="chapter" id="ch7">
+      <div class="ch-eyebrow">Capítulo 8 · Fechamento</div>
+      <h1 class="ch-title">Seu plano dos próximos 90 dias</h1>
+      <div class="ch-subtitle">Sem plano, intenção é só intenção</div>
+
+      <p>Noventa dias é o prazo mínimo para transformar um método novo em comportamento consistente. É tempo suficiente para completar três ciclos mensais completos, identificar seus padrões reais de gasto e começar a tomar decisões com base em dados próprios em vez de estimativas. O plano abaixo não é rígido — é um roteiro de referência para que você saiba o que priorizar em cada fase.</p>
+
+      <div class="plan-box">
+        <h4>Semanas 1 e 2 — Diagnóstico</h4>
+        <ul>
+          <li>Baixar extrato bancário e de cartão dos últimos 60 dias</li>
+          <li>Categorizar todos os lançamentos usando a tabela do Capítulo 2</li>
+          <li>Calcular o percentual de cada categoria sobre a renda líquida</li>
+          <li>Identificar os três maiores desvios e definir o teto realista para cada um</li>
+          <li>Listar todas as dívidas com juros, valor total e taxa de cada uma</li>
+        </ul>
+      </div>
+
+      <div class="plan-box">
+        <h4>Semanas 3 e 4 — Implementar a Planilha Viva</h4>
+        <ul>
+          <li>Montar a planilha com as 10–15 categorias definidas no diagnóstico</li>
+          <li>Registrar todos os gastos diariamente por pelo menos 14 dias consecutivos</li>
+          <li>Revisar ao fim da semana 4: categorias estão certas? Alguma está impossível de manter?</li>
+          <li>Ajustar tetos baseado nos dados reais, não nos dados que você gostaria que fossem</li>
+        </ul>
+      </div>
+
+      <div class="plan-box">
+        <h4>Mês 2 — Lista Inteligente e Morning Brief</h4>
+        <ul>
+          <li>Criar a lista semanal todo domingo à noite, separando urgente do importante</li>
+          <li>Aplicar a regra das 3 ações financeiras diárias durante 30 dias seguidos</li>
+          <li>Iniciar o Morning Brief vinculado a uma âncora já existente na rotina</li>
+          <li>Registrar no fim do mês: quantas das 3 ações diárias você realmente executou?</li>
+        </ul>
+      </div>
+
+      <div class="plan-box">
+        <h4>Mês 3 — Estabilização e primeiro investimento</h4>
+        <ul>
+          <li>Verificar se o saldo mensal está positivo e consistente</li>
+          <li>Calcular o tamanho da reserva de emergência necessária (3x despesas essenciais)</li>
+          <li>Se ainda sem reserva: direcionar 100% do excedente mensal para ela</li>
+          <li>Se reserva formada: definir objetivo de investimento, prazo e perfil — e começar</li>
+          <li>Avaliar o método: o que funcionou? O que precisa de ajuste?</li>
+        </ul>
+      </div>
+
+      <p>Ao fim de 90 dias com este roteiro, você vai ter algo que a maioria das pessoas nunca tem: clareza financeira real. Não um número no app, não uma estimativa mental — dados seus, sobre seu comportamento, estruturados de forma que qualquer decisão financeira relevante pode ser tomada com base em informação concreta.</p>
+
+      <p>O Ático vai chegar durante ou depois desse processo — e quando chegar, você vai entender cada função porque você já fez o equivalente manual. Isso é o que separa um usuário que usa o app durante 3 semanas e abandona de um usuário que usa durante anos e vê seu patrimônio crescer de forma consistente. O método é seu. O app acelera o que você já sabe fazer.</p>
+
+      <div class="callout">
+        <p><strong>Uma última coisa:</strong> disciplina financeira não é restrição. É liberdade comprada em parcelas de atenção diária. Cada cinco minutos de Morning Brief, cada gasto registrado, cada ação da lista executada é um depósito na conta da sua autonomia financeira. O saldo aparece devagar — e então, de uma vez.</p>
+      </div>
+
+      <div class="ch-nav">
+        <button class="ch-nav-btn" onclick="goTo(6)">
+          <span class="dir">Capítulo anterior</span>
+          <span class="label">O Assistente Ático: o próximo nível</span>
+        </button>
+        <div></div>
+      </div>
+    </article>
+
+  </main>
+</div>
+
+<!-- FLOAT CTA -->
+<a href="checkout.html?slug=atico" class="float-cta">Garantir acesso beta</a>
+
+<script>
+const chapters=[
+  {title:'Por que o método antes do app'},
+  {title:'Diagnóstico: por onde o dinheiro some'},
+  {title:'Pilar 1 — A Planilha Viva'},
+  {title:'Pilar 2 — A Lista Inteligente'},
+  {title:'Pilar 3 — O Morning Brief'},
+  {title:'Da sobrevivência ao primeiro investimento'},
+  {title:'O Assistente Ático: o próximo nível'},
+  {title:'Seu plano dos próximos 90 dias'}
+];
+
+let current=0;
+const total=chapters.length;
+
+function goTo(idx){
+  if(idx<0||idx>=total)return;
+  document.getElementById('ch'+current).classList.remove('active');
+  document.querySelectorAll('.sidebar-item')[current].classList.remove('active');
+  document.querySelectorAll('.sidebar-item')[current].classList.add('done');
+  current=idx;
+  document.getElementById('ch'+current).classList.add('active');
+  document.querySelectorAll('.sidebar-item')[current].classList.add('active');
+  document.getElementById('navTitle').textContent='Cap. '+(current+1)+' — '+chapters[current].title;
+  document.getElementById('mobileChapterSelect').value=current;
+  const pct=Math.round(((current+1)/total)*100);
+  document.getElementById('progressBar').style.width=pct+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
+}
+
+// init
+document.getElementById('navTitle').textContent='Cap. 1 — '+chapters[0].title;
+document.getElementById('progressBar').style.width=Math.round(1/total*100)+'%';
+</script>
+</body>
+</html>
