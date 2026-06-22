@@ -6,9 +6,7 @@
 (function () {
   'use strict';
 
-  const SB_URL  = 'https://xfkepekffdyrtcgagwqo.supabase.co';
-  const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
-  const EDGE    = SB_URL + '/functions/v1';
+  const EDGE = (window.SUPABASE_URL || 'https://xfkepekffdyrtcgagwqo.supabase.co') + '/functions/v1';
 
   // ── Estado ────────────────────────────────────────────────────
   let playlist    = [];   // [{id, titulo, artista, genero, universo_slug, bg_color, capa_url, gratuita}]
@@ -189,8 +187,10 @@
 
   async function carregarPlaylist() {
     try {
-      const r = await fetch(SB_URL + '/rest/v1/musicas?ativo=eq.true&order=ordem.asc&select=id,titulo,artista,genero,universo_slug,bg_color,capa_url,gratuita,produto_id', {
-        headers: { 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON }
+      const sbUrl = window.SUPABASE_URL || 'https://xfkepekffdyrtcgagwqo.supabase.co';
+      const sbAnon = window.SUPABASE_ANON || '';
+      const r = await fetch(sbUrl + '/rest/v1/musicas?ativo=eq.true&order=ordem.asc&select=id,titulo,artista,genero,universo_slug,bg_color,capa_url,gratuita,produto_id', {
+        headers: { 'apikey': sbAnon, 'Authorization': 'Bearer ' + sbAnon }
       });
       const data = await r.json();
       if (Array.isArray(data) && data.length) {
@@ -252,10 +252,14 @@
 
     const capaEl = document.getElementById('ttp-capa');
     capaEl.style.background = t.bg_color || '#0f2d1a';
+    capaEl.textContent = '';
     if (t.capa_url) {
-      capaEl.innerHTML = '<img src="' + t.capa_url + '" alt="Capa">';
+      const img = document.createElement('img');
+      img.src = t.capa_url;
+      img.alt = 'Capa';
+      capaEl.appendChild(img);
     } else {
-      capaEl.innerHTML = '🎵';
+      capaEl.textContent = '🎵';
     }
 
     const univEl = document.getElementById('ttp-universo');
@@ -315,9 +319,8 @@
 
   async function getAuthToken() {
     try {
-      const sb = window.supabase?.createClient ? window.supabase.createClient(SB_URL, SB_ANON) : null;
-      if (!sb) return null;
-      const { data: { session } } = await sb.auth.getSession();
+      if (!window.sb) return null;
+      const { data: { session } } = await window.sb.auth.getSession();
       return session?.access_token || null;
     } catch { return null; }
   }

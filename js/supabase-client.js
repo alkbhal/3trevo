@@ -7,6 +7,10 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // supabase global vem do CDN carregado antes deste script
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+// Expose for other scripts (player.js, etc.) — single source of truth
+window.SUPABASE_URL  = SUPABASE_URL;
+window.SUPABASE_ANON = SUPABASE_ANON;
+
 // URL base das Edge Functions
 const EDGE_BASE = `${SUPABASE_URL}/functions/v1`;
 

@@ -34,6 +34,9 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   if (!slug || !email) {
     return Response.json({ ok: false, erro: 'slug e email obrigatórios' }, { status: 400 });
   }
+  if (typeof slug !== 'string' || !/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug) || slug.length > 80) {
+    return Response.json({ ok: false, erro: 'slug inválido' }, { status: 400 });
+  }
 
   // Buscar produto no Supabase
   const prodResp = await fetch(
