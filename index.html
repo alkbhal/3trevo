@@ -77,41 +77,55 @@
       position: absolute; inset: 0; z-index: 0;
     }
     .hero-video-bg video {
-      width: 100%; height: 100%; object-fit: cover; opacity: .18;
+      width: 100%; height: 100%; object-fit: cover; opacity: .55;
     }
-    /* Overlay em gradiente para legibilidade — mais denso à esquerda */
     .hero-video-overlay {
       position: absolute; inset: 0;
       background: linear-gradient(
         105deg,
-        rgba(5,15,7,.96) 0%,
-        rgba(10,31,14,.88) 45%,
-        rgba(10,31,14,.55) 70%,
-        rgba(10,31,14,.35) 100%
+        rgba(5,15,7,.92) 0%,
+        rgba(10,31,14,.7) 35%,
+        rgba(10,31,14,.25) 65%,
+        rgba(10,31,14,.1) 100%
       );
     }
 
     .hero-in {
       max-width: var(--max); margin: 0 auto; padding: 72px 24px 96px;
-      display: grid; grid-template-columns: 1fr 480px; gap: 64px; align-items: center;
+      display: grid; grid-template-columns: minmax(320px, 520px) 1fr; gap: 48px; align-items: center;
       position: relative; z-index: 1; width: 100%;
     }
 
-    .hero-ebook-call {
-      position: absolute; bottom: 32px; right: 32px; z-index: 2;
-      background: rgba(0,0,0,.7); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,160,40,.25); border-radius: 12px;
-      padding: 14px 22px; display: flex; align-items: center; gap: 14px;
-      opacity: 0; transform: translateY(16px);
-      transition: opacity .6s ease, transform .6s ease;
+    .hero-ebook-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.85) 100%);
+      padding: 28px 32px 22px;
+      display: flex; align-items: center; justify-content: center; gap: 18px;
+      transform: translateY(100%);
+      transition: transform .8s cubic-bezier(.22,1,.36,1);
       pointer-events: none;
     }
-    .hero-ebook-call.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    .hero-ebook-call .hec-badge { font-size: 9px; text-transform: uppercase; letter-spacing: .15em; color: #ffa028; font-weight: 600; }
-    .hero-ebook-call .hec-title { font-family: var(--serif); font-size: 15px; color: #fff; font-weight: 300; line-height: 1.3; }
-    .hero-ebook-call .hec-arrow { color: #ffa028; font-size: 18px; transition: transform .3s; }
-    .hero-ebook-call:hover .hec-arrow { transform: translateX(4px); }
-    @media(max-width:768px) { .hero-ebook-call { bottom: 16px; right: 16px; left: 16px; } }
+    .hero-ebook-bar.visible { transform: translateY(0); pointer-events: auto; }
+    .hero-ebook-bar .heb-progress {
+      position: absolute; top: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg, #ffa028, #ff6a00);
+      width: 0%; transition: width .3s linear;
+    }
+    .hero-ebook-bar .heb-badge { font-size: 9px; text-transform: uppercase; letter-spacing: .2em; color: #ffa028; font-weight: 600; white-space: nowrap; }
+    .hero-ebook-bar .heb-sep { width: 1px; height: 20px; background: rgba(255,255,255,.15); }
+    .hero-ebook-bar .heb-title { font-family: var(--serif); font-size: clamp(14px,2vw,18px); color: #fff; font-weight: 300; }
+    .hero-ebook-bar .heb-cta {
+      margin-left: auto; color: #ffa028; font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+      text-transform: uppercase; letter-spacing: .1em; white-space: nowrap;
+      transition: color .2s;
+    }
+    .hero-ebook-bar .heb-cta:hover { color: #fff; }
+    @media(max-width:768px) {
+      .hero-ebook-bar { padding: 20px 16px 16px; flex-wrap: wrap; gap: 8px; }
+      .hero-ebook-bar .heb-sep { display: none; }
+      .hero-ebook-bar .heb-cta { margin-left: 0; width: 100%; justify-content: center; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); }
+    }
 
     .hero-sup { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
     .hero-sup::before { content: ''; display: block; width: 24px; height: 1px; background: var(--v6); }
@@ -515,13 +529,13 @@
     <div class="hero-video-overlay"></div>
   </div>
 
-  <a href="#catalogo" class="hero-ebook-call" id="hero-ebook-call">
-    <div>
-      <div class="hec-badge">Destaque</div>
-      <div class="hec-title">O Nascimento Silencioso<br>da 3ª Guerra Mundial</div>
-    </div>
-    <span class="hec-arrow">→</span>
-  </a>
+  <div class="hero-ebook-bar" id="hero-ebook-bar">
+    <div class="heb-progress" id="heb-progress"></div>
+    <span class="heb-badge">Destaque</span>
+    <span class="heb-sep"></span>
+    <span class="heb-title">O Nascimento Silencioso da 3ª Guerra Mundial</span>
+    <a href="#catalogo" class="heb-cta">Ver ebook →</a>
+  </div>
 
   <div class="hero-in">
 
@@ -1293,13 +1307,17 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 (function(){
   var v = document.getElementById('hero-video');
-  var call = document.getElementById('hero-ebook-call');
-  if (!v || !call) return;
+  var bar = document.getElementById('hero-ebook-bar');
+  var prog = document.getElementById('heb-progress');
+  if (!v || !bar) return;
   v.addEventListener('timeupdate', function(){
-    if (v.duration && v.currentTime >= v.duration - 2) {
-      call.classList.add('visible');
+    if (!v.duration) return;
+    var pct = (v.currentTime / v.duration) * 100;
+    if (prog) prog.style.width = pct + '%';
+    if (v.currentTime >= v.duration - 2.5) {
+      bar.classList.add('visible');
     } else {
-      call.classList.remove('visible');
+      bar.classList.remove('visible');
     }
   });
 })();
