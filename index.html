@@ -521,17 +521,16 @@
   <div class="hero-video-bg">
     <video autoplay muted loop playsinline id="hero-video">
       <source src="assets/hero-reel.mp4" type="video/mp4">
-      <!-- Sem vídeo: fundo verde profundo mantido pelo CSS -->
     </video>
     <div class="hero-video-overlay"></div>
   </div>
 
   <div class="hero-ebook-bar" id="hero-ebook-bar">
     <div class="heb-progress" id="heb-progress"></div>
-    <span class="heb-badge">Destaque</span>
+    <span class="heb-badge" id="heb-badge">Destaque</span>
     <span class="heb-sep"></span>
-    <span class="heb-title">O Nascimento Silencioso da 3ª Guerra Mundial</span>
-    <a href="#catalogo" class="heb-cta" id="heb-cta-link" onclick="event.preventDefault();var c=document.querySelector('[data-slug=terceiraguerra]');if(c){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.transition='box-shadow .3s';c.style.boxShadow='0 0 0 3px #ffa028';setTimeout(function(){c.style.boxShadow=''},2000)}else{document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}">Ver ebook →</a>
+    <span class="heb-title" id="heb-title">O Nascimento Silencioso da 3ª Guerra Mundial</span>
+    <a href="#catalogo" class="heb-cta" id="heb-cta-link">Ver ebook →</a>
   </div>
 
   <div class="hero-in">
@@ -1306,11 +1305,55 @@ document.addEventListener('DOMContentLoaded', () => {
 (function(){
   var v = document.getElementById('hero-video');
   var prog = document.getElementById('heb-progress');
-  if (!v || !prog) return;
-  v.addEventListener('timeupdate', function(){
-    if (!v.duration) return;
-    prog.style.width = (v.currentTime / v.duration) * 100 + '%';
-  });
+  if (v && prog) {
+    v.addEventListener('timeupdate', function(){
+      if (!v.duration) return;
+      prog.style.width = (v.currentTime / v.duration) * 100 + '%';
+    });
+  }
+
+  // Hero dinâmico via KV — carrega config do admin
+  fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/hero-public')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(cfg){
+      if (!cfg) return;
+      // Vídeo
+      if (cfg.video_url && v) {
+        v.querySelector('source').src = cfg.video_url;
+        v.load();
+      }
+      // Título hero
+      if (cfg.titulo_pt) {
+        var ht = document.querySelector('.hero-t');
+        if (ht) ht.innerHTML = cfg.titulo_pt;
+      }
+      // Subtítulo hero
+      if (cfg.sub_pt) {
+        var hs = document.querySelector('.hero-sub');
+        if (hs) hs.textContent = cfg.sub_pt;
+      }
+      // Barra destaque
+      if (cfg.destaque_titulo) {
+        var t = document.getElementById('heb-title');
+        if (t) t.textContent = cfg.destaque_titulo;
+      }
+      if (cfg.destaque_badge) {
+        var b = document.getElementById('heb-badge');
+        if (b) b.textContent = cfg.destaque_badge;
+      }
+      // CTA → scroll ao card do slug destaque
+      var slug = cfg.destaque_slug;
+      if (slug) {
+        var cta = document.getElementById('heb-cta-link');
+        if (cta) cta.onclick = function(e){
+          e.preventDefault();
+          var c = document.querySelector('[data-slug=' + slug + ']');
+          if (c) { c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.transition='box-shadow .3s'; c.style.boxShadow='0 0 0 3px #ffa028'; setTimeout(function(){c.style.boxShadow=''},2000); }
+          else { document.getElementById('catalogo').scrollIntoView({behavior:'smooth'}); }
+        };
+      }
+    })
+    .catch(function(){});
 })();
 </script>
 </body>

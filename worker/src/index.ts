@@ -149,6 +149,15 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleHealthStatus(env);
     }
 
+    // Hero config pública (sem auth — leitura do KV para o frontend)
+    if (path === '/api/hero-public' && method === 'GET') {
+      if (!env.TT_KV) return new Response('{}', { headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) } });
+      const raw = await env.TT_KV.get('site:hero-config');
+      return new Response(raw || '{}', {
+        headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=60', ...corsHeaders(origin) },
+      });
+    }
+
     // Depoimentos públicos (aprovados — para o site)
     if (path === '/api/public/depoimentos' && method === 'GET') {
       const r = await fetch(

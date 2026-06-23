@@ -490,6 +490,26 @@
                 </div>
               </div>
             </div>
+            <div class="card">
+              <div class="card-hdr"><span class="card-titulo">Barra de destaque (inferior do hero)</span></div>
+              <div class="card-body" style="padding:16px;">
+                <div style="display:grid;gap:12px;">
+                  <div class="field">
+                    <label>Slug do ebook destaque</label>
+                    <input type="text" id="hero-destaque-slug" placeholder="terceiraguerra">
+                    <div class="field-sub">Slug do catálogo. O CTA "Ver ebook →" leva direto a este card.</div>
+                  </div>
+                  <div class="field">
+                    <label>Título do destaque (barra inferior)</label>
+                    <input type="text" id="hero-destaque-titulo" placeholder="O Nascimento Silencioso da 3ª Guerra Mundial">
+                  </div>
+                  <div class="field">
+                    <label>Badge (label à esquerda)</label>
+                    <input type="text" id="hero-destaque-badge" placeholder="Destaque" value="Destaque">
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div>
             <div class="card">
@@ -1149,9 +1169,12 @@ async function carregarHeroConfig() {
     const r = await api('/api/admin/hero-config');
     const d = await r.json();
     document.getElementById('hero-video-url').value = d.video_url || 'assets/hero-reel.mp4';
-    document.getElementById('hero-poster-url').value = d.poster_url || 'assets/hero-poster.jpg';
+    document.getElementById('hero-poster-url').value = d.poster_url || '';
     document.getElementById('hero-titulo-pt').value = d.titulo_pt || '';
     document.getElementById('hero-sub-pt').value = d.sub_pt || '';
+    document.getElementById('hero-destaque-slug').value = d.destaque_slug || '';
+    document.getElementById('hero-destaque-titulo').value = d.destaque_titulo || '';
+    document.getElementById('hero-destaque-badge').value = d.destaque_badge || 'Destaque';
     if (catalogoCache.length === 0) await carregarCatalogoPub();
     renderCarouselOrder(d.carousel_slugs || catalogoCache.map(l => l.slug));
   } catch(e) {
@@ -1228,6 +1251,9 @@ async function salvarHero() {
     poster_url: document.getElementById('hero-poster-url').value.trim(),
     titulo_pt: document.getElementById('hero-titulo-pt').value.trim(),
     sub_pt: document.getElementById('hero-sub-pt').value.trim(),
+    destaque_slug: document.getElementById('hero-destaque-slug').value.trim(),
+    destaque_titulo: document.getElementById('hero-destaque-titulo').value.trim(),
+    destaque_badge: document.getElementById('hero-destaque-badge').value.trim() || 'Destaque',
     carousel_slugs: slugs,
   };
   try {

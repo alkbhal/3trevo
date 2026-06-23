@@ -55,13 +55,16 @@ export async function handleHeroConfigPut(request: Request, env: Env): Promise<R
   // Só salva campos conhecidos — nunca persiste campos arbitrários
   const config = {
     video_url:       String(body.video_url ?? 'assets/hero-reel.mp4'),
-    poster_url:      String(body.poster_url ?? 'assets/hero-poster.jpg'),
+    poster_url:      String(body.poster_url ?? ''),
     titulo_pt:       String(body.titulo_pt ?? ''),
     titulo_en:       String(body.titulo_en ?? ''),
     titulo_es:       String(body.titulo_es ?? ''),
     sub_pt:          String(body.sub_pt ?? ''),
     sub_en:          String(body.sub_en ?? ''),
     sub_es:          String(body.sub_es ?? ''),
+    destaque_slug:   String(body.destaque_slug ?? ''),
+    destaque_titulo: String(body.destaque_titulo ?? ''),
+    destaque_badge:  String(body.destaque_badge ?? 'Destaque'),
     carousel_slugs:  Array.isArray(body.carousel_slugs) ? body.carousel_slugs : [],
     updated_at:      new Date().toISOString(),
   };
