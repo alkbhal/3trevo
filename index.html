@@ -531,7 +531,7 @@
     <span class="heb-badge">Destaque</span>
     <span class="heb-sep"></span>
     <span class="heb-title">O Nascimento Silencioso da 3ª Guerra Mundial</span>
-    <a href="#catalogo" class="heb-cta">Ver ebook →</a>
+    <a href="#catalogo" class="heb-cta" id="heb-cta-link" onclick="event.preventDefault();var c=document.querySelector('[data-slug=terceiraguerra]');if(c){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.transition='box-shadow .3s';c.style.boxShadow='0 0 0 3px #ffa028';setTimeout(function(){c.style.boxShadow=''},2000)}else{document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}">Ver ebook →</a>
   </div>
 
   <div class="hero-in">
@@ -1144,6 +1144,7 @@ function renderProdutos(prods, filtro) {
   lista.forEach((p, i) => {
     const card = document.createElement('div');
     card.className = `pcard fi${p.premium ? ' premium' : ''}`;
+    card.dataset.slug = p.slug;
     card.style.transitionDelay = `${i * 0.07}s`;
     card.style.cursor = 'pointer';
     card.onclick = function(e) { if (e.target.closest('.btn-adq')) return; window.location.href = '/checkout.html?slug=' + p.slug; };
