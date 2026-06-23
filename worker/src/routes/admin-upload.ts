@@ -62,6 +62,100 @@ export async function handleAdminUploadCapa(request: Request, env: Env): Promise
   return Response.json({ ok: true, url, key: r2Key });
 }
 
+// ─── Upload EPUB ─────────────────────────────────────────────────────────────
+const MAX_EPUB_BYTES = 50 * 1024 * 1024; // 50 MB
+
+export async function handleAdminUploadEpub(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) {
+    return Response.json({ ok: false, erro: 'unauthorized' }, { status: 401 });
+  }
+  if (!env.BIBLIOTECA_R2) {
+    return Response.json({ ok: false, erro: 'r2_nao_configurado' }, { status: 503 });
+  }
+
+  let form: FormData;
+  try { form = await request.formData(); }
+  catch { return Response.json({ ok: false, erro: 'multipart_invalido' }, { status: 400 }); }
+
+  const file = form.get('epub') as File | null;
+  if (!file || !file.size) {
+    return Response.json({ ok: false, erro: 'arquivo_ausente' }, { status: 400 });
+  }
+  if (file.size > MAX_EPUB_BYTES) {
+    return Response.json({ ok: false, erro: 'arquivo_muito_grande', max_mb: 50 }, { status: 413 });
+  }
+  if (!file.name.endsWith('.epub') && file.type !== 'application/epub+zip') {
+    return Response.json({ ok: false, erro: 'tipo_nao_permitido', tipo: file.type }, { status: 415 });
+  }
+
+  const rawSlug = (form.get('slug') as string | null) ?? 'ebook';
+  const slug = rawSlug.replace(/[^a-z0-9-]/g, '-').slice(0, 60);
+  const filename = `${slug}.epub`;
+  const r2Key = `epubs/${filename}`;
+
+  await env.BIBLIOTECA_R2.put(r2Key, await file.arrayBuffer(), {
+    httpMetadata: { contentType: 'application/epub+zip' },
+  });
+
+  return Response.json({ ok: true, epub_url: r2Key, filename });
+}
+
+// ─── Upload Vídeo (hero) ─────────────────────────────────────────────────────
+const MAX_VIDEO_BYTES = 30 * 1024 * 1024; // 30 MB
+
+export async function handleAdminUploadVideo(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) {
+    return Response.json({ ok: false, erro: 'unauthorized' }, { status: 401 });
+  }
+  if (!env.BIBLIOTECA_R2) {
+    return Response.json({ ok: false, erro: 'r2_nao_configurado' }, { status: 503 });
+  }
+
+  let form: FormData;
+  try { form = await request.formData(); }
+  catch { return Response.json({ ok: false, erro: 'multipart_invalido' }, { status: 400 }); }
+
+  const file = form.get('video') as File | null;
+  if (!file || !file.size) {
+    return Response.json({ ok: false, erro: 'arquivo_ausente' }, { status: 400 });
+  }
+  if (file.size > MAX_VIDEO_BYTES) {
+    return Response.json({ ok: false, erro: 'arquivo_muito_grande', max_mb: 30 }, { status: 413 });
+  }
+  if (!file.type.startsWith('video/')) {
+    return Response.json({ ok: false, erro: 'tipo_nao_permitido', tipo: file.type }, { status: 415 });
+  }
+
+  const label = (form.get('label') as string | null) ?? 'hero';
+  const safeName = label.replace(/[^a-z0-9-]/g, '-').slice(0, 40);
+  const filename = `${safeName}-${Date.now()}.mp4`;
+  const r2Key = `videos/${filename}`;
+
+  await env.BIBLIOTECA_R2.put(r2Key, await file.arrayBuffer(), {
+    httpMetadata: { contentType: file.type },
+  });
+
+  const url = `${WORKER_URL}/api/public/videos/${filename}`;
+  return Response.json({ ok: true, url, key: r2Key, filename });
+}
+
+// ─── Serve vídeo público ─────────────────────────────────────────────────────
+export async function handlePublicVideo(request: Request, env: Env, filename: string): Promise<Response> {
+  if (!env.BIBLIOTECA_R2) return new Response('R2 não configurado', { status: 503 });
+  if (!filename || filename.includes('..') || filename.includes('/')) return new Response('Inválido', { status: 400 });
+
+  const obj = await env.BIBLIOTECA_R2.get(`videos/${filename}`);
+  if (!obj) return new Response('Não encontrado', { status: 404 });
+
+  return new Response(obj.body, {
+    headers: {
+      'Content-Type': obj.httpMetadata?.contentType ?? 'video/mp4',
+      'Cache-Control': 'public, max-age=86400',
+      'Accept-Ranges': 'bytes',
+    },
+  });
+}
+
 // ─── Serve pública ────────────────────────────────────────────────────────────
 export async function handlePublicCapa(request: Request, env: Env, filename: string): Promise<Response> {
   if (!env.BIBLIOTECA_R2) {

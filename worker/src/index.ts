@@ -22,7 +22,7 @@ import {
   handleModerar,
 } from './routes/apuracao';
 import { handleSorteio } from './routes/sorteio';
-import { handleAdminUploadCapa, handlePublicCapa } from './routes/admin-upload';
+import { handleAdminUploadCapa, handleAdminUploadEpub, handleAdminUploadVideo, handlePublicCapa, handlePublicVideo } from './routes/admin-upload';
 import {
   verificarToken,
   handleAdminCatalogoGet,
@@ -241,15 +241,25 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleAdminStats(request, env);
     }
 
-    // ── Upload de capas (admin) ────────────────────────────────────────────
+    // ── Uploads (admin) ─────────────────────────────────────────────────────
     if (path === '/api/admin/upload/capa' && method === 'POST') {
       return handleAdminUploadCapa(request, env);
     }
+    if (path === '/api/admin/upload/epub' && method === 'POST') {
+      return handleAdminUploadEpub(request, env);
+    }
+    if (path === '/api/admin/upload/video' && method === 'POST') {
+      return handleAdminUploadVideo(request, env);
+    }
 
-    // ── Serve capas públicas (sem auth, cache longo) ───────────────────────
+    // ── Serve arquivos públicos (sem auth, cache) ─────────────────────────
     if (path.startsWith('/api/public/capas/') && method === 'GET') {
       const filename = path.replace('/api/public/capas/', '');
       return handlePublicCapa(request, env, filename);
+    }
+    if (path.startsWith('/api/public/videos/') && method === 'GET') {
+      const filename = path.replace('/api/public/videos/', '');
+      return handlePublicVideo(request, env, filename);
     }
 
     // ── Admin Catálogo ─────────────────────────────────────────────────────

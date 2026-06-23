@@ -465,9 +465,16 @@
               <div class="card-hdr"><span class="card-titulo">Vídeo de fundo</span></div>
               <div class="card-body" style="padding:16px;">
                 <div class="field" style="margin-bottom:14px;">
-                  <label>URL do vídeo (MP4)</label>
-                  <input type="text" id="hero-video-url" placeholder="https://... ou assets/hero-reel.mp4">
-                  <div class="field-sub">Hospede no R2 ou use caminho relativo. Rec: 1920×1080, H.264, ~15s loop.</div>
+                  <label>Vídeo do Hero (MP4)</label>
+                  <div style="display:flex;gap:10px;align-items:flex-start;margin-top:4px;">
+                    <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                      <button type="button" class="btn btn-s btn-sm" id="btn-upload-hero-video" onclick="document.getElementById('hero-video-file').click()">↑ Upload vídeo</button>
+                      <input type="file" id="hero-video-file" accept="video/mp4,video/webm" style="display:none" onchange="uploadHeroVideo(this)">
+                      <input type="text" id="hero-video-url" placeholder="URL preenchida após upload ou cole externa">
+                      <div class="upload-status" id="hero-video-status"></div>
+                    </div>
+                  </div>
+                  <div class="field-sub">Rec: 1920×1080, H.264, 10-15s loop, máx 30MB.</div>
                 </div>
                 <div class="field">
                   <label>URL do poster (fallback imagem)</label>
@@ -658,7 +665,17 @@
               <div class="form-group"><label>Gênero</label><input id="bib-genero" class="input" placeholder="Romance"></div>
             </div>
             <div class="form-group"><label>Sinopse</label><textarea id="bib-sinopse" class="input" rows="3" style="resize:vertical"></textarea></div>
-            <div class="form-group"><label>URL do EPUB <small style="color:var(--t3)">(Gutenberg, R2, etc.)</small></label><input id="bib-epub-url" class="input" placeholder="https://..."></div>
+            <div class="form-group">
+              <label>Arquivo EPUB</label>
+              <div style="display:flex;gap:10px;align-items:flex-start;margin-top:4px;">
+                <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                  <button type="button" class="btn btn-s btn-sm" id="btn-upload-bib-epub" onclick="document.getElementById('bib-epub-file').click()">↑ Upload EPUB</button>
+                  <input type="file" id="bib-epub-file" accept=".epub,application/epub+zip" style="display:none" onchange="uploadEpubArquivo(this)">
+                  <input id="bib-epub-url" class="input" placeholder="URL preenchida após upload ou cole externa">
+                  <div class="upload-status" id="bib-epub-status"></div>
+                </div>
+              </div>
+            </div>
             <div class="form-group">
               <label>Capa da obra</label>
               <div style="display:flex;gap:10px;align-items:flex-start;margin-top:4px;">
@@ -1692,6 +1709,81 @@ async function uploadCapaImagem(inputEl, opts) {
   } catch(e) {
     if (status) { status.textContent = 'Erro: ' + e.message; status.style.color = 'var(--danger)'; }
     toast('Erro: ' + e.message, 'err');
+  } finally {
+    if (btn) btn.disabled = false;
+    inputEl.value = '';
+  }
+}
+
+async function uploadEpubArquivo(inputEl) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  const status = document.getElementById('bib-epub-status');
+  const urlEl = document.getElementById('bib-epub-url');
+  const btn = document.getElementById('btn-upload-bib-epub');
+
+  if (status) { status.textContent = 'Enviando EPUB (' + (file.size/1024/1024).toFixed(1) + ' MB)…'; status.style.color = 'var(--t3)'; }
+  if (btn) btn.disabled = true;
+
+  const form = new FormData();
+  form.append('epub', file);
+  const slug = (document.getElementById('bib-slug')?.value || 'ebook').trim();
+  form.append('slug', slug);
+
+  try {
+    const r = await fetch(`${API}/api/admin/upload/epub`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    const d = await r.json();
+    if (d.ok) {
+      urlEl.value = d.epub_url;
+      if (status) { status.textContent = '✓ EPUB enviado (' + d.filename + ')'; status.style.color = 'var(--ok)'; }
+      toast('EPUB enviado para R2.', 'ok');
+    } else {
+      if (status) { status.textContent = 'Erro: ' + (d.erro || 'falhou'); status.style.color = 'var(--danger)'; }
+      toast('Erro: ' + (d.erro || '—'), 'err');
+    }
+  } catch(e) {
+    if (status) { status.textContent = 'Erro: ' + e.message; status.style.color = 'var(--danger)'; }
+  } finally {
+    if (btn) btn.disabled = false;
+    inputEl.value = '';
+  }
+}
+
+async function uploadHeroVideo(inputEl) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  const status = document.getElementById('hero-video-status');
+  const urlEl = document.getElementById('hero-video-url');
+  const btn = document.getElementById('btn-upload-hero-video');
+
+  if (status) { status.textContent = 'Enviando vídeo (' + (file.size/1024/1024).toFixed(1) + ' MB)…'; status.style.color = 'var(--t3)'; }
+  if (btn) btn.disabled = true;
+
+  const form = new FormData();
+  form.append('video', file);
+  form.append('label', 'hero');
+
+  try {
+    const r = await fetch(`${API}/api/admin/upload/video`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    const d = await r.json();
+    if (d.ok) {
+      urlEl.value = d.url;
+      if (status) { status.textContent = '✓ Vídeo enviado'; status.style.color = 'var(--ok)'; }
+      toast('Vídeo enviado para R2.', 'ok');
+    } else {
+      if (status) { status.textContent = 'Erro: ' + (d.erro || 'falhou'); status.style.color = 'var(--danger)'; }
+      toast('Erro: ' + (d.erro || '—'), 'err');
+    }
+  } catch(e) {
+    if (status) { status.textContent = 'Erro: ' + e.message; status.style.color = 'var(--danger)'; }
   } finally {
     if (btn) btn.disabled = false;
     inputEl.value = '';
