@@ -311,38 +311,38 @@ footer{
   <div class="strip-label">Em destaque</div>
   <div class="destaque-grid" id="grid-destaque">
 
-    <div class="card-grande" data-categoria="ficcao" onclick="abrirDegustacao('vigilante')">
-      <div class="cg-emoji">🔍</div>
-      <div class="cg-genero">Ficção Literária · Premium</div>
-      <h3 class="cg-titulo">Vigilante</h3>
-      <div class="cg-autor">Said Anes</div>
-      <p class="cg-desc">Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão — onde cada página questiona o que você acredita ser certo.</p>
-      <div class="cg-footer">
-        <div>
-          <div class="cg-preco">R$76,74</div>
-          <div class="cg-cotas">10 cotas no Programa Cultural</div>
-        </div>
-        <div class="cg-acoes">
-          <button class="btn-degustar" onclick="event.stopPropagation();abrirDegustacao('vigilante')">Ler amostra</button>
-          <a href="checkout.html?slug=vigilante" class="btn-adquirir" onclick="event.stopPropagation()">Adquirir</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-grande" data-categoria="ficcao" onclick="abrirDegustacao('terceiraguerra')">
+    <div class="card-grande" data-categoria="ficcao" onclick="abrirDegustacao('3a-guerra')">
       <div class="cg-emoji">🌐</div>
       <div class="cg-genero">Ficção Documental · Premium</div>
       <h3 class="cg-titulo">O Nascimento Silencioso da 3ª Guerra Mundial</h3>
       <div class="cg-autor">Said Anes</div>
-      <p class="cg-desc">Como guerras modernas acontecem sem disparos — no campo da informação, economia e política. Assustadoramente atual. Uma leitura que muda o que você vê nas notícias.</p>
+      <p class="cg-desc">Um analista de logística percebe padrões nos dados que ninguém quer ver. A reorganização silenciosa revela algo que não será anunciado como guerra.</p>
       <div class="cg-footer">
         <div>
           <div class="cg-preco">R$76,74</div>
           <div class="cg-cotas">10 cotas no Programa Cultural</div>
         </div>
         <div class="cg-acoes">
-          <button class="btn-degustar" onclick="event.stopPropagation();abrirDegustacao('terceiraguerra')">Ler amostra</button>
-          <a href="checkout.html?slug=terceiraguerra" class="btn-adquirir" onclick="event.stopPropagation()">Adquirir</a>
+          <button class="btn-degustar" onclick="event.stopPropagation();abrirDegustacao('3a-guerra')">Ler amostra</button>
+          <a href="checkout.html?slug=3a-guerra" class="btn-adquirir" onclick="event.stopPropagation()">Adquirir</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grande" data-categoria="ficcao" onclick="abrirDegustacao('ultima-coisa')">
+      <div class="cg-emoji">📖</div>
+      <div class="cg-genero">Ficção Literária · Premium</div>
+      <h3 class="cg-titulo">A Última Coisa que Ela Disse</h3>
+      <div class="cg-autor">Anes Said</div>
+      <p class="cg-desc">Laura descobre uma caixa no porão da mãe falecida. Dentro, escritos em sete idiomas — sete vidas nunca contadas.</p>
+      <div class="cg-footer">
+        <div>
+          <div class="cg-preco">R$76,74</div>
+          <div class="cg-cotas">10 cotas no Programa Cultural</div>
+        </div>
+        <div class="cg-acoes">
+          <button class="btn-degustar" onclick="event.stopPropagation();abrirDegustacao('ultima-coisa')">Ler amostra</button>
+          <a href="checkout.html?slug=ultima-coisa" class="btn-adquirir" onclick="event.stopPropagation()">Adquirir</a>
         </div>
       </div>
     </div>
@@ -465,31 +465,28 @@ const DEGUSTAÇOES = {
       <p><strong>O Morning Brief manual</strong> — cinco minutos todas as manhãs. Três perguntas. Uma decisão. O Ático vai fazer isso automaticamente; você vai fazer isso conscientemente enquanto ele não existe.</p>
     `
   },
-  vigilante: {
+  'ultima-coisa': {
     genero: "Ficção Literária · Premium",
-    titulo: "Vigilante",
-    autor: "Said Anes",
+    titulo: "A Última Coisa que Ela Disse",
+    autor: "Anes Said",
     preco: "R$76,74",
     cotas: "10 cotas no Programa Cultural",
-    slug: "vigilante",
+    slug: "ultima-coisa",
     texto: `
-      <h3>Prólogo</h3>
-      <p>Existe uma linha. Não está desenhada no chão nem escrita em nenhuma lei. Mas todo homem que já vestiu uma farda sabe onde ela está — sente quando está se aproximando dela, sente o cheiro diferente do ar quando a cruza.</p>
-      <p>Eu cruzei essa linha numa noite de março. Não por acidente. Não porque estava com raiva, ou com medo, ou porque havia perdido o controle. Cruzei porque escolhi. Porque olhei para os dois lados — o lado da lei e o lado da justiça — e decidi que não eram a mesma coisa.</p>
-      <p><em>Essa decisão tem um custo.</em></p>
-      <h3>Capítulo I — O chamado</h3>
-      <p>A rádio chamou 23:47. Ocorrência na Rua das Palmeiras, número dezoito. Perturbação da paz. Era o tipo de chamado que a gente ignorava quando havia algo mais urgente na área — não havia nada mais urgente naquela noite.</p>
-      <p>Eu estava de plantão com o Rodrigues. Ele dirigia. Eu olhava a cidade passar pela janela e pensava, como pensava toda noite, se o trabalho que estávamos fazendo valia alguma coisa. Se as pessoas que a gente prendia hoje voltariam amanhã. Se a linha que separava nós delas era tão clara quanto eles nos ensinaram na academia.</p>
-      <p>A casa tinha uma luz acesa na janela do primeiro andar. Sinal de que havia alguém acordado, ou de que alguém não queria que soubessem que estavam dormindo. Aprendi a diferença cedo nessa profissão.</p>
+      <h3>Capítulo 1 — O cheiro do porão</h3>
+      <p>O cheiro era o mesmo. Não importava quantos anos passassem, não importava que a casa tivesse sido pintada três vezes desde a última vez que Laura estivera ali. O porão continuava cheirando ao que sempre cheirara: mofo, papel velho, terra úmida, silêncio guardado em gavetas.</p>
+      <p>Laura desceu os degraus de madeira com cuidado. Colocava o pé, esperava, colocava o outro. A madeira rangeu no terceiro degrau, como rangia há trinta anos.</p>
+      <p>A mãe morrera há dez anos. Laura ainda não tinha terminado de ouvir.</p>
+      <p><em>A última caixa estava no canto, onde sempre estivera. A caixa dizia "PESSOAL" em letra cursiva.</em></p>
     `
   },
-  terceiraguerra: {
+  '3a-guerra': {
     genero: "Ficção Documental · Premium",
     titulo: "O Nascimento Silencioso da 3ª Guerra Mundial",
     autor: "Said Anes",
     preco: "R$76,74",
     cotas: "10 cotas no Programa Cultural",
-    slug: "terceiraguerra",
+    slug: "3a-guerra",
     texto: `
       <h3>Introdução — A guerra que você não vai ver começar</h3>
       <p>As guerras do século XX tinham datas de início. Setembro de 1939. Dezembro de 1941. Havia um momento preciso em que o mundo sabia: começou. Havia uniformes, declarações, fronteiras cruzadas por tanques.</p>

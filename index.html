@@ -224,34 +224,6 @@
       box-shadow: 0 0 0 24px rgba(122,184,138,.05), 0 0 0 48px rgba(122,184,138,.03);
     }
 
-    /* 2 · Vigilante — Azul-escuro, minimalista */
-    .capa-vigilante {
-      background: linear-gradient(160deg, #0d1926 0%, #07101c 100%);
-    }
-    .capa-vigilante .capa-genero { color: #7aaad4; }
-    .capa-vigilante .capa-divisor { background: #7aaad4; }
-    .capa-vigilante .capa-ornamento {
-      right: 14px; bottom: 50px;
-      width: 8px; height: 8px;
-      background: #7aaad4;
-      border-radius: 50%;
-      box-shadow: 0 0 0 16px rgba(122,170,212,.08), 0 0 0 32px rgba(122,170,212,.05), 0 0 0 52px rgba(122,170,212,.03);
-    }
-
-    /* 3 · 3ª GM — Quase preto, grade sutil */
-    .capa-terceiraguerra {
-      background: linear-gradient(150deg, #0e1018 0%, #08090e 100%);
-    }
-    .capa-terceiraguerra .capa-genero { color: #9896b4; }
-    .capa-terceiraguerra .capa-divisor { background: #9896b4; }
-    .capa-terceiraguerra .capa-ornamento {
-      right: 12px; top: 30px;
-      width: 80px; height: 80px;
-      border: 1px solid rgba(152,150,180,.1);
-      transform: rotate(45deg);
-      box-shadow: inset 0 0 0 20px rgba(152,150,180,.04);
-    }
-
     /* 4 · Antifalência — Chumbo quente */
     .capa-antifalencia {
       background: linear-gradient(150deg, #101820 0%, #08101a 100%);
@@ -792,7 +764,7 @@
 const CAPAS = [
   {
     slug: 'caminho-rubro-vol1',
-    classe: 'capa-terceiraguerra',
+    classe: 'capa-antifalencia',
     genero: 'Ensaio Político',
     titulo: '<em>Caminho Rubro</em><br>A Engenharia<br>da Tirania',
     autor: 'Said Anes',
@@ -820,7 +792,7 @@ const CAPAS = [
   },
   {
     slug: 'ultima-coisa',
-    classe: 'capa-vigilante',
+    classe: 'capa-justicamento',
     genero: 'Ficção Literária',
     titulo: 'A Última Coisa<br>que <em>Ela Disse</em>',
     autor: 'Anes Said',
@@ -835,7 +807,7 @@ const CAPAS = [
   },
   {
     slug: '3a-guerra',
-    classe: 'capa-terceiraguerra',
+    classe: 'capa-antifalencia',
     genero: 'Ficção Documental',
     titulo: 'O Nascimento<br>Silencioso da<br><em>3ª Guerra Mundial</em>',
     autor: 'Said Anes',
@@ -1105,7 +1077,7 @@ function setLang(lang) {
 // ── Produtos ──────────────────────────────────────────────────────────────────
 const PROD_BASE = [
   {
-    slug:'3a-guerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-terceiraguerra', premium:true,
+    slug:'3a-guerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-antifalencia', premium:true,
     capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/3a-guerra-1782321102999-0xl7a8.png',
     titulo:{pt:'O Nascimento Silencioso da 3ª Guerra Mundial',en:'The Silent Birth of WWIII',es:'El Nacimiento Silencioso de la 3ª GM'},
     genero:{pt:'Ficção Documental · Premium',en:'Documentary Fiction · Premium',es:'Ficción Documental · Premium'},
