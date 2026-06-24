@@ -332,7 +332,7 @@ function gerarPix() {
 
   var precoText = document.getElementById('prodPreco').textContent;
   var valor = parseFloat(precoText.replace('R$','').replace(/\s/g,'').replace(',','.'));
-  if (!valor || valor <= 0) { mostrarAlerta('Pre\u00e7o inv\u00e1lido.', 'erro'); return; }
+  if (!valor || valor <= 0) { mostrarAlerta('Preço inválido.', 'erro'); return; }
 
   var txid = produtoSlug.replace(/[^a-zA-Z0-9]/g,'').substring(0,25);
   pixPayloadAtual = gerarPixPayload('42368ddb-ec25-4dc4-97a7-80b28a3cb2d1', 'EDITORA TRES TREVO', 'MONTAURI', valor, txid);
@@ -345,14 +345,14 @@ function gerarPix() {
   document.getElementById('pixValor').textContent = 'R$ ' + valor.toFixed(2).replace('.', ',');
   document.getElementById('pixCopiar').textContent = pixPayloadAtual;
   document.getElementById('pixQrBox').style.display = 'block';
-  btn.innerHTML = '<span class="pix-icon">\u2705</span> QR Code gerado';
+  btn.innerHTML = '<span class="pix-icon">✅</span> QR Code gerado';
   btn.disabled = true;
 }
 
 function copiarPix() {
   if (!pixPayloadAtual) return;
   navigator.clipboard.writeText(pixPayloadAtual).then(function() {
-    document.getElementById('pixStatus').textContent = '\u2705 C\u00f3digo copiado! Cole no app do banco.';
+    document.getElementById('pixStatus').textContent = '✅ Código copiado! Cole no app do banco.';
     document.getElementById('pixStatus').style.color = '#00A868';
   }).catch(function() {
     var el = document.getElementById('pixCopiar');
@@ -360,7 +360,7 @@ function copiarPix() {
     range.selectNode(el);
     window.getSelection().removeAllRanges();
     window.getSelection().addRange(range);
-    document.getElementById('pixStatus').textContent = '\u2705 Selecione e copie (Ctrl+C).';
+    document.getElementById('pixStatus').textContent = '✅ Selecione e copie (Ctrl+C).';
   });
 }
 
