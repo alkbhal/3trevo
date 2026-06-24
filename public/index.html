@@ -77,24 +77,51 @@
       position: absolute; inset: 0; z-index: 0;
     }
     .hero-video-bg video {
-      width: 100%; height: 100%; object-fit: cover; opacity: .18;
+      width: 100%; height: 100%; object-fit: cover; opacity: .55;
     }
-    /* Overlay em gradiente para legibilidade — mais denso à esquerda */
     .hero-video-overlay {
       position: absolute; inset: 0;
       background: linear-gradient(
         105deg,
-        rgba(5,15,7,.96) 0%,
-        rgba(10,31,14,.88) 45%,
-        rgba(10,31,14,.55) 70%,
-        rgba(10,31,14,.35) 100%
+        rgba(5,15,7,.92) 0%,
+        rgba(10,31,14,.7) 35%,
+        rgba(10,31,14,.25) 65%,
+        rgba(10,31,14,.1) 100%
       );
     }
 
     .hero-in {
       max-width: var(--max); margin: 0 auto; padding: 72px 24px 96px;
-      display: grid; grid-template-columns: 1fr 480px; gap: 64px; align-items: center;
+      display: grid; grid-template-columns: minmax(320px, 520px) 1fr; gap: 48px; align-items: center;
       position: relative; z-index: 1; width: 100%;
+    }
+
+    .hero-ebook-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+      padding: 14px 32px;
+      display: flex; align-items: center; gap: 18px;
+    }
+    .hero-ebook-bar .heb-progress {
+      position: absolute; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, #ffa028, #ff6a00);
+      width: 0%; transition: width .2s linear;
+      box-shadow: 0 0 8px rgba(255,106,0,.5);
+    }
+    .hero-ebook-bar .heb-badge { font-size: 9px; text-transform: uppercase; letter-spacing: .2em; color: #ffa028; font-weight: 600; white-space: nowrap; }
+    .hero-ebook-bar .heb-sep { width: 1px; height: 20px; background: rgba(255,255,255,.15); }
+    .hero-ebook-bar .heb-title { font-family: var(--serif); font-size: clamp(14px,2vw,18px); color: #fff; font-weight: 300; }
+    .hero-ebook-bar .heb-cta {
+      margin-left: auto; color: #ffa028; font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+      text-transform: uppercase; letter-spacing: .1em; white-space: nowrap;
+      transition: color .2s;
+    }
+    .hero-ebook-bar .heb-cta:hover { color: #fff; }
+    @media(max-width:768px) {
+      .hero-ebook-bar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+      .hero-ebook-bar .heb-sep { display: none; }
+      .hero-ebook-bar .heb-cta { margin-left: 0; width: 100%; justify-content: center; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); }
     }
 
     .hero-sup { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
@@ -195,34 +222,6 @@
       border: 1px solid rgba(122,184,138,.12);
       border-radius: 50%;
       box-shadow: 0 0 0 24px rgba(122,184,138,.05), 0 0 0 48px rgba(122,184,138,.03);
-    }
-
-    /* 2 · Vigilante — Azul-escuro, minimalista */
-    .capa-vigilante {
-      background: linear-gradient(160deg, #0d1926 0%, #07101c 100%);
-    }
-    .capa-vigilante .capa-genero { color: #7aaad4; }
-    .capa-vigilante .capa-divisor { background: #7aaad4; }
-    .capa-vigilante .capa-ornamento {
-      right: 14px; bottom: 50px;
-      width: 8px; height: 8px;
-      background: #7aaad4;
-      border-radius: 50%;
-      box-shadow: 0 0 0 16px rgba(122,170,212,.08), 0 0 0 32px rgba(122,170,212,.05), 0 0 0 52px rgba(122,170,212,.03);
-    }
-
-    /* 3 · 3ª GM — Quase preto, grade sutil */
-    .capa-terceiraguerra {
-      background: linear-gradient(150deg, #0e1018 0%, #08090e 100%);
-    }
-    .capa-terceiraguerra .capa-genero { color: #9896b4; }
-    .capa-terceiraguerra .capa-divisor { background: #9896b4; }
-    .capa-terceiraguerra .capa-ornamento {
-      right: 12px; top: 30px;
-      width: 80px; height: 80px;
-      border: 1px solid rgba(152,150,180,.1);
-      transform: rotate(45deg);
-      box-shadow: inset 0 0 0 20px rgba(152,150,180,.04);
     }
 
     /* 4 · Antifalência — Chumbo quente */
@@ -492,11 +491,18 @@
   <!-- Vídeo de fundo — substituir src pelo arquivo produzido -->
   <!-- Recomendado: 1920×1080, H.264, ~15s loop, sem áudio -->
   <div class="hero-video-bg">
-    <video autoplay muted loop playsinline id="hero-video" poster="assets/hero-poster.jpg">
+    <video autoplay muted loop playsinline id="hero-video">
       <source src="assets/hero-reel.mp4" type="video/mp4">
-      <!-- Sem vídeo: fundo verde profundo mantido pelo CSS -->
     </video>
     <div class="hero-video-overlay"></div>
+  </div>
+
+  <div class="hero-ebook-bar" id="hero-ebook-bar">
+    <div class="heb-progress" id="heb-progress"></div>
+    <span class="heb-badge" id="heb-badge">Destaque</span>
+    <span class="heb-sep"></span>
+    <span class="heb-title" id="heb-title">O Nascimento Silencioso da 3ª Guerra Mundial</span>
+    <a href="#catalogo" class="heb-cta" id="heb-cta-link">Ver ebook →</a>
   </div>
 
   <div class="hero-in">
@@ -522,7 +528,7 @@
         </div>
         <div class="hsr-sep"></div>
         <div class="hsr-item">
-          <span class="hsr-n">4</span>
+          <span class="hsr-n">11</span>
           <span class="hsr-l" data-i18n="hero.stat.titulos">títulos</span>
         </div>
         <div class="hsr-sep"></div>
@@ -579,9 +585,10 @@
       </div>
       <div class="filtros">
         <button class="fbtn ativo" onclick="filtrar(this,'todos')" data-i18n="cat.f.todos">Todos</button>
-        <button class="fbtn" onclick="filtrar(this,'reflexao')" data-i18n="cat.f.reflexao">Reflexão</button>
         <button class="fbtn" onclick="filtrar(this,'ficcao')" data-i18n="cat.f.ficcao">Ficção</button>
+        <button class="fbtn" onclick="filtrar(this,'ensaio')" data-i18n="cat.f.ensaio">Ensaios</button>
         <button class="fbtn" onclick="filtrar(this,'manuais')" data-i18n="cat.f.manuais">Manuais</button>
+        <button class="fbtn" onclick="filtrar(this,'infantil')" data-i18n="cat.f.infantil">Infantil</button>
       </div>
     </div>
     <div class="prod-grid" id="prod-grid"></div>
@@ -756,24 +763,40 @@
 // ── CAPAS ──────────────────────────────────────────────────────────────────────
 const CAPAS = [
   {
-    slug: 'justicamento',
-    classe: 'capa-justicamento',
-    genero: 'Ensaio',
-    titulo: 'Justiça(mento)<br><em>para Orelha</em>',
+    slug: 'caminho-rubro-vol1',
+    classe: 'capa-antifalencia',
+    genero: 'Ensaio Político',
+    titulo: '<em>Caminho Rubro</em><br>A Engenharia<br>da Tirania',
     autor: 'Said Anes',
-    infoEN: 'Essay · Entry level',
-    infoES: 'Ensayo · Nivel entrada',
-    infoPT: 'Ensaio · Nível entrada',
-    preco: 'R$15,35',
-    cotas: 1,
-    cat: 'reflexao',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol1-1782321137532-601i5j.png',
+    infoPT: 'Ensaio Político · Vol. 1 · Série',
+    infoEN: 'Political Essay · Vol. 1 · Series',
+    infoES: 'Ensayo Político · Vol. 1 · Serie',
+    preco: 'R$46,04',
+    cotas: 3,
+    cat: 'ensaio',
   },
   {
-    slug: 'vigilante',
-    classe: 'capa-vigilante',
-    genero: 'Ficção Literária',
-    titulo: '<em>Vigilante</em>',
+    slug: 'isa-isma-tintim',
+    classe: 'capa-justicamento',
+    genero: 'Infantojuvenil',
+    titulo: 'Isa, Isma<br>e <em>Tintim</em>',
     autor: 'Said Anes',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/isa-isma-tintim-1782321119350-hnjh8a.png',
+    infoPT: 'Infantojuvenil · 4 a 10 anos',
+    infoEN: 'Children\'s · Ages 4-10',
+    infoES: 'Infantil · 4 a 10 años',
+    preco: 'R$15,35',
+    cotas: 1,
+    cat: 'infantil',
+  },
+  {
+    slug: 'ultima-coisa',
+    classe: 'capa-justicamento',
+    genero: 'Ficção Literária',
+    titulo: 'A Última Coisa<br>que <em>Ela Disse</em>',
+    autor: 'Anes Said',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/ultima-coisa-1782321114105-h9ozsj.png',
     infoPT: 'Ficção Literária · Premium · 10 cotas',
     infoEN: 'Literary Fiction · Premium · 10 entries',
     infoES: 'Ficción Literaria · Premium · 10 participaciones',
@@ -783,11 +806,12 @@ const CAPAS = [
     premium: true,
   },
   {
-    slug: 'terceiraguerra',
-    classe: 'capa-terceiraguerra',
+    slug: '3a-guerra',
+    classe: 'capa-antifalencia',
     genero: 'Ficção Documental',
     titulo: 'O Nascimento<br>Silencioso da<br><em>3ª Guerra Mundial</em>',
     autor: 'Said Anes',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/3a-guerra-1782321102999-0xl7a8.png',
     infoPT: 'Ficção Documental · Premium · 10 cotas',
     infoEN: 'Documentary Fiction · Premium · 10 entries',
     infoES: 'Ficción Documental · Premium · 10 participaciones',
@@ -797,17 +821,19 @@ const CAPAS = [
     premium: true,
   },
   {
-    slug: 'antifalencia',
+    slug: 'habitaculos',
     classe: 'capa-antifalencia',
-    genero: 'Manual',
-    titulo: 'Guia<br><em>Antifalência</em><br>Vol. 1',
+    genero: 'Ensaio',
+    titulo: '<em>Habitáculos</em><br>do Fim',
     autor: 'Said Anes',
-    infoPT: 'Manual · Intermediário · 3 cotas',
-    infoEN: 'Business Guide · Mid-tier · 3 entries',
-    infoES: 'Guía · Intermedio · 3 participaciones',
-    preco: 'R$46,04',
-    cotas: 3,
-    cat: 'manuais',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/habitaculos-1782321107993-katvre.png',
+    infoPT: 'Ensaio · Não ficção · Premium',
+    infoEN: 'Essay · Non-fiction · Premium',
+    infoES: 'Ensayo · No ficción · Premium',
+    preco: 'R$76,74',
+    cotas: 10,
+    cat: 'ensaio',
+    premium: true,
   },
 ];
 
@@ -1051,36 +1077,103 @@ function setLang(lang) {
 // ── Produtos ──────────────────────────────────────────────────────────────────
 const PROD_BASE = [
   {
-    slug:'justicamento', cat:'reflexao', cor:'#0d2415', corCapa:'capa-justicamento',
-    titulo:{pt:'Justiça(mento) para Orelha',en:'Justice For Your Ears',es:'Justicia(mento) para el Oído'},
-    genero:{pt:'Ensaio · Entrada',en:'Essay · Entry',es:'Ensayo · Entrada'},
-    desc:{pt:'Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.',en:'An essay on justice, language and power. For those who question what they hear before repeating it.',es:'Un ensayo sobre justicia, lenguaje y poder.'},
-    preco:'R$15,35',cotas:1,autor:'Said Anes',
-    pc:{pt:'Sorteio · participação após D+7',en:'Draw · participation after D+7',es:'Sorteo · participación tras D+7'}
-  },
-  {
-    slug:'vigilante', cat:'ficcao', cor:'#0d1926', corCapa:'capa-vigilante', premium:true,
-    titulo:{pt:'Vigilante',en:'Vigilante',es:'Vigilante'},
-    genero:{pt:'Ficção Literária · Premium',en:'Literary Fiction · Premium',es:'Ficción Literaria · Premium'},
-    desc:{pt:'Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão.',en:'A narrative about the line between justice and revenge. High-tension literary fiction.',es:'Una narrativa sobre el límite entre justicia y venganza. Ficción literaria de alta tensión.'},
-    preco:'R$76,74',cotas:10,autor:'Said Anes',
-    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
-  },
-  {
-    slug:'terceiraguerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-terceiraguerra', premium:true,
+    slug:'3a-guerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-antifalencia', premium:true,
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/3a-guerra-1782321102999-0xl7a8.png',
     titulo:{pt:'O Nascimento Silencioso da 3ª Guerra Mundial',en:'The Silent Birth of WWIII',es:'El Nacimiento Silencioso de la 3ª GM'},
     genero:{pt:'Ficção Documental · Premium',en:'Documentary Fiction · Premium',es:'Ficción Documental · Premium'},
-    desc:{pt:'Como guerras modernas acontecem sem disparos. Assustadoramente atual.',en:'How modern wars happen without a shot fired. Frighteningly current.',es:'Cómo las guerras modernas ocurren sin disparos. Aterradoramente actual.'},
+    desc:{pt:'Um analista de logística percebe padrões nos dados que ninguém quer ver. A reorganização silenciosa das cadeias globais revela algo que não será anunciado como guerra.',en:'How modern wars happen without a shot fired. Frighteningly current.',es:'Cómo las guerras modernas ocurren sin disparos.'},
     preco:'R$76,74',cotas:10,autor:'Said Anes',
     pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
   },
   {
-    slug:'antifalencia', cat:'manuais', cor:'#101820', corCapa:'capa-antifalencia',
-    titulo:{pt:'O Guia Antifalência do Empreendedor Iniciante',en:'The Anti-Bankruptcy Guide for New Entrepreneurs',es:'La Guía Antiquiebra del Emprendedor Principiante'},
-    genero:{pt:'Manual · Intermediário',en:'Business Guide · Mid-tier',es:'Guía · Intermedio'},
-    desc:{pt:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio.',en:'The math nobody makes you do. Costs, pricing and break-even for survival.',es:'Las cuentas que nadie te obliga a hacer. Costos, precios y punto de equilibrio.'},
+    slug:'habitaculos', cat:'ensaio', cor:'#0a1628', premium:true,
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/habitaculos-1782321107993-katvre.png',
+    titulo:{pt:'Habitáculos do Fim',en:'Habitats of the End',es:'Habitáculos del Fin'},
+    genero:{pt:'Ensaio · Não ficção · Premium',en:'Essay · Non-fiction · Premium',es:'Ensayo · No ficción · Premium'},
+    desc:{pt:'Superricos, testes globais e a corrida pelo último refúgio. Como bilionários constroem bunkers enquanto o mundo assiste.',en:'Billionaire bunkers, global tests, and the race for the last refuge.',es:'Superricos, pruebas globales y la carrera por el último refugio.'},
+    preco:'R$76,74',cotas:10,autor:'Said Anes',
+    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
+  },
+  {
+    slug:'ultima-coisa', cat:'ficcao', cor:'#2a1a0a', premium:true,
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/ultima-coisa-1782321114105-h9ozsj.png',
+    titulo:{pt:'A Última Coisa que Ela Disse',en:'The Last Thing She Said',es:'Lo Último que Ella Dijo'},
+    genero:{pt:'Ficção Literária · Premium',en:'Literary Fiction · Premium',es:'Ficción Literaria · Premium'},
+    desc:{pt:'Laura descobre uma caixa no porão da mãe falecida. Dentro, escritos em sete idiomas — sete vidas nunca contadas.',en:'Laura discovers a box in her late mother\'s basement. Inside, writings in seven languages.',es:'Laura descubre una caja en el sótano de su madre fallecida.'},
+    preco:'R$76,74',cotas:10,autor:'Anes Said',
+    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
+  },
+  {
+    slug:'caminho-rubro-vol1', cat:'ensaio', cor:'#1a0808',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol1-1782321137532-601i5j.png',
+    titulo:{pt:'Caminho Rubro — Vol. 1: A Engenharia da Tirania',en:'Red Path — Vol. 1: The Engineering of Tyranny',es:'Camino Rojo — Vol. 1'},
+    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
+    desc:{pt:'Como regimes autoritários são construídos por dentro. O mapa antes da jornada. Volume 1 da trilogia.',en:'How authoritarian regimes are built from within.',es:'Cómo los regímenes autoritarios se construyen desde adentro.'},
     preco:'R$46,04',cotas:3,autor:'Said Anes',
-    pc:{pt:'3 cotas · sorteio principal',en:'3 entries · main draw',es:'3 participaciones · sorteo principal'}
+    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
+  },
+  {
+    slug:'caminho-rubro-vol2', cat:'ensaio', cor:'#1a0808',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol2-1782321142546-sqfts5.png',
+    titulo:{pt:'Caminho Rubro — Vol. 2: As 7 Leis',en:'Red Path — Vol. 2: The 7 Laws',es:'Camino Rojo — Vol. 2'},
+    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
+    desc:{pt:'Sete mecanismos que todo regime autoritário opera — do monopólio da narrativa à autopreservação sistêmica.',en:'Seven mechanisms every authoritarian regime operates.',es:'Siete mecanismos que todo régimen autoritario opera.'},
+    preco:'R$46,04',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
+  },
+  {
+    slug:'caminho-rubro-vol3', cat:'ensaio', cor:'#1a0808',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol3-1782321147039-awykts.png',
+    titulo:{pt:'Caminho Rubro — Vol. 3: Tiranos São Construídos',en:'Red Path — Vol. 3: Tyrants Are Built',es:'Camino Rojo — Vol. 3'},
+    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
+    desc:{pt:'Casos comparados: Hungria, Turquia, Venezuela, Brasil. Como desmontar o que foi erguido.',en:'Comparative cases. How to dismantle what was built.',es:'Casos comparados. Cómo desmontar lo construido.'},
+    preco:'R$46,04',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
+  },
+  {
+    slug:'justicamento', cat:'ensaio', cor:'#2a0d1a',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/justicamento-1782321124486-sctxd2.png',
+    titulo:{pt:'Justiça(mento) para Orelha',en:'Justice For Your Ears',es:'Justicia(mento) para el Oído'},
+    genero:{pt:'Ensaio',en:'Essay',es:'Ensayo'},
+    desc:{pt:'O que acontece quando a justiça fala mas não escuta? Ensaio sobre punição, escuta e os limites do sistema penal brasileiro.',en:'What happens when justice speaks but doesn\'t listen?',es:'¿Qué pasa cuando la justicia habla pero no escucha?'},
+    preco:'R$15,35',cotas:1,autor:'Said Anes',
+    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
+  },
+  {
+    slug:'antifalencia', cat:'manuais', cor:'#101820',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/antifalencia-1782321129445-lnp5d8.png',
+    titulo:{pt:'O Guia Antifalência do Empreendedor',en:'The Anti-Bankruptcy Guide',es:'La Guía Antiquiebra'},
+    genero:{pt:'Manual · Negócios',en:'Business Guide',es:'Guía · Negocios'},
+    desc:{pt:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para sobreviver os primeiros 2 anos.',en:'The math nobody makes you do. Costs, pricing and break-even.',es:'Las cuentas que nadie te obliga a hacer.'},
+    preco:'R$46,04',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · sorteio',en:'3 entries · draw',es:'3 participaciones · sorteo'}
+  },
+  {
+    slug:'livre-das-dividas', cat:'manuais', cor:'#0a1a2e',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/livre-das-dividas-1782321133512-yspj7p.png',
+    titulo:{pt:'Livre das Dívidas',en:'Debt Free',es:'Libre de Deudas'},
+    genero:{pt:'Finanças Pessoais',en:'Personal Finance',es:'Finanzas Personales'},
+    desc:{pt:'70 milhões de brasileiros negativados. Este guia mostra o caminho de volta — com scripts, direitos e um plano que funciona.',en:'70 million Brazilians in debt. This guide shows the way back.',es:'70 millones de brasileños endeudados. Esta guía muestra el camino.'},
+    preco:'R$15,35',cotas:1,autor:'Said Anes',
+    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
+  },
+  {
+    slug:'isa-isma-tintim', cat:'infantil', cor:'#1a2a1a',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/isa-isma-tintim-1782321119350-hnjh8a.png',
+    titulo:{pt:'Isa, Isma e Tintim',en:'Isa, Isma & Tintim',es:'Isa, Isma y Tintim'},
+    genero:{pt:'Infantojuvenil',en:'Children\'s',es:'Infantil'},
+    desc:{pt:'Coração, vitalidade e alegria. Três irmãos, uma porta colorida e aventuras que ensinam sem sermão.',en:'Heart, vitality and joy. Three siblings and adventures that teach without preaching.',es:'Corazón, vitalidad y alegría. Tres hermanos y aventuras.'},
+    preco:'R$15,35',cotas:1,autor:'Said Anes',
+    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
+  },
+  {
+    slug:'antes-do-app', cat:'manuais', cor:'#1a1a0a',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/antes-do-app-1782321151315-tg2b7y.png',
+    titulo:{pt:'Antes do App, o Método',en:'Before the App, the Method',es:'Antes de la App, el Método'},
+    genero:{pt:'Finanças · Método',en:'Finance · Method',es:'Finanzas · Método'},
+    desc:{pt:'O método Ático de gestão financeira pessoal. Cinco estados, oito grupos, um ciclo mensal. Entenda seu dinheiro antes de qualquer app.',en:'The Ático method. Five states, eight groups, one monthly cycle.',es:'El método Ático. Cinco estados, ocho grupos, un ciclo mensual.'},
+    preco:'R$37,00',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · sorteio',en:'3 entries · draw',es:'3 participaciones · sorteo'}
   },
 ];
 
@@ -1109,6 +1202,7 @@ function renderProdutos(prods, filtro) {
   lista.forEach((p, i) => {
     const card = document.createElement('div');
     card.className = `pcard fi${p.premium ? ' premium' : ''}`;
+    card.dataset.slug = p.slug;
     card.style.transitionDelay = `${i * 0.07}s`;
     card.style.cursor = 'pointer';
     card.onclick = function(e) { if (e.target.closest('.btn-adq')) return; window.location.href = '/checkout.html?slug=' + p.slug; };
@@ -1265,6 +1359,61 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(() => {});
 });
+</script>
+<script>
+(function(){
+  var v = document.getElementById('hero-video');
+  var prog = document.getElementById('heb-progress');
+  if (v && prog) {
+    v.addEventListener('timeupdate', function(){
+      if (!v.duration) return;
+      prog.style.width = (v.currentTime / v.duration) * 100 + '%';
+    });
+  }
+
+  // Hero dinâmico via KV — carrega config do admin
+  fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/hero-public')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(cfg){
+      if (!cfg) return;
+      // Vídeo
+      if (cfg.video_url && v) {
+        v.querySelector('source').src = cfg.video_url;
+        v.load();
+      }
+      // Título hero
+      if (cfg.titulo_pt) {
+        var ht = document.querySelector('.hero-t');
+        if (ht) ht.innerHTML = cfg.titulo_pt;
+      }
+      // Subtítulo hero
+      if (cfg.sub_pt) {
+        var hs = document.querySelector('.hero-sub');
+        if (hs) hs.textContent = cfg.sub_pt;
+      }
+      // Barra destaque
+      if (cfg.destaque_titulo) {
+        var t = document.getElementById('heb-title');
+        if (t) t.textContent = cfg.destaque_titulo;
+      }
+      if (cfg.destaque_badge) {
+        var b = document.getElementById('heb-badge');
+        if (b) b.textContent = cfg.destaque_badge;
+      }
+      // CTA → scroll ao card do slug destaque
+      var slug = cfg.destaque_slug;
+      if (slug) {
+        var cta = document.getElementById('heb-cta-link');
+        if (cta) cta.onclick = function(e){
+          e.preventDefault();
+          var c = document.querySelector('[data-slug=' + slug + ']');
+          if (c) { c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.transition='box-shadow .3s'; c.style.boxShadow='0 0 0 3px #ffa028'; setTimeout(function(){c.style.boxShadow=''},2000); }
+          else { document.getElementById('catalogo').scrollIntoView({behavior:'smooth'}); }
+        };
+      }
+    })
+    .catch(function(){});
+})();
 </script>
 </body>
 </html>

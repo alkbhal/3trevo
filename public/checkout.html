@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co tres-trevo-api.al-kbhal.workers.dev; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
 <title>Finalizar Compra — Editora Três Trevo</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/qrcode.min.js"></script>
 <style>
 :root{
   --verde:#0f2d1a;--verde-medio:#1a4a2e;--verde-claro:#2a6b42;
@@ -115,21 +116,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 .alert.erro{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.25);color:#922b21}
 .alert.sucesso{background:rgba(26,74,46,.07);border:1px solid rgba(26,74,46,.2);color:var(--verde-medio)}
 
-/* Botão Mercado Pago */
-.btn-mp{width:100%;padding:16px;
-  background:linear-gradient(135deg,#009ee3,#00b4f0);
+/* Botão PIX */
+.btn-pix{width:100%;padding:16px;
+  background:linear-gradient(135deg,#32BCAD,#00A868);
   color:#fff;border:none;font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;
   letter-spacing:.5px;cursor:pointer;transition:opacity .2s;
   display:flex;align-items:center;justify-content:center;gap:10px}
-.btn-mp:hover{opacity:.9}
-.btn-mp:disabled{opacity:.4;cursor:not-allowed}
-.mp-logo{font-size:18px}
+.btn-pix:hover{opacity:.9}
+.btn-pix:disabled{opacity:.4;cursor:not-allowed}
+.pix-icon{font-size:18px}
 .separador{text-align:center;font-size:11px;color:rgba(26,26,22,.35);
   letter-spacing:2px;text-transform:uppercase;margin:4px 0;position:relative}
 .separador::before,.separador::after{content:'';position:absolute;top:50%;
   width:42%;height:1px;background:rgba(26,26,22,.1)}
 .separador::before{left:0}.separador::after{right:0}
 
+.pix-qr-box{text-align:center;padding:24px;background:#fff;border:2px solid #00A868;border-radius:8px;margin-top:16px;display:none}
+.pix-qr-box canvas{margin:0 auto 12px;display:block}
+.pix-qr-box .pix-valor{font-size:22px;font-weight:700;color:#00A868;margin-bottom:12px}
+.pix-copiar{width:100%;padding:10px;background:#f5f0e8;border:1px solid #ccc;border-radius:4px;font-size:10px;word-break:break-all;cursor:pointer;margin-top:8px;text-align:left}
+.pix-copiar:hover{background:#e8e0d0}
+.pix-status{font-size:12px;color:#666;margin-top:8px}
 @media(max-width:768px){
   nav{padding:0 20px}
   .checkout-wrap{grid-template-columns:1fr}
@@ -191,12 +198,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 
       <!-- Botão pagar -->
       <div>
-        <button class="btn-mp" id="btnPagar" onclick="iniciarPagamento()" disabled>
-          <span class="mp-logo">💳</span> Pagar com Mercado Pago
+        <button class="btn-pix" id="btnPagar" onclick="gerarPix()" disabled>
+          <span class="mp-logo">⚡</span> Pagar com PIX
         </button>
         <p style="font-size:11px;color:rgba(26,26,22,.35);text-align:center;margin:8px 0 0;line-height:1.5">
-          Cartão de crédito, débito, PIX e boleto<br>aceitos pelo Mercado Pago
+          Pagamento instantâneo via PIX<br>QR Code gerado na hora
         </p>
+        <div class="pix-qr-box" id="pixQrBox">
+          <div class="pix-valor" id="pixValor"></div>
+          <canvas id="pixQrCanvas"></canvas>
+          <p style="font-size:12px;color:#333;margin:0 0 8px">Escaneie o QR Code ou copie o código:</p>
+          <div class="pix-copiar" id="pixCopiar" onclick="copiarPix()" title="Clique para copiar"></div>
+          <div class="pix-status" id="pixStatus">Aguardando pagamento...</div>
+        </div>
       </div>
 
       <!-- Garantia -->
@@ -246,18 +260,24 @@ async function init() {
 
 // ── PRODUTO ───────────────────────────────────────────────
 async function carregarPorSlug(slug) {
-  // Tentar Supabase direto
-  const { data: p } = await sb.from('products').select('*').eq('slug', slug).eq('ativo', true).single();
-  if (p) { renderProduto(p); return; }
+  try {
+    const { data } = await sb.from('catalogo').select('*').eq('slug', slug).eq('ativo', true).limit(1);
+    if (data && data.length > 0) { renderProduto(data[0]); return; }
+  } catch (e) { console.warn('Supabase catalogo:', e); }
 
-  // Fallback catálogo local
-  const local = CATALOGO[slug];
-  if (!local) { mostrarAlerta('Produto não encontrado.', 'erro'); return; }
-  document.getElementById('prodGenero').textContent = local.genero;
-  document.getElementById('prodTitulo').textContent = local.titulo;
-  document.getElementById('prodAutor').textContent  = local.autor;
-  document.getElementById('prodCotas').textContent  = local.cotas;
-  document.getElementById('prodPreco').textContent  = 'R$ ' + local.preco.toFixed(2).replace('.', ',');
+  const local = CATALOGO[slug] || (window.CATALOGO_LIVE && window.CATALOGO_LIVE[slug]);
+  if (local) {
+    document.getElementById('prodGenero').textContent = local.genero || '';
+    document.getElementById('prodTitulo').textContent = local.titulo;
+    document.getElementById('prodAutor').textContent  = local.autor || 'Said Anes';
+    document.getElementById('prodDesc').textContent   = local.descricao || '';
+    document.getElementById('prodCotas').textContent  = local.cotas || 1;
+    document.getElementById('prodPreco').textContent  = 'R$ ' + Number(local.preco).toFixed(2).replace('.', ',');
+    return;
+  }
+
+  mostrarAlerta('Produto não encontrado. Redirecionando ao catálogo...', 'erro');
+  setTimeout(function() { window.location.href = '/#catalogo'; }, 3000);
 }
 
 function renderProduto(p) {
@@ -279,44 +299,69 @@ function validarFormulario() {
 }
 
 // ── PAGAMENTO ─────────────────────────────────────────────
-async function iniciarPagamento() {
-  const email = document.getElementById('emailInput').value.trim();
-  const nome  = document.getElementById('nomeInput').value.trim();
-  const btn   = document.getElementById('btnPagar');
+// PIX EMV payload (BR Code padrao BACEN)
+function gerarPixPayload(chave, nome, cidade, valor, txid) {
+  function tlv(id, val) { return id + String(val.length).padStart(2,'0') + val; }
+  var gui = tlv('00','br.gov.bcb.pix');
+  var chaveF = tlv('01', chave);
+  var mai = tlv('26', gui + chaveF);
+  var mcc = tlv('52','0000');
+  var moeda = tlv('53','986');
+  var valorF = valor > 0 ? tlv('54', valor.toFixed(2)) : '';
+  var pais = tlv('58','BR');
+  var nomeF = tlv('59', nome.substring(0,25));
+  var cidadeF = tlv('60', cidade.substring(0,15));
+  var txidF = tlv('05', txid.substring(0,25));
+  var addData = tlv('62', txidF);
+  var payload = tlv('00','01') + mai + mcc + moeda + valorF + pais + nomeF + cidadeF + addData + '6304';
+  var crc = 0xFFFF;
+  for (var i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (var j = 0; j < 8; j++) { crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1; crc &= 0xFFFF; }
+  }
+  return payload + crc.toString(16).toUpperCase().padStart(4,'0');
+}
 
+var pixPayloadAtual = '';
+
+function gerarPix() {
+  var email = document.getElementById('emailInput').value.trim();
+  var nome  = document.getElementById('nomeInput').value.trim();
+  var btn   = document.getElementById('btnPagar');
   if (!email || !nome || !produtoSlug) return;
 
-  btn.disabled    = true;
-  btn.innerHTML   = '<span class="mp-logo">⏳</span> Preparando pagamento…';
-  mostrarOverlay('Redirecionando para o Mercado Pago…');
+  var precoText = document.getElementById('prodPreco').textContent;
+  var valor = parseFloat(precoText.replace('R$','').replace(/\s/g,'').replace(',','.'));
+  if (!valor || valor <= 0) { mostrarAlerta('Preço inválido.', 'erro'); return; }
 
-  try {
-    const res = await fetch(`${WORKER}/api/checkout/preferencia`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ slug: produtoSlug, email, nome }),
-    });
+  var txid = produtoSlug.replace(/[^a-zA-Z0-9]/g,'').substring(0,25);
+  pixPayloadAtual = gerarPixPayload('42368ddb-ec25-4dc4-97a7-80b28a3cb2d1', 'EDITORA TRES TREVO', 'MONTAURI', valor, txid);
 
-    const data = await res.json();
+  var canvas = document.getElementById('pixQrCanvas');
+  QRCode.toCanvas(canvas, pixPayloadAtual, { width: 250, margin: 2 }, function(err) {
+    if (err) { mostrarAlerta('Erro ao gerar QR Code.', 'erro'); return; }
+  });
 
-    if (!res.ok || !data.init_point) {
-      ocultarOverlay();
-      btn.disabled  = false;
-      btn.innerHTML = '<span class="mp-logo">💳</span> Pagar com Mercado Pago';
-      mostrarAlerta(data.erro || 'Erro ao iniciar pagamento. Tente novamente.', 'erro');
-      return;
-    }
+  document.getElementById('pixValor').textContent = 'R$ ' + valor.toFixed(2).replace('.', ',');
+  document.getElementById('pixCopiar').textContent = pixPayloadAtual;
+  document.getElementById('pixQrBox').style.display = 'block';
+  btn.innerHTML = '<span class="pix-icon">✅</span> QR Code gerado';
+  btn.disabled = true;
+}
 
-    // Redirecionar para checkout do Mercado Pago
-    window.location.href = data.init_point;
-
-  } catch (err) {
-    console.error(err);
-    ocultarOverlay();
-    btn.disabled  = false;
-    btn.innerHTML = '<span class="mp-logo">💳</span> Pagar com Mercado Pago';
-    mostrarAlerta('Erro de conexão. Verifique sua internet e tente novamente.', 'erro');
-  }
+function copiarPix() {
+  if (!pixPayloadAtual) return;
+  navigator.clipboard.writeText(pixPayloadAtual).then(function() {
+    document.getElementById('pixStatus').textContent = '✅ Código copiado! Cole no app do banco.';
+    document.getElementById('pixStatus').style.color = '#00A868';
+  }).catch(function() {
+    var el = document.getElementById('pixCopiar');
+    var range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.getElementById('pixStatus').textContent = '✅ Selecione e copie (Ctrl+C).';
+  });
 }
 
 // ── HELPERS ───────────────────────────────────────────────
