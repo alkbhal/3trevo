@@ -173,7 +173,7 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // Catálogo (leitura pública)
     if (path === '/api/public/catalogo' && method === 'GET') {
       const resp = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,accent_color,capa_url,ordem`,
+        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem`,
         {
           headers: {
             apikey: env.SUPABASE_SERVICE_KEY,

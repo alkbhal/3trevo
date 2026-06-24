@@ -28,7 +28,7 @@ window.CATALOGO_LIVE = null;
 
 async function carregarCatalogo() {
   try {
-    const { data } = await sb.from('catalogo').select('slug,titulo,preco,cotas_total,ativo').eq('ativo', true);
+    const { data } = await sb.from('catalogo').select('slug,titulo,preco,cotas,ativo').eq('ativo', true);
     if (data && data.length) {
       window.CATALOGO_LIVE = {};
       data.forEach(p => {
