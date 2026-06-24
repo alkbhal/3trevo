@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev; img-src 'self' data: blob: *.supabase.co tres-trevo-api.al-kbhal.workers.dev; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
 <title>Finalizar Compra — Editora Três Trevo</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -247,11 +247,11 @@ async function init() {
 // ── PRODUTO ───────────────────────────────────────────────
 async function carregarPorSlug(slug) {
   // Tentar Supabase direto
-  const { data: p } = await sb.from('products').select('*').eq('slug', slug).eq('ativo', true).single();
+  const { data: p } = await sb.from('catalogo').select('*').eq('slug', slug).eq('ativo', true).single().catch(() => ({ data: null }));
   if (p) { renderProduto(p); return; }
 
   // Fallback catálogo local
-  const local = CATALOGO[slug];
+  const local = CATALOGO[slug] || (window.CATALOGO_LIVE && window.CATALOGO_LIVE[slug]);
   if (!local) { mostrarAlerta('Produto não encontrado.', 'erro'); return; }
   document.getElementById('prodGenero').textContent = local.genero;
   document.getElementById('prodTitulo').textContent = local.titulo;

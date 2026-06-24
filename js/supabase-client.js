@@ -16,11 +16,17 @@ const EDGE_BASE = `${SUPABASE_URL}/functions/v1`;
 
 // Catálogo local (espelha products no banco — fallback visual)
 const CATALOGO = {
-  justicamento:   { titulo: 'Justiça(mento) para Orelha',              autor: 'Said Anes', genero: 'Ensaio',            emoji: '⚖️', cor: '#1a4a2e', cotas: 1,  preco: 15.35 },
-  vigilante:      { titulo: 'Vigilante',                               autor: 'Said Anes', genero: 'Ficção Literária',  emoji: '🔍', cor: '#2a1a1a', cotas: 10, preco: 76.74 },
-  terceiraguerra: { titulo: 'O Nascimento Silencioso da 3ª GM',         autor: 'Said Anes', genero: 'Ficção Documental', emoji: '🌐', cor: '#1a1a2e', cotas: 10, preco: 76.74 },
-  antifalencia:   { titulo: 'O Guia Antifalência do Empreendedor',      autor: 'Said Anes', genero: 'Manual',           emoji: '📘', cor: '#1a2a3e', cotas: 3,  preco: 46.04 },
-  atico:          { titulo: 'Antes do App, o Método',                   autor: 'Said Anes', genero: 'Finanças · Método', emoji: '⚡', cor: '#1a2a1a', cotas: 3,  preco: 37.00 },
+  '3a-guerra':          { titulo: 'O Nascimento Silencioso da 3ª Guerra Mundial', autor: 'Said Anes', genero: 'Ficção Documental', cotas: 10, preco: 76.74 },
+  habitaculos:          { titulo: 'Habitáculos do Fim',                           autor: 'Said Anes', genero: 'Ensaio',            cotas: 10, preco: 76.74 },
+  'ultima-coisa':       { titulo: 'A Última Coisa que Ela Disse',                 autor: 'Anes Said', genero: 'Ficção Literária',  cotas: 10, preco: 76.74 },
+  'caminho-rubro-vol1': { titulo: 'Caminho Rubro — Vol. 1: A Engenharia da Tirania', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 46.04 },
+  'caminho-rubro-vol2': { titulo: 'Caminho Rubro — Vol. 2: As 7 Leis',           autor: 'Said Anes', genero: 'Ensaio Político',   cotas: 3,  preco: 46.04 },
+  'caminho-rubro-vol3': { titulo: 'Caminho Rubro — Vol. 3: Tiranos São Construídos', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 46.04 },
+  justicamento:         { titulo: 'Justiça(mento) para Orelha',                   autor: 'Said Anes', genero: 'Ensaio',            cotas: 1,  preco: 15.35 },
+  antifalencia:         { titulo: 'O Guia Antifalência do Empreendedor',           autor: 'Said Anes', genero: 'Manual',           cotas: 3,  preco: 46.04 },
+  'livre-das-dividas':  { titulo: 'Livre das Dívidas',                            autor: 'Said Anes', genero: 'Finanças Pessoais', cotas: 1,  preco: 15.35 },
+  'isa-isma-tintim':    { titulo: 'Isa, Isma e Tintim',                           autor: 'Said Anes', genero: 'Infantojuvenil',   cotas: 1,  preco: 15.35 },
+  'antes-do-app':       { titulo: 'Antes do App, o Método',                       autor: 'Said Anes', genero: 'Finanças / Método', cotas: 3,  preco: 37.00 },
 };
 
 // Catálogo live do Supabase (sobrepõe hardcoded quando disponível)
