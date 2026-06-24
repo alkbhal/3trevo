@@ -613,9 +613,10 @@
       </div>
       <div class="filtros">
         <button class="fbtn ativo" onclick="filtrar(this,'todos')" data-i18n="cat.f.todos">Todos</button>
-        <button class="fbtn" onclick="filtrar(this,'reflexao')" data-i18n="cat.f.reflexao">Reflexão</button>
         <button class="fbtn" onclick="filtrar(this,'ficcao')" data-i18n="cat.f.ficcao">Ficção</button>
+        <button class="fbtn" onclick="filtrar(this,'ensaio')" data-i18n="cat.f.ensaio">Ensaios</button>
         <button class="fbtn" onclick="filtrar(this,'manuais')" data-i18n="cat.f.manuais">Manuais</button>
+        <button class="fbtn" onclick="filtrar(this,'infantil')" data-i18n="cat.f.infantil">Infantil</button>
       </div>
     </div>
     <div class="prod-grid" id="prod-grid"></div>
@@ -790,24 +791,40 @@
 // ── CAPAS ──────────────────────────────────────────────────────────────────────
 const CAPAS = [
   {
-    slug: 'justicamento',
-    classe: 'capa-justicamento',
-    genero: 'Ensaio',
-    titulo: 'Justiça(mento)<br><em>para Orelha</em>',
+    slug: 'caminho-rubro-vol1',
+    classe: 'capa-terceiraguerra',
+    genero: 'Ensaio Político',
+    titulo: '<em>Caminho Rubro</em><br>A Engenharia<br>da Tirania',
     autor: 'Said Anes',
-    infoEN: 'Essay · Entry level',
-    infoES: 'Ensayo · Nivel entrada',
-    infoPT: 'Ensaio · Nível entrada',
-    preco: 'R$15,35',
-    cotas: 1,
-    cat: 'reflexao',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol1-1782313689756-4mqfz6.png',
+    infoPT: 'Ensaio Político · Vol. 1 · Série',
+    infoEN: 'Political Essay · Vol. 1 · Series',
+    infoES: 'Ensayo Político · Vol. 1 · Serie',
+    preco: 'R$46,04',
+    cotas: 3,
+    cat: 'ensaio',
   },
   {
-    slug: 'vigilante',
+    slug: 'isa-isma-tintim',
+    classe: 'capa-justicamento',
+    genero: 'Infantojuvenil',
+    titulo: 'Isa, Isma<br>e <em>Tintim</em>',
+    autor: 'Said Anes',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/isa-isma-tintim-1782313679087-1o4pv1.png',
+    infoPT: 'Infantojuvenil · 4 a 10 anos',
+    infoEN: 'Children\'s · Ages 4-10',
+    infoES: 'Infantil · 4 a 10 años',
+    preco: 'R$15,35',
+    cotas: 1,
+    cat: 'infantil',
+  },
+  {
+    slug: 'ultima-coisa',
     classe: 'capa-vigilante',
     genero: 'Ficção Literária',
-    titulo: '<em>Vigilante</em>',
-    autor: 'Said Anes',
+    titulo: 'A Última Coisa<br>que <em>Ela Disse</em>',
+    autor: 'Anes Said',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/ultima-coisa-1782313676771-1vc9uq.png',
     infoPT: 'Ficção Literária · Premium · 10 cotas',
     infoEN: 'Literary Fiction · Premium · 10 entries',
     infoES: 'Ficción Literaria · Premium · 10 participaciones',
@@ -817,11 +834,12 @@ const CAPAS = [
     premium: true,
   },
   {
-    slug: 'terceiraguerra',
+    slug: '3a-guerra',
     classe: 'capa-terceiraguerra',
     genero: 'Ficção Documental',
     titulo: 'O Nascimento<br>Silencioso da<br><em>3ª Guerra Mundial</em>',
     autor: 'Said Anes',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/3a-guerra-1782313670325-eg9f9h.png',
     infoPT: 'Ficção Documental · Premium · 10 cotas',
     infoEN: 'Documentary Fiction · Premium · 10 entries',
     infoES: 'Ficción Documental · Premium · 10 participaciones',
@@ -831,17 +849,19 @@ const CAPAS = [
     premium: true,
   },
   {
-    slug: 'antifalencia',
+    slug: 'habitaculos',
     classe: 'capa-antifalencia',
-    genero: 'Manual',
-    titulo: 'Guia<br><em>Antifalência</em><br>Vol. 1',
+    genero: 'Ensaio',
+    titulo: '<em>Habitáculos</em><br>do Fim',
     autor: 'Said Anes',
-    infoPT: 'Manual · Intermediário · 3 cotas',
-    infoEN: 'Business Guide · Mid-tier · 3 entries',
-    infoES: 'Guía · Intermedio · 3 participaciones',
-    preco: 'R$46,04',
-    cotas: 3,
-    cat: 'manuais',
+    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/habitaculos-1782313673734-saolp0.png',
+    infoPT: 'Ensaio · Não ficção · Premium',
+    infoEN: 'Essay · Non-fiction · Premium',
+    infoES: 'Ensayo · No ficción · Premium',
+    preco: 'R$76,74',
+    cotas: 10,
+    cat: 'ensaio',
+    premium: true,
   },
 ];
 
@@ -1085,36 +1105,103 @@ function setLang(lang) {
 // ── Produtos ──────────────────────────────────────────────────────────────────
 const PROD_BASE = [
   {
-    slug:'justicamento', cat:'reflexao', cor:'#0d2415', corCapa:'capa-justicamento',
-    titulo:{pt:'Justiça(mento) para Orelha',en:'Justice For Your Ears',es:'Justicia(mento) para el Oído'},
-    genero:{pt:'Ensaio · Entrada',en:'Essay · Entry',es:'Ensayo · Entrada'},
-    desc:{pt:'Um ensaio sobre justiça, linguagem e poder. Para quem questiona o que ouve antes de repetir.',en:'An essay on justice, language and power. For those who question what they hear before repeating it.',es:'Un ensayo sobre justicia, lenguaje y poder.'},
-    preco:'R$15,35',cotas:1,autor:'Said Anes',
-    pc:{pt:'Sorteio · participação após D+7',en:'Draw · participation after D+7',es:'Sorteo · participación tras D+7'}
-  },
-  {
-    slug:'vigilante', cat:'ficcao', cor:'#0d1926', corCapa:'capa-vigilante', premium:true,
-    titulo:{pt:'Vigilante',en:'Vigilante',es:'Vigilante'},
-    genero:{pt:'Ficção Literária · Premium',en:'Literary Fiction · Premium',es:'Ficción Literaria · Premium'},
-    desc:{pt:'Uma narrativa sobre o limite entre justiça e vingança, entre lei e consciência. Ficção literária de alta tensão.',en:'A narrative about the line between justice and revenge. High-tension literary fiction.',es:'Una narrativa sobre el límite entre justicia y venganza. Ficción literaria de alta tensión.'},
-    preco:'R$76,74',cotas:10,autor:'Said Anes',
-    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
-  },
-  {
-    slug:'terceiraguerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-terceiraguerra', premium:true,
+    slug:'3a-guerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-terceiraguerra', premium:true,
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/3a-guerra-1782313670325-eg9f9h.png',
     titulo:{pt:'O Nascimento Silencioso da 3ª Guerra Mundial',en:'The Silent Birth of WWIII',es:'El Nacimiento Silencioso de la 3ª GM'},
     genero:{pt:'Ficção Documental · Premium',en:'Documentary Fiction · Premium',es:'Ficción Documental · Premium'},
-    desc:{pt:'Como guerras modernas acontecem sem disparos. Assustadoramente atual.',en:'How modern wars happen without a shot fired. Frighteningly current.',es:'Cómo las guerras modernas ocurren sin disparos. Aterradoramente actual.'},
+    desc:{pt:'Um analista de logística percebe padrões nos dados que ninguém quer ver. A reorganização silenciosa das cadeias globais revela algo que não será anunciado como guerra.',en:'How modern wars happen without a shot fired. Frighteningly current.',es:'Cómo las guerras modernas ocurren sin disparos.'},
     preco:'R$76,74',cotas:10,autor:'Said Anes',
     pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
   },
   {
-    slug:'antifalencia', cat:'manuais', cor:'#101820', corCapa:'capa-antifalencia',
-    titulo:{pt:'O Guia Antifalência do Empreendedor Iniciante',en:'The Anti-Bankruptcy Guide for New Entrepreneurs',es:'La Guía Antiquiebra del Emprendedor Principiante'},
-    genero:{pt:'Manual · Intermediário',en:'Business Guide · Mid-tier',es:'Guía · Intermedio'},
-    desc:{pt:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio.',en:'The math nobody makes you do. Costs, pricing and break-even for survival.',es:'Las cuentas que nadie te obliga a hacer. Costos, precios y punto de equilibrio.'},
+    slug:'habitaculos', cat:'ensaio', cor:'#0a1628', premium:true,
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/habitaculos-1782313673734-saolp0.png',
+    titulo:{pt:'Habitáculos do Fim',en:'Habitats of the End',es:'Habitáculos del Fin'},
+    genero:{pt:'Ensaio · Não ficção · Premium',en:'Essay · Non-fiction · Premium',es:'Ensayo · No ficción · Premium'},
+    desc:{pt:'Superricos, testes globais e a corrida pelo último refúgio. Como bilionários constroem bunkers enquanto o mundo assiste.',en:'Billionaire bunkers, global tests, and the race for the last refuge.',es:'Superricos, pruebas globales y la carrera por el último refugio.'},
+    preco:'R$76,74',cotas:10,autor:'Said Anes',
+    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
+  },
+  {
+    slug:'ultima-coisa', cat:'ficcao', cor:'#2a1a0a', premium:true,
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/ultima-coisa-1782313676771-1vc9uq.png',
+    titulo:{pt:'A Última Coisa que Ela Disse',en:'The Last Thing She Said',es:'Lo Último que Ella Dijo'},
+    genero:{pt:'Ficção Literária · Premium',en:'Literary Fiction · Premium',es:'Ficción Literaria · Premium'},
+    desc:{pt:'Laura descobre uma caixa no porão da mãe falecida. Dentro, escritos em sete idiomas — sete vidas nunca contadas.',en:'Laura discovers a box in her late mother\'s basement. Inside, writings in seven languages.',es:'Laura descubre una caja en el sótano de su madre fallecida.'},
+    preco:'R$76,74',cotas:10,autor:'Anes Said',
+    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
+  },
+  {
+    slug:'caminho-rubro-vol1', cat:'ensaio', cor:'#1a0808',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol1-1782313689756-4mqfz6.png',
+    titulo:{pt:'Caminho Rubro — Vol. 1: A Engenharia da Tirania',en:'Red Path — Vol. 1: The Engineering of Tyranny',es:'Camino Rojo — Vol. 1'},
+    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
+    desc:{pt:'Como regimes autoritários são construídos por dentro. O mapa antes da jornada. Volume 1 da trilogia.',en:'How authoritarian regimes are built from within.',es:'Cómo los regímenes autoritarios se construyen desde adentro.'},
     preco:'R$46,04',cotas:3,autor:'Said Anes',
-    pc:{pt:'3 cotas · sorteio principal',en:'3 entries · main draw',es:'3 participaciones · sorteo principal'}
+    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
+  },
+  {
+    slug:'caminho-rubro-vol2', cat:'ensaio', cor:'#1a0808',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol2-1782313691755-n1ymj2.png',
+    titulo:{pt:'Caminho Rubro — Vol. 2: As 7 Leis',en:'Red Path — Vol. 2: The 7 Laws',es:'Camino Rojo — Vol. 2'},
+    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
+    desc:{pt:'Sete mecanismos que todo regime autoritário opera — do monopólio da narrativa à autopreservação sistêmica.',en:'Seven mechanisms every authoritarian regime operates.',es:'Siete mecanismos que todo régimen autoritario opera.'},
+    preco:'R$46,04',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
+  },
+  {
+    slug:'caminho-rubro-vol3', cat:'ensaio', cor:'#1a0808',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol3-1782313695058-qeynsj.png',
+    titulo:{pt:'Caminho Rubro — Vol. 3: Tiranos São Construídos',en:'Red Path — Vol. 3: Tyrants Are Built',es:'Camino Rojo — Vol. 3'},
+    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
+    desc:{pt:'Casos comparados: Hungria, Turquia, Venezuela, Brasil. Como desmontar o que foi erguido.',en:'Comparative cases. How to dismantle what was built.',es:'Casos comparados. Cómo desmontar lo construido.'},
+    preco:'R$46,04',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
+  },
+  {
+    slug:'justicamento', cat:'ensaio', cor:'#2a0d1a',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/justicamento-1782313682333-yfov4m.png',
+    titulo:{pt:'Justiça(mento) para Orelha',en:'Justice For Your Ears',es:'Justicia(mento) para el Oído'},
+    genero:{pt:'Ensaio',en:'Essay',es:'Ensayo'},
+    desc:{pt:'O que acontece quando a justiça fala mas não escuta? Ensaio sobre punição, escuta e os limites do sistema penal brasileiro.',en:'What happens when justice speaks but doesn\'t listen?',es:'¿Qué pasa cuando la justicia habla pero no escucha?'},
+    preco:'R$15,35',cotas:1,autor:'Said Anes',
+    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
+  },
+  {
+    slug:'antifalencia', cat:'manuais', cor:'#101820',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/antifalencia-1782313684286-ryci5d.png',
+    titulo:{pt:'O Guia Antifalência do Empreendedor',en:'The Anti-Bankruptcy Guide',es:'La Guía Antiquiebra'},
+    genero:{pt:'Manual · Negócios',en:'Business Guide',es:'Guía · Negocios'},
+    desc:{pt:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para sobreviver os primeiros 2 anos.',en:'The math nobody makes you do. Costs, pricing and break-even.',es:'Las cuentas que nadie te obliga a hacer.'},
+    preco:'R$46,04',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · sorteio',en:'3 entries · draw',es:'3 participaciones · sorteo'}
+  },
+  {
+    slug:'livre-das-dividas', cat:'manuais', cor:'#0a1a2e',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/livre-das-dividas-1782313686437-4v7ru8.png',
+    titulo:{pt:'Livre das Dívidas',en:'Debt Free',es:'Libre de Deudas'},
+    genero:{pt:'Finanças Pessoais',en:'Personal Finance',es:'Finanzas Personales'},
+    desc:{pt:'70 milhões de brasileiros negativados. Este guia mostra o caminho de volta — com scripts, direitos e um plano que funciona.',en:'70 million Brazilians in debt. This guide shows the way back.',es:'70 millones de brasileños endeudados. Esta guía muestra el camino.'},
+    preco:'R$15,35',cotas:1,autor:'Said Anes',
+    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
+  },
+  {
+    slug:'isa-isma-tintim', cat:'infantil', cor:'#1a2a1a',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/isa-isma-tintim-1782313679087-1o4pv1.png',
+    titulo:{pt:'Isa, Isma e Tintim',en:'Isa, Isma & Tintim',es:'Isa, Isma y Tintim'},
+    genero:{pt:'Infantojuvenil',en:'Children\'s',es:'Infantil'},
+    desc:{pt:'Coração, vitalidade e alegria. Três irmãos, uma porta colorida e aventuras que ensinam sem sermão.',en:'Heart, vitality and joy. Three siblings and adventures that teach without preaching.',es:'Corazón, vitalidad y alegría. Tres hermanos y aventuras.'},
+    preco:'R$15,35',cotas:1,autor:'Said Anes',
+    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
+  },
+  {
+    slug:'antes-do-app', cat:'manuais', cor:'#1a1a0a',
+    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/antes-do-app-1782313697139-tzxlna.png',
+    titulo:{pt:'Antes do App, o Método',en:'Before the App, the Method',es:'Antes de la App, el Método'},
+    genero:{pt:'Finanças · Método',en:'Finance · Method',es:'Finanzas · Método'},
+    desc:{pt:'O método Ático de gestão financeira pessoal. Cinco estados, oito grupos, um ciclo mensal. Entenda seu dinheiro antes de qualquer app.',en:'The Ático method. Five states, eight groups, one monthly cycle.',es:'El método Ático. Cinco estados, ocho grupos, un ciclo mensual.'},
+    preco:'R$37,00',cotas:3,autor:'Said Anes',
+    pc:{pt:'3 cotas · sorteio',en:'3 entries · draw',es:'3 participaciones · sorteo'}
   },
 ];
 
