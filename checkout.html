@@ -246,18 +246,24 @@ async function init() {
 
 // ── PRODUTO ───────────────────────────────────────────────
 async function carregarPorSlug(slug) {
-  // Tentar Supabase direto
-  const { data: p } = await sb.from('catalogo').select('*').eq('slug', slug).eq('ativo', true).single().catch(() => ({ data: null }));
-  if (p) { renderProduto(p); return; }
+  try {
+    const { data } = await sb.from('catalogo').select('*').eq('slug', slug).eq('ativo', true).limit(1);
+    if (data && data.length > 0) { renderProduto(data[0]); return; }
+  } catch (e) { console.warn('Supabase catalogo:', e); }
 
-  // Fallback catálogo local
   const local = CATALOGO[slug] || (window.CATALOGO_LIVE && window.CATALOGO_LIVE[slug]);
-  if (!local) { mostrarAlerta('Produto não encontrado.', 'erro'); return; }
-  document.getElementById('prodGenero').textContent = local.genero;
-  document.getElementById('prodTitulo').textContent = local.titulo;
-  document.getElementById('prodAutor').textContent  = local.autor;
-  document.getElementById('prodCotas').textContent  = local.cotas;
-  document.getElementById('prodPreco').textContent  = 'R$ ' + local.preco.toFixed(2).replace('.', ',');
+  if (local) {
+    document.getElementById('prodGenero').textContent = local.genero || '';
+    document.getElementById('prodTitulo').textContent = local.titulo;
+    document.getElementById('prodAutor').textContent  = local.autor || 'Said Anes';
+    document.getElementById('prodDesc').textContent   = local.descricao || '';
+    document.getElementById('prodCotas').textContent  = local.cotas || 1;
+    document.getElementById('prodPreco').textContent  = 'R$ ' + Number(local.preco).toFixed(2).replace('.', ',');
+    return;
+  }
+
+  mostrarAlerta('Produto não encontrado. Redirecionando ao catálogo...', 'erro');
+  setTimeout(function() { window.location.href = '/#catalogo'; }, 3000);
 }
 
 function renderProduto(p) {
