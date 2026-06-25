@@ -126,6 +126,56 @@ export async function handleAdminCatalogoUpdate(request: Request, env: Env, slug
   return Response.json({ ok: true });
 }
 
+// ─── Sync products (atualiza arquivo_url, autor, titulo na tabela products) ──
+export async function handleAdminProductsSync(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
+  let body: any;
+  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+
+  const { updates } = body;
+  if (!Array.isArray(updates)) return Response.json({ ok: false, erro: 'updates deve ser array' }, { status: 400 });
+
+  const results: any[] = [];
+  for (const u of updates) {
+    if (!u.slug) continue;
+    const fields: Record<string, any> = {};
+    for (const k of ['titulo', 'autor', 'preco', 'cotas', 'ativo', 'arquivo_url']) {
+      if (k in u) fields[k] = u[k];
+    }
+    const r = await sb(env, `products?slug=eq.${encodeURIComponent(u.slug)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(fields),
+    });
+    results.push({ slug: u.slug, ok: r.ok, status: r.status });
+  }
+  return Response.json({ ok: true, results });
+}
+
+// ─── Patch catalogo direto (corrige encoding, autor) ─────────────────────────
+export async function handleAdminCatalogoPatch(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
+  let body: any;
+  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+
+  const { updates } = body;
+  if (!Array.isArray(updates)) return Response.json({ ok: false, erro: 'updates deve ser array' }, { status: 400 });
+
+  const results: any[] = [];
+  for (const u of updates) {
+    if (!u.slug) continue;
+    const fields: Record<string, any> = {};
+    for (const k of ['titulo', 'descricao', 'genero', 'genero_pt', 'autor']) {
+      if (k in u) fields[k] = u[k];
+    }
+    const r = await sb(env, `catalogo?slug=eq.${encodeURIComponent(u.slug)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(fields),
+    });
+    results.push({ slug: u.slug, ok: r.ok, status: r.status });
+  }
+  return Response.json({ ok: true, results });
+}
+
 // ─── Inativar livro (soft delete) ─────────────────────────────────────────────
 export async function handleAdminCatalogoDelete(request: Request, env: Env, slug: string): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });

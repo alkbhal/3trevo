@@ -29,6 +29,8 @@ import {
   handleAdminCatalogoCreate,
   handleAdminCatalogoUpdate,
   handleAdminCatalogoDelete,
+  handleAdminProductsSync,
+  handleAdminCatalogoPatch,
 } from './routes/admin-catalog';
 import {
   handleHeroConfigGet,
@@ -276,6 +278,13 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     if (path.startsWith('/api/admin/catalogo/') && method === 'DELETE') {
       const slug = path.replace('/api/admin/catalogo/', '');
       return handleAdminCatalogoDelete(request, env, slug);
+    }
+
+    if (path === '/api/admin/products/sync' && method === 'POST') {
+      return handleAdminProductsSync(request, env);
+    }
+    if (path === '/api/admin/catalogo/patch' && method === 'POST') {
+      return handleAdminCatalogoPatch(request, env);
     }
 
     // ── Admin Hero Config ──────────────────────────────────────────────────
