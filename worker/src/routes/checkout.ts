@@ -38,9 +38,9 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     return Response.json({ ok: false, erro: 'slug inválido' }, { status: 400 });
   }
 
-  // Buscar produto no Supabase
+  // Buscar produto no Supabase (catalogo é a fonte de verdade com 11 slugs)
   const prodResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/products?slug=eq.${slug}&ativo=eq.true&select=id,titulo,preco,cotas,autor,arquivo_url`,
+    `${env.SUPABASE_URL}/rest/v1/catalogo?slug=eq.${slug}&ativo=eq.true&select=slug,titulo,preco,cotas,autor`,
     { headers: supabaseHeaders(env) }
   );
   const [produto] = (await prodResp.json()) as any[];
@@ -67,6 +67,12 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     },
     auto_return: 'approved',
     statement_descriptor: 'EDITORA TRES TREVO',
+    payment_methods: {
+      excluded_payment_types: [
+        { id: 'ticket' },
+        { id: 'atm' },
+      ],
+    },
   };
 
   const mpResp = await fetch(`${MP_API}/checkout/preferences`, {
