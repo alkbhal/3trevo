@@ -176,6 +176,25 @@ export async function handleAdminCatalogoPatch(request: Request, env: Env): Prom
   return Response.json({ ok: true, results });
 }
 
+// ─── Admin SQL-safe: insert em tabela permitida ─────────────────────────────
+export async function handleAdminTableInsert(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
+  let body: any;
+  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+
+  const { table, rows } = body;
+  const allowed = ['email_templates', 'campaigns', 'leads'];
+  if (!allowed.includes(table)) return Response.json({ ok: false, erro: 'tabela_nao_permitida' }, { status: 403 });
+  if (!Array.isArray(rows)) return Response.json({ ok: false, erro: 'rows deve ser array' }, { status: 400 });
+
+  const r = await sb(env, table, {
+    method: 'POST',
+    headers: { Prefer: 'return=minimal,resolution=ignore-duplicates' } as any,
+    body: JSON.stringify(rows),
+  });
+  return Response.json({ ok: r.ok, status: r.status });
+}
+
 // ─── Inativar livro (soft delete) ─────────────────────────────────────────────
 export async function handleAdminCatalogoDelete(request: Request, env: Env, slug: string): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });

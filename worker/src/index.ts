@@ -31,12 +31,17 @@ import {
   handleAdminCatalogoDelete,
   handleAdminProductsSync,
   handleAdminCatalogoPatch,
+  handleAdminTableInsert,
 } from './routes/admin-catalog';
 import {
   handleHeroConfigGet,
   handleHeroConfigPut,
 } from './routes/admin-hero';
 import { handleAiStudio } from './routes/admin-ai-studio';
+import { handleTrack, handleMetaCapi } from './routes/track';
+import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
+import { handleBudgetController } from './cron/budget-controller';
+import { handleEmailEngine } from './cron/email-engine';
 import {
   handleAdminDepoimentosList,
   handleAdminDepoimentoUpdate,
@@ -136,6 +141,8 @@ export default {
     // Health monitor — toda hora
     if (event.cron === '0 * * * *') {
       ctx.waitUntil(handleHealthMonitor(env));
+      ctx.waitUntil(handleEmailEngine(env));
+      ctx.waitUntil(handleBudgetController(env));
     }
   },
 };
@@ -159,6 +166,12 @@ async function dispatch(request: Request, env: Env, path: string, method: string
         headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=60', ...corsHeaders(origin) },
       });
     }
+
+    // ── Growth Engine: tracking + leads (público) ────────────────────────
+    if (path === '/api/track' && method === 'POST') return handleTrack(request, env);
+    if (path === '/api/track/capi' && method === 'POST') return handleMetaCapi(request, env);
+    if (path === '/api/leads/capture' && method === 'POST') return handleLeadCapture(request, env);
+    if (path === '/api/leads/unsub' && method === 'GET') return handleUnsubscribe(request, env);
 
     // Depoimentos públicos (aprovados — para o site)
     if (path === '/api/public/depoimentos' && method === 'GET') {
@@ -285,6 +298,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
     if (path === '/api/admin/catalogo/patch' && method === 'POST') {
       return handleAdminCatalogoPatch(request, env);
+    }
+    if (path === '/api/admin/table/insert' && method === 'POST') {
+      return handleAdminTableInsert(request, env);
     }
 
     // ── Admin Hero Config ──────────────────────────────────────────────────
