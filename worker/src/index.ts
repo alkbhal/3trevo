@@ -40,6 +40,7 @@ import {
 import { handleAiStudio } from './routes/admin-ai-studio';
 import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
+import { handleAdminMarketingStats } from './routes/admin-marketing';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
 import {
@@ -309,6 +310,11 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
     if (path === '/api/admin/hero-config' && method === 'PUT') {
       return handleHeroConfigPut(request, env);
+    }
+
+    // ── Admin Marketing (Growth Engine) ──────────────────────────────────
+    if (path === '/api/admin/marketing/stats' && method === 'GET') {
+      return handleAdminMarketingStats(request, env);
     }
 
     // ── Admin IA Studio ────────────────────────────────────────────────────

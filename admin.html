@@ -376,6 +376,10 @@
         <span class="sb-ic">✦</span> Depoimentos
         <span class="sb-badge" id="badge-fila" style="display:none">0</span>
       </button>
+      <div class="sb-section">Marketing</div>
+      <button class="sb-item" onclick="irPara('marketing',this)">
+        <span class="sb-ic">◎</span> Growth Engine
+      </button>
       <div class="sb-section">IA</div>
       <button class="sb-item" onclick="irPara('ia',this)">
         <span class="sb-ic">◈</span> IA Studio
@@ -554,6 +558,58 @@
         </div>
         <div class="tab-panel" id="dep-reprovados">
           <div class="card"><div class="card-body" id="dep-reprovados-lista"><div class="empty-state"><div class="empty-state-ic">✕</div><div class="empty-state-t">Carregando…</div></div></div></div>
+        </div>
+      </div>
+
+      <!-- ── MARKETING / GROWTH ENGINE ────────────────────────────────────── -->
+      <div class="panel" id="panel-marketing">
+        <div class="section-hdr">
+          <div>
+            <div class="section-titulo">Growth Engine</div>
+            <div class="section-sub">Leads, tracking, e-mails automatizados e métricas de campanha.</div>
+          </div>
+          <button class="btn-sec" onclick="carregarMarketing()">↻ Atualizar</button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+          <div class="card" style="text-align:center;padding:20px">
+            <div style="font-size:28px;font-weight:300;font-family:var(--serif);color:var(--v3)" id="mk-total-leads">—</div>
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:4px">Total Leads</div>
+          </div>
+          <div class="card" style="text-align:center;padding:20px">
+            <div style="font-size:28px;font-weight:300;font-family:var(--serif);color:var(--v3)" id="mk-leads-week">—</div>
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:4px">Leads 7 dias</div>
+          </div>
+          <div class="card" style="text-align:center;padding:20px">
+            <div style="font-size:28px;font-weight:300;font-family:var(--serif);color:var(--v3)" id="mk-total-events">—</div>
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:4px">Eventos rastreados</div>
+          </div>
+          <div class="card" style="text-align:center;padding:20px">
+            <div style="font-size:28px;font-weight:300;font-family:var(--serif);color:var(--ouro)" id="mk-emails-pending">—</div>
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:4px">E-mails pendentes</div>
+          </div>
+        </div>
+
+        <!-- Events breakdown -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-hdr"><span class="card-titulo">Eventos por tipo</span></div>
+          <div class="card-body" id="mk-events-breakdown" style="padding:16px">
+            <div class="empty-state"><div class="empty-state-ic">◎</div><div class="empty-state-t">Carregando…</div></div>
+          </div>
+        </div>
+
+        <!-- Recent leads table -->
+        <div class="card">
+          <div class="card-hdr"><span class="card-titulo">Leads recentes</span></div>
+          <div class="card-body" style="padding:0;overflow-x:auto">
+            <table>
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Status</th><th>Score</th><th>Data</th></tr></thead>
+              <tbody id="mk-leads-table">
+                <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--t3)">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -968,7 +1024,7 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', hero:'Hero', depoimentos:'Depoimentos', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
@@ -976,6 +1032,7 @@ function irPara(panel, btn) {
   if (panel === 'depoimentos') carregarDepoimentos();
   if (panel === 'sorteio' && statsCache) renderSorteio(statsCache);
   if (panel === 'biblioteca') carregarBiblioteca();
+  if (panel === 'marketing') carregarMarketing();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -1787,6 +1844,64 @@ async function uploadHeroVideo(inputEl) {
   } finally {
     if (btn) btn.disabled = false;
     inputEl.value = '';
+  }
+}
+
+// ── MARKETING / GROWTH ENGINE ─────────────────────────────────────────────────
+let mkCache = null;
+
+async function carregarMarketing() {
+  try {
+    const d = await api('/api/admin/marketing/stats', 'GET');
+    if (!d || !d.ok) { toast('Erro ao carregar marketing', 'err'); return; }
+    mkCache = d;
+    renderMarketing(d);
+  } catch(e) { toast('Erro: ' + e.message, 'err'); }
+}
+
+function renderMarketing(d) {
+  document.getElementById('mk-total-leads').textContent = d.total_leads ?? 0;
+  document.getElementById('mk-leads-week').textContent = d.leads_week ?? 0;
+  document.getElementById('mk-total-events').textContent = d.total_events ?? 0;
+  document.getElementById('mk-emails-pending').textContent = d.emails_pending ?? 0;
+
+  // Events breakdown
+  const eb = d.event_breakdown || {};
+  const ebEl = document.getElementById('mk-events-breakdown');
+  const keys = Object.keys(eb).sort((a,b) => eb[b] - eb[a]);
+  if (!keys.length) {
+    ebEl.innerHTML = '<div class="empty-state"><div class="empty-state-ic">◎</div><div class="empty-state-t">Nenhum evento rastreado ainda.</div></div>';
+  } else {
+    const maxVal = eb[keys[0]] || 1;
+    ebEl.innerHTML = keys.map(k => {
+      const pct = Math.round((eb[k] / maxVal) * 100);
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:130px;font-size:12px;color:var(--t1);text-align:right;flex-shrink:0">${escapeHtml(k)}</div>
+        <div style="flex:1;background:#e8f5e9;border-radius:3px;height:20px;overflow:hidden">
+          <div style="width:${pct}%;background:var(--v3);height:100%;border-radius:3px;transition:width .3s"></div>
+        </div>
+        <div style="width:50px;font-size:12px;font-weight:600;color:var(--t0)">${eb[k]}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Leads table
+  const leads = d.leads_recent || [];
+  const tbody = document.getElementById('mk-leads-table');
+  if (!leads.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--t3)">Nenhum lead capturado ainda.</td></tr>';
+  } else {
+    tbody.innerHTML = leads.map(l => {
+      const dt = l.created_at ? new Date(l.created_at).toLocaleDateString('pt-BR') : '—';
+      const statusColor = l.status === 'novo' ? '#1e5c3a' : l.status === 'unsub' ? '#c0392b' : '#d4a017';
+      return `<tr>
+        <td>${escapeHtml(l.nome || '—')}</td>
+        <td style="font-size:12px">${escapeHtml(l.email)}</td>
+        <td><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${statusColor}22;color:${statusColor}">${escapeHtml(l.status)}</span></td>
+        <td style="text-align:center">${l.score ?? 0}</td>
+        <td style="font-size:12px;color:var(--t3)">${dt}</td>
+      </tr>`;
+    }).join('');
   }
 }
 
