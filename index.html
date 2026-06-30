@@ -13,7 +13,8 @@
   <link rel="canonical" href="https://www.3trevo.com.br/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -457,9 +458,10 @@
       .faixa-sep { display: none; }
     }
   </style>
-  <!-- Meta Pixel — substituir 296545814480082 pela ID real após criar conta Meta Ads -->
-  <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','296545814480082');fbq('track','PageView');</script>
+  <!-- Meta Pixel — diferido para não bloquear render -->
+  <script>window.addEventListener('load',function(){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','296545814480082');fbq('track','PageView');});</script>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=296545814480082&ev=PageView&noscript=1"/></noscript>
+  <script>window.addEventListener('load',function(){var v=document.getElementById('hero-video');if(v){v.load();v.play();}});</script>
 </head>
 <body>
 
@@ -494,7 +496,7 @@
   <!-- Vídeo de fundo — substituir src pelo arquivo produzido -->
   <!-- Recomendado: 1920×1080, H.264, ~15s loop, sem áudio -->
   <div class="hero-video-bg">
-    <video autoplay muted loop playsinline id="hero-video">
+    <video muted loop playsinline preload="none" id="hero-video">
       <source src="assets/hero-reel.mp4" type="video/mp4">
     </video>
     <div class="hero-video-overlay"></div>
