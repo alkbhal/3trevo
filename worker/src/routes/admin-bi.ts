@@ -20,59 +20,61 @@ export async function handleAdminBI(request: Request, env: Env): Promise<Respons
   const desde = dias > 0 ? new Date(Date.now() - dias * 86400000).toISOString() : null;
   const df = desde ? `&created_at=gte.${desde}` : '';
 
-  const [pedidosR, pedidosTotalR, eventsUtmR, leadsR, leadsWeekR, catalogoR, downloadsR] = await Promise.all([
-    sb(env, `pedidos?select=*&order=created_at.desc&limit=500${df}`),
-    sb(env, 'pedidos?select=count', { headers: { Prefer: 'count=exact', Range: '0-0' } as any }),
+  const [paymentsR, paymentsTotalR, eventsUtmR, leadsR, leadsWeekR, productsR, downloadsR] = await Promise.all([
+    sb(env, `payments?select=id,valor,metodo,product_id,created_at&status=eq.approved&order=created_at.desc&limit=500${df}`),
+    sb(env, 'payments?select=count&status=eq.approved', { headers: { Prefer: 'count=exact', Range: '0-0' } as any }),
     sb(env, `lead_events?select=utm_source,utm_medium,utm_campaign,event_type${df}&order=created_at.desc&limit=2000`),
     sb(env, `leads?select=count${df}`, { headers: { Prefer: 'count=exact', Range: '0-0' } as any }),
     sb(env, `leads?select=count&created_at=gte.${new Date(Date.now() - 7 * 86400000).toISOString()}`, {
       headers: { Prefer: 'count=exact', Range: '0-0' } as any,
     }),
-    sb(env, 'catalogo?select=slug,titulo,preco&ativo=eq.true'),
+    sb(env, 'products?select=id,slug,titulo&ativo=eq.true'),
     sb(env, 'downloads?select=product_id,download_count&order=download_count.desc&limit=50'),
   ]);
 
-  const pedidos = (await pedidosR.json()) as any[];
-  const totalPedidosGeral = parseCount(pedidosTotalR);
+  const payments = (await paymentsR.json()) as any[];
+  const totalVendasGeral = parseCount(paymentsTotalR);
   const eventos = (await eventsUtmR.json()) as any[];
   const totalLeads = parseCount(leadsR);
   const leadsWeek = parseCount(leadsWeekR);
-  const catalogo = (await catalogoR.json()) as any[];
+  const products = (await productsR.json()) as any[];
   const downloads = (await downloadsR.json()) as any[];
 
-  const catalogoMap: Record<string, string> = Object.fromEntries(
-    catalogo.map((c: any) => [c.slug, c.titulo])
+  // product_id → { slug, titulo }
+  const prodMap: Record<string, { slug: string; titulo: string }> = Object.fromEntries(
+    products.map((p: any) => [p.id, { slug: p.slug, titulo: p.titulo }])
   );
 
   // ── Receita ────────────────────────────────────────────────────────────────
-  const receita_total = pedidos.reduce((s: number, p: any) => s + Number(p.valor ?? p.preco ?? 0), 0);
-  const ticket_medio = pedidos.length > 0 ? receita_total / pedidos.length : 0;
+  const receita_total = payments.reduce((s: number, p: any) => s + Number(p.valor ?? 0), 0);
+  const ticket_medio = payments.length > 0 ? receita_total / payments.length : 0;
 
   // ── Por ebook ──────────────────────────────────────────────────────────────
   const por_ebook: Record<string, { titulo: string; vendas: number; receita: number }> = {};
-  for (const p of pedidos) {
-    const slug = p.product_slug ?? p.slug ?? 'desconhecido';
-    if (!por_ebook[slug]) por_ebook[slug] = { titulo: catalogoMap[slug] ?? slug, vendas: 0, receita: 0 };
-    por_ebook[slug].vendas++;
-    por_ebook[slug].receita += Number(p.valor ?? p.preco ?? 0);
+  for (const p of payments) {
+    const prod = prodMap[p.product_id] ?? { slug: p.product_id ?? 'desconhecido', titulo: 'Desconhecido' };
+    const key = prod.slug;
+    if (!por_ebook[key]) por_ebook[key] = { titulo: prod.titulo, vendas: 0, receita: 0 };
+    por_ebook[key].vendas++;
+    por_ebook[key].receita += Number(p.valor ?? 0);
   }
 
   // ── Por método de pagamento ────────────────────────────────────────────────
   const por_metodo: Record<string, { vendas: number; receita: number }> = {};
-  for (const p of pedidos) {
-    const m = p.metodo ?? p.payment_method ?? 'desconhecido';
+  for (const p of payments) {
+    const m = p.metodo ?? 'desconhecido';
     if (!por_metodo[m]) por_metodo[m] = { vendas: 0, receita: 0 };
     por_metodo[m].vendas++;
-    por_metodo[m].receita += Number(p.valor ?? p.preco ?? 0);
+    por_metodo[m].receita += Number(p.valor ?? 0);
   }
 
   // ── Vendas por dia ─────────────────────────────────────────────────────────
   const vendas_dia: Record<string, { vendas: number; receita: number }> = {};
-  for (const p of pedidos) {
+  for (const p of payments) {
     const dia = (p.created_at ?? '').slice(0, 10) || 'desconhecido';
     if (!vendas_dia[dia]) vendas_dia[dia] = { vendas: 0, receita: 0 };
     vendas_dia[dia].vendas++;
-    vendas_dia[dia].receita += Number(p.valor ?? p.preco ?? 0);
+    vendas_dia[dia].receita += Number(p.valor ?? 0);
   }
 
   // ── UTM / canais ───────────────────────────────────────────────────────────
@@ -98,8 +100,8 @@ export async function handleAdminBI(request: Request, env: Env): Promise<Respons
     periodo: period,
     resumo: {
       receita_total: round2(receita_total),
-      total_vendas: pedidos.length,
-      total_vendas_geral: totalPedidosGeral,
+      total_vendas: payments.length,
+      total_vendas_geral: totalVendasGeral,
       ticket_medio: round2(ticket_medio),
       total_leads: totalLeads,
       leads_semana: leadsWeek,
