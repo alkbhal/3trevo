@@ -975,6 +975,7 @@ const API = 'https://tres-trevo-api.al-kbhal.workers.dev';
 let token = sessionStorage.getItem('tt_admin_token') || '';
 let statsCache = null;
 let catalogoCache = [];
+let mkCache = null;
 let ctxAtual = 'geral';
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -1719,12 +1720,13 @@ async function salvarObra() {
     } else {
       r = await api('/api/admin/biblioteca/acervo', 'POST', payload);
     }
-    if (r && r.ok !== false) {
+    const d = await r.json();
+    if (d && d.ok) {
       toast(bibSlugEditando ? 'Obra atualizada.' : 'Obra cadastrada.', 'ok');
       fecharFormObra();
       carregarBiblioteca();
     } else {
-      toast('Erro ao salvar: ' + JSON.stringify(r), 'err');
+      toast('Erro ao salvar: ' + (d?.erro || 'desconhecido'), 'err');
     }
   } catch(e) { toast(e.message, 'err'); }
 
@@ -1736,8 +1738,9 @@ async function desativarObra(slug, atualAtivo) {
   if (!confirm(`${novoEstado ? 'Reativar' : 'Desativar'} "${slug}"?`)) return;
   try {
     const r = await api(`/api/admin/biblioteca/acervo/${slug}`, 'DELETE');
-    if (r && r.ok) { toast('Feito.', 'ok'); carregarBiblioteca(); }
-    else toast('Erro.', 'err');
+    const d = await r.json();
+    if (d && d.ok) { toast('Feito.', 'ok'); carregarBiblioteca(); }
+    else toast('Erro: ' + (d?.erro || '—'), 'err');
   } catch(e) { toast(e.message, 'err'); }
 }
 
@@ -1871,7 +1874,8 @@ let mkCache = null;
 
 async function carregarMarketing() {
   try {
-    const d = await api('/api/admin/marketing/stats', 'GET');
+    const r = await api('/api/admin/marketing/stats', 'GET');
+    const d = await r.json();
     if (!d || !d.ok) { toast('Erro ao carregar marketing', 'err'); return; }
     mkCache = d;
     renderMarketing(d);
