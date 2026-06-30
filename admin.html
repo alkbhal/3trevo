@@ -90,6 +90,13 @@
     .kpi-l { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--t3); margin-top:4px; }
     .kpi.alerta .kpi-v { color:var(--ouro); }
     .kpi.perigo .kpi-v { color:var(--danger); }
+    .kpi[onclick] { cursor:pointer; transition:border-color .15s, transform .1s; }
+    .kpi[onclick]:hover { border-color:var(--v3); transform:translateY(-1px); }
+    .quick-actions { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+    .qa-btn { display:flex; align-items:center; gap:8px; padding:10px 16px; background:var(--branco); border:1px solid var(--borda); border-radius:3px; font-size:13px; font-weight:500; color:var(--t0); cursor:pointer; transition:border-color .15s; white-space:nowrap; font-family:var(--sans); }
+    .qa-btn:hover { border-color:var(--v3); color:var(--v3); }
+    .qa-btn.urgente { border-color:var(--ouro); background:#fffdf5; }
+    .qa-badge { background:var(--ouro); color:#fff; font-size:10px; font-weight:700; border-radius:10px; padding:1px 7px; }
 
     .card { background:var(--branco); border:1px solid var(--borda); border-radius:3px; }
     .card-hdr { padding:14px 20px; border-bottom:1px solid var(--borda); display:flex; align-items:center; justify-content:space-between; }
@@ -414,11 +421,12 @@
       <!-- ── DASHBOARD ──────────────────────────────────────────────────── -->
       <div class="panel ativo" id="panel-dashboard">
         <div class="kpi-grid" id="kpi-grid">
-          <div class="kpi"><div class="kpi-v" id="kpi-pedidos">—</div><div class="kpi-l">Pedidos totais</div></div>
-          <div class="kpi"><div class="kpi-v" id="kpi-entries">—</div><div class="kpi-l">Cotas válidas</div></div>
-          <div class="kpi"><div class="kpi-v" id="kpi-dep">—</div><div class="kpi-l">Depoimentos aprovados</div></div>
-          <div class="kpi alerta"><div class="kpi-v" id="kpi-fila">—</div><div class="kpi-l">Fila revisão</div></div>
+          <div class="kpi" onclick="irPara('catalogo')" title="Ver catálogo"><div class="kpi-v" id="kpi-pedidos">—</div><div class="kpi-l">Pedidos totais</div></div>
+          <div class="kpi" onclick="irPara('sorteio')" title="Ver sorteio"><div class="kpi-v" id="kpi-entries">—</div><div class="kpi-l">Cotas válidas</div></div>
+          <div class="kpi" onclick="irPara('depoimentos')" title="Ver depoimentos"><div class="kpi-v" id="kpi-dep">—</div><div class="kpi-l">Depoimentos aprovados</div></div>
+          <div class="kpi alerta" onclick="irPara('depoimentos')" title="Revisar fila"><div class="kpi-v" id="kpi-fila">—</div><div class="kpi-l">Fila revisão</div></div>
         </div>
+        <div class="quick-actions" id="quick-actions"></div>
         <div id="draw-area"></div>
         <div class="card">
           <div class="card-hdr"><span class="card-titulo">Atividade recente</span><button class="btn btn-s btn-sm" onclick="carregarStats()">↻ Atualizar</button></div>
@@ -1158,6 +1166,19 @@ async function carregarStats() {
       ${d.revisao_pendente > 0 ? `<div class="activity-item"><div class="activity-dot activity-dot-warn"></div><div class="activity-text"><strong>${d.revisao_pendente}</strong> depoimentos aguardando revisão manual</div><div class="activity-ts">—</div></div>` : ''}
       <div class="activity-item"><div class="activity-dot activity-dot-info"></div><div class="activity-text">Sistema Loteria TT · ${d.draw_ativo ? 'Draw aberto: ' + escapeHtml(d.draw_ativo.titulo || d.draw_ativo.id) : 'Nenhum draw aberto'}</div><div class="activity-ts">—</div></div>
     `;
+    // Ações rápidas
+    const qa = document.getElementById('quick-actions');
+    if (qa) {
+      const acoes = [];
+      if (d.revisao_pendente > 0) acoes.push(`<button class="qa-btn urgente" onclick="irPara('depoimentos')">⚠ Revisar depoimentos <span class="qa-badge">${d.revisao_pendente}</span></button>`);
+      if (d.draw_ativo) acoes.push(`<button class="qa-btn" onclick="irPara('sorteio')">🎲 Gerenciar sorteio</button>`);
+      acoes.push(`<button class="qa-btn" onclick="irPara('marketing')">📈 Growth Engine</button>`);
+      acoes.push(`<button class="qa-btn" onclick="irPara('catalogo')">📚 Catálogo</button>`);
+      acoes.push(`<button class="qa-btn" onclick="irPara('ia')">✦ IA Studio</button>`);
+      qa.innerHTML = acoes.join('');
+    }
+    // Auto-refresh a cada 60s
+    if (!carregarStats._timer) carregarStats._timer = setInterval(carregarStats, 60000);
   } catch(e) { toast('Erro ao carregar stats: ' + e.message, 'err'); }
 }
 
@@ -1928,7 +1949,7 @@ async function uploadHeroVideo(inputEl) {
 }
 
 // ── MARKETING / GROWTH ENGINE ─────────────────────────────────────────────────
-let mkCache = null;
+mkCache = null;
 
 async function carregarMarketing() {
   try {
