@@ -42,6 +42,7 @@ import { handleAdminLogin, handleAdminStats } from './routes/admin-auth';
 import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
 import { handleAdminMarketingStats } from './routes/admin-marketing';
+import { handleAdminBI } from './routes/admin-bi';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
 import {
@@ -313,6 +314,11 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // ── Admin Marketing (Growth Engine) ──────────────────────────────────
     if (path === '/api/admin/marketing/stats' && method === 'GET') {
       return handleAdminMarketingStats(request, env);
+    }
+
+    // ── Admin BI ──────────────────────────────────────────────────────────
+    if (path === '/api/admin/bi' && method === 'GET') {
+      return handleAdminBI(request, env);
     }
 
     // ── Admin IA Studio ────────────────────────────────────────────────────
