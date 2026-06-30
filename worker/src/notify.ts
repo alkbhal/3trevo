@@ -19,9 +19,9 @@ export async function notify(env: Env, text: string, alertType?: string): Promis
     : '';
   const fullText = text + why;
 
-  const waToken = (env as any).WHATSAPP_TOKEN;
-  const waPhoneId = (env as any).WHATSAPP_PHONE_ID;
-  const waTo = (env as any).WHATSAPP_TO;
+  const waToken = env.WHATSAPP_TOKEN;
+  const waPhoneId = env.WHATSAPP_PHONE_ID;
+  const waTo = env.WHATSAPP_TO;
 
   if (waToken && waPhoneId && waTo) {
     try {

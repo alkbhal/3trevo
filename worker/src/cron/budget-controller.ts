@@ -9,21 +9,7 @@
 
 import type { Env } from '../types';
 import { notify } from '../notify';
-
-function sbHeaders(env: Env): Record<string, string> {
-  return {
-    apikey: env.SUPABASE_SERVICE_KEY,
-    Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-    'Content-Type': 'application/json',
-  };
-}
-
-function sb(env: Env, path: string, opts: RequestInit = {}) {
-  return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-    ...opts,
-    headers: { ...sbHeaders(env), ...(opts.headers as Record<string, string> ?? {}) },
-  });
-}
+import { sb } from '../sb';
 
 type DailyRow = { date: string; spend: number; revenue: number; roi: number };
 

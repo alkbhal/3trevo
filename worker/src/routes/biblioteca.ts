@@ -25,19 +25,7 @@
 
 import type { Env } from '../types';
 import { verificarToken as verificarTokenAdmin } from './admin-catalog';
-
-// ─── Supabase helper ──────────────────────────────────────────────────────────
-function sb(env: Env, path: string, opts: RequestInit = {}) {
-  return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-    ...opts,
-    headers: {
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-      ...(opts.headers as Record<string, string> ?? {}),
-    },
-  });
-}
+import { sb } from '../sb';
 
 // ─── Auth: verificar sessão de leitor (KV) ───────────────────────────────────
 async function sessaoLeitor(request: Request, env: Env): Promise<string | null> {

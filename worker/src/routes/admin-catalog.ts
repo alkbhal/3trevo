@@ -10,6 +10,7 @@
  */
 
 import type { Env } from '../types';
+import { sb } from '../sb';
 
 // ─── Auth helper ─────────────────────────────────────────────────────────────
 export async function verificarToken(request: Request, env: Env): Promise<boolean> {
@@ -24,17 +25,6 @@ export async function verificarToken(request: Request, env: Env): Promise<boolea
   return rows.length > 0 && new Date(rows[0].expira_em) > new Date();
 }
 
-function sb(env: Env, path: string, opts: RequestInit = {}) {
-  return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-    ...opts,
-    headers: {
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-      ...(opts.headers as Record<string, string> ?? {}),
-    },
-  });
-}
 
 // ─── Listar todos (admin — inclui inativos) ───────────────────────────────────
 export async function handleAdminCatalogoGet(request: Request, env: Env): Promise<Response> {

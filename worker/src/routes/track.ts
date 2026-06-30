@@ -5,14 +5,7 @@
  */
 
 import type { Env } from '../types';
-
-function sbHeaders(env: Env): Record<string, string> {
-  return {
-    apikey: env.SUPABASE_SERVICE_KEY,
-    Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-    'Content-Type': 'application/json',
-  };
-}
+import { sbHeaders } from '../sb';
 
 export async function handleTrack(request: Request, env: Env): Promise<Response> {
   let body: any;

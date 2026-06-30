@@ -20,6 +20,7 @@
 
 import type { Env } from '../types';
 import { verificarToken } from './admin-catalog';
+import { sb } from '../sb';
 
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-haiku-4-5-20251001';
@@ -61,23 +62,19 @@ Se não houver ação concreta para executar, omita o bloco JSON.`;
 
 // ─── Buscar dados contextuais ──────────────────────────────────────────────────
 async function fetchContextData(env: Env, contexto: string): Promise<string> {
-  const sb = (path: string) => fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-    headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` },
-  });
-
   const sections: string[] = [];
 
   try {
     if (contexto === 'geral' || contexto === 'catalogo') {
-      const r = await sb('catalogo?order=ordem.asc&select=slug,titulo,descricao,preco,cotas,ativo,ordem');
+      const r = await sb(env, 'catalogo?order=ordem.asc&select=slug,titulo,descricao,preco,cotas,ativo,ordem');
       const livros = await r.json() as any[];
       sections.push(`## Catálogo atual\n${JSON.stringify(livros, null, 2)}`);
     }
 
     if (contexto === 'geral' || contexto === 'depoimentos') {
       const [filaR, aprovR] = await Promise.all([
-        sb('depoimentos?estado=eq.revisao_manual&select=id,texto,slug&limit=10'),
-        sb('depoimentos?estado=eq.aprovado&select=id,texto,slug&limit=10&order=created_at.desc'),
+        sb(env, 'depoimentos?estado=eq.revisao_manual&select=id,texto,slug&limit=10'),
+        sb(env, 'depoimentos?estado=eq.aprovado&select=id,texto,slug&limit=10&order=created_at.desc'),
       ]);
       const fila = await filaR.json() as any[];
       const aprov = await aprovR.json() as any[];
@@ -94,8 +91,8 @@ async function fetchContextData(env: Env, contexto: string): Promise<string> {
 
     if (contexto === 'geral') {
       const [pedR, entrR] = await Promise.all([
-        sb('pedidos?select=count'),
-        sb('draw_entries?select=count'),
+        sb(env, 'pedidos?select=count'),
+        sb(env, 'draw_entries?select=count'),
       ]);
       const pedCount = pedR.headers.get('Content-Range')?.split('/')[1] ?? '?';
       const entrCount = entrR.headers.get('Content-Range')?.split('/')[1] ?? '?';
@@ -104,18 +101,11 @@ async function fetchContextData(env: Env, contexto: string): Promise<string> {
 
     if (contexto === 'marketing') {
       const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
-      const authHdr = { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` };
       const [leadsR, leadsWeekR, eventsR, catR] = await Promise.all([
-        fetch(`${env.SUPABASE_URL}/rest/v1/leads?select=count`, {
-          headers: { ...authHdr, Prefer: 'count=exact', Range: '0-0' } as any,
-        }),
-        fetch(`${env.SUPABASE_URL}/rest/v1/leads?created_at=gte.${weekAgo}&select=count`, {
-          headers: { ...authHdr, Prefer: 'count=exact', Range: '0-0' } as any,
-        }),
-        fetch(`${env.SUPABASE_URL}/rest/v1/lead_events?select=event_type&order=created_at.desc&limit=200`, {
-          headers: authHdr,
-        }),
-        sb('catalogo?order=ordem.asc&select=slug,titulo,preco,cotas,ativo'),
+        sb(env, 'leads?select=count', { headers: { Prefer: 'count=exact', Range: '0-0' } }),
+        sb(env, `leads?created_at=gte.${weekAgo}&select=count`, { headers: { Prefer: 'count=exact', Range: '0-0' } }),
+        sb(env, 'lead_events?select=event_type&order=created_at.desc&limit=200'),
+        sb(env, 'catalogo?order=ordem.asc&select=slug,titulo,preco,cotas,ativo'),
       ]);
       const totalLeads = leadsR.headers.get('Content-Range')?.split('/')[1] ?? '?';
       const leadsWeek = leadsWeekR.headers.get('Content-Range')?.split('/')[1] ?? '?';

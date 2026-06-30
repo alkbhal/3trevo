@@ -5,21 +5,7 @@
 
 import type { Env } from '../types';
 import { verificarToken } from './admin-catalog';
-
-function sbHeaders(env: Env): Record<string, string> {
-  return {
-    apikey: env.SUPABASE_SERVICE_KEY,
-    Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-    'Content-Type': 'application/json',
-  };
-}
-
-function sb(env: Env, path: string, opts: RequestInit = {}) {
-  return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-    ...opts,
-    headers: { ...sbHeaders(env), ...(opts.headers as Record<string, string> ?? {}) },
-  });
-}
+import { sb } from '../sb';
 
 function parseCount(r: Response): number {
   return parseInt(r.headers.get('Content-Range')?.split('/')[1] ?? '0', 10);

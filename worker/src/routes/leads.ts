@@ -5,21 +5,7 @@
  */
 
 import type { Env } from '../types';
-
-function sbHeaders(env: Env): Record<string, string> {
-  return {
-    apikey: env.SUPABASE_SERVICE_KEY,
-    Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-    'Content-Type': 'application/json',
-  };
-}
-
-function sb(env: Env, path: string, opts: RequestInit = {}) {
-  return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-    ...opts,
-    headers: { ...sbHeaders(env), ...(opts.headers as Record<string, string> ?? {}) },
-  });
-}
+import { sb } from '../sb';
 
 export async function handleLeadCapture(request: Request, env: Env): Promise<Response> {
   let body: any;

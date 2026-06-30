@@ -33,4 +33,9 @@ export interface Env {
 
   // Admin (gerado via wrangler secret)
   ADMIN_SECRET?: string;
+
+  // WhatsApp Cloud API
+  WHATSAPP_TOKEN?: string;
+  WHATSAPP_PHONE_ID?: string;
+  WHATSAPP_TO?: string;
 }

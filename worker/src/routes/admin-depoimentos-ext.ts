@@ -8,18 +8,7 @@
 
 import type { Env } from '../types';
 import { verificarToken } from './admin-catalog';
-
-function sb(env: Env, path: string, opts: RequestInit = {}) {
-  return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-    ...opts,
-    headers: {
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-      ...(opts.headers as Record<string, string> ?? {}),
-    },
-  });
-}
+import { sb } from '../sb';
 
 // ─── Listar por estado ────────────────────────────────────────────────────────
 export async function handleAdminDepoimentosList(request: Request, env: Env): Promise<Response> {
