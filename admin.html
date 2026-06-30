@@ -656,6 +656,10 @@
                 <div class="ctx-btn-t">✦ Depoimentos</div>
                 <div class="ctx-btn-s">Padrões, qualidade, alertas</div>
               </button>
+              <button class="ctx-btn" data-ctx="marketing" onclick="selecionarCtx('marketing',this)">
+                <div class="ctx-btn-t">◎ Marketing</div>
+                <div class="ctx-btn-s">Copy Instagram, Ads, e-mail</div>
+              </button>
             </div>
             <div class="ia-ctx" id="ia-historico-panel" style="display:none;">
               <div class="ia-ctx-titulo">Última ação sugerida</div>
@@ -1477,6 +1481,7 @@ const SUGESTOES = {
   catalogo: ['Sugira uma nova ordem para os títulos', 'Qual título deve ter desconto?', 'Escreva uma descrição melhorada para um livro'],
   hero: ['Qual título deve estar em destaque esta semana?', 'Sugira um texto para o hero', 'Avalie o carousel atual'],
   depoimentos: ['Resuma os padrões nos depoimentos aprovados', 'Identifique red flags nos pendentes', 'Sugira critérios de aprovação'],
+  marketing: ['Crie um post para o Instagram sobre a 3ª Guerra Mundial', 'Escreva uma legenda de Reels provocativa', 'Gere copy para anúncio Meta Ads (carrossel)', 'Escreva o e-mail 2 da sequência de nutrição'],
 };
 
 function selecionarCtx(ctx, btn) {
@@ -1505,15 +1510,29 @@ function adicionarMsgIA(texto, tipo='ai', acaoJson=null) {
   const hora = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
   let acaoHtml = '';
   if (acaoJson && acaoJson.tipo && acaoJson.tipo !== 'nenhuma') {
-    acaoHtml = `
-      <div class="ia-acao-card">
-        <div class="ia-acao-titulo">✦ Ação sugerida: ${escapeHtml(acaoJson.tipo)}</div>
-        <div class="ia-acao-payload">${JSON.stringify(acaoJson.payload, null, 2)}</div>
-        <div class="ia-acao-btns">
-          <button class="btn btn-p btn-sm" onclick="executarAcaoIA(${JSON.stringify(acaoJson).replace(/"/g,'&quot;')},this)">Confirmar e executar</button>
-          <button class="btn btn-s btn-sm" onclick="this.closest('.ia-acao-card').remove()">Ignorar</button>
-        </div>
-      </div>`;
+    if (acaoJson.tipo === 'copy_pronto') {
+      const p = acaoJson.payload || {};
+      const copyTexto = [p.titulo, p.corpo, p.cta, p.hashtags ? p.hashtags.join(' ') : ''].filter(Boolean).join('\n\n');
+      acaoHtml = `
+        <div class="ia-acao-card">
+          <div class="ia-acao-titulo">◎ Copy pronto — ${escapeHtml(p.formato || 'texto')}</div>
+          <textarea id="copy-output-${hora.replace(':','')}" style="width:100%;min-height:120px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:10px;font-size:13px;color:var(--t1);resize:vertical;margin:8px 0" readonly>${escapeHtml(copyTexto)}</textarea>
+          <div class="ia-acao-btns">
+            <button class="btn btn-p btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('copy-output-${hora.replace(':','')}').value);toast('Copiado!','ok')">Copiar</button>
+            <button class="btn btn-s btn-sm" onclick="this.closest('.ia-acao-card').remove()">Fechar</button>
+          </div>
+        </div>`;
+    } else {
+      acaoHtml = `
+        <div class="ia-acao-card">
+          <div class="ia-acao-titulo">✦ Ação sugerida: ${escapeHtml(acaoJson.tipo)}</div>
+          <div class="ia-acao-payload">${JSON.stringify(acaoJson.payload, null, 2)}</div>
+          <div class="ia-acao-btns">
+            <button class="btn btn-p btn-sm" onclick="executarAcaoIA(${JSON.stringify(acaoJson).replace(/"/g,'&quot;')},this)">Confirmar e executar</button>
+            <button class="btn btn-s btn-sm" onclick="this.closest('.ia-acao-card').remove()">Ignorar</button>
+          </div>
+        </div>`;
+    }
   }
   div.innerHTML = `<div class="ia-bubble">${texto.replace(/\n/g,'<br>')}${acaoHtml}</div><div class="ia-msg-ts">${hora}</div>`;
   msgs.appendChild(div);

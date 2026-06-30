@@ -53,6 +53,7 @@ Se não houver ação concreta para executar, omita o bloco JSON.`;
     hero: '\n\nFoco atual: HERO — analise qual livro deve estar em destaque, o vídeo e a ordem do carousel. Pense em impacto visual e conversão da primeira dobra.',
     depoimentos: '\n\nFoco atual: DEPOIMENTOS — analise qualidade, autenticidade e padrões. Identifique depoimentos que devem ser aprovados, rejeitados ou precisam de atenção.',
     geral: '\n\nFoco atual: VISÃO GERAL — analise o estado completo do site e sugira a ação de maior impacto neste momento.',
+    marketing: `\n\nFoco atual: MARKETING / GROWTH ENGINE — você tem acesso a métricas de leads, eventos de tracking e catálogo.\n\nREGRAS DE COMUNICAÇÃO DA TRÊS TREVO:\n- Fórmula: "Compre, leia, concorra." — NUNCA mencionar "cotas", "SHA-256", "hash" em copy público.\n- Livro âncora: "O Nascimento Silencioso da 3ª Guerra Mundial" (slug: 3a-guerra).\n- Autor público: "Said Anes" (nunca citar nome real).\n- Preços confidenciais — use "a partir de R$15,35" em copy externo.\n- Tom: provocativo, intelectual, direto. Evitar excesso de emojis.\n- Hashtags fixas: #3trevo #editoratrestrevo #ebookbrasileiro #literaturaindependente\n\nQUANDO GERAR COPY, inclua bloco JSON ao final:\n\`\`\`json\n{\n  "tipo": "copy_pronto",\n  "payload": {\n    "formato": "post_instagram" | "reels_caption" | "meta_ads" | "email" | "whatsapp",\n    "titulo": "...",\n    "corpo": "...",\n    "cta": "...",\n    "hashtags": ["..."]\n  }\n}\n\`\`\``,
   };
 
   return base + (extras[contexto] ?? extras.geral);
@@ -99,6 +100,31 @@ async function fetchContextData(env: Env, contexto: string): Promise<string> {
       const pedCount = pedR.headers.get('Content-Range')?.split('/')[1] ?? '?';
       const entrCount = entrR.headers.get('Content-Range')?.split('/')[1] ?? '?';
       sections.push(`## Stats gerais\n- Total pedidos: ${pedCount}\n- Total cotas: ${entrCount}`);
+    }
+
+    if (contexto === 'marketing') {
+      const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+      const authHdr = { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` };
+      const [leadsR, leadsWeekR, eventsR, catR] = await Promise.all([
+        fetch(`${env.SUPABASE_URL}/rest/v1/leads?select=count`, {
+          headers: { ...authHdr, Prefer: 'count=exact', Range: '0-0' } as any,
+        }),
+        fetch(`${env.SUPABASE_URL}/rest/v1/leads?created_at=gte.${weekAgo}&select=count`, {
+          headers: { ...authHdr, Prefer: 'count=exact', Range: '0-0' } as any,
+        }),
+        fetch(`${env.SUPABASE_URL}/rest/v1/lead_events?select=event_type&order=created_at.desc&limit=200`, {
+          headers: authHdr,
+        }),
+        sb('catalogo?order=ordem.asc&select=slug,titulo,preco,cotas,ativo'),
+      ]);
+      const totalLeads = leadsR.headers.get('Content-Range')?.split('/')[1] ?? '?';
+      const leadsWeek = leadsWeekR.headers.get('Content-Range')?.split('/')[1] ?? '?';
+      const eventsRaw = await eventsR.json() as any[];
+      const evtCount: Record<string, number> = {};
+      for (const e of eventsRaw) evtCount[e.event_type] = (evtCount[e.event_type] || 0) + 1;
+      const catalogo = await catR.json() as any[];
+      sections.push(`## Métricas de leads\n- Total de leads: ${totalLeads}\n- Leads nos últimos 7 dias: ${leadsWeek}\n- Breakdown de eventos: ${JSON.stringify(evtCount)}`);
+      sections.push(`## Catálogo (para referência de copy)\n${JSON.stringify(catalogo.filter((l: any) => l.ativo), null, 2)}`);
     }
   } catch(e) {
     sections.push(`## Erro ao buscar dados\n${String(e)}`);
