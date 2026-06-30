@@ -1,0 +1,39 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # a cada 6 horas
+  workflow_dispatch:          # permite disparo manual
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping worker
+        id: ping
+        run: |
+          STATUS=$(curl -s -o /tmp/body.json -w "%{http_code}" \
+            https://tres-trevo-api.al-kbhal.workers.dev/api/health/status)
+          echo "http_status=$STATUS" >> $GITHUB_OUTPUT
+          OK=$(jq -r '.ok' /tmp/body.json 2>/dev/null || echo "false")
+          echo "ok=$OK" >> $GITHUB_OUTPUT
+          echo "body=$(cat /tmp/body.json)" >> $GITHUB_OUTPUT
+
+      - name: Abrir issue se falhar
+        if: steps.ping.outputs.http_status != '200' || steps.ping.outputs.ok != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `${{ steps.ping.outputs.body }}`;
+            const status = `${{ steps.ping.outputs.http_status }}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[ALERTA] Worker indisponível — HTTP ${status}`,
+              body: `### Worker health check falhou\n\n**Horário:** ${new Date().toISOString()}\n**HTTP status:** ${status}\n\n**Resposta:**\n\`\`\`json\n${body}\n\`\`\`\n\nVerifique o painel admin: https://3trevo.com.br/admin.html`,
+              labels: ['alerta', 'infra'],
+            });
+
+      - name: OK
+        if: steps.ping.outputs.http_status == '200' && steps.ping.outputs.ok == 'true'
+        run: echo "✓ Worker saudável — $(cat /tmp/body.json)"

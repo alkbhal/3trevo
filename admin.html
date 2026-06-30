@@ -392,6 +392,10 @@
       <button class="sb-item" onclick="irPara('sorteio',this)">
         <span class="sb-ic">◉</span> Sorteio
       </button>
+      <button class="sb-item" onclick="irPara('monitor',this)" id="sb-monitor">
+        <span class="sb-ic">◎</span> Monitor
+        <span class="sb-badge" id="badge-monitor" style="display:none;background:#e74c3c">!</span>
+      </button>
     </div>
     <div class="sb-foot">
       <div class="sb-user" id="sb-user">—</div>
@@ -802,6 +806,59 @@
         </div>
       </div>
 
+      <!-- ── MONITOR ──────────────────────────────────────────────────── -->
+      <div class="panel" id="panel-monitor">
+        <div class="section-hdr">
+          <div>
+            <div class="section-titulo">Monitor do Sistema</div>
+            <div class="section-sub">Saúde em tempo real — worker, banco, email, IA e segurança. Atualizado a cada clique.</div>
+          </div>
+          <button class="btn btn-s" onclick="carregarMonitor()">↻ Atualizar</button>
+        </div>
+
+        <!-- Status dos componentes -->
+        <div class="kpi-grid" id="mon-status-grid" style="margin-bottom:16px;">
+          <div class="kpi"><div class="kpi-v" id="mon-sb">—</div><div class="kpi-l">Supabase</div></div>
+          <div class="kpi"><div class="kpi-v" id="mon-kv">—</div><div class="kpi-l">KV Cache</div></div>
+          <div class="kpi"><div class="kpi-v" id="mon-ai">—</div><div class="kpi-l">Anthropic API</div></div>
+          <div class="kpi"><div class="kpi-v" id="mon-em">—</div><div class="kpi-l">Email (Resend)</div></div>
+          <div class="kpi"><div class="kpi-v" id="mon-fl">—</div><div class="kpi-l">Logins falhos/h</div></div>
+          <div class="kpi"><div class="kpi-v" id="mon-hm">—</div><div class="kpi-l">Falhas HMAC/h</div></div>
+        </div>
+
+        <!-- Alertas ativos -->
+        <div class="card" style="margin-bottom:16px;" id="mon-alertas-card">
+          <div class="card-hdr"><span class="card-titulo">Alertas ativos</span><span id="mon-checked" style="font-size:11px;color:var(--t3)"></span></div>
+          <div class="card-body" style="padding:16px;" id="mon-alertas">
+            <div class="empty-state"><div class="empty-state-s">Carregando…</div></div>
+          </div>
+        </div>
+
+        <!-- Log de erros -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hdr"><span class="card-titulo">Log de erros recentes</span><span id="mon-log-total" style="font-size:11px;color:var(--t3)"></span></div>
+          <div class="card-body" style="padding:0;overflow-x:auto">
+            <table>
+              <thead><tr><th>Hora</th><th>Componente</th><th>Nível</th><th>Mensagem</th></tr></thead>
+              <tbody id="mon-log-body">
+                <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--t3)">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Links externos -->
+        <div class="card">
+          <div class="card-hdr"><span class="card-titulo">Painéis externos</span></div>
+          <div class="card-body" style="padding:16px;display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="https://dash.cloudflare.com" target="_blank" rel="noopener" class="btn btn-s">☁ CF Analytics</a>
+            <a href="https://supabase.com/dashboard" target="_blank" rel="noopener" class="btn btn-s">⚡ Supabase</a>
+            <a href="https://app.resend.com" target="_blank" rel="noopener" class="btn btn-s">✉ Resend</a>
+            <a href="https://github.com/alkbhal/3trevo/actions" target="_blank" rel="noopener" class="btn btn-s">⚙ GitHub Actions</a>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main-body -->
   </div><!-- /main -->
 </div><!-- /app -->
@@ -1029,7 +1086,7 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
@@ -1038,6 +1095,7 @@ function irPara(panel, btn) {
   if (panel === 'sorteio' && statsCache) renderSorteio(statsCache);
   if (panel === 'biblioteca') carregarBiblioteca();
   if (panel === 'marketing') carregarMarketing();
+  if (panel === 'monitor') carregarMonitor();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -1926,6 +1984,74 @@ function renderMarketing(d) {
       </tr>`;
     }).join('');
   }
+}
+
+// ── MONITOR ───────────────────────────────────────────────────────────────────
+function monStatus(ok, latencia_ms) {
+  if (!ok) return '<span style="color:#e74c3c;font-weight:700">✗ ERRO</span>';
+  const cor = latencia_ms > 2000 ? '#e67e22' : '#27ae60';
+  return `<span style="color:${cor};font-weight:700">✓ ${latencia_ms}ms</span>`;
+}
+
+async function carregarMonitor() {
+  try {
+    const [rH, rL] = await Promise.all([
+      api('/api/admin/health'),
+      api('/api/admin/health/log'),
+    ]);
+    const h = await rH.json();
+    const l = await rL.json();
+
+    // Status grid
+    const c = h.componentes || {};
+    document.getElementById('mon-sb').innerHTML = monStatus(c.supabase?.ok, c.supabase?.latencia_ms);
+    document.getElementById('mon-kv').innerHTML = monStatus(c.kv?.ok, c.kv?.latencia_ms);
+    document.getElementById('mon-ai').innerHTML = monStatus(c.anthropic?.ok, c.anthropic?.latencia_ms);
+    document.getElementById('mon-em').innerHTML = monStatus(c.resend?.ok, c.resend?.latencia_ms);
+    const seg = h.seguranca || {};
+    const flCor = seg.failed_logins >= 5 ? '#e74c3c' : '#27ae60';
+    const hmCor = seg.hmac_failures >= 10 ? '#e74c3c' : '#27ae60';
+    document.getElementById('mon-fl').innerHTML = `<span style="color:${flCor};font-weight:700">${seg.failed_logins ?? 0}</span>`;
+    document.getElementById('mon-hm').innerHTML = `<span style="color:${hmCor};font-weight:700">${seg.hmac_failures ?? 0}</span>`;
+
+    // Timestamp
+    if (h.checked_at) {
+      document.getElementById('mon-checked').textContent = 'Verificado: ' + new Date(h.checked_at).toLocaleString('pt-BR');
+    }
+
+    // Alertas
+    const alertas = h.alertas || [];
+    const badgeM = document.getElementById('badge-monitor');
+    if (alertas.length > 0) {
+      badgeM.style.display = '';
+      document.getElementById('mon-alertas').innerHTML = alertas.map(a =>
+        `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px">${escapeHtml(a)}</div>`
+      ).join('');
+    } else {
+      badgeM.style.display = 'none';
+      document.getElementById('mon-alertas').innerHTML = '<div style="color:var(--t3);font-size:13px">✓ Nenhum alerta ativo — todos os sistemas operacionais.</div>';
+    }
+
+    // Log
+    const log = l.log || [];
+    document.getElementById('mon-log-total').textContent = `${l.total ?? 0} entradas`;
+    const tbody = document.getElementById('mon-log-body');
+    if (!log.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--t3)">Nenhum erro registrado.</td></tr>';
+    } else {
+      const corNivel = { warn:'#e67e22', error:'#e74c3c', critical:'#c0392b', info:'#27ae60' };
+      tbody.innerHTML = log.slice(0, 30).map(e => {
+        const dt = new Date(e.ts).toLocaleString('pt-BR');
+        const cor = corNivel[e.nivel] || '#aaa';
+        return `<tr>
+          <td style="font-size:11px;color:var(--t3);white-space:nowrap">${dt}</td>
+          <td style="font-size:12px">${escapeHtml(e.componente)}</td>
+          <td><span style="color:${cor};font-weight:700;font-size:11px">${e.nivel.toUpperCase()}</span></td>
+          <td style="font-size:12px">${escapeHtml(e.mensagem)}${e.detalhe ? `<br><span style="color:var(--t3);font-size:11px">${escapeHtml(e.detalhe)}</span>` : ''}</td>
+        </tr>`;
+      }).join('');
+    }
+  } catch(e) { toast('Erro ao carregar monitor: ' + e.message, 'err'); }
 }
 
 // Atualiza preview quando URL é digitada/colada manualmente
