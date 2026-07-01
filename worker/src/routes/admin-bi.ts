@@ -20,6 +20,12 @@ export async function handleAdminBI(request: Request, env: Env): Promise<Respons
   const desde = dias > 0 ? new Date(Date.now() - dias * 86400000).toISOString() : null;
   const df = desde ? `&created_at=gte.${desde}` : '';
 
+  const safeJson = async (r: Response): Promise<any[]> => {
+    if (!r.ok) return [];
+    const d = await r.json().catch(() => []);
+    return Array.isArray(d) ? d : [];
+  };
+
   const [paymentsR, paymentsTotalR, eventsUtmR, leadsR, leadsWeekR, productsR, downloadsR] = await Promise.all([
     sb(env, `payments?select=id,valor,metodo,product_id,created_at&status=eq.approved&order=created_at.desc&limit=500${df}`),
     sb(env, 'payments?select=count&status=eq.approved', { headers: { Prefer: 'count=exact', Range: '0-0' } as any }),
@@ -32,13 +38,13 @@ export async function handleAdminBI(request: Request, env: Env): Promise<Respons
     sb(env, 'downloads?select=product_id,download_count&order=download_count.desc&limit=50'),
   ]);
 
-  const payments = (await paymentsR.json()) as any[];
+  const payments = await safeJson(paymentsR);
   const totalVendasGeral = parseCount(paymentsTotalR);
-  const eventos = (await eventsUtmR.json()) as any[];
+  const eventos = await safeJson(eventsUtmR);
   const totalLeads = parseCount(leadsR);
   const leadsWeek = parseCount(leadsWeekR);
-  const products = (await productsR.json()) as any[];
-  const downloads = (await downloadsR.json()) as any[];
+  const products = await safeJson(productsR);
+  const downloads = await safeJson(downloadsR);
 
   // product_id → { slug, titulo }
   const prodMap: Record<string, { slug: string; titulo: string }> = Object.fromEntries(

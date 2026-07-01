@@ -11,6 +11,7 @@ export function sbHeaders(env: Env): Record<string, string> {
 export function sb(env: Env, path: string, opts: RequestInit = {}): Promise<Response> {
   return fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
     ...opts,
+    signal: AbortSignal.timeout(8000),
     headers: { ...sbHeaders(env), ...(opts.headers as Record<string, string> ?? {}) },
   });
 }

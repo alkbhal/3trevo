@@ -82,6 +82,8 @@ const ALLOWED_ORIGINS = [
   'https://www.3trevo.com.br',
   'http://localhost:5500',
   'http://127.0.0.1:5500',
+  'http://localhost:8099',
+  'http://127.0.0.1:8099',
 ];
 
 function corsHeaders(origin: string | null): HeadersInit {

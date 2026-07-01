@@ -7,9 +7,21 @@
 import type { Env } from '../types';
 import { sb } from '../sb';
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 export async function handleLeadCapture(request: Request, env: Env): Promise<Response> {
   let body: any;
   try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+
+  const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  if (env.TT_KV) {
+    const k = `rl:lead:${ip}`;
+    const n = parseInt((await env.TT_KV.get(k)) ?? '0', 10);
+    if (n >= 10) return Response.json({ ok: false, erro: 'muitas_tentativas' }, { status: 429 });
+    await env.TT_KV.put(k, String(n + 1), { expirationTtl: 3600 });
+  }
 
   const email = (body.email ?? '').trim().toLowerCase();
   const nome = (body.nome ?? '').trim();
@@ -83,7 +95,7 @@ export async function handleLeadCapture(request: Request, env: Env): Promise<Res
     const [tpl] = (await tplResp.json()) as any[];
     if (tpl) {
       const html = tpl.html
-        .replace(/\{\{nome\}\}/g, nome || 'Leitor(a)')
+        .replace(/\{\{nome\}\}/g, escapeHtml(nome || 'Leitor(a)'))
         .replace(/\{\{link\}\}/g, 'https://3trevo.com.br/catalogo.html');
 
       await fetch('https://api.resend.com/emails', {
