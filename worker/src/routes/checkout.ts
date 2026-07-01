@@ -222,8 +222,13 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
     return new Response('Link expirado. Contate sac@3trevo.com.br para renovação.', { status: 410 });
   }
 
-  const MAX_DOWNLOADS = 5;
-  if ((dl.download_count ?? 0) >= MAX_DOWNLOADS) {
+  // Atomic check + increment — evita TOCTOU no limite de downloads
+  const incrResp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/increment_download_count`, {
+    method: 'POST',
+    headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dl_id: dl.id, dl_ip: request.headers.get('cf-connecting-ip') ?? '' }),
+  });
+  if (!incrResp.ok || (await incrResp.json()) !== true) {
     return new Response('Limite de downloads atingido. Contate sac@3trevo.com.br.', { status: 403 });
   }
 
@@ -236,13 +241,6 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
   if (!produto?.arquivo_url) {
     return new Response('Arquivo não configurado', { status: 404 });
   }
-
-  // Registrar uso e incrementar contador
-  await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/increment_download_count`, {
-    method: 'POST',
-    headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ dl_id: dl.id, dl_ip: request.headers.get('cf-connecting-ip') ?? '' }),
-  }).catch((e) => console.error('[download] increment error:', e));
 
   // Redirecionar para R2 público (ou URL pré-assinada)
   if (!env.R2_PUBLIC_BUCKET_ID) {
