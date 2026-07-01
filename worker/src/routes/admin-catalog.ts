@@ -11,14 +11,16 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { sha256 } from './admin-auth';
 
 // ─── Auth helper ─────────────────────────────────────────────────────────────
 export async function verificarToken(request: Request, env: Env): Promise<boolean> {
   const auth = request.headers.get('Authorization') ?? '';
   const token = auth.replace('Bearer ', '').trim();
   if (!token) return false;
+  const hash = await sha256(token);
   const r = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/admin_sessoes?token=eq.${encodeURIComponent(token)}&ativa=eq.true&select=expira_em`,
+    `${env.SUPABASE_URL}/rest/v1/admin_sessoes?token_hash=eq.${encodeURIComponent(hash)}&ativa=eq.true&select=expira_em`,
     { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
   );
   const rows = (await r.json()) as any[];

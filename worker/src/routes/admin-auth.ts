@@ -16,7 +16,7 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
-async function sha256(text: string): Promise<string> {
+export async function sha256(text: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
@@ -90,14 +90,16 @@ export async function handleAdminLogin(request: Request, env: Env): Promise<Resp
     return json({ ok: false, erro: 'pin_invalido' }, 401);
   }
 
+  const rawToken = crypto.randomUUID();
+  const tokenHash = await sha256(rawToken);
   const sessaoResp = await sb(env, 'admin_sessoes', {
     method: 'POST',
     headers: { Prefer: 'return=representation' },
-    body: JSON.stringify({ ip: request.headers.get('CF-Connecting-IP') }),
+    body: JSON.stringify({ ip: request.headers.get('CF-Connecting-IP'), token_hash: tokenHash }),
   });
   const [sessao] = (await sessaoResp.json()) as any[];
 
-  return json({ ok: true, token: sessao.token, expira_em: sessao.expira_em });
+  return json({ ok: true, token: rawToken, expira_em: sessao.expira_em });
 }
 
 export async function handleAdminStats(request: Request, env: Env): Promise<Response> {
