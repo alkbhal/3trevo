@@ -104,14 +104,13 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   // MP envia GET para validação inicial da URL
   if (request.method === 'GET') return new Response('ok', { status: 200 });
 
-  // Verificar assinatura MP (opcional mas recomendado)
-  if (env.WEBHOOK_HMAC_SECRET) {
-    const valido = await verificarAssinaturaMP(request, env.WEBHOOK_HMAC_SECRET);
-    if (!valido) {
-      console.warn('[webhook] assinatura inválida');
-      return new Response('Unauthorized', { status: 401 });
-    }
+  // Verificar assinatura MP (fail-closed: sem secret = 503)
+  if (!env.WEBHOOK_HMAC_SECRET) {
+    console.error('[webhook] WEBHOOK_HMAC_SECRET ausente — rejeitando');
+    return new Response('Service Unavailable', { status: 503 });
   }
+  const valido = await verificarAssinaturaMP(request.clone(), env.WEBHOOK_HMAC_SECRET);
+  if (!valido) return new Response('Unauthorized', { status: 401 });
 
   let body: any;
   try { body = await request.clone().json(); } catch {
@@ -279,6 +278,12 @@ async function verificarAssinaturaMP(request: Request, secret: string): Promise<
   // Extrair ts e v1 do header
   const ts = xSig.match(/ts=([^,]+)/)?.[1] ?? '';
   const v1 = xSig.match(/v1=([^,]+)/)?.[1] ?? '';
+
+  const tsNum = parseInt(ts, 10);
+  const agora = Math.floor(Date.now() / 1000);
+  if (isNaN(tsNum) || Math.abs(agora - tsNum) > 300) {
+    return false; // timestamp ausente ou fora da janela de 5 minutos
+  }
 
   if (!ts || !v1 || !mpId) {
     // Fallback: aceitar se secret não está configurado (dev)

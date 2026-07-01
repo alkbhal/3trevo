@@ -21,6 +21,27 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+async function derivarPinHash(pin: string, salt: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: 200_000 },
+    key, 256
+  );
+  return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function upgradeParaPbkdf2(env: Env, userId: string, pin: string): Promise<void> {
+  const salt = crypto.randomUUID();
+  const hash = await derivarPinHash(pin, salt);
+  await sb(env, `dash_usuarios?id=eq.${userId}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ pin_salt: salt, pin_hash_v2: hash }),
+  });
+}
+
 export async function handleAdminLogin(request: Request, env: Env): Promise<Response> {
   let body: any;
   try { body = await request.json(); } catch { return json({ ok: false, erro: 'bad_request' }, 400); }
@@ -39,11 +60,32 @@ export async function handleAdminLogin(request: Request, env: Env): Promise<Resp
     await env.TT_KV.put(rlKey, String(attempts + 1), { expirationTtl: 3600 });
   }
 
-  const pinHash = await sha256(pin);
-
-  const userResp = await sb(env, `dash_usuarios?pin_hash=eq.${pinHash}&select=id`);
+  const userResp = await sb(env, `dash_usuarios?select=id,pin_hash,pin_hash_v2,pin_salt`);
+  if (!userResp.ok) {
+    const errBody = await userResp.text().catch(() => '');
+    console.error('Supabase query falhou:', userResp.status, errBody);
+    return json({ ok: false, erro: 'internal_error' }, 500);
+  }
   const users = (await userResp.json()) as any[];
-  if (!users.length) {
+
+  let usuarioId: string | null = null;
+  for (const usuario of users) {
+    let pinValido = false;
+    if (usuario.pin_hash_v2 && usuario.pin_salt) {
+      const hash = await derivarPinHash(pin, usuario.pin_salt);
+      pinValido = hash === usuario.pin_hash_v2;
+    } else {
+      // ponytail: fallback SHA-256 legado — auto-upgrade na próxima linha
+      const hash = await sha256(pin);
+      pinValido = hash === usuario.pin_hash;
+      if (pinValido) {
+        upgradeParaPbkdf2(env, usuario.id, pin).catch(e => console.error('[auth] upgrade PBKDF2 falhou:', e));
+      }
+    }
+    if (pinValido) { usuarioId = usuario.id; break; }
+  }
+
+  if (!usuarioId) {
     await registrarFalhaLogin(env, ip);
     return json({ ok: false, erro: 'pin_invalido' }, 401);
   }

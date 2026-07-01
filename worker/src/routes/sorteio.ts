@@ -193,63 +193,38 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     certificado_numero: certificado_numero ?? null,
   }];
 
-  // 8. Registrar auditoria em draw_audits
-  const auditResp = await fetch(`${env.SUPABASE_URL}/rest/v1/draw_audits`, {
+  // 8-10. Registrar resultado atomicamente via RPC (audit + winner + fechar draw em 1 transação)
+  const rpcResp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/registrar_resultado_sorteio`, {
     method: 'POST',
     headers: {
       apikey: env.SUPABASE_SERVICE_KEY,
       Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
       'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
     },
     body: JSON.stringify({
-      draw_id,
-      seed,
-      algoritmo: 'rng-web-crypto-sha256',
-      numero_sorteado: sorteado.numero,
-      cartela: cartela.map(n => ({ numero: n.numero, user_id: n.user_id, origem: n.origem })),
-      participantes,
-      resultado,
-      hash_sha256,
-      executado_em,
+      p_draw_id: draw_id,
+      p_seed: seed,
+      p_algoritmo: 'rng-web-crypto-sha256',
+      p_numero_sorteado: sorteado.numero,
+      p_user_id: sorteado.user_id,
+      p_cartela: cartela.map(n => ({ numero: n.numero, user_id: n.user_id, origem: n.origem })),
+      p_participantes: participantes,
+      p_resultado: resultado,
+      p_hash_sha256: hash_sha256,
+      p_executado_em: executado_em,
+      p_premio: draw.premio_1 ?? null,
     }),
   });
 
-  if (!auditResp.ok) {
-    const err = await auditResp.text();
-    console.error('[sorteio] falha ao registrar auditoria:', err);
-    return Response.json({ ok: false, erro: 'falha_registro_auditoria', detalhe: err }, { status: 500 });
+  if (!rpcResp.ok) {
+    const err = await rpcResp.text();
+    console.error('[sorteio] rpc falhou:', err);
+    const jaFechado = err.includes('draw_nao_encontrado_ou_ja_fechado');
+    return Response.json(
+      { ok: false, erro: jaFechado ? 'draw_ja_fechado' : 'falha_registro_sorteio', detalhe: err },
+      { status: jaFechado ? 409 : 500 }
+    );
   }
-
-  // 9. Registrar vencedor em draw_winners
-  await fetch(`${env.SUPABASE_URL}/rest/v1/draw_winners`, {
-    method: 'POST',
-    headers: {
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
-    },
-    body: JSON.stringify({
-      draw_id,
-      user_id: sorteado.user_id,
-      posicao: 1,
-      cotas_total: userCount.get(sorteado.user_id) ?? 1,
-      premio: draw.premio_1,
-    }),
-  });
-
-  // 10. Fechar draw
-  await fetch(`${env.SUPABASE_URL}/rest/v1/draws?id=eq.${draw_id}`, {
-    method: 'PATCH',
-    headers: {
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
-    },
-    body: JSON.stringify({ status: 'closed', data_sorteio: executado_em, numero_sorteado: sorteado.numero }),
-  });
 
   // 11. Email ao vencedor
   if (emailVencedor && env.RESEND_API_KEY) {

@@ -5,6 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "production"
+SUPABASE_URL = "https://xfkepekffdyrtcgagwqo.supabase.co"
 
 # Secrets (configurar via: npx wrangler secret put NOME)
 # SUPABASE_URL
