@@ -341,6 +341,27 @@ export async function handleBibliotecaStream(request: Request, env: Env): Promis
   });
 }
 
+// ─── Admin: GET /api/admin/biblioteca/ler?slug=X — revisão sem exigir compra/slot ─
+export async function handleAdminBibliotecaLer(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarTokenAdmin(request, env))) return new Response('Unauthorized', { status: 401 });
+
+  const url = new URL(request.url);
+  const slug = url.searchParams.get('slug') ?? '';
+  if (!slug) return Response.json({ ok: false, erro: 'slug_obrigatorio' }, { status: 400 });
+
+  const obraR = await sb(env, `biblioteca_acervo?slug=eq.${encodeURIComponent(slug)}&select=epub_url&limit=1`);
+  const [obra] = (await obraR.json()) as any[];
+  if (!obra || !obra.epub_url) return Response.json({ ok: false, erro: 'obra_nao_encontrada' }, { status: 404 });
+
+  const epubToken = await gerarToken(24);
+  if (env.TT_KV) {
+    await env.TT_KV.put(`bib:epub:${epubToken}`, JSON.stringify({ epub_url: obra.epub_url }), { expirationTtl: 3600 });
+  }
+
+  const stream_url = `https://tres-trevo-api.al-kbhal.workers.dev/api/biblioteca/stream?t=${epubToken}`;
+  return Response.json({ ok: true, stream_url, expira_em: new Date(Date.now() + 3_600_000).toISOString() });
+}
+
 // ─── Admin: acervo ────────────────────────────────────────────────────────────
 export async function handleAdminBibliotecaAcervoGet(request: Request, env: Env): Promise<Response> {
   if (!(await verificarTokenAdmin(request, env))) return new Response('Unauthorized', { status: 401 });

@@ -70,6 +70,7 @@ import {
   handleBibliotecaMarcarLida,
   handleBibliotecaProgresso,
   handleBibliotecaLer,
+  handleAdminBibliotecaLer,
   handleAdminBibliotecaAcervoGet,
   handleAdminBibliotecaAcervoCreate,
   handleAdminBibliotecaAcervoUpdate,
@@ -375,6 +376,10 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
 
     // ── Admin Biblioteca ───────────────────────────────────────────────────
+    if (path === '/api/admin/biblioteca/ler' && method === 'GET') {
+      return handleAdminBibliotecaLer(request, env);
+    }
+
     if (path === '/api/admin/biblioteca/acervo' && method === 'GET') {
       return handleAdminBibliotecaAcervoGet(request, env);
     }

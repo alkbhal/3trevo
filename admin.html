@@ -1746,11 +1746,21 @@ function renderTabelaBib(livros) {
       <td>${escapeHtml(l.genero ?? '—')}</td>
       <td><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${l.ativo ? '#e8f5e9' : '#ffebee'};color:${l.ativo ? '#2e7d32' : '#c62828'}">${l.ativo ? 'Ativo' : 'Inativo'}${l.featured ? ' ★' : ''}</span></td>
       <td>
+        <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="lerObraAdmin('${escapeHtml(l.slug)}')">Ler</button>
         <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="editarObra('${escapeHtml(l.slug)}')">Editar</button>
         <button class="btn-ghost" style="padding:4px 10px;font-size:12px;color:#c62828" onclick="desativarObra('${escapeHtml(l.slug)}','${l.ativo}')">${l.ativo ? 'Desativar' : 'Ativar'}</button>
       </td>
     </tr>
   `).join('');
+}
+
+async function lerObraAdmin(slug) {
+  try {
+    const r = await api(`/api/admin/biblioteca/ler?slug=${encodeURIComponent(slug)}`);
+    const d = await r.json();
+    if (!d.ok) { toast(d.erro || 'Erro ao abrir obra.', 'err'); return; }
+    window.open(d.stream_url, '_blank');
+  } catch(e) { toast('Erro de conexão: ' + e.message, 'err'); }
 }
 
 function abrirFormObra() {
