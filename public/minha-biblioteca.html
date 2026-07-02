@@ -142,6 +142,14 @@
       padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
       background: var(--creme); color: var(--verde); border: 1px solid var(--verde);
     }
+    .livro-badge-seu { background: var(--verde); color: #fff; border-color: var(--verde); }
+    .livro-badge-bloqueado {
+      background: var(--dourado); color: var(--verde-escuro); border-color: var(--dourado);
+      text-decoration: none; cursor: pointer;
+    }
+    .livro-card-bloqueado { cursor: default; }
+    .livro-card-bloqueado:hover { box-shadow: none; transform: none; }
+    .livro-card-bloqueado .livro-capa { filter: grayscale(0.6) brightness(0.75); }
 
     /* Histórico */
     .historico-lista { display: flex; flex-direction: column; gap: 10px; }
@@ -223,7 +231,7 @@
     </div>
 
     <!-- Acervo -->
-    <div class="secao-titulo">Acervo de clássicos</div>
+    <div class="secao-titulo">Seu acervo <small>clássicos inclusos + títulos que você comprou</small></div>
     <div class="acervo-grid" id="lista-acervo">
       <div class="spinner" id="spinner-acervo" style="display:block"></div>
     </div>
@@ -358,10 +366,10 @@ function entrarBiblioteca() {
 }
 
 async function carregarDados() {
-  await Promise.all([carregarSlots(), carregarAcervo()]);
+  await carregarMinha();
 }
 
-async function carregarSlots() {
+async function carregarMinha() {
   try {
     const r = await fetch(`${API}/api/biblioteca/minha`, {
       headers: { Authorization: `Bearer ${sessaoToken}` },
@@ -370,15 +378,10 @@ async function carregarSlots() {
     const d = await r.json();
     renderSlots(d.slots, d.slots_max);
     renderHistorico(d.historico);
-  } catch { document.getElementById('lista-slots').innerHTML = '<p style="color:#c00;font-size:13px">Erro ao carregar slots.</p>'; }
-}
-
-async function carregarAcervo() {
-  try {
-    const r = await fetch(`${API}/api/biblioteca/acervo`);
-    const livros = await r.json();
-    renderAcervo(livros);
-  } catch { document.getElementById('lista-acervo').innerHTML = '<p style="color:#c00;font-size:13px">Erro ao carregar acervo.</p>'; }
+    renderAcervo(d.catalogo);
+  } catch {
+    document.getElementById('lista-slots').innerHTML = '<p style="color:#c00;font-size:13px">Erro ao carregar biblioteca.</p>';
+  }
 }
 
 // ── Render Slots ──────────────────────────────────────────────────────────────
@@ -425,16 +428,22 @@ function renderAcervo(livros) {
   const el = document.getElementById('lista-acervo');
   if (!livros.length) { el.innerHTML = '<p style="color:#999;font-size:14px">Nenhuma obra disponível no momento.</p>'; return; }
 
-  el.innerHTML = livros.map(l => `
-    <div class="livro-card" onclick="abrirModalSelecionar('${l.slug}','${l.titulo}','${(l.sinopse||'').replace(/'/g,"&#39;")}')">
+  el.innerHTML = livros.map(l => {
+    const bloqueado = l.acesso === 'compra' && !l.possui;
+    const clique = bloqueado ? '' : `onclick="abrirModalSelecionar('${l.slug}','${l.titulo}','${(l.sinopse||'').replace(/'/g,"&#39;")}')"`;
+    const badge = bloqueado
+      ? `<a href="checkout.html?slug=${l.slug}" class="livro-badge livro-badge-bloqueado" onclick="event.stopPropagation()">🔒 Comprar</a>`
+      : (l.acesso === 'compra' ? '<span class="livro-badge livro-badge-seu">✓ Seu</span>' : (l.featured ? '<span class="livro-badge">Destaque</span>' : ''));
+    return `
+    <div class="livro-card ${bloqueado ? 'livro-card-bloqueado' : ''}" ${clique}>
       <div class="livro-capa">${l.capa_url ? `<img src="${l.capa_url}" alt="${l.titulo}" style="width:100%;height:100%;object-fit:cover">` : l.titulo}</div>
       <div class="livro-info">
         <div class="livro-titulo">${l.titulo}</div>
-        <div class="livro-autor">${l.autor} · ${l.ano_publicacao ?? ''}</div>
-        ${l.featured ? '<span class="livro-badge">Destaque</span>' : ''}
+        <div class="livro-autor">${l.autor ?? ''}</div>
+        ${badge}
       </div>
     </div>
-  `).join('');
+  `; }).join('');
 }
 
 // ── Render Histórico ──────────────────────────────────────────────────────────
@@ -476,7 +485,7 @@ document.getElementById('btn-confirmar-selecionar').addEventListener('click', as
     });
     const d = await r.json();
     fecharModalSelecionar();
-    if (d.ok) { await carregarSlots(); }
+    if (d.ok) { await carregarMinha(); }
     else { alert(d.msg || d.erro || 'Erro ao adicionar obra.'); }
   } catch { alert('Erro de conexão.'); }
   btn.disabled = false; btn.textContent = 'Adicionar à leitura';
@@ -573,7 +582,7 @@ function fecharLeitor() {
   if (book) { book.destroy(); book = null; }
   document.onkeydown = null;
   livroAtual = null;
-  carregarSlots();
+  carregarMinha();
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

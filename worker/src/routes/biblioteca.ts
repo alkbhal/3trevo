@@ -154,7 +154,7 @@ export async function handleBibliotecaMinha(request: Request, env: Env): Promise
   const [slotsR, histR, catalogoR, comprasR] = await Promise.all([
     sb(env, `biblioteca_usuario_status?email=eq.${encodeURIComponent(email)}&order=slot_numero.asc`),
     sb(env, `biblioteca_historico?email=eq.${encodeURIComponent(email)}&order=concluido_em.desc&limit=20&select=slug,titulo,autor,concluido_em`),
-    sb(env, 'biblioteca_acervo?ativo=eq.true&order=featured.desc,titulo.asc&select=slug,titulo,autor,capa_url,acesso,product_id,featured'),
+    sb(env, 'biblioteca_acervo?ativo=eq.true&order=featured.desc,titulo.asc&select=slug,titulo,autor,capa_url,acesso,product_id,featured,sinopse'),
     sb(env, `payments?email_pagador=eq.${encodeURIComponent(email)}&status=eq.approved&select=product_id`),
   ]);
 
@@ -170,6 +170,7 @@ export async function handleBibliotecaMinha(request: Request, env: Env): Promise
     autor: obra.autor,
     capa_url: obra.capa_url,
     featured: obra.featured,
+    sinopse: obra.sinopse,
     acesso: obra.acesso,
     possui: obra.acesso === 'bonus' || productsOwned.has(obra.product_id),
   }));
