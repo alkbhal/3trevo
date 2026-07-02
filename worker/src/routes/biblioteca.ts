@@ -1,6 +1,7 @@
 /**
  * biblioteca.ts — Três Trevo Worker
- * Biblioteca TT — Acervo de clássicos em domínio público
+ * Biblioteca TT — clássicos de domínio público (bônus, qualquer comprador)
+ * + títulos próprios pagos (leitura liberada só a quem comprou aquele produto)
  *
  * Públicas:
  *   GET  /api/biblioteca/acervo       — lista livros ativos (sem URL do EPUB)
@@ -35,17 +36,22 @@ async function sessaoLeitor(request: Request, env: Env): Promise<string | null> 
   return env.TT_KV.get(`bib:session:${token}`);
 }
 
-// ─── Verificar acesso (email com pelo menos 1 pedido pago) ───────────────────
+// ─── Verificar acesso (email com pelo menos 1 pagamento aprovado) ────────────
 async function temAcesso(email: string, env: Env): Promise<boolean> {
-  // 1. Busca cliente pelo email
-  const rc = await sb(env, `clientes?email=eq.${encodeURIComponent(email)}&select=id&limit=1`);
-  const clientes = (await rc.json()) as any[];
-  if (!clientes.length) return false;
-  // 2. Verifica pedido pago (status 'pago' ou 'paid')
-  const clienteId = clientes[0].id;
-  const rp = await sb(env, `pedidos?cliente_id=eq.${clienteId}&status=in.(pago,paid)&select=id&limit=1`);
-  const pedidos = (await rp.json()) as any[];
-  return pedidos.length > 0;
+  const r = await sb(env, `payments?email_pagador=eq.${encodeURIComponent(email)}&status=eq.approved&select=id&limit=1`);
+  const rows = (await r.json()) as any[];
+  return rows.length > 0;
+}
+
+// ─── Verificar compra de um produto específico (títulos pagos na biblioteca) ─
+async function temAcessoProduto(email: string, productId: string, env: Env): Promise<boolean> {
+  if (!productId) return false;
+  const r = await sb(
+    env,
+    `payments?email_pagador=eq.${encodeURIComponent(email)}&product_id=eq.${productId}&status=eq.approved&select=id&limit=1`
+  );
+  const rows = (await r.json()) as any[];
+  return rows.length > 0;
 }
 
 // ─── Token aleatório ──────────────────────────────────────────────────────────
@@ -132,7 +138,7 @@ export async function handleBibliotecaVerificar(request: Request, env: Env): Pro
 export async function handleBibliotecaAcervo(_request: Request, env: Env): Promise<Response> {
   const r = await sb(
     env,
-    'biblioteca_acervo?ativo=eq.true&order=featured.desc,titulo.asc&select=slug,titulo,autor,ano_publicacao,genero,sinopse,capa_url,paginas_estimadas,idioma,featured'
+    'biblioteca_acervo?ativo=eq.true&order=featured.desc,titulo.asc&select=slug,titulo,autor,ano_publicacao,genero,sinopse,capa_url,paginas_estimadas,idioma,featured,acesso'
   );
   const data = await r.json();
   return new Response(JSON.stringify(data), {
@@ -167,9 +173,16 @@ export async function handleBibliotecaSelecionar(request: Request, env: Env): Pr
   const slug = typeof body.slug === 'string' ? body.slug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '') : '';
   if (!slug || slug.length > 80) return Response.json({ ok: false, erro: 'slug_invalido' }, { status: 400 });
 
-  const obraR = await sb(env, `biblioteca_acervo?slug=eq.${encodeURIComponent(slug)}&ativo=eq.true&select=id,titulo&limit=1`);
+  const obraR = await sb(env, `biblioteca_acervo?slug=eq.${encodeURIComponent(slug)}&ativo=eq.true&select=id,titulo,acesso,product_id&limit=1`);
   const [obra] = (await obraR.json()) as any[];
   if (!obra) return Response.json({ ok: false, erro: 'obra_nao_encontrada' }, { status: 404 });
+
+  if (obra.acesso === 'compra' && !(await temAcessoProduto(email, obra.product_id, env))) {
+    return Response.json(
+      { ok: false, erro: 'compra_necessaria', msg: 'Este título não está incluído no seu acesso — é preciso comprá-lo separadamente.' },
+      { status: 403 }
+    );
+  }
 
   const slotsR = await sb(env, `biblioteca_slots?email=eq.${encodeURIComponent(email)}&status=eq.lendo&select=slot_numero,acervo_id`);
   const ativos = (await slotsR.json()) as any[];
