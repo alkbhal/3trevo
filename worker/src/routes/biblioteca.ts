@@ -151,15 +151,30 @@ export async function handleBibliotecaMinha(request: Request, env: Env): Promise
   const email = await sessaoLeitor(request, env);
   if (!email) return new Response('Unauthorized', { status: 401 });
 
-  const [slotsR, histR] = await Promise.all([
+  const [slotsR, histR, catalogoR, comprasR] = await Promise.all([
     sb(env, `biblioteca_usuario_status?email=eq.${encodeURIComponent(email)}&order=slot_numero.asc`),
     sb(env, `biblioteca_historico?email=eq.${encodeURIComponent(email)}&order=concluido_em.desc&limit=20&select=slug,titulo,autor,concluido_em`),
+    sb(env, 'biblioteca_acervo?ativo=eq.true&order=featured.desc,titulo.asc&select=slug,titulo,autor,capa_url,acesso,product_id,featured'),
+    sb(env, `payments?email_pagador=eq.${encodeURIComponent(email)}&status=eq.approved&select=product_id`),
   ]);
 
   const slots = (await slotsR.json()) as any[];
   const historico = await histR.json();
+  const catalogoRaw = (await catalogoR.json()) as any[];
+  const compras = (await comprasR.json()) as any[];
+  const productsOwned = new Set(compras.map((c: any) => c.product_id));
 
-  return Response.json({ ok: true, slots, historico, slots_usados: slots.length, slots_max: 3 });
+  const catalogo = catalogoRaw.map((obra: any) => ({
+    slug: obra.slug,
+    titulo: obra.titulo,
+    autor: obra.autor,
+    capa_url: obra.capa_url,
+    featured: obra.featured,
+    acesso: obra.acesso,
+    possui: obra.acesso === 'bonus' || productsOwned.has(obra.product_id),
+  }));
+
+  return Response.json({ ok: true, slots, historico, catalogo, slots_usados: slots.length, slots_max: 3 });
 }
 
 // ─── POST /api/biblioteca/selecionar ─────────────────────────────────────────
