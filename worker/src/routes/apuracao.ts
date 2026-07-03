@@ -10,31 +10,11 @@
  */
 
 import type { Env } from '../types';
-
-async function verificarAdmin(request: Request, env: Env): Promise<boolean> {
-  const auth = request.headers.get('Authorization') ?? '';
-  const token = auth.replace('Bearer ', '').trim();
-  if (!token) return false;
-
-  const resp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/admin_sessoes?token=eq.${encodeURIComponent(token)}&ativa=eq.true&select=token,expira_em`,
-    {
-      headers: {
-        apikey: env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      },
-    }
-  );
-  const rows = (await resp.json()) as any[];
-  if (!rows.length) return false;
-
-  const expira = new Date(rows[0].expira_em).getTime();
-  return Date.now() < expira;
-}
+import { verificarToken } from './admin-catalog';
 
 // ─── GET /api/admin/fila ──────────────────────────────────────────────────────
 export async function handleFilaRevisao(request: Request, env: Env): Promise<Response> {
-  if (!(await verificarAdmin(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
 
   const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/fila_revisao_manual`, {
     method: 'POST',
@@ -50,7 +30,7 @@ export async function handleFilaRevisao(request: Request, env: Env): Promise<Res
 
 // ─── POST /api/admin/moderar ──────────────────────────────────────────────────
 export async function handleModerar(request: Request, env: Env): Promise<Response> {
-  if (!(await verificarAdmin(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
 
   let body: any;
   try { body = await request.json(); } catch { return new Response('Bad Request', { status: 400 }); }
