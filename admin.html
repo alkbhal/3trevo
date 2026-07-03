@@ -425,6 +425,7 @@
           <div class="kpi" onclick="irPara('sorteio')" title="Ver sorteio"><div class="kpi-v" id="kpi-entries">—</div><div class="kpi-l">Cotas válidas</div></div>
           <div class="kpi" onclick="irPara('depoimentos')" title="Ver depoimentos"><div class="kpi-v" id="kpi-dep">—</div><div class="kpi-l">Depoimentos aprovados</div></div>
           <div class="kpi alerta" onclick="irPara('depoimentos')" title="Revisar fila"><div class="kpi-v" id="kpi-fila">—</div><div class="kpi-l">Fila revisão</div></div>
+          <div class="kpi" title="Receita últimos 30 dias"><div class="kpi-v" id="kpi-receita">—</div><div class="kpi-l">Receita (30d)</div></div>
         </div>
         <div class="quick-actions" id="quick-actions"></div>
         <div id="draw-area"></div>
@@ -1174,6 +1175,10 @@ async function carregarStats() {
     document.getElementById('kpi-entries').textContent = d.total_entries ?? '—';
     document.getElementById('kpi-dep').textContent = d.depoimentos_aprovados ?? '—';
     document.getElementById('kpi-fila').textContent = d.revisao_pendente ?? '—';
+    // Receita (QW1)
+    api('/api/admin/bi?period=30d').then(r => r.json()).then(bi => {
+      if (bi.ok) document.getElementById('kpi-receita').textContent = `R$${bi.resumo.receita_total.toFixed(2)}`;
+    }).catch(() => {});
     // Badge sidebar
     const badge = document.getElementById('badge-fila');
     if (d.revisao_pendente > 0) { badge.textContent = d.revisao_pendente; badge.style.display = ''; }
