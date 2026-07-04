@@ -375,6 +375,9 @@
       <button class="sb-item" onclick="irPara('catalogo',this)">
         <span class="sb-ic">☰</span> Catálogo
       </button>
+      <button class="sb-item" onclick="irPara('forge',this)">
+        <span class="sb-ic">📖</span> Revisar Forge
+      </button>
       <button class="sb-item" onclick="irPara('hero',this)">
         <span class="sb-ic">▶</span> Hero
       </button>
@@ -467,6 +470,61 @@
               </thead>
               <tbody id="cat-tbody"></tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REVISAR FORGE ──────────────────────────────────────────────── -->
+      <div class="panel" id="panel-forge">
+        <div class="section-hdr">
+          <div>
+            <div class="section-titulo">Revisar produção do Forge</div>
+            <div class="section-sub">Carregue um projeto do tr3vo-forge pelo projectId, revise o material gerado e decida o destino.</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-body" style="display:flex;gap:10px;align-items:center;">
+            <input type="text" id="forge-project-id" class="input" placeholder="projectId (UUID)" style="flex:1;">
+            <button class="btn btn-p" onclick="carregarForgeProjeto()">Carregar</button>
+          </div>
+        </div>
+        <div id="forge-status-area" class="card" style="margin-bottom:16px;display:none;">
+          <div class="card-body" id="forge-status-body"></div>
+        </div>
+        <div id="forge-preview-area" style="display:none;">
+          <div style="display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start;margin-bottom:16px;">
+            <div>
+              <img id="forge-cover-img" src="" alt="Capa" style="width:100%;border-radius:8px;background:#1a2a1a;aspect-ratio:2/3;object-fit:cover;" onerror="this.style.objectFit='none';this.removeAttribute('src');this.alt='Sem capa gerada';">
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+                <a id="forge-link-html" href="#" target="_blank" class="btn-ghost" style="text-align:center;">Ver HTML completo</a>
+                <a id="forge-link-epub" href="#" target="_blank" class="btn-ghost" style="text-align:center;">Baixar EPUB</a>
+                <a id="forge-link-pdf" href="#" target="_blank" class="btn-ghost" style="text-align:center;">Baixar PDF</a>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="field"><label>Título</label><input type="text" id="forge-titulo" class="input"></div>
+                <div class="field"><label>Slug (usado no catálogo/checkout)</label><input type="text" id="forge-slug" class="input"></div>
+                <div class="field"><label>Descrição</label><textarea id="forge-descricao" class="input" rows="4"></textarea></div>
+                <div class="field"><label>Gênero</label><input type="text" id="forge-genero" class="input"></div>
+                <div class="field"><label>Preço (R$)</label><input type="number" id="forge-preco" class="input" step="0.01" value="19.90"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-hdr"><span class="card-titulo">Material de marketing</span></div>
+            <div class="card-body" id="forge-marketing-list">—</div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><span class="card-titulo">Decisão de publicação</span></div>
+            <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;">
+              <button class="btn btn-p" onclick="decidirForge('exclusiva')">Página exclusiva</button>
+              <button class="btn btn-p" onclick="decidirForge('hero')">Destaque no hero</button>
+              <button class="btn btn-s" onclick="decidirForge('biblioteca')">Só biblioteca</button>
+              <button class="btn-ghost" onclick="decidirForge('rejeitar')">Não publicar</button>
+              <button class="btn btn-s" style="margin-left:auto;" onclick="gerarBibliotecaLocal()">⭳ Gerar biblioteca local</button>
+            </div>
+            <div class="card-body" id="forge-decisao-status" style="padding-top:0;font-size:12px;color:var(--t3);"></div>
           </div>
         </div>
       </div>
@@ -1042,7 +1100,10 @@ function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&l
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 const API = 'https://tres-trevo-api.al-kbhal.workers.dev';
+const FORGE_URL = 'https://tr3vo-forge.al-kbhal.workers.dev';
 let token = sessionStorage.getItem('tt_admin_token') || '';
+let forgeProjectId = null;
+let forgeMarketingFiles = [];
 let statsCache = null;
 let catalogoCache = [];
 let mkCache = null;
@@ -1099,7 +1160,7 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', forge:'Revisar Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
@@ -1354,6 +1415,163 @@ async function deletarLivro() {
     if (d.ok) { toast('Título inativado.', 'ok'); fecharModal('modal-livro'); carregarCatalogo(); }
     else toast('Erro: ' + (d.erro || '—'), 'err');
   } catch(e) { toast(e.message, 'err'); }
+}
+
+// ── REVISAR FORGE ─────────────────────────────────────────────────────────────
+function slugify(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+async function carregarForgeProjeto() {
+  const id = document.getElementById('forge-project-id').value.trim();
+  if (!/^[0-9a-f-]{36}$/i.test(id)) { toast('projectId inválido.', 'err'); return; }
+  forgeProjectId = id;
+  forgeMarketingFiles = [];
+  document.getElementById('forge-status-area').style.display = '';
+  document.getElementById('forge-status-body').textContent = 'Carregando…';
+  document.getElementById('forge-preview-area').style.display = 'none';
+  document.getElementById('forge-decisao-status').textContent = '';
+
+  try {
+    const r = await fetch(`${FORGE_URL}/project/${id}/status`);
+    const d = await r.json();
+    if (!r.ok) { document.getElementById('forge-status-body').textContent = d.error || 'Projeto não encontrado.'; return; }
+
+    document.getElementById('forge-status-body').innerHTML =
+      `Status: <strong>${escapeHtml(d.status)}</strong>` +
+      (d.currentWorker ? ` — worker atual: ${escapeHtml(d.currentWorker)}` : '') +
+      (d.errorMessage ? ` — <span style="color:#c62828">${escapeHtml(d.errorMessage)}</span>` : '');
+
+    if (d.status !== 'complete') return;
+
+    document.getElementById('forge-preview-area').style.display = '';
+    document.getElementById('forge-cover-img').src = `${FORGE_URL}/project/${id}/cover`;
+    document.getElementById('forge-link-html').href = `${FORGE_URL}/project/${id}/html`;
+    document.getElementById('forge-link-epub').href = `${FORGE_URL}/project/${id}/epub`;
+    document.getElementById('forge-link-pdf').href = `${FORGE_URL}/project/${id}/pdf`;
+    document.getElementById('forge-slug').value = `forge-${id.slice(0, 8)}`;
+
+    carregarForgeMarketing(id);
+  } catch(e) { document.getElementById('forge-status-body').textContent = 'Erro de conexão: ' + e.message; }
+}
+
+async function carregarForgeMarketing(id) {
+  const el = document.getElementById('forge-marketing-list');
+  el.textContent = 'Carregando…';
+  try {
+    const r = await fetch(`${FORGE_URL}/project/${id}/marketing`);
+    const d = await r.json();
+    forgeMarketingFiles = Array.isArray(d.files) ? d.files : [];
+    if (!forgeMarketingFiles.length) { el.textContent = 'Nenhum arquivo de marketing encontrado.'; return; }
+    const porLang = {};
+    forgeMarketingFiles.forEach(f => { (porLang[f.lang] ||= []).push(f); });
+    el.innerHTML = Object.entries(porLang).map(([lang, files]) => `
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:4px;">${escapeHtml(lang)}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${files.map(f => `<a href="${f.url}" target="_blank" class="btn-ghost" style="font-size:12px;padding:4px 10px;">${escapeHtml(f.name)}</a>`).join('')}
+        </div>
+      </div>`).join('');
+  } catch(e) { el.textContent = 'Erro ao carregar marketing: ' + e.message; }
+}
+
+async function decidirForge(destino) {
+  if (!forgeProjectId) return;
+  const statusEl = document.getElementById('forge-decisao-status');
+
+  if (destino === 'rejeitar') {
+    statusEl.textContent = 'Decisão registrada: não publicado.';
+    toast('Marcado como não publicado.', 'ok');
+    return;
+  }
+
+  const titulo = document.getElementById('forge-titulo').value.trim();
+  const slug = slugify(document.getElementById('forge-slug').value.trim() || titulo);
+  const descricao = document.getElementById('forge-descricao').value.trim();
+  const genero = document.getElementById('forge-genero').value.trim();
+  const preco = parseFloat(document.getElementById('forge-preco').value) || 0;
+
+  if (!titulo || !slug) { toast('Preencha título e slug.', 'err'); return; }
+
+  const capaUrl = `${FORGE_URL}/project/${forgeProjectId}/cover`;
+
+  try {
+    if (destino === 'biblioteca') {
+      const r = await api('/api/admin/biblioteca/acervo', 'POST', {
+        slug, titulo, autor: 'Said Anes', genero: genero || null,
+        sinopse: descricao || null, epub_url: `${FORGE_URL}/project/${forgeProjectId}/epub`,
+        capa_url: capaUrl, idioma: 'pt', ativo: true, featured: false,
+      });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.erro || 'erro ao salvar na biblioteca');
+      statusEl.textContent = 'Publicado só na biblioteca.';
+      toast('Adicionado à biblioteca.', 'ok');
+      return;
+    }
+
+    // exclusiva | hero — ambos entram no catálogo (página própria = /checkout.html?slug=X)
+    const rCat = await api('/api/admin/catalogo', 'POST', {
+      slug, titulo, autor: 'Said Anes', genero: genero || 'reflexao', genero_pt: genero || 'reflexao',
+      descricao: descricao || '', preco, cotas: 1, utm_campaign: slug,
+      bg_color: '#0d2415', capa_url: capaUrl, ordem: 99, ativo: true,
+    });
+    const dCat = await rCat.json();
+    if (!dCat.ok) throw new Error(dCat.erro || 'erro ao criar no catálogo');
+
+    if (destino === 'hero') {
+      const rHero = await api('/api/admin/hero-config');
+      const heroAtual = await rHero.json();
+      await api('/api/admin/hero-config', 'PUT', {
+        ...heroAtual, destaque_slug: slug, destaque_titulo: titulo, destaque_badge: 'Novo',
+      });
+      statusEl.textContent = 'Publicado no catálogo e destacado no hero.';
+      toast('Publicado com destaque no hero.', 'ok');
+    } else {
+      statusEl.textContent = 'Publicado no catálogo (página própria via checkout).';
+      toast('Publicado no catálogo.', 'ok');
+    }
+  } catch(e) { toast('Erro: ' + e.message, 'err'); }
+}
+
+async function gerarBibliotecaLocal() {
+  if (!forgeProjectId) return;
+  if (!window.showDirectoryPicker) {
+    toast('Recurso disponível apenas em Chrome/Edge no desktop.', 'err');
+    return;
+  }
+  const titulo = document.getElementById('forge-titulo').value.trim() || `forge-${forgeProjectId.slice(0, 8)}`;
+  const pastaNome = slugify(titulo) || forgeProjectId;
+
+  try {
+    const raizHandle = await window.showDirectoryPicker();
+    const pastaHandle = await raizHandle.getDirectoryHandle(pastaNome, { create: true });
+
+    const arquivos = [
+      { nome: `${pastaNome}.epub`, url: `${FORGE_URL}/project/${forgeProjectId}/epub` },
+      { nome: `${pastaNome}.pdf`, url: `${FORGE_URL}/project/${forgeProjectId}/pdf` },
+      { nome: `${pastaNome}.html`, url: `${FORGE_URL}/project/${forgeProjectId}/html` },
+      { nome: 'capa.jpg', url: `${FORGE_URL}/project/${forgeProjectId}/cover` },
+      ...forgeMarketingFiles.map(f => ({ nome: `marketing_${f.lang}_${f.name}`, url: f.url })),
+    ];
+
+    let salvos = 0;
+    for (const a of arquivos) {
+      try {
+        const resp = await fetch(a.url);
+        if (!resp.ok) continue;
+        const blob = await resp.blob();
+        const fileHandle = await pastaHandle.getFileHandle(a.nome, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        salvos++;
+      } catch { /* arquivo individual ausente — segue para o próximo */ }
+    }
+    toast(`Biblioteca local gerada: ${salvos}/${arquivos.length} arquivos salvos em "${pastaNome}".`, 'ok');
+  } catch(e) {
+    if (e.name !== 'AbortError') toast('Erro ao gerar biblioteca local: ' + e.message, 'err');
+  }
 }
 
 // ── HERO CONFIG ───────────────────────────────────────────────────────────────
