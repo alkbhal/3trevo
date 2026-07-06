@@ -15,6 +15,8 @@ export interface Env {
 
   // Segurança
   WEBHOOK_HMAC_SECRET: string;
+  FORGE_WEBHOOK_SECRET?: string;
+  FORGE_PUBLIC_URL?: string;
 
   // IA
   ANTHROPIC_KEY: string;

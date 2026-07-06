@@ -43,6 +43,7 @@ import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
 import { handleAdminMarketingStats } from './routes/admin-marketing';
 import { handleAdminBI } from './routes/admin-bi';
+import { handleForgeDelivery } from './routes/forge-webhook';
 import { handleDrawProgress } from './routes/admin-draw';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
@@ -230,6 +231,11 @@ async function dispatch(request: Request, env: Env, path: string, method: string
 
     if (path === '/api/webhook/pagamento' && (method === 'POST' || method === 'GET')) {
       return handleWebhookPagamento(request, env);
+    }
+
+    // ── Webhook forge (entrega de e-book completo) ────────────────────────
+    if (path === '/api/webhook/forge-delivery' && method === 'POST') {
+      return handleForgeDelivery(request, env);
     }
 
     // ── Download de ebook ──────────────────────────────────────────────────
