@@ -297,7 +297,16 @@ async function verificarAssinaturaMP(request: Request, secret: string): Promise<
   const expected = Array.from(new Uint8Array(sigBuf))
     .map(b => b.toString(16).padStart(2, '0')).join('');
 
-  return v1 === expected;
+  return timingSafeEqualHex(v1, expected);
+}
+
+// ponytail: mesmo helper em forge-webhook.ts — duplicado pra evitar novo
+// arquivo compartilhado só por 2 call sites (CLAUDE.md: "prefer editing existing files")
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }
 
 // ─── Helpers: Supabase Auth ───────────────────────────────────────────────────

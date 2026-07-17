@@ -17,13 +17,22 @@ interface DeliveryPackage {
   timestamp: string;
 }
 
+// ponytail: comparação hex constant-time duplicada em checkout.ts — sem util
+// compartilhado pra 2 call sites, per CLAUDE.md ("prefer editing existing files")
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 async function assinaturaValida(body: string, sigHeader: string, secret: string): Promise<boolean> {
   const key = await crypto.subtle.importKey(
     'raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
   );
   const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
   const expected = `sha256=${[...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, '0')).join('')}`;
-  return sigHeader === expected;
+  return timingSafeEqualHex(sigHeader, expected);
 }
 
 export async function handleForgeDelivery(request: Request, env: Env): Promise<Response> {
