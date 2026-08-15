@@ -1,0 +1,20 @@
+# GitHub Pages serve a raiz do repo sem build (path: "/"). Sem este exclude,
+# Jekyll publica QUALQUER arquivo commitado — inclusive docs internos e
+# config do Worker. Ver achado de sessão: CLAUDE.md, README.md, SECURITY.md,
+# RELATORIO_ENTREGA.md, worker/wrangler.toml e docs/ estavam ao vivo em
+# produção (confirmado 200 via curl).
+exclude:
+  - worker
+  - docs
+  - scripts
+  - supabase
+  - CLAUDE.md
+  - README.md
+  - SECURITY.md
+  - SECURITY-BASELINE-TT.md
+  - RELATORIO_ENTREGA.md
+  - apply_css_patch.py
+  - css-patch.css
+  - setup-loteria-tt-v3.ps1
+  - wrangler.jsonc
+  - config.json
