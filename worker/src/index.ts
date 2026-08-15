@@ -16,6 +16,7 @@ import {
   handleCriarPreferencia,
   handleWebhookPagamento,
   handleDownload,
+  handleReembolso,
 } from './routes/checkout';
 import {
   handleFilaRevisao,
@@ -256,6 +257,10 @@ async function dispatch(request: Request, env: Env, path: string, method: string
 
     if (path === '/api/admin/moderar' && method === 'POST') {
       return handleModerar(request, env);
+    }
+
+    if (path === '/api/admin/reembolso' && method === 'POST') {
+      return handleReembolso(request, env);
     }
 
     // Login admin (geração de sessão)

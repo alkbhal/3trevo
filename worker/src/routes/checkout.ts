@@ -13,6 +13,7 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { verificarToken } from './admin-catalog';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -258,6 +259,70 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
     : `https://pub-${env.R2_PUBLIC_BUCKET_ID}.r2.dev/${produto.arquivo_url}`;
 
   return Response.redirect(pdfUrl, 302);
+}
+
+// ─── 4. Reembolso (admin) — CDC art.49, direito de arrependimento ────────────
+// POST /api/admin/reembolso  { purchase_id }
+// Aciona o reembolso real no MP (dinheiro), depois cancela as cotas do
+// participante — nessa ordem, pra nunca cancelar cota sem o dinheiro ter
+// voltado de verdade. Idempotente: purchase já 'refunded' retorna 409 sem
+// tentar de novo (evita reembolso duplicado na API do MP).
+export async function handleReembolso(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) {
+    return Response.json({ ok: false, erro: 'unauthorized' }, { status: 401 });
+  }
+  if (!env.MP_ACCESS_TOKEN) {
+    return Response.json({ ok: false, erro: 'gateway_nao_configurado' }, { status: 503 });
+  }
+
+  let body: any;
+  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'bad_request' }, { status: 400 }); }
+  const purchaseId = body?.purchase_id;
+  if (typeof purchaseId !== 'string' || !/^[0-9a-f-]{36}$/i.test(purchaseId)) {
+    return Response.json({ ok: false, erro: 'purchase_id inválido' }, { status: 400 });
+  }
+
+  const purchaseResp = await sb(env, `purchases?id=eq.${purchaseId}&select=id,payment_id,status`);
+  const [purchase] = (await purchaseResp.json()) as any[];
+  if (!purchase) return Response.json({ ok: false, erro: 'compra_nao_encontrada' }, { status: 404 });
+  if (purchase.status === 'refunded') {
+    return Response.json({ ok: false, erro: 'ja_reembolsado' }, { status: 409 });
+  }
+
+  const paymentResp = await sb(env, `payments?id=eq.${purchase.payment_id}&select=id,mp_payment_id,status`);
+  const [payment] = (await paymentResp.json()) as any[];
+  if (!payment?.mp_payment_id) {
+    return Response.json({ ok: false, erro: 'pagamento_sem_mp_payment_id' }, { status: 400 });
+  }
+
+  // Chamar API de reembolso do MP — dinheiro de verdade. PIX volta em
+  // minutos/horas; cartão de crédito repassa ao emissor, prazo fora do
+  // controle do MP/3Trevo (normalmente 1-2 faturas).
+  const mpResp = await fetch(`${MP_API}/v1/payments/${payment.mp_payment_id}/refunds`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.MP_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+  });
+  if (!mpResp.ok) {
+    const err = await mpResp.text();
+    console.error('[reembolso] erro MP:', err);
+    await registrarAuditoria(env, 'reembolso_erro', { purchase_id: purchaseId, mp_payment_id: payment.mp_payment_id, erro: err });
+    return Response.json({ ok: false, erro: 'falha_ao_reembolsar' }, { status: 502 });
+  }
+
+  // Dinheiro confirmado de volta — agora cancela as cotas: apaga os números
+  // sorteáveis da compra e o registro de cotas, marca purchase/payment como
+  // reembolsados. Não bloqueia a resposta ao admin em caso de falha parcial
+  // aqui (a auditoria registra o estado real pra conferência manual).
+  await Promise.all([
+    sb(env, `draw_numbers?purchase_id=eq.${purchaseId}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }),
+    sb(env, `draw_entries?purchase_id=eq.${purchaseId}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }),
+    sb(env, `purchases?id=eq.${purchaseId}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'refunded' }) }),
+    sb(env, `payments?id=eq.${payment.id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'refunded' }) }),
+  ]);
+
+  await registrarAuditoria(env, 'reembolso_processado', { purchase_id: purchaseId, payment_id: payment.id, mp_payment_id: payment.mp_payment_id });
+
+  return Response.json({ ok: true });
 }
 
 // ─── Helpers: MP API ─────────────────────────────────────────────────────────
