@@ -5,6 +5,7 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { TAG_RECOVERY_1, TAG_RECOVERY_2, leadTemCompraAtiva } from './cart-recovery';
 
 export async function handleEmailEngine(env: Env): Promise<void> {
   if (!env.RESEND_API_KEY) return;
@@ -24,15 +25,51 @@ export async function handleEmailEngine(env: Env): Promise<void> {
       continue;
     }
 
+    const isRecovery = item.tag === TAG_RECOVERY_1 || item.tag === TAG_RECOVERY_2;
+    if (isRecovery && (await leadTemCompraAtiva(env, lead.email))) {
+      // Comprou entre o agendamento e o envio — recuperação não faz mais sentido.
+      await sb(env, `email_sequence?id=eq.${item.id}`, { method: 'DELETE' });
+      continue;
+    }
+
     const tplResp = await sb(env, `email_templates?tag=eq.${encodeURIComponent(item.tag)}&select=subject,html`);
     const [tpl] = (await tplResp.json()) as any[];
     if (!tpl) continue;
 
+    let linkUrl = 'https://3trevo.com.br/catalogo.html';
+    let titulo = '';
+    if (isRecovery) {
+      const evResp = await sb(env,
+        `lead_events?lead_id=eq.${item.lead_id}&event_type=eq.checkout_start&order=criado_em.desc&limit=1&select=props`
+      );
+      const [ev] = (await evResp.json()) as any[];
+      const slug = ev?.props?.slug;
+      if (!slug) continue; // sem carrinho pra recuperar, não tem o que mandar
+      linkUrl = `https://3trevo.com.br/checkout.html?slug=${encodeURIComponent(slug)}`;
+      const catResp = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}&select=titulo`);
+      const [cat] = (await catResp.json()) as any[];
+      titulo = cat?.titulo ?? '';
+    }
+
+    // Templates novos (recovery_*) já trazem o link de descadastro embutido no
+    // próprio HTML, estilizado no rodapé — não duplicar o parágrafo genérico
+    // nesse caso. Templates antigos (nurture_*) não têm {{unsubscribe_link}},
+    // então continuam recebendo o parágrafo simples anexado ao final.
     const unsubUrl = `https://tres-trevo-api.al-kbhal.workers.dev/api/leads/unsub?token=${lead.unsub_token}`;
-    const html = tpl.html
+    const temUnsubEmbutido = tpl.html.includes('{{unsubscribe_link}}');
+    let html = tpl.html
       .replace(/\{\{nome\}\}/g, lead.nome || 'Leitor(a)')
-      .replace(/\{\{link\}\}/g, 'https://3trevo.com.br/catalogo.html')
-      + `<p style="font-size:11px;color:#999;margin-top:24px"><a href="${unsubUrl}" style="color:#999">Não quero mais receber e-mails</a></p>`;
+      .replace(/\{\{titulo\}\}/g, titulo)
+      .replace(/\{\{link\}\}/g, linkUrl)
+      .replace(/\{\{link_recuperacao\}\}/g, linkUrl)
+      .replace(/\{\{unsubscribe_link\}\}/g, unsubUrl);
+    if (!temUnsubEmbutido) {
+      html += `<p style="font-size:11px;color:#999;margin-top:24px"><a href="${unsubUrl}" style="color:#999">Não quero mais receber e-mails</a></p>`;
+    }
+
+    const subject = tpl.subject
+      .replace(/\{\{nome\}\}/g, lead.nome || 'Leitor(a)')
+      .replace(/\{\{titulo\}\}/g, titulo);
 
     try {
       const sendResp = await fetch('https://api.resend.com/emails', {
@@ -41,7 +78,7 @@ export async function handleEmailEngine(env: Env): Promise<void> {
         body: JSON.stringify({
           from: 'Editora Três Trevo <sac@3trevo.com.br>',
           to: lead.email,
-          subject: tpl.subject,
+          subject,
           html,
         }),
       });

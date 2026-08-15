@@ -12,6 +12,7 @@
  */
 
 import type { Env } from '../types';
+import { sb } from '../sb';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -47,6 +48,12 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   if (!produto) {
     return Response.json({ ok: false, erro: 'produto_nao_encontrado' }, { status: 404 });
   }
+
+  // Instrumentação de funil (Fase 1 recuperação de carrinho): registra o início do checkout
+  // sem bloquear nem atrasar o pagamento — mesmo padrão fire-and-forget de leads.ts/track.ts.
+  registrarInicioCheckout(env, email, slug).catch((e) =>
+    console.error('[checkout] registrarInicioCheckout falhou:', e)
+  );
 
   // Criar preferência no MP
   const prefBody = {
@@ -556,6 +563,35 @@ async function enviarEmailCompra(
       html,
     }),
   });
+}
+
+// ─── Instrumentação de funil (recuperação de carrinho) ───────────────────────
+// Upsert em `leads` (sem sobrescrever status/score de um lead já existente — só
+// a coluna `email` vai no payload, igual ao padrão de leads.ts) + evento
+// `checkout_start` em `lead_events`, consumido pelo cron de recuperação
+// (worker/src/cron/cart-recovery.ts).
+async function registrarInicioCheckout(env: Env, email: string, slug: string): Promise<void> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const upsertResp = await sb(env, 'leads?on_conflict=email', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation,resolution=merge-duplicates' } as any,
+    body: JSON.stringify({ email: normalizedEmail }),
+  });
+  if (!upsertResp.ok) {
+    console.error('[checkout] upsert de lead falhou:', upsertResp.status, await upsertResp.text());
+    return;
+  }
+  const [lead] = (await upsertResp.json()) as any[];
+  if (!lead) return;
+
+  const eventResp = await sb(env, 'lead_events', {
+    method: 'POST',
+    headers: { Prefer: 'return=minimal' } as any,
+    body: JSON.stringify({ lead_id: lead.id, event_type: 'checkout_start', props: { slug } }),
+  });
+  if (!eventResp.ok) {
+    console.error('[checkout] insert de checkout_start falhou:', eventResp.status, await eventResp.text());
+  }
 }
 
 // ─── Utilitários ─────────────────────────────────────────────────────────────

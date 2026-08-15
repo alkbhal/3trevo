@@ -47,6 +47,7 @@ import { handleForgeDelivery } from './routes/forge-webhook';
 import { handleDrawProgress } from './routes/admin-draw';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
+import { handleCartRecovery } from './cron/cart-recovery';
 import {
   handleAdminDepoimentosList,
   handleAdminDepoimentoUpdate,
@@ -148,6 +149,7 @@ export default {
       ctx.waitUntil(handleHealthMonitor(env));
       ctx.waitUntil(handleEmailEngine(env));
       ctx.waitUntil(handleBudgetController(env));
+      ctx.waitUntil(handleCartRecovery(env));
     }
   },
 };
