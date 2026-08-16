@@ -10,7 +10,11 @@
 import type { Env } from '../types';
 import { verificarToken } from './admin-catalog';
 
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+// ponytail: 1MB barra PNG cru de gerador de IA (achado real: 11 capas de
+// 3.1MB cada deixavam o catalogo com ~35MB de imagem) sem precisar de
+// pipeline de recompressao no Worker (sharp/libs nativas nao rodam no
+// runtime de Workers) — forca comprimir antes de subir.
+const MAX_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
 const ALLOWED_TYPES: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/jpg':  'jpg',
