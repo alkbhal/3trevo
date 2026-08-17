@@ -1,14 +1,23 @@
 /**
  * sorteio.ts — Três Trevo Worker
- * Admin-only: sorteio puro interno (RNG sem vínculo com Loteria Federal)
+ * Admin-only: sorteio por commit-reveal navegador↔servidor ("Semente TT",
+ * mesmo motor canônico do DOTIS — packages/core/src/routes/sorteio.ts).
  *
- * POST /api/admin/sorteio  — disparar sorteio manual (ou automático por meta atingida)
+ * POST /api/admin/sorteio/iniciar  — fase 1: navegador comita client_hash às
+ *   cegas do server_seed; servidor comita server_hash às cegas do client_seed.
+ * POST /api/admin/sorteio/revelar  — fase 2: navegador revela client_seed;
+ *   servidor confere o hash, combina os 2 seeds e só então sorteia.
  *
- * Input:  { draw_id, testemunha_1?, testemunha_2?, certificado_numero? }
- * Output: { ok, numero_sorteado, winner_user_id, winner_email, total_numeros,
- *           total_participantes, hash_sha256, seed, executado_em }
+ * Substitui 3 motores incompatíveis que coexistiam sem se verificar entre si:
+ * execute-draw (hash de bloco Bitcoin, sem compromisso prévio de altura —
+ * brecha de grinding), o RNG só-servidor que este arquivo tinha antes (sem
+ * nenhuma entrada verificável externamente), e a reimplementação mulberry32
+ * da página pública de auditoria (que não reproduzia nenhum dos dois).
  *
- * Auditoria: draw_audits registra seed, algoritmo, cartela snapshot, hash SHA-256.
+ * Auditoria: draw_audits.details guarda client_seed/client_hash/server_seed/
+ * server_hash — qualquer pessoa pode reconferir sha256(client_seed)==client_hash
+ * e sha256(server_seed)==server_hash (prova que nenhum lado escolheu o seed
+ * depois de ver o do outro), combinar seedFinal e recalcular o índice.
  * Regularização futura: apresentar draw_audits ao SPA/Ministério da Fazenda.
  */
 
@@ -117,8 +126,19 @@ async function enviarEmailVencedor(env: Env, opts: {
   });
 }
 
-// ─── POST /api/admin/sorteio ──────────────────────────────────────────────────
-export async function handleSorteio(request: Request, env: Env): Promise<Response> {
+// ─── Índice vencedor a partir do seed combinado — função pura, testada em
+// worker/tests/sorteio-index.test.ts. Mesma fórmula do motor do DOTIS.
+export async function calcularIndiceVencedor(seedFinal: string, tamanhoCartela: number): Promise<number> {
+  if (tamanhoCartela <= 0) throw new Error('tamanhoCartela deve ser > 0');
+  const idxBuf = new Uint8Array(
+    await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${seedFinal}:${tamanhoCartela}`))
+  );
+  const idxBig = idxBuf.slice(0, 8).reduce((acc, byte) => (acc << 8n) | BigInt(byte), 0n);
+  return Number(idxBig % BigInt(tamanhoCartela));
+}
+
+// ─── POST /api/admin/sorteio/iniciar — fase 1 (commit) ────────────────────────
+export async function handleIniciarSorteio(request: Request, env: Env): Promise<Response> {
   if (!(await verificarToken(request, env))) {
     return new Response('Unauthorized', { status: 401 });
   }
@@ -126,14 +146,13 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
   let body: any;
   try { body = await request.json(); } catch { return new Response('Bad Request', { status: 400 }); }
 
-  const { draw_id, testemunha_1, testemunha_2, certificado_numero } = body ?? {};
-  if (!draw_id) {
-    return Response.json({ ok: false, erro: 'draw_id é obrigatório' }, { status: 400 });
+  const { draw_id, client_hash } = body ?? {};
+  if (!draw_id || !client_hash) {
+    return Response.json({ ok: false, erro: 'draw_id_e_client_hash_obrigatorios' }, { status: 400 });
   }
 
-  // 1. Buscar draw aberto
   const drawResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/draws?id=eq.${draw_id}&status=eq.open&select=id,titulo,max_numeros,premio_1`,
+    `${env.SUPABASE_URL}/rest/v1/draws?id=eq.${draw_id}&status=eq.open&select=id`,
     { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
   );
   const [draw] = (await drawResp.json()) as any[];
@@ -141,7 +160,73 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     return Response.json({ ok: false, erro: 'draw_nao_encontrado_ou_fechado' }, { status: 400 });
   }
 
-  // 2. Buscar cartela completa (todos os números emitidos)
+  const seedBuf = new Uint8Array(16);
+  crypto.getRandomValues(seedBuf);
+  const server_seed = Array.from(seedBuf).map(b => b.toString(16).padStart(2, '0')).join('');
+  const server_hash = await sha256hex(server_seed);
+
+  // permite reiniciar um compromisso não revelado (ex.: admin cancelou antes de
+  // revelar) — apaga o pendente anterior antes de inserir o novo; nunca apaga
+  // um já revelado (histórico de auditoria). Mesmo padrão do DOTIS.
+  await fetch(
+    `${env.SUPABASE_URL}/rest/v1/draw_commits?draw_id=eq.${draw_id}&revelado_em=is.null`,
+    { method: 'DELETE', headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
+  );
+
+  const insertResp = await fetch(`${env.SUPABASE_URL}/rest/v1/draw_commits`, {
+    method: 'POST',
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ draw_id, client_hash, server_seed, server_hash }),
+  });
+
+  if (!insertResp.ok) {
+    return Response.json({ ok: false, erro: 'falha_ao_comprometer', detalhe: await insertResp.text() }, { status: 500 });
+  }
+
+  return Response.json({ ok: true, server_hash });
+}
+
+// ─── POST /api/admin/sorteio/revelar — fase 2 (reveal) ────────────────────────
+export async function handleRevelarSorteio(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  let body: any;
+  try { body = await request.json(); } catch { return new Response('Bad Request', { status: 400 }); }
+
+  const { draw_id, client_seed, testemunha_1, testemunha_2, certificado_numero } = body ?? {};
+  if (!draw_id || !client_seed) {
+    return Response.json({ ok: false, erro: 'draw_id_e_client_seed_obrigatorios' }, { status: 400 });
+  }
+
+  const commitResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/draw_commits?draw_id=eq.${draw_id}&revelado_em=is.null&select=id,client_hash,server_seed,server_hash&order=criado_em.desc&limit=1`,
+    { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
+  );
+  const [commit] = (await commitResp.json()) as Array<{ id: string; client_hash: string; server_seed: string; server_hash: string }>;
+  if (!commit) {
+    return Response.json({ ok: false, erro: 'compromisso_nao_encontrado_inicie_o_sorteio_primeiro' }, { status: 404 });
+  }
+
+  if ((await sha256hex(client_seed)) !== commit.client_hash) {
+    return Response.json({ ok: false, erro: 'client_seed_nao_bate_com_compromisso' }, { status: 400 });
+  }
+
+  const drawResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/draws?id=eq.${draw_id}&status=eq.open&select=id,titulo,premio_1`,
+    { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
+  );
+  const [draw] = (await drawResp.json()) as any[];
+  if (!draw) {
+    return Response.json({ ok: false, erro: 'draw_nao_encontrado_ou_ja_fechado' }, { status: 409 });
+  }
+
   const numResp = await fetch(
     `${env.SUPABASE_URL}/rest/v1/draw_numbers?draw_id=eq.${draw_id}&select=numero,user_id,origem`,
     { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
@@ -151,37 +236,16 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     return Response.json({ ok: false, erro: 'nenhum_numero_emitido' }, { status: 400 });
   }
 
-  // 3. Gerar seed criptográfico
-  const seedBuf = new Uint8Array(16);
-  crypto.getRandomValues(seedBuf);
-  const seed = Array.from(seedBuf).map(b => b.toString(16).padStart(2, '0')).join('');
-
-  // 4. Derivar índice via SHA-256 do seed (reproduzível e auditável)
-  const idxBuf = new Uint8Array(
-    await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${seed}:${cartela.length}`))
-  );
-  const idxBig = idxBuf.slice(0, 8).reduce((acc, byte) => (acc << 8n) | BigInt(byte), 0n);
-  const idx = Number(idxBig % BigInt(cartela.length));
+  const seedFinal = await sha256hex(`${commit.server_seed}:${client_seed}`);
+  const idx = await calcularIndiceVencedor(seedFinal, cartela.length);
   const sorteado = cartela[idx];
 
   const executado_em = new Date().toISOString();
-
-  // 5. Buscar email do vencedor
   const emailVencedor = await getEmailUsuario(env, sorteado.user_id);
 
-  // 6. Snapshot de participantes (agrupado por user_id)
   const userCount = new Map<string, number>();
-  for (const n of cartela) {
-    userCount.set(n.user_id, (userCount.get(n.user_id) ?? 0) + 1);
-  }
-  const participantes = Array.from(userCount.entries()).map(([uid, total]) => ({
-    user_id: uid,
-    total_numeros: total,
-  }));
-
-  // 7. Hash SHA-256 de auditoria (prova do resultado: não pode ser forjado sem o seed)
-  const auditPayload = `${draw_id}:${seed}:${sorteado.numero}:${sorteado.user_id}:${executado_em}`;
-  const hash_sha256 = await sha256hex(auditPayload);
+  for (const n of cartela) userCount.set(n.user_id, (userCount.get(n.user_id) ?? 0) + 1);
+  const participantes = Array.from(userCount.entries()).map(([uid, total]) => ({ user_id: uid, total_numeros: total }));
 
   const resultado = [{
     posicao: 1,
@@ -193,8 +257,26 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     certificado_numero: certificado_numero ?? null,
   }];
 
-  // 8-10. Registrar resultado atomicamente via RPC (audit + winner + fechar draw em 1 transação)
-  const rpcResp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/registrar_resultado_sorteio`, {
+  const hash_sha256 = await sha256hex(`${draw_id}:${seedFinal}:${sorteado.numero}:${sorteado.user_id}:${executado_em}`);
+
+  const details = {
+    algoritmo: 'commit-reveal-sha256',
+    client_seed,
+    client_hash: commit.client_hash,
+    server_seed: commit.server_seed,
+    server_hash: commit.server_hash,
+    seed: seedFinal,
+    numero_sorteado: sorteado.numero,
+    winner_user_id: sorteado.user_id,
+    cartela: cartela.map(n => ({ numero: n.numero, user_id: n.user_id, origem: n.origem })),
+    participantes,
+    resultado,
+    hash_sha256,
+    executado_em,
+    premio: draw.premio_1 ?? null,
+  };
+
+  const rpcResp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/registrar_resultado_sorteio_v2`, {
     method: 'POST',
     headers: {
       apikey: env.SUPABASE_SERVICE_KEY,
@@ -203,16 +285,12 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     },
     body: JSON.stringify({
       p_draw_id: draw_id,
-      p_seed: seed,
-      p_algoritmo: 'rng-web-crypto-sha256',
-      p_numero_sorteado: sorteado.numero,
-      p_user_id: sorteado.user_id,
-      p_cartela: cartela.map(n => ({ numero: n.numero, user_id: n.user_id, origem: n.origem })),
-      p_participantes: participantes,
-      p_resultado: resultado,
-      p_hash_sha256: hash_sha256,
-      p_executado_em: executado_em,
-      p_premio: draw.premio_1 ?? null,
+      p_seed: seedFinal,
+      p_details: details,
+      p_executed_by: 'admin',
+      p_testemunha_1: testemunha_1 ?? null,
+      p_testemunha_2: testemunha_2 ?? null,
+      p_certificado_numero: certificado_numero ?? null,
     }),
   });
 
@@ -226,7 +304,17 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     );
   }
 
-  // 11. Email ao vencedor
+  await fetch(`${env.SUPABASE_URL}/rest/v1/draw_commits?id=eq.${commit.id}`, {
+    method: 'PATCH',
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ revelado_em: executado_em }),
+  });
+
   if (emailVencedor && env.RESEND_API_KEY) {
     try {
       await enviarEmailVencedor(env, {
@@ -241,7 +329,6 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     }
   }
 
-  // 12. Notificar admin
   if (env.RESEND_API_KEY) {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -250,7 +337,7 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
         from: 'sistema@3trevo.com.br',
         to: 'rogerio.kbhal@gmail.com',
         subject: `[Três Trevo] ✦ Sorteio concluído — ${draw.titulo}`,
-        html: `<p>Sorteio concluído com sucesso.</p>
+        html: `<p>Sorteio concluído com sucesso (commit-reveal).</p>
 <ul>
   <li>Draw: <strong>${draw.titulo}</strong></li>
   <li>Total de números emitidos: <strong>${cartela.length}</strong></li>
@@ -258,7 +345,8 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
   <li>Número sorteado: <strong>#${sorteado.numero.toString().padStart(5, '0')}</strong></li>
   <li>Vencedor: ${emailVencedor ?? sorteado.user_id}</li>
   <li>Hash SHA-256: <code>${hash_sha256}</code></li>
-  <li>Seed RNG: <code>${seed}</code></li>
+  <li>Seed final: <code>${seedFinal}</code></li>
+  <li>client_seed: <code>${client_seed}</code> · server_seed: <code>${commit.server_seed}</code></li>
   <li>Timestamp: ${executado_em}</li>
 </ul>
 <p><a href="https://3trevo.com.br/admin.html">Painel admin →</a></p>`,
@@ -274,7 +362,23 @@ export async function handleSorteio(request: Request, env: Env): Promise<Respons
     total_numeros: cartela.length,
     total_participantes: participantes.length,
     hash_sha256,
-    seed,
+    seed: seedFinal,
+    client_seed,
+    client_hash: commit.client_hash,
+    server_seed: commit.server_seed,
+    server_hash: commit.server_hash,
     executado_em,
   });
+}
+
+// ─── POST /api/admin/sorteio — rota antiga, aposentada ────────────────────────
+// Não apagar silenciosamente: evita 404 confuso se algo antigo ainda apontar
+// pra cá. Usava RNG só-servidor sem entrada verificável e gravava em colunas
+// que não existem mais em draw_audits (quebrava com 500) — substituída pelo
+// fluxo de 2 fases acima.
+export async function handleSorteio(_request: Request, _env: Env): Promise<Response> {
+  return Response.json(
+    { ok: false, erro: 'rota_aposentada', detalhe: 'use POST /api/admin/sorteio/iniciar e /revelar' },
+    { status: 410 }
+  );
 }

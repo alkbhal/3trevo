@@ -856,7 +856,7 @@
         <div class="card">
           <div class="card-hdr"><span class="card-titulo">Executar sorteio</span></div>
           <div class="card-body" style="padding:16px;">
-            <p style="font-size:13px;color:var(--t2);margin-bottom:14px;">Sorteio por RNG criptográfico (Web Crypto API). Requer draw com status <code>open</code>. Todas as execuções são auditadas com hash SHA-256.</p>
+            <p style="font-size:13px;color:var(--t2);margin-bottom:14px;">Sorteio por compromisso-e-revelação (commit-reveal, "Semente TT") — nem o navegador nem o servidor escolhem o resultado sozinhos. Requer draw com status <code>open</code>. Auditado com hash SHA-256.</p>
             <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
               <div class="field" style="flex:1;min-width:200px;">
                 <label>Draw ID</label>
@@ -870,8 +870,10 @@
                 <label>Testemunha 2 (opcional)</label>
                 <input type="text" id="sorteio-testemunha2" placeholder="Nome ou identificação">
               </div>
-              <button class="btn btn-p" onclick="dispararSorteio()">Sortear</button>
+              <button class="btn btn-p" id="btn-sorteio-iniciar" onclick="iniciarSorteio()">1. Iniciar sorteio</button>
+              <button class="btn btn-p" id="btn-sorteio-revelar" onclick="revelarSorteio()" disabled>2. Revelar</button>
             </div>
+            <div id="sorteio-commit-info" style="margin-top:10px;font-size:12px;color:var(--t3);"></div>
             <div id="sorteio-resultado" style="margin-top:12px;font-size:13px;"></div>
           </div>
         </div>
@@ -1782,26 +1784,70 @@ function renderSorteio(d) {
   }
 }
 
-async function dispararSorteio() {
+// Estado do compromisso em andamento — client_seed nunca é reenviado ao
+// servidor na fase 1 (só o hash); fica guardado aqui até a fase 2.
+let sorteioCommit = null;
+
+function bufferParaHex(buf) {
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function sha256HexBrowser(texto) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+  return bufferParaHex(buf);
+}
+
+async function iniciarSorteio() {
   const drawId = document.getElementById('sorteio-draw-id').value.trim();
   if (!drawId) return toast('Informe o Draw ID.', 'warn');
+  const res = document.getElementById('sorteio-resultado');
+  const info = document.getElementById('sorteio-commit-info');
+  res.textContent = '';
+  info.textContent = 'Comprometendo…';
+  try {
+    const seedBuf = new Uint8Array(16);
+    crypto.getRandomValues(seedBuf);
+    const client_seed = bufferParaHex(seedBuf);
+    const client_hash = await sha256HexBrowser(client_seed);
+
+    const r = await api('/api/admin/sorteio/iniciar', 'POST', { draw_id: drawId, client_hash });
+    const d = await r.json();
+    if (d.ok) {
+      sorteioCommit = { draw_id: drawId, client_seed, client_hash, server_hash: d.server_hash };
+      info.innerHTML = `Compromisso feito. client_hash: <code>${escapeHtml(client_hash.substring(0,16))}…</code> ·
+        server_hash: <code>${escapeHtml(d.server_hash.substring(0,16))}…</code><br>
+        Clique em "2. Revelar" pra combinar os 2 seeds e sortear.`;
+      document.getElementById('btn-sorteio-revelar').disabled = false;
+    } else {
+      info.innerHTML = `<span style="color:var(--danger)">Erro: ${escapeHtml(d.erro)}${d.detalhe ? ' — ' + escapeHtml(d.detalhe) : ''}</span>`;
+    }
+  } catch(e) { info.innerHTML = `<span style="color:var(--danger)">${escapeHtml(e.message)}</span>`; }
+}
+
+async function revelarSorteio() {
+  if (!sorteioCommit) return toast('Inicie o sorteio primeiro.', 'warn');
   const t1 = document.getElementById('sorteio-testemunha1').value.trim();
   const t2 = document.getElementById('sorteio-testemunha2').value.trim();
   const res = document.getElementById('sorteio-resultado');
-  res.textContent = 'Sorteando…';
+  res.textContent = 'Revelando…';
   try {
-    const body = { draw_id: drawId };
+    const body = { draw_id: sorteioCommit.draw_id, client_seed: sorteioCommit.client_seed };
     if (t1) body.testemunha_1 = t1;
     if (t2) body.testemunha_2 = t2;
-    const r = await api('/api/admin/sorteio', 'POST', body);
+    const r = await api('/api/admin/sorteio/revelar', 'POST', body);
     const d = await r.json();
     if (d.ok) {
       res.innerHTML = `<span style="color:var(--ok)">✓ Sorteio concluído.<br>
         Número sorteado: <strong>${escapeHtml(d.numero_sorteado)}</strong> ·
         Vencedor: <strong>${escapeHtml(d.winner_email || d.winner_user_id)}</strong><br>
         Hash SHA-256: <code>${escapeHtml((d.hash_sha256 || '').substring(0,20))}…</code> ·
-        Participantes: ${escapeHtml(d.total_participantes)}
+        Participantes: ${escapeHtml(d.total_participantes)}<br>
+        <span style="color:var(--t3);font-size:12px;">seed final: <code>${escapeHtml((d.seed||'').substring(0,16))}…</code> ·
+        client_seed: <code>${escapeHtml((d.client_seed||'').substring(0,16))}…</code> ·
+        server_seed: <code>${escapeHtml((d.server_seed||'').substring(0,16))}…</code></span>
       </span>`;
+      sorteioCommit = null;
+      document.getElementById('btn-sorteio-revelar').disabled = true;
     } else {
       res.innerHTML = `<span style="color:var(--danger)">Erro: ${escapeHtml(d.erro)}${d.detalhe ? ' — ' + escapeHtml(d.detalhe) : ''}</span>`;
     }

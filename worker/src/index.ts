@@ -22,7 +22,7 @@ import {
   handleFilaRevisao,
   handleModerar,
 } from './routes/apuracao';
-import { handleSorteio } from './routes/sorteio';
+import { handleSorteio, handleIniciarSorteio, handleRevelarSorteio } from './routes/sorteio';
 import { handleAdminUploadCapa, handleAdminUploadEpub, handleAdminUploadVideo, handlePublicCapa, handlePublicVideo } from './routes/admin-upload';
 import {
   verificarToken,
@@ -249,6 +249,14 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // ── Admin ──────────────────────────────────────────────────────────────
     if (path === '/api/admin/sorteio' && method === 'POST') {
       return handleSorteio(request, env);
+    }
+
+    if (path === '/api/admin/sorteio/iniciar' && method === 'POST') {
+      return handleIniciarSorteio(request, env);
+    }
+
+    if (path === '/api/admin/sorteio/revelar' && method === 'POST') {
+      return handleRevelarSorteio(request, env);
     }
 
     if (path === '/api/admin/fila' && method === 'GET') {

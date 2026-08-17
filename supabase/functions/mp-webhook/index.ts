@@ -296,20 +296,41 @@ async function verificarEDisparar(drawId: string, sbClient: ReturnType<typeof cr
     return;
   }
 
-  // Todos qualificados ou prazo vencido — disparar sorteio automático
-  console.log(`[DRAW] Meta atingida + todos prontos — disparando sorteio automático para ${drawId}`);
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const serviceKey  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  // Todos qualificados ou prazo vencido — pronto pra sortear. O sorteio em si
+  // (commit-reveal, "Semente TT") exige o admin no painel — nada dispara
+  // sozinho. Só avisa que está pronto.
+  console.log(`[DRAW] Meta atingida + todos prontos — rodada ${drawId} pronta pra sortear`);
+  await notificarRodadaProntaPraSortear(drawId);
+}
 
-  await fetch(`${supabaseUrl}/functions/v1/execute-draw`, {
-    method:  "POST",
-    headers: {
-      "Content-Type":    "application/json",
-      "Authorization":   `Bearer ${serviceKey}`,
-      "X-Internal-Key":  serviceKey,
-    },
-    body: JSON.stringify({ draw_id: drawId }),
-  }).catch(e => console.error("[DRAW] Erro ao chamar execute-draw:", e));
+// ── Avisa o admin que uma rodada bateu a meta e está pronta pra sortear ────
+// Sorteio em si é manual (painel admin, fluxo iniciar→revelar) — este
+// e-mail só evita que a rodada fique esquecida esperando alguém notar.
+async function notificarRodadaProntaPraSortear(drawId: string): Promise<void> {
+  if (!RESEND_API_KEY) {
+    console.warn("[EMAIL] RESEND_API_KEY não configurado — pulando aviso de rodada pronta.");
+    return;
+  }
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type":  "application/json",
+      },
+      body: JSON.stringify({
+        from:    `Editora Três Trevo <${FROM_EMAIL}>`,
+        to:      ["rogerio.kbhal@gmail.com"],
+        subject: "[Três Trevo] ✦ Rodada pronta pra sortear",
+        html: `<p>Uma rodada do Programa Cultural bateu a meta e todos os participantes já se qualificaram.</p>
+<p>Draw ID: <code>${drawId}</code></p>
+<p>Entre no painel admin e complete o sorteio (iniciar → revelar).</p>
+<p><a href="${SITE_URL}/admin.html">Painel admin →</a></p>`,
+      }),
+    });
+  } catch (e) {
+    console.error("[DRAW] Erro ao notificar rodada pronta:", e);
+  }
 }
 
 // ── Mapeia status do MP para nosso status ──────────────────

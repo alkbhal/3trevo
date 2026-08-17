@@ -6,8 +6,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SUPABASE_URL   = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_KEY    = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const SITE_URL       = Deno.env.get("SITE_URL") ?? "https://3trevo.com.br";
+const FROM_EMAIL     = Deno.env.get("FROM_EMAIL") ?? "sac@3trevo.com.br";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -164,20 +167,12 @@ serve(async (req: Request) => {
         .limit(1);
 
       if (!pendentes || pendentes.length === 0) {
-        console.log(`[VALIDATE] Último qualificado — disparando sorteio automático para ${draw_id}`);
-        const supaUrl    = Deno.env.get("SUPABASE_URL")!;
-        const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-        // Fire-and-forget
-        fetch(`${supaUrl}/functions/v1/execute-draw`, {
-          method:  "POST",
-          headers: {
-            "Content-Type":   "application/json",
-            "Authorization":  `Bearer ${serviceKey}`,
-            "X-Internal-Key": serviceKey,
-          },
-          body: JSON.stringify({ draw_id }),
-        }).catch(e => console.error("[VALIDATE] Erro ao chamar execute-draw:", e));
+        // Sorteio em si é manual (painel admin, fluxo commit-reveal
+        // iniciar→revelar) — só avisa que a rodada está pronta.
+        console.log(`[VALIDATE] Último qualificado — rodada ${draw_id} pronta pra sortear`);
+        notificarRodadaProntaPraSortear(draw_id).catch(e =>
+          console.error("[VALIDATE] Erro ao notificar rodada pronta:", e)
+        );
       }
     }
 
@@ -201,3 +196,29 @@ serve(async (req: Request) => {
     });
   }
 });
+
+// ── Avisa o admin que uma rodada bateu a meta e está pronta pra sortear ────
+// Mesmo padrão de mp-webhook/index.ts — sorteio é manual (painel admin),
+// este e-mail só evita que a rodada fique esquecida esperando alguém notar.
+async function notificarRodadaProntaPraSortear(drawId: string): Promise<void> {
+  if (!RESEND_API_KEY) {
+    console.warn("[EMAIL] RESEND_API_KEY não configurado — pulando aviso de rodada pronta.");
+    return;
+  }
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${RESEND_API_KEY}`,
+      "Content-Type":  "application/json",
+    },
+    body: JSON.stringify({
+      from:    `Editora Três Trevo <${FROM_EMAIL}>`,
+      to:      ["rogerio.kbhal@gmail.com"],
+      subject: "[Três Trevo] ✦ Rodada pronta pra sortear",
+      html: `<p>Uma rodada do Programa Cultural bateu a meta e todos os participantes já se qualificaram.</p>
+<p>Draw ID: <code>${drawId}</code></p>
+<p>Entre no painel admin e complete o sorteio (iniciar → revelar).</p>
+<p><a href="${SITE_URL}/admin.html">Painel admin →</a></p>`,
+    }),
+  });
+}
