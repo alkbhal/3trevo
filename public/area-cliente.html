@@ -1142,7 +1142,7 @@ async function carregarBiblioteca() {
 
   const { data: lib, error } = await sb
     .from('user_library')
-    .select('id, liberado_em, produto:product_id(id, slug, tipo, titulo, autor, genero, cotas, capa_url)')
+    .select('id, liberado_em, produto:product_id(id, slug, tipo, titulo, autor, genero, cotas, capa_url, arquivo_url, epub_url)')
     .eq('user_id', usuarioAtual.id)
     .order('liberado_em', { ascending: false });
 
@@ -1196,6 +1196,13 @@ async function carregarBiblioteca() {
   }).join('');
 }
 
+// A extensão real decide o formato, não a coluna — arquivo_url historicamente guarda
+// o "arquivo principal" e nem sempre é PDF (vários títulos têm só EPUB nesse campo).
+function temFormato(p, ext) {
+  const termina = (v) => (v || '').toLowerCase().endsWith('.' + ext);
+  return termina(p.arquivo_url) || termina(p.epub_url);
+}
+
 function cardEbook(p, meta, i, libId) {
   const emoji  = meta.emoji || '📖';
   const titulo = p.titulo || meta.titulo || 'Ebook';
@@ -1221,10 +1228,14 @@ function cardEbook(p, meta, i, libId) {
         <span class="ebook-cotas">${cotas} cota${cotas !== 1 ? 's' : ''}</span>
         <div style="display:flex;gap:6px;align-items:center">
           ${p.slug === 'atico' ? `<a href="ebook-atico-conteudo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(200,123,27,.12);border:1px solid rgba(200,123,27,.3);color:#7a5c1e;font-size:11px;font-weight:500;text-decoration:none;white-space:nowrap;border-radius:2px">⚡ Ler</a>` : ''}
-          <button class="btn-dl" id="dl-${p.id}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}')">
+          ${temFormato(p, 'pdf') ? `<button class="btn-dl" id="dl-${p.id}-pdf" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','pdf')">
             <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg>
             PDF
-          </button>
+          </button>` : ''}
+          ${temFormato(p, 'epub') ? `<button class="btn-dl" id="dl-${p.id}-epub" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','epub')">
+            <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg>
+            EPUB
+          </button>` : ''}
         </div>
         ${libId ? `<button onclick="event.stopPropagation();ocultarDaBiblioteca('${libId}',this)" title="Remover da biblioteca" style="background:none;border:none;cursor:pointer;color:rgba(26,26,22,.25);font-size:14px;padding:2px 4px;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(200,80,80,.7)'" onmouseout="this.style.color='rgba(26,26,22,.25)'">✕</button>` : ''}
       </div>
@@ -1232,8 +1243,9 @@ function cardEbook(p, meta, i, libId) {
   </div>`;
 }
 
-async function baixar(productId, titulo) {
-  const btn = document.getElementById('dl-' + productId);
+async function baixar(productId, titulo, formato) {
+  const btn = document.getElementById(`dl-${productId}-${formato}`);
+  const rotulo = formato.toUpperCase();
   if (btn) { btn.classList.add('carregando'); btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/><path d="M12 2v4a6 6 0 010 12v4a10 10 0 000-20z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".8s" repeatCount="indefinite"/></path></svg> Gerando…'; }
 
   try {
@@ -1247,19 +1259,23 @@ async function baixar(productId, titulo) {
       body: JSON.stringify({ product_id: productId }),
     });
     const data = await res.json();
+    const item = data?.formatos?.[formato];
 
     if (!res.ok || data.error) {
       toast(data.error || 'Erro ao gerar link de download.', 'erro');
+    } else if (!item) {
+      toast(`Formato ${rotulo} não disponível para este título.`, 'erro');
     } else {
-      window.open(data.download_url, '_blank');
-      toast(`✦ Link de "${titulo}" gerado! Expira em 72h.`);
+      window.open(item.download_url, '_blank');
+      toast(`✦ Link de "${titulo}" (${rotulo}) gerado! Expira em 72h.`);
     }
   } catch {
     toast('Erro de conexão. Tente novamente.', 'erro');
   } finally {
     if (btn) {
       btn.classList.remove('carregando');
-      btn.innerHTML = '<svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg> PDF';
+      const icone = '<svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zm-5 2h10v1.5H3V14z"/></svg>';
+      btn.innerHTML = `${icone} ${rotulo}`;
     }
   }
 }

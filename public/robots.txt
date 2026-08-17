@@ -9,9 +9,6 @@ Disallow: /public/
 
 Allow: /
 Allow: /catalogo.html
-Allow: /ebook-terceira-guerra.html
-Allow: /ebook-guia-antifalencia.html
-Allow: /ebook-justicamento.html
 Allow: /ebook-atico.html
 Allow: /escritor.html
 Allow: /premiacoes.html

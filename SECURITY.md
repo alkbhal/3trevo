@@ -81,13 +81,16 @@ git rm --cached apply_css_patch.py
 git rm --cached css-patch.css
 ```
 
-### 3.2 Desnecessários para produção (opcional)
-Os arquivos de ebook individuais podem ser mantidos se forem servidos diretamente pelo GitHub Pages, ou removidos se `checkout.html` for a única entrada:
-- `ebook-guia-antifalencia.html`
-- `ebook-justicamento.html`
-- `ebook-terceira-guerra.html`
-- `ebook-vigilante.html`
-- `ebook.html`
+### 3.2 ✅ RESOLVIDO (2026-08-16) — não era opcional, era vazamento ativo
+`ebook-guia-antifalencia.html`, `ebook-justicamento.html` e `ebook-terceira-guerra.html`
+continham link direto de download (Google Drive / placeholder) sem nenhuma autenticação,
+estavam listados em `sitemap.xml` e liberados em `robots.txt` — indexação ativa pelo Google de
+uma página que entrega o produto pago de graça. Nenhum código do fluxo real (`checkout.ts`,
+`area-cliente.html`) referenciava essas páginas — confirmado órfãs, removidas sem risco de
+regressão. Entrega real de todos os 3 títulos já passa por `area-cliente.html` →
+Edge Function `get-download` (JWT + `user_library` + URL assinada 72h), confirmado contra
+`products.arquivo_url` real no banco de produção. `ebook-vigilante.html`/`ebook.html` já não
+existiam no repo.
 
 ---
 

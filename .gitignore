@@ -9,6 +9,9 @@ admin.html
 # ── Arquivos HTML obsoletos (substituídos pelo novo fluxo) ──
 ebook.html
 
+# ── Staging local de entrega de ebooks (binários, nunca no repo) ──
+.entrega-temp/
+
 # ── Dados internos de negócio ───────────────────────────────
 config.json
 progresso.json
