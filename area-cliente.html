@@ -1336,7 +1336,7 @@ async function abrirLeitor(productId, titulo) {
 
     if (data.formatos?.epub) {
       viewer.innerHTML = '';
-      const book = ePub(data.formatos.epub.download_url);
+      const book = ePub(data.formatos.epub.download_url, { openAs: 'epub' });
       const rendition = book.renderTo('leitor-viewer', { width: '100%', height: '100%', spread: 'none' });
       rendition.display();
     } else if (data.formatos?.pdf) {
