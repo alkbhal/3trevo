@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src 'self' *.supabase.co; img-src 'self' data: blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src 'self' *.supabase.co; img-src 'self' data: blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'self' *.supabase.co; object-src 'none';">
 <title>Minha Biblioteca — Editora Três Trevo</title>
 <meta name="description" content="Acesse sua biblioteca de ebooks, músicas e acompanhe o Programa Cultural da Editora Três Trevo.">
 <meta name="robots" content="noindex">
@@ -16,6 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 <style>
 /* ══════════════════════════════════════════════════════════
    RESET & TOKENS
@@ -271,6 +273,20 @@ nav{
 .btn-dl:hover{background:var(--ouro-claro)}
 .btn-dl:disabled,.btn-dl.carregando{opacity:.5;cursor:wait;pointer-events:none}
 .btn-dl svg{flex-shrink:0}
+.btn-ler{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;background:var(--ouro);color:var(--verde);border:none;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.btn-ler:hover{background:var(--ouro-claro)}
+.btn-ler:disabled{opacity:.5;cursor:wait}
+.btn-dl-mini{background:none;border:none;color:rgba(15,45,26,.35);cursor:pointer;padding:4px;display:inline-flex;align-items:center;transition:color .2s}
+.btn-dl-mini:hover{color:var(--verde-medio)}
+
+/* ── Leitor embutido (PDF via iframe nativo, EPUB via epub.js) ── */
+#tela-leitura{display:none;position:fixed;inset:0;background:#fff;z-index:1000;flex-direction:column}
+.leitor-topo{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--verde-medio);color:#fff;flex-shrink:0}
+.leitor-titulo{font-family:'Lora',serif;font-size:16px;font-weight:400}
+.btn-leitor{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:3px;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:13px}
+.btn-leitor:hover{background:rgba(255,255,255,.25)}
+#leitor-viewer{flex:1;overflow:hidden}
+#leitor-viewer iframe{width:100%;height:100%;border:none}
 
 /* ══ CARROSSEL SECAO ══ */
 .secao-wrapper{margin-bottom:40px}
@@ -918,6 +934,15 @@ nav{
 <!-- Toast -->
 <div class="toast" id="toast" role="alert"></div>
 
+<!-- Leitor embutido -->
+<div id="tela-leitura">
+  <div class="leitor-topo">
+    <div class="leitor-titulo" id="leitor-titulo-texto">—</div>
+    <button class="btn-leitor" onclick="fecharLeitor()">✕ Fechar</button>
+  </div>
+  <div id="leitor-viewer"></div>
+</div>
+
 <script src="/js/supabase-client.js"></script>
 <script>
 // ============================================================
@@ -1237,14 +1262,12 @@ function cardEbook(p, meta, i, libId) {
         <span class="ebook-cotas">${cotas} cota${cotas !== 1 ? 's' : ''}</span>
         <div style="display:flex;gap:6px;align-items:center">
           ${p.slug === 'atico' ? `<a href="ebook-atico-conteudo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(200,123,27,.12);border:1px solid rgba(200,123,27,.3);color:#7a5c1e;font-size:11px;font-weight:500;text-decoration:none;white-space:nowrap;border-radius:2px">⚡ Ler</a>` : ''}
-          ${temFormato(p, 'pdf') ? `<button class="btn-dl" id="dl-${p.id}-pdf" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','pdf')">
-            ${iconeFormato('pdf')}
-            PDF
-          </button>` : ''}
-          ${temFormato(p, 'epub') ? `<button class="btn-dl" id="dl-${p.id}-epub" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','epub')">
+          ${(temFormato(p, 'epub') || temFormato(p, 'pdf')) ? `<button class="btn-ler" onclick="abrirLeitor('${p.id}','${titulo.replace(/'/g, "\\'")}')">
             ${iconeFormato('epub')}
-            EPUB
+            Ler agora
           </button>` : ''}
+          ${temFormato(p, 'pdf') ? `<button class="btn-dl-mini" id="dl-${p.id}-pdf" title="Baixar arquivo PDF" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','pdf')">${iconeFormato('pdf')}</button>` : ''}
+          ${temFormato(p, 'epub') ? `<button class="btn-dl-mini" id="dl-${p.id}-epub" title="Baixar arquivo EPUB" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','epub')">${iconeFormato('epub')}</button>` : ''}
         </div>
         ${libId ? `<button onclick="event.stopPropagation();ocultarDaBiblioteca('${libId}',this)" title="Remover da biblioteca" style="background:none;border:none;cursor:pointer;color:rgba(26,26,22,.25);font-size:14px;padding:2px 4px;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(200,80,80,.7)'" onmouseout="this.style.color='rgba(26,26,22,.25)'">✕</button>` : ''}
       </div>
@@ -1255,7 +1278,7 @@ function cardEbook(p, meta, i, libId) {
 async function baixar(productId, titulo, formato) {
   const btn = document.getElementById(`dl-${productId}-${formato}`);
   const rotulo = formato.toUpperCase();
-  if (btn) { btn.classList.add('carregando'); btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/><path d="M12 2v4a6 6 0 010 12v4a10 10 0 000-20z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".8s" repeatCount="indefinite"/></path></svg> Gerando…'; }
+  if (btn) { btn.classList.add('carregando'); btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/><path d="M12 2v4a6 6 0 010 12v4a10 10 0 000-20z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".8s" repeatCount="indefinite"/></path></svg>'; }
 
   try {
     const { data: { session } } = await sb.auth.getSession();
@@ -1276,17 +1299,61 @@ async function baixar(productId, titulo, formato) {
       toast(`Formato ${rotulo} não disponível para este título.`, 'erro');
     } else {
       window.open(item.download_url, '_blank');
-      toast(`✦ Link de "${titulo}" (${rotulo}) gerado! Expira em 72h.`);
+      toast(`✦ Arquivo ${rotulo} de "${titulo}" baixado (link válido por 72h).`);
     }
   } catch {
     toast('Erro de conexão. Tente novamente.', 'erro');
   } finally {
     if (btn) {
       btn.classList.remove('carregando');
-      btn.innerHTML = `${iconeFormato(formato)} ${rotulo}`;
+      btn.innerHTML = iconeFormato(formato);
     }
   }
 }
+
+// Leitor embutido — EPUB via epub.js (mesmo leitor já usado em minha-biblioteca.html),
+// PDF via iframe nativo do navegador. Prefere EPUB quando os dois formatos existem
+// (texto reflui, melhor em qualquer tamanho de tela).
+async function abrirLeitor(productId, titulo) {
+  document.getElementById('tela-leitura').style.display = 'flex';
+  document.getElementById('leitor-titulo-texto').textContent = titulo;
+  const viewer = document.getElementById('leitor-viewer');
+  viewer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999">Carregando…</div>';
+
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(`${EDGE_BASE}/get-download`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body: JSON.stringify({ product_id: productId }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      viewer.innerHTML = `<div style="padding:40px;color:#999">${data.error || 'Erro ao abrir leitura.'}</div>`;
+      return;
+    }
+
+    if (data.formatos?.epub) {
+      viewer.innerHTML = '';
+      const book = ePub(data.formatos.epub.download_url);
+      const rendition = book.renderTo('leitor-viewer', { width: '100%', height: '100%', spread: 'none' });
+      rendition.display();
+    } else if (data.formatos?.pdf) {
+      viewer.innerHTML = `<iframe src="${data.formatos.pdf.download_url}"></iframe>`;
+    } else {
+      viewer.innerHTML = '<div style="padding:40px;color:#999">Nenhum formato disponível pra leitura.</div>';
+    }
+  } catch {
+    viewer.innerHTML = '<div style="padding:40px;color:#999">Erro de conexão.</div>';
+  }
+}
+
+function fecharLeitor() {
+  document.getElementById('tela-leitura').style.display = 'none';
+  document.getElementById('leitor-viewer').innerHTML = '';
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharLeitor(); });
 
 // ══════════════════════════════════════════════════════════
 // MÚSICAS
