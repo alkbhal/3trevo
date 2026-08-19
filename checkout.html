@@ -220,6 +220,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 <script>
 const WORKER = 'https://tres-trevo-api.al-kbhal.workers.dev';
 let produtoSlug = null;
+let produtoIndisponivel = false;
 
 // ── INIT ─────────────────────────────────────────────────
 async function init() {
@@ -245,12 +246,19 @@ async function init() {
 
 // ── PRODUTO ───────────────────────────────────────────────
 async function carregarPorSlug(slug) {
+  let consultaFalhou = false;
   try {
-    const { data } = await sb.from('catalogo').select('*').eq('slug', slug).eq('ativo', true).limit(1);
+    const { data, error } = await sb.from('catalogo').select('*').eq('slug', slug).eq('ativo', true).limit(1);
+    if (error) throw error;
     if (data && data.length > 0) { renderProduto(data[0]); return; }
-  } catch (e) { console.warn('Supabase catalogo:', e); }
+    mostrarIndisponivel();
+    return;
+  } catch (e) {
+    console.warn('Supabase catalogo:', e);
+    consultaFalhou = true;
+  }
 
-  const local = CATALOGO[slug] || (window.CATALOGO_LIVE && window.CATALOGO_LIVE[slug]);
+  const local = consultaFalhou ? CATALOGO[slug] : null;
   if (local) {
     document.getElementById('prodGenero').textContent = local.genero || '';
     document.getElementById('prodTitulo').textContent = local.titulo;
@@ -261,8 +269,19 @@ async function carregarPorSlug(slug) {
     return;
   }
 
-  mostrarAlerta('Produto não encontrado. Redirecionando ao catálogo...', 'erro');
-  setTimeout(function() { window.location.href = '/#catalogo'; }, 3000);
+  mostrarIndisponivel();
+}
+
+function mostrarIndisponivel() {
+  document.getElementById('prodGenero').textContent = '';
+  document.getElementById('prodTitulo').textContent = 'Produto indisponível';
+  document.getElementById('prodAutor').textContent  = '';
+  document.getElementById('prodDesc').textContent   = '';
+  document.getElementById('prodCotas').textContent  = '—';
+  document.getElementById('prodPreco').textContent  = '—';
+  produtoIndisponivel = true;
+  document.getElementById('btnPagar').disabled = true;
+  mostrarAlerta('Este título não está disponível no momento. Volte ao catálogo para ver as opções ativas.', 'erro');
 }
 
 function renderProduto(p) {
@@ -280,7 +299,7 @@ function validarFormulario() {
   const email = document.getElementById('emailInput').value.trim();
   const nome  = document.getElementById('nomeInput').value.trim();
   const ok    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && nome.length >= 2;
-  document.getElementById('btnPagar').disabled = !ok;
+  document.getElementById('btnPagar').disabled = !ok || produtoIndisponivel;
 }
 
 // ── PAGAMENTO VIA MERCADO PAGO (PIX + CARTÃO) ────────────
