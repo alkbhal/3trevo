@@ -425,11 +425,29 @@ CREATE TABLE IF NOT EXISTS musicas (
 ALTER TABLE musicas ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Musicas publicas leitura" ON musicas
   FOR SELECT USING (ativo = true);
-CREATE POLICY "Admin gerencia musicas" ON musicas
-  FOR ALL USING (EXISTS (
-    SELECT 1 FROM admin_users a
-    WHERE a.email = auth.email() AND a.role = ANY (ARRAY['gestor','design']) AND a.ativo
-  ));
+-- "Admin gerencia musicas" (client-side, via admin_users) removida em 19/08 -- disparava recursao
+-- infinita ja existente na propria RLS de admin_users. Gestao de musicas e so via SUPABASE_SERVICE_KEY
+-- no worker (bypassa RLS), igual catalogo/products -- nunca precisou de policy client-side de escrita.
+
+-- ── FEATURE UNLOCKS (barra de progresso publica, desbloqueio sequencial Frente 1->2->3) ──
+-- Schema pronto, SEM incremento automatico ligado ainda -- decisao pendente: (1) meta_valor real de
+-- negocio pra proxima fase (2) onde plugar o incremento (registrar_compra_mp e o RPC do pagamento
+-- real ao vivo hoje, NAO tem incremento de meta nenhum -- draws.meta_atual so incrementa numa Edge
+-- Function ja confirmada dormente, mp-webhook/process-payment, nao usada pelo checkout real).
+CREATE TABLE IF NOT EXISTS feature_unlocks (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome          text NOT NULL,
+  descricao     text,
+  meta_valor    numeric(10,2) NOT NULL,
+  meta_atual    numeric(10,2) NOT NULL DEFAULT 0,
+  desbloqueado  boolean NOT NULL DEFAULT false,
+  ordem         int DEFAULT 0,
+  criado_em     timestamptz DEFAULT now()
+);
+
+ALTER TABLE feature_unlocks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "feature_unlocks: public read" ON feature_unlocks
+  FOR SELECT USING (true);
 
 -- ── DEPOIMENTOS ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS depoimentos (
