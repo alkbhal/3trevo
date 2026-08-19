@@ -1057,9 +1057,13 @@
         </div>
         <div class="field" style="align-items:flex-start;justify-content:flex-end;padding-top:20px;">
           <div class="toggle-row">
-            <label class="toggle"><input type="checkbox" id="livro-ativo" checked><span class="toggle-slider"></span></label>
+            <label class="toggle"><input type="checkbox" id="livro-ativo" checked onchange="atualizarMotivoInativoVisivel()"><span class="toggle-slider"></span></label>
             <span style="font-size:13px;color:var(--t1)">Ativo (visível no site)</span>
           </div>
+        </div>
+        <div class="field" id="livro-motivo-inativo-row" style="display:none;">
+          <label>Motivo da inativação <span style="font-weight:400;color:var(--t3)">(interno, nunca exposto no site)</span></label>
+          <input type="text" id="livro-motivo-inativo" placeholder="ex: EPUB corrompido, aguardando revisão editorial">
         </div>
       </div>
     </div>
@@ -1319,7 +1323,7 @@ function renderTabelaCatalogo(livros) {
       <td>R$${parseFloat(l.preco||0).toFixed(2)}</td>
       <td>${l.cotas} cota${l.cotas>1?'s':''}</td>
       <td><span style="font-size:11px;color:var(--t3);">${escapeHtml(l.utm_campaign||l.slug||'—')}</span></td>
-      <td><span class="badge ${l.ativo?'badge-ok':'badge-cinza'}">${l.ativo?'Ativo':'Inativo'}</span></td>
+      <td><span class="badge ${l.ativo?'badge-ok':'badge-cinza'}"${!l.ativo && l.motivo_inativo ? ` title="${escapeHtml(l.motivo_inativo)}"` : ''}>${l.ativo?'Ativo':'Inativo'}</span></td>
       <td style="text-align:right;">
         <button class="btn btn-icon btn-sm" onclick="abrirModalLivro('${l.slug}')" title="Editar">✎</button>
       </td>
@@ -1352,6 +1356,8 @@ function abrirModalLivro(slug) {
   document.getElementById('livro-accent-txt').value = livro?.accent_color || '#7ab88a';
   document.getElementById('livro-utm').value = livro?.utm_campaign || '';
   document.getElementById('livro-ativo').checked = livro?.ativo !== false;
+  document.getElementById('livro-motivo-inativo').value = livro?.motivo_inativo || '';
+  atualizarMotivoInativoVisivel();
   document.getElementById('btn-deletar-livro').style.display = livro ? '' : 'none';
   // Capa
   const capaUrl = livro?.capa_url || '';
@@ -1367,6 +1373,11 @@ function abrirModalLivro(slug) {
   document.getElementById('livro-accent-color').oninput = e => document.getElementById('livro-accent-txt').value = e.target.value;
   document.getElementById('livro-accent-txt').oninput = e => { document.getElementById('livro-accent-color').value = e.target.value; };
   document.getElementById('modal-livro').classList.add('open');
+}
+
+function atualizarMotivoInativoVisivel() {
+  const ativo = document.getElementById('livro-ativo').checked;
+  document.getElementById('livro-motivo-inativo-row').style.display = ativo ? 'none' : '';
 }
 
 function selecionarCor(hex, chip) {
@@ -1402,6 +1413,7 @@ async function salvarLivro() {
     capa_url: document.getElementById('livro-capa-url').value.trim() || null,
     ordem: parseInt(document.getElementById('livro-ordem').value) || 99,
     ativo: document.getElementById('livro-ativo').checked,
+    motivo_inativo: document.getElementById('livro-motivo-inativo').value.trim() || null,
   };
   try {
     const r = slugOriginal
