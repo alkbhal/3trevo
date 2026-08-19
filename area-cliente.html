@@ -908,6 +908,7 @@ nav{
 <div id="tela-leitura">
   <div class="leitor-topo">
     <div class="leitor-titulo" id="leitor-titulo-texto">—</div>
+    <button class="btn-leitor" id="btn-trilha-livro" onclick="tocarTrilhaLivro()" style="display:none">🎵 Ouvir trilha</button>
     <button class="btn-leitor" onclick="fecharLeitor()">✕ Fechar</button>
   </div>
   <div id="leitor-viewer"></div>
@@ -1269,11 +1270,21 @@ async function baixar(productId, titulo, formato) {
 // Leitor embutido — EPUB via epub.js (mesmo leitor já usado em minha-biblioteca.html),
 // PDF via iframe nativo do navegador. Prefere EPUB quando os dois formatos existem
 // (texto reflui, melhor em qualquer tamanho de tela).
+let trilhaLivroId = null;
+
 async function abrirLeitor(productId, titulo) {
   document.getElementById('tela-leitura').style.display = 'flex';
   document.getElementById('leitor-titulo-texto').textContent = titulo;
   const viewer = document.getElementById('leitor-viewer');
   viewer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999">Carregando…</div>';
+
+  trilhaLivroId = null;
+  const btnTrilha = document.getElementById('btn-trilha-livro');
+  btnTrilha.style.display = 'none';
+  sb.from('musicas').select('id').eq('produto_id', productId).eq('ativo', true).limit(1)
+    .then(({ data }) => {
+      if (data && data[0]) { trilhaLivroId = data[0].id; btnTrilha.style.display = ''; }
+    });
 
   try {
     const { data: { session } } = await sb.auth.getSession();
@@ -1313,6 +1324,10 @@ async function abrirLeitor(productId, titulo) {
   } catch {
     viewer.innerHTML = '<div style="padding:40px;color:#999">Erro de conexão.</div>';
   }
+}
+
+function tocarTrilhaLivro() {
+  if (trilhaLivroId && window.TTPlayer) TTPlayer.play(trilhaLivroId);
 }
 
 function fecharLeitor() {
