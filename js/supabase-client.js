@@ -10,6 +10,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 // Expose for other scripts (player.js, etc.) — single source of truth
 window.SUPABASE_URL  = SUPABASE_URL;
 window.SUPABASE_ANON = SUPABASE_ANON;
+window.sb             = sb;
 
 // URL base das Edge Functions
 const EDGE_BASE = `${SUPABASE_URL}/functions/v1`;
