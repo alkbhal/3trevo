@@ -1235,7 +1235,11 @@ async function carregarBiblioteca() {
 
   // Se só um gênero ou poucos itens, usar grid direto
   if (ebooks.length <= 6) {
-    cont.innerHTML = `<div class="biblioteca-grid">${ebooks.map(({ l, p, meta }, i) => cardEbook(p, meta, i, l.id)).join('')}</div>`;
+    cont.innerHTML = `<div class="biblioteca-grid">${ebooks.map((l, i) => {
+      const p = l.produto || {};
+      const meta = CATALOGO[p.slug] || {};
+      return cardEbook(p, meta, i, l.id);
+    }).join('')}</div>`;
     return;
   }
 
