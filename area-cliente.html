@@ -1375,7 +1375,18 @@ async function abrirLeitor(productId, titulo) {
       viewer.innerHTML = '';
       const book = ePub(data.formatos.epub.download_url, { openAs: 'epub' });
       const rendition = book.renderTo('leitor-viewer', { width: '100%', height: '100%', flow: 'scrolled-doc' });
-      rendition.display();
+      book.ready.then(() => {
+        // O sumario/nav.xhtml costuma ser o item 0 do spine (padrao do Ebook-lib) -- sem isso,
+        // "Ler agora" abre numa lista de links em vez do texto do livro. Pula pro proximo item real.
+        try {
+          const manifest = book.packaging?.manifest || {};
+          const navHref = Object.values(manifest).find(m => (m.properties || '').includes('nav'))?.href;
+          const primeiro = book.spine.items.find(i => i.linear !== 'no' && i.href !== navHref);
+          rendition.display(primeiro ? primeiro.href : undefined);
+        } catch {
+          rendition.display();
+        }
+      });
     } else if (data.formatos?.pdf) {
       viewer.innerHTML = `<iframe src="${data.formatos.pdf.download_url}"></iframe>`;
     } else {
