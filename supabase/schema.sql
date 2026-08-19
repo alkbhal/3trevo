@@ -402,6 +402,35 @@ ALTER TABLE catalogo ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "catalogo: public read" ON catalogo
   FOR SELECT USING (true);
 
+-- ── MUSICAS (biblioteca de audio -- Frente 1, bundle musica) ───
+-- Formalizado aqui em 19/08/2026, tabela ja existia no banco live (drift).
+CREATE TABLE IF NOT EXISTS musicas (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  titulo        text NOT NULL,
+  artista       text DEFAULT 'Said Anes',
+  genero        text,
+  universo_slug text,
+  produto_id    uuid REFERENCES products(id),
+  arquivo_url   text NOT NULL,
+  capa_url      text,
+  bg_color      text DEFAULT '#0f2d1a',
+  duracao       int,
+  descricao     text,
+  gratuita      boolean DEFAULT false,
+  ativo         boolean DEFAULT true,
+  ordem         int DEFAULT 0,
+  criado_em     timestamptz DEFAULT now()
+);
+
+ALTER TABLE musicas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Musicas publicas leitura" ON musicas
+  FOR SELECT USING (ativo = true);
+CREATE POLICY "Admin gerencia musicas" ON musicas
+  FOR ALL USING (EXISTS (
+    SELECT 1 FROM admin_users a
+    WHERE a.email = auth.email() AND a.role = ANY (ARRAY['gestor','design']) AND a.ativo
+  ));
+
 -- ── DEPOIMENTOS ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS depoimentos (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
