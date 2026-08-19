@@ -394,6 +394,7 @@ CREATE TABLE IF NOT EXISTS catalogo (
   capa_url      text,
   ordem         int DEFAULT 0,
   ativo         boolean DEFAULT true,
+  motivo_inativo text,  -- por que esta oculto do catalogo publico (visivel so no admin)
   criado_em     timestamptz DEFAULT now()
 );
 
