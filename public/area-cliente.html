@@ -1140,9 +1140,9 @@ function trocarAba(id, btn) {
 
 // ── STATS ─────────────────────────────────────────────────
 async function carregarStats() {
-  const [libRes, cotasRes, subRes] = await Promise.all([
+  const [libRes, cotasRes, subRes, musicasRes] = await Promise.all([
     sb.from('user_library')
-      .select('id, product_id, produto:product_id(tipo)')
+      .select('id, product_id')
       .eq('user_id', usuarioAtual.id),
     sb.from('draw_entries')
       .select('cotas_base, cotas_bonus')
@@ -1152,11 +1152,15 @@ async function carregarStats() {
       .eq('user_id', usuarioAtual.id)
       .eq('status', 'active')
       .limit(1),
+    sb.from('musicas')
+      .select('id, produto_id, gratuita')
+      .eq('ativo', true),
   ]);
 
   const lib     = libRes.data  || [];
-  const ebooks  = lib.filter(l => l.produto?.tipo !== 'musica').length;
-  const musicas = lib.filter(l => l.produto?.tipo === 'musica').length;
+  const ebooks  = lib.length;
+  const libProductIds = new Set(lib.map(l => l.product_id));
+  const musicas = (musicasRes.data || []).filter(m => m.gratuita || (m.produto_id && libProductIds.has(m.produto_id))).length;
   const cotas   = (cotasRes.data || []).reduce((s, e) => s + (e.cotas_base || 0) + (e.cotas_bonus || 0), 0);
   const hasSub  = (subRes.data  || []).length > 0;
 
@@ -1196,7 +1200,7 @@ async function carregarBiblioteca() {
     return;
   }
 
-  const ebooks = (lib || []).filter(l => l.produto?.tipo !== 'musica');
+  const ebooks = lib || [];
 
   if (ebooks.length === 0) {
     cont.innerHTML = `<div class="vazio">
@@ -1382,36 +1386,33 @@ async function carregarMusicas() {
   const cont = document.getElementById('listaMusicas');
   cont.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>`;
 
-  const { data: lib } = await sb
-    .from('user_library')
-    .select('id, produto:product_id(id, titulo, autor, arquivo_url, duracao_seg, capa_url)')
-    .eq('user_id', usuarioAtual.id)
-    .eq('produto.tipo', 'musica');
+  const { data: todasMusicas } = await sb.from('musicas').select('*').eq('ativo', true).order('ordem');
+  const { data: lib } = await sb.from('user_library').select('product_id').eq('user_id', usuarioAtual.id);
+  const userLibrary = new Set((lib || []).map(l => l.product_id));
 
-  const musicas = (lib || []).filter(l => l.produto?.id);
+  const musicas = (todasMusicas || []).filter(m => m.gratuita || (m.produto_id && userLibrary.has(m.produto_id)));
 
   playlist = musicas
-    .filter(l => l.produto?.arquivo_url)
-    .map(l => ({
-      titulo:  l.produto.titulo   || 'Faixa',
-      artista: l.produto.autor    || 'Três Trevo',
-      url:     l.produto.arquivo_url,
+    .filter(m => m.arquivo_url)
+    .map(m => ({
+      titulo:  m.titulo  || 'Faixa',
+      artista: m.artista || 'Três Trevo',
+      url:     m.arquivo_url,
       emoji:   '🎵',
-      dur:     l.produto.duracao_seg || 0,
+      dur:     m.duracao || 0,
     }));
 
   if (musicas.length === 0) {
     cont.innerHTML = `<div class="vazio">
       <div class="vazio-icone">🎵</div>
       <div class="vazio-titulo">Nenhuma música ainda</div>
-      <p class="vazio-texto">Músicas são liberadas com assinatura ativa<br>ou adquiridas individualmente.</p>
+      <p class="vazio-texto">Músicas gratuitas ou desbloqueadas ao comprar o ebook relacionado<br>aparecem aqui.</p>
     </div>`;
     return;
   }
 
-  cont.innerHTML = `<div class="musicas-lista">${musicas.map((l, i) => {
-    const p = l.produto;
-    const semAudio = !p.arquivo_url;
+  cont.innerHTML = `<div class="musicas-lista">${musicas.map((m, i) => {
+    const semAudio = !m.arquivo_url;
     return `<div class="musica-row${faixaAtual === i ? ' tocando' : ''}" id="mrow-${i}"
       onclick="${semAudio ? '' : `tocarFaixa(${i})`}"
       style="${semAudio ? 'opacity:.4;cursor:default' : ''}">
@@ -1419,14 +1420,14 @@ async function carregarMusicas() {
       <div class="musica-equalizador" aria-hidden="true">
         <span></span><span></span><span></span>
       </div>
-      <button class="musica-btn-play" aria-label="${semAudio ? 'Indisponível' : 'Tocar ' + p.titulo}" ${semAudio ? 'disabled' : ''}>
+      <button class="musica-btn-play" aria-label="${semAudio ? 'Indisponível' : 'Tocar ' + m.titulo}" ${semAudio ? 'disabled' : ''}>
         <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
       </button>
       <div>
-        <div class="musica-nome">${p.titulo || 'Faixa'}</div>
-        <div class="musica-sub">${p.autor || 'Três Trevo'}${semAudio ? ' · indisponível' : ''}</div>
+        <div class="musica-nome">${m.titulo || 'Faixa'}</div>
+        <div class="musica-sub">${m.artista || 'Três Trevo'}${semAudio ? ' · indisponível' : ''}</div>
       </div>
-      <div class="musica-dur">${p.duracao_seg ? fmtTempo(p.duracao_seg) : '—'}</div>
+      <div class="musica-dur">${m.duracao ? fmtTempo(m.duracao) : '—'}</div>
     </div>`;
   }).join('')}</div>`;
 }
