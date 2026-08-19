@@ -64,7 +64,7 @@ export async function handleAdminCatalogoGet(request: Request, env: Env): Promis
   try {
     const r = await sb(
       env,
-      'catalogo?order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem,ativo'
+      'catalogo?order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem,ativo,motivo_inativo'
     );
     if (!r.ok) {
       const err = await r.text();
@@ -108,6 +108,7 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
       capa_url: body.capa_url ?? null,
       ordem: body.ordem ?? 99,
       ativo: body.ativo !== false,
+      motivo_inativo: body.motivo_inativo ?? null,
     }),
   });
 
@@ -139,7 +140,7 @@ export async function handleAdminCatalogoUpdate(request: Request, env: Env, slug
   const allowed = [
     'titulo','titulo_en','titulo_es','descricao','descricao_en','descricao_es',
     'genero','genero_pt','genero_en','genero_es','autor','preco','cotas',
-    'utm_campaign','bg_color','capa_url','ordem','ativo','slug',
+    'utm_campaign','bg_color','capa_url','ordem','ativo','slug','motivo_inativo',
   ];
   for (const k of allowed) { if (k in body) updates[k] = body[k]; }
 
