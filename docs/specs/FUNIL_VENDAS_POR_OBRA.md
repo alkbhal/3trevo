@@ -122,6 +122,21 @@ num "banco de referência" (coluna nova no banco, ainda não criada) — degusta
 dor, capítulos, bônus, todos por obra. Mudar a estrutura da página = editar o template uma vez,
 não centenas de arquivos.
 
+### 4.1 Regra permanente — landing dedicada é requisito de publicação (decisão do Rogério, 19/08/2026)
+
+**A partir de agora, todo título ganha página de venda própria (`obra/*.html` ou o que a
+arquitetura da Fase 3 vier a substituir) — não é mais opcional nem "quando der tempo".** Isso vira
+requisito de contrato: um título não é considerado pronto pra vender só por existir em `catalogo` +
+`products` com arquivo válido (as 3 condições já registradas em `project_3trevo.md`) — falta a
+landing dedicada como 4ª condição.
+
+**Agenda:** hoje só 2 dos títulos ativos têm página própria (`antifalencia`, `justicamento`); todos
+os outros (`3a-guerra`, `livre-das-dividas`, `isa-isma-tintim`, mais qualquer um reativado — ex.
+`ultima-coisa`) ficam pendentes de landing até a Fase 3 (casco por título + template compartilhado,
+seção 4 acima) ser construída. Não criar página completa à mão por título daqui pra frente (não
+escala) — a prioridade real passa a ser terminar a Fase 3 antes de qualquer novo título entrar em
+catálogo, pra que "criar título" já inclua "gerar landing" pelo mesmo processo.
+
 ## 5. Peças que já existem no sistema mas estão desconectadas
 
 Achado relevante pra quem for analisar conversão: várias peças de um funil mais forte já existem
