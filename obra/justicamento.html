@@ -242,23 +242,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   <div class="obra-outros-inner">
     <div class="sec-label">Série 1 — Literatura & Ideias</div>
     <h2 class="sec-titulo reveal">Outros títulos do catálogo</h2>
-    <div class="outros-grid">
-      <article class="outro-card" onclick="location.href='/obra/atico.html'" role="link" tabindex="0">
-        <div class="outro-genero">Finanças · Método</div>
-        <h3 class="outro-titulo">Antes do App, o Método</h3>
-        <div class="outro-preco">R$37,00</div>
-      </article>
-      <article class="outro-card" onclick="location.href='/obra/terceiraguerra.html'" role="link" tabindex="0">
-        <div class="outro-genero">Ficção Documental · Premium</div>
-        <h3 class="outro-titulo">O Nascimento Silencioso da 3ª Guerra Mundial</h3>
-        <div class="outro-preco">R$76,74</div>
-      </article>
-      <article class="outro-card" onclick="location.href='/obra/antifalencia.html'" role="link" tabindex="0">
-        <div class="outro-genero">Manual Prático · Intermediário</div>
-        <h3 class="outro-titulo">O Guia Antifalência do Empreendedor Iniciante</h3>
-        <div class="outro-preco">R$46,04</div>
-      </article>
-    </div>
+    <div class="outros-grid" id="outrosGrid"></div>
     <div style="text-align:center;margin-top:32px">
       <a href="/catalogo.html" style="font-size:13px;color:var(--ouro-texto);text-decoration:underline;text-underline-offset:3px">Ver catálogo completo →</a>
     </div>
@@ -292,7 +276,18 @@ document.addEventListener('DOMContentLoaded',function(){
   var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visivel');});},{threshold:0.1});
   document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
   setTimeout(function(){document.querySelectorAll('.obra-hero .reveal').forEach(function(el){el.classList.add('visivel');});},80);
-  (function(){var SB='https://xfkepekffdyrtcgagwqo.supabase.co';var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';fetch(SB+'/rest/v1/catalogo?slug=eq.justicamento&select=preco',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(function(r){return r.ok?r.json():null;}).then(function(data){if(Array.isArray(data)&&data[0]){var el=document.getElementById('preco-justicamento');if(el)el.textContent='R$'+Number(data[0].preco).toFixed(2).replace('.',',');}}).catch(function(){});})();
+  (function(){var SB='https://xfkepekffdyrtcgagwqo.supabase.co';var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';var SLUG='justicamento';
+    fetch(SB+'/rest/v1/catalogo?slug=eq.'+SLUG+'&select=preco',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(function(r){return r.ok?r.json():null;}).then(function(data){if(Array.isArray(data)&&data[0]){var el=document.getElementById('preco-justicamento');if(el)el.textContent='R$'+Number(data[0].preco).toFixed(2).replace('.',',');}}).catch(function(){});
+    fetch(SB+'/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,genero,genero_pt,preco',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(function(r){return r.ok?r.json():[];}).then(function(rows){
+      var grid=document.getElementById('outrosGrid');if(!grid||!Array.isArray(rows))return;
+      var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+      var outros=rows.filter(function(o){return o.slug!==SLUG;}).slice(0,3);
+      grid.innerHTML=outros.map(function(o){
+        var preco='R$'+Number(o.preco).toFixed(2).replace('.',',');
+        return '<article class="outro-card" onclick="location.href=\'/checkout.html?slug='+o.slug+'\'" role="link" tabindex="0"><div class="outro-genero">'+esc(o.genero_pt||o.genero)+'</div><h3 class="outro-titulo">'+esc(o.titulo)+'</h3><div class="outro-preco">'+preco+'</div></article>';
+      }).join('');
+    }).catch(function(){});
+  })();
 });
 </script>
 </body>
