@@ -28,6 +28,36 @@ export async function verificarToken(request: Request, env: Env): Promise<boolea
 }
 
 
+// ─── Espelhar catalogo → products (fonte de verdade é catalogo; products é o que
+//     registrar_compra_mp exige pra liberar a compra após pagamento aprovado) ────
+async function mirrorParaProducts(env: Env, slug: string, campos: Record<string, any>): Promise<void> {
+  const permitido: Record<string, any> = {};
+  for (const k of ['slug', 'titulo', 'autor', 'preco', 'cotas', 'ativo']) {
+    if (k in campos) permitido[k] = campos[k];
+  }
+  if (!Object.keys(permitido).length) return;
+
+  try {
+    const rPatch = await sb(env, `products?slug=eq.${encodeURIComponent(slug)}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=representation' } as any,
+      body: JSON.stringify(permitido),
+    });
+    const linhas = rPatch.ok ? await rPatch.json().catch(() => []) : [];
+    if (Array.isArray(linhas) && linhas.length > 0) return; // já existia, sincronizado
+
+    // Nunca existiu em products — só cria se tiver os campos obrigatórios (titulo, preco)
+    if (!('titulo' in permitido) || !('preco' in permitido)) return;
+    await sb(env, 'products', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates,return=minimal' } as any,
+      body: JSON.stringify({ slug, cotas: 0, autor: 'Said Anes', ...permitido }),
+    });
+  } catch (err) {
+    console.error('[admin-catalogo] mirror pra products falhou:', slug, err);
+  }
+}
+
 // ─── Listar todos (admin — inclui inativos) ───────────────────────────────────
 export async function handleAdminCatalogoGet(request: Request, env: Env): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
@@ -86,6 +116,15 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
     return Response.json({ ok: false, erro: (err as any).message ?? 'supabase_error' }, { status: 400 });
   }
 
+  await mirrorParaProducts(env, body.slug, {
+    slug: body.slug,
+    titulo: body.titulo,
+    autor: body.autor ?? 'Said Anes',
+    preco: body.preco ?? 0,
+    cotas: body.cotas ?? 1,
+    ativo: body.ativo !== false,
+  });
+
   return Response.json({ ok: true });
 }
 
@@ -115,32 +154,11 @@ export async function handleAdminCatalogoUpdate(request: Request, env: Env, slug
     return Response.json({ ok: false, erro: (err as any).message ?? 'supabase_error' }, { status: 400 });
   }
 
+  // usa o slug da ROTA (identificador atual) pra achar a linha em products — se `updates.slug`
+  // for uma renomeação, mirrorParaProducts já inclui o campo no PATCH e renomeia junto
+  await mirrorParaProducts(env, slug, updates);
+
   return Response.json({ ok: true });
-}
-
-// ─── Sync products (atualiza arquivo_url, autor, titulo na tabela products) ──
-export async function handleAdminProductsSync(request: Request, env: Env): Promise<Response> {
-  if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
-  let body: any;
-  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
-
-  const { updates } = body;
-  if (!Array.isArray(updates)) return Response.json({ ok: false, erro: 'updates deve ser array' }, { status: 400 });
-
-  const results: any[] = [];
-  for (const u of updates) {
-    if (!u.slug) continue;
-    const fields: Record<string, any> = {};
-    for (const k of ['titulo', 'autor', 'preco', 'cotas', 'ativo', 'arquivo_url']) {
-      if (k in u) fields[k] = u[k];
-    }
-    const r = await sb(env, `products?slug=eq.${encodeURIComponent(u.slug)}`, {
-      method: 'PATCH',
-      body: JSON.stringify(fields),
-    });
-    results.push({ slug: u.slug, ok: r.ok, status: r.status });
-  }
-  return Response.json({ ok: true, results });
 }
 
 // ─── Patch catalogo direto (corrige encoding, autor) ─────────────────────────
@@ -197,5 +215,8 @@ export async function handleAdminCatalogoDelete(request: Request, env: Env, slug
   });
 
   if (!r.ok) return Response.json({ ok: false, erro: 'supabase_error' }, { status: 400 });
+
+  await mirrorParaProducts(env, slug, { ativo: false });
+
   return Response.json({ ok: true });
 }

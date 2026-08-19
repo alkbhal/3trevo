@@ -30,7 +30,6 @@ import {
   handleAdminCatalogoCreate,
   handleAdminCatalogoUpdate,
   handleAdminCatalogoDelete,
-  handleAdminProductsSync,
   handleAdminCatalogoPatch,
   handleAdminTableInsert,
 } from './routes/admin-catalog';
@@ -318,9 +317,6 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleAdminCatalogoDelete(request, env, slug);
     }
 
-    if (path === '/api/admin/products/sync' && method === 'POST') {
-      return handleAdminProductsSync(request, env);
-    }
     if (path === '/api/admin/catalogo/patch' && method === 'POST') {
       return handleAdminCatalogoPatch(request, env);
     }
