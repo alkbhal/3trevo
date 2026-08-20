@@ -336,9 +336,53 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           }
           requestAnimationFrame(function(){ card.classList.add('visivel'); });
         });
+
+        // Faixa é sobre a LINHA de produto (intervalo de preço), não um preço único --
+        // um título específico não define a faixa, o intervalo de preço define quantos
+        // títulos diferentes cabem nela. Cota já vem computada pelo servidor
+        // (cotasPorPreco em admin-catalog.ts), reaproveitada aqui como fonte única de
+        // verdade -- não recalculada a partir do preço de novo.
+        var FAIXAS = [
+          { tag:'Faixa Entrada', nome:'Ponto de partida', cotas:1, faixaTxt:'até R$20',
+            cotasTxt:'1 cota',
+            desc:'Acesso ao Programa Cultural com participação em todas as 6 rodadas da série. Ideal para quem quer começar e conhecer a editora.' },
+          { tag:'Faixa Intermediária', nome:'Custo-benefício', cotas:3, faixaTxt:'R$20 a R$30',
+            cotasTxt:'3 cotas',
+            desc:'3 cotas por título (cota base da faixa). Cada cota vale independentemente nas 6 rodadas — seu peso cresce conforme o prêmio aumenta.' },
+          { tag:'Faixa Premium', nome:'Máxima elegibilidade', cotas:10, faixaTxt:'acima de R$30',
+            cotasTxt:'10 cotas', destaque:true,
+            desc:'10 cotas por título (cota base da faixa) — a maior elegibilidade possível. Para leitores que levam a sério sua participação na série.' },
+        ];
+        var faixasGrid = document.getElementById('faixasGrid');
+        if (faixasGrid) {
+          faixasGrid.innerHTML = FAIXAS.map(function(f, i) {
+            var titulosFaixa = livros.filter(function(l) { return l.cotas === f.cotas; });
+            var listaHtml = titulosFaixa.length
+              ? titulosFaixa.map(function(l) { return '— ' + l.titulo; }).join('<br>')
+              : 'Nenhum título ativo nesta faixa no momento.';
+            var precoMin = titulosFaixa.length ? Math.min.apply(null, titulosFaixa.map(function(l) { return Number(l.preco); })) : null;
+            var cta = titulosFaixa.length
+              ? '<a href="/checkout.html?slug=' + titulosFaixa[0].slug + '" class="faixa-btn">A partir de R$' + precoMin.toFixed(2).replace('.', ',') + '</a>'
+              : '<a href="/catalogo.html" class="faixa-btn" style="opacity:.5;pointer-events:none">Indisponível</a>';
+            return '<div class="faixa-card' + (f.destaque ? ' destaque' : '') + ' reveal" style="transition-delay:' + (i * 0.1) + 's">' +
+              '<div class="faixa-tag">' + f.tag + '</div>' +
+              '<div class="faixa-preco">' + f.faixaTxt + '</div>' +
+              '<div class="faixa-cotas">' + f.cotasTxt + '</div>' +
+              '<div class="faixa-nome">' + f.nome + '</div>' +
+              '<p class="faixa-desc">' + f.desc + '</p>' +
+              '<div class="faixa-obras">Títulos disponíveis:<br>' + listaHtml + '</div>' +
+              cta +
+            '</div>';
+          }).join('');
+          requestAnimationFrame(function() {
+            faixasGrid.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visivel'); });
+          });
+        }
       })
       .catch(function(){
         grid.innerHTML = '<p style="padding:40px;color:#999">Não foi possível carregar o catálogo agora. Tente novamente em instantes.</p>';
+        var faixasGrid = document.getElementById('faixasGrid');
+        if (faixasGrid) faixasGrid.innerHTML = '<p style="padding:20px;color:#999">Não foi possível carregar as faixas agora.</p>';
       });
   })();
   </script>
@@ -352,36 +396,8 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   <h2 class="sec-titulo reveal">Escolha sua <em style="color:var(--verde);font-style:italic">faixa</em></h2>
   <p class="sec-sub reveal" style="transition-delay:.1s">Cada faixa inclui cotas diferentes para o Programa Cultural. Mais cotas, maior elegibilidade a cada rodada de premiação.</p>
 
-  <div class="faixas-grid">
-    <div class="faixa-card reveal">
-      <div class="faixa-tag">Faixa Entrada</div>
-      <div class="faixa-preco">R$15,35</div>
-      <div class="faixa-cotas">1 cota inclusa</div>
-      <div class="faixa-nome">Ponto de partida</div>
-      <p class="faixa-desc">Acesso ao Programa Cultural com participação em todas as 6 rodadas da série. Ideal para quem quer começar e conhecer a editora.</p>
-      <div class="faixa-obras">Títulos disponíveis:<br>— Justiça(mento) para Orelha</div>
-      <a href="/checkout.html?slug=justicamento" class="faixa-btn">Adquirir por R$15,35</a>
-    </div>
-
-    <div class="faixa-card reveal" style="transition-delay:.1s">
-      <div class="faixa-tag">Faixa Intermediária</div>
-      <div class="faixa-preco">R$46,04</div>
-      <div class="faixa-cotas">3 cotas inclusas</div>
-      <div class="faixa-nome">Custo-benefício</div>
-      <p class="faixa-desc">Tripla elegibilidade com um único título. Cada cota vale independentemente nas 6 rodadas — seu peso cresce conforme o prêmio aumenta.</p>
-      <div class="faixa-obras">Títulos disponíveis:<br>— Guia Antifalência do Empreendedor Iniciante</div>
-      <a href="/checkout.html?slug=antifalencia" class="faixa-btn">Adquirir por R$46,04</a>
-    </div>
-
-    <div class="faixa-card destaque reveal" style="transition-delay:.2s">
-      <div class="faixa-tag">Faixa Premium</div>
-      <div class="faixa-preco">R$76,74</div>
-      <div class="faixa-cotas">10 cotas inclusas</div>
-      <div class="faixa-nome">Máxima elegibilidade</div>
-      <p class="faixa-desc">Dez cotas por título — 10× mais elegibilidade que a faixa de entrada. Para leitores que levam a sério sua participação na série.</p>
-      <div class="faixa-obras">Títulos disponíveis:<br>— O Nascimento Silencioso da 3ª GM<br>— A Última Coisa que Ela Disse</div>
-      <a href="/checkout.html?slug=3a-guerra" class="faixa-btn">Adquirir por R$76,74</a>
-    </div>
+  <div class="faixas-grid" id="faixasGrid">
+    <p style="padding:20px;opacity:.6">Carregando faixas…</p>
   </div>
 </section>
 
