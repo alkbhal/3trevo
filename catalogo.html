@@ -14,7 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' www.googletagmanager.com; connect-src 'self' *.supabase.co *.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com; img-src 'self' data: blob: *.supabase.co; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' www.googletagmanager.com; connect-src 'self' *.supabase.co *.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com; img-src 'self' data: blob: *.supabase.co *.al-kbhal.workers.dev; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
 <title>Catálogo — Editora Três Trevo | Ebooks de Ficção, Ensaio e Negócios</title>
 <meta name="description" content="Catálogo completo da Editora Três Trevo. Ebooks de ficção literária, ensaio político, ficção documental e manuais de negócios. Programa Cultural com prêmios em dinheiro.">
 <meta name="robots" content="index, follow">
@@ -289,42 +289,62 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   <div class="grid-ebooks" role="list" id="gridEbooks"></div>
   <script>
   (function(){
-    var livros = [
-      {slug:'3a-guerra',gen:'ficcao',cor:'#0e1018',genero:'Ficção Documental · Premium',titulo:'O Nascimento Silencioso da 3ª Guerra Mundial',desc:'Um analista de logística percebe padrões nos dados que ninguém quer ver. A reorganização silenciosa revela algo que não será anunciado como guerra.',preco:76.74,cotas:10},
-      {slug:'habitaculos',gen:'ensaio',cor:'#0a1628',genero:'Ensaio · Não ficção · Premium',titulo:'Habitáculos do Fim',desc:'Superricos, testes globais e a corrida pelo último refúgio. Como bilionários constroem bunkers enquanto o mundo assiste.',preco:76.74,cotas:10},
-      {slug:'ultima-coisa',gen:'ficcao',cor:'#2a1a0a',genero:'Ficção Literária · Premium',titulo:'A Última Coisa que Ela Disse',desc:'Laura descobre uma caixa no porão da mãe falecida. Dentro, escritos em sete idiomas — sete vidas nunca contadas.',preco:76.74,cotas:10,autor:'Anes Said'},
-      {slug:'caminho-rubro-vol1',gen:'ensaio',cor:'#1a0808',genero:'Ensaio Político · Série',titulo:'Caminho Rubro — Vol. 1: A Engenharia da Tirania',desc:'Como regimes autoritários são construídos por dentro. Volume 1 da trilogia.',preco:46.04,cotas:3},
-      {slug:'caminho-rubro-vol2',gen:'ensaio',cor:'#1a0808',genero:'Ensaio Político · Série',titulo:'Caminho Rubro — Vol. 2: As 7 Leis',desc:'Sete mecanismos que todo regime autoritário opera — do monopólio da narrativa à autopreservação.',preco:46.04,cotas:3},
-      {slug:'caminho-rubro-vol3',gen:'ensaio',cor:'#1a0808',genero:'Ensaio Político · Série',titulo:'Caminho Rubro — Vol. 3: Tiranos São Construídos',desc:'Casos comparados: Hungria, Turquia, Venezuela, Brasil. Como desmontar o que foi erguido.',preco:46.04,cotas:3},
-      {slug:'justicamento',gen:'ensaio',cor:'#2a0d1a',genero:'Ensaio',titulo:'Justiça(mento) para Orelha',desc:'O que acontece quando a justiça fala mas não escuta? Ensaio sobre punição, escuta e os limites do sistema penal.',preco:15.35,cotas:1},
-      {slug:'antifalencia',gen:'manuais',cor:'#101820',genero:'Manual · Negócios',titulo:'O Guia Antifalência do Empreendedor',desc:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para os primeiros 2 anos.',preco:46.04,cotas:3},
-      {slug:'livre-das-dividas',gen:'manuais',cor:'#0a1a2e',genero:'Finanças Pessoais',titulo:'Livre das Dívidas',desc:'70 milhões de brasileiros negativados. Este guia mostra o caminho de volta — com scripts, direitos e um plano.',preco:15.35,cotas:1},
-      {slug:'isa-isma-tintim',gen:'infantil',cor:'#1a2a1a',genero:'Infantojuvenil',titulo:'Isa, Isma e Tintim',desc:'Coração, vitalidade e alegria. Três irmãos, uma porta colorida e aventuras que ensinam sem sermão.',preco:15.35,cotas:1},
-      {slug:'antes-do-app',gen:'manuais',cor:'#1a1a0a',genero:'Finanças · Método',titulo:'Antes do App, o Método',desc:'O método Ático de gestão financeira pessoal. Cinco estados, oito grupos, um ciclo mensal.',preco:37.00,cotas:3}
-    ];
+    // Categoria de filtro (Ficção/Ensaio/Manuais/Infantil) não existe como coluna no banco --
+    // é só rótulo de UI, então fica num mapa local. Preço/título/descrição/capa/disponibilidade
+    // vêm 100% ao vivo do Supabase abaixo: catalogo.html chegou a ter esses 11 títulos com preço
+    // congelado direto no HTML (não sincronizava com o admin) e listava títulos já inativos como
+    // se estivessem à venda -- causa raiz real do "corrigi o preço e não mudou" e de anunciar
+    // título sem arquivo/quebrado.
+    var CATEGORIAS = {
+      '3a-guerra':'ficcao','habitaculos':'ensaio','ultima-coisa':'ficcao',
+      'caminho-rubro-vol1':'ensaio','caminho-rubro-vol2':'ensaio','caminho-rubro-vol3':'ensaio',
+      'justicamento':'ensaio','antifalencia':'manuais','livre-das-dividas':'manuais',
+      'isa-isma-tintim':'infantil','antes-do-app':'manuais'
+    };
+    var SB='https://xfkepekffdyrtcgagwqo.supabase.co';
+    var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
     var grid = document.getElementById('gridEbooks');
-    livros.forEach(function(l, i) {
-      var autor = l.autor || 'Said Anes';
-      var card = document.createElement('article');
-      card.className = 'ebook-card reveal';
-      card.setAttribute('role','listitem');
-      card.dataset.genero = l.gen;
-      card.style.transitionDelay = (i * 0.08) + 's';
-      card.onclick = function(){ location.href='/checkout.html?slug='+l.slug; };
-      card.innerHTML =
-        '<div class="livro-mockup" data-mockup-cor="'+l.cor+'" data-mockup-titulo="'+l.titulo+'" data-mockup-w="80" data-mockup-h="110"></div>'+
-        '<div class="ebook-genero">'+l.genero+'</div>'+
-        '<h2 class="ebook-titulo">'+l.titulo+'</h2>'+
-        '<p class="ebook-autor">'+autor+'</p>'+
-        '<p class="ebook-desc">'+l.desc+'</p>'+
-        '<div class="ebook-premio-box">✦ Participa do Programa Cultural · confirmação após D+7</div>'+
-        '<div class="ebook-footer">'+
-          '<div><div class="ebook-preco" id="preco-'+l.slug+'">R$'+l.preco.toFixed(2).replace('.',',')+'</div>'+
-          '<div class="ebook-cotas">'+l.cotas+' cota'+(l.cotas>1?'s':'')+' inclusa'+(l.cotas>1?'s':'')+'</div></div>'+
-          '<a href="/checkout.html?slug='+l.slug+'" class="ebook-btn" onclick="event.stopPropagation()">Adquirir</a>'+
-        '</div>';
-      grid.appendChild(card);
-    });
+    fetch(SB+'/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,descricao,genero_pt,genero,autor,preco,cotas,capa_url,bg_color',
+      {headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}})
+      .then(function(r){return r.ok?r.json():[];})
+      .then(function(livros){
+        var totalEl = document.getElementById('totalObras');
+        if (totalEl) totalEl.textContent = livros.length;
+        livros.forEach(function(l, i) {
+          var autor = l.autor || 'Said Anes';
+          var genero = l.genero_pt || l.genero || '';
+          var card = document.createElement('article');
+          card.className = 'ebook-card reveal';
+          card.setAttribute('role','listitem');
+          card.dataset.genero = CATEGORIAS[l.slug] || 'ensaio';
+          card.style.transitionDelay = (i * 0.08) + 's';
+          card.onclick = function(){ location.href='/checkout.html?slug='+l.slug; };
+          var capa = l.capa_url
+            ? '<div class="livro-mockup"><img src="'+l.capa_url+'" alt="Capa de '+l.titulo+'" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:2px"></div>'
+            : '<div class="livro-mockup" data-mockup-cor="'+(l.bg_color||'#1a4a2e')+'" data-mockup-titulo="'+l.titulo+'" data-mockup-w="80" data-mockup-h="110"></div>';
+          card.innerHTML =
+            capa+
+            '<div class="ebook-genero">'+genero+'</div>'+
+            '<h2 class="ebook-titulo">'+l.titulo+'</h2>'+
+            '<p class="ebook-autor">'+autor+'</p>'+
+            '<p class="ebook-desc">'+(l.descricao||'')+'</p>'+
+            '<div class="ebook-premio-box">✦ Participa do Programa Cultural · confirmação após D+7</div>'+
+            '<div class="ebook-footer">'+
+              '<div><div class="ebook-preco" id="preco-'+l.slug+'">R$'+Number(l.preco).toFixed(2).replace('.',',')+'</div>'+
+              '<div class="ebook-cotas">'+l.cotas+' cota'+(l.cotas>1?'s':'')+' inclusa'+(l.cotas>1?'s':'')+'</div></div>'+
+              '<a href="/checkout.html?slug='+l.slug+'" class="ebook-btn" onclick="event.stopPropagation()">Adquirir</a>'+
+            '</div>';
+          grid.appendChild(card);
+          if (!l.capa_url) {
+            var mockupEl = card.querySelector('[data-mockup-cor]');
+            if (mockupEl) mockupEl.innerHTML = gerarMockup(mockupEl.dataset.mockupCor, mockupEl.dataset.mockupTitulo||'', 80, 110);
+          }
+          requestAnimationFrame(function(){ card.classList.add('visivel'); });
+        });
+      })
+      .catch(function(){
+        grid.innerHTML = '<p style="padding:40px;color:#999">Não foi possível carregar o catálogo agora. Tente novamente em instantes.</p>';
+      });
   })();
   </script>
 </section>
@@ -502,22 +522,8 @@ document.addEventListener('DOMContentLoaded',function(){
     if(e.key==='Escape'){var nav=document.getElementById('navMobile');if(nav.classList.contains('aberto')){nav.classList.remove('aberto');document.getElementById('menuBtn').setAttribute('aria-expanded','false');}}
   });
 
-  // Preços dinâmicos do Supabase
-  (function(){
-    var SB='https://xfkepekffdyrtcgagwqo.supabase.co';
-    var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
-    fetch(SB+'/rest/v1/catalogo?ativo=eq.true&select=slug,preco,cotas',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}})
-      .then(function(r){return r.ok?r.json():null;})
-      .then(function(data){
-        if(!Array.isArray(data))return;
-        data.forEach(function(item){
-          var el=document.getElementById('preco-'+item.slug);
-          if(el&&item.preco)el.textContent='R$'+Number(item.preco).toFixed(2).replace('.',',');
-        });
-        document.getElementById('totalObras').textContent=data.length;
-      })
-      .catch(function(){});
-  })();
+  // Preço/total de obras já vêm do fetch único que monta o grid (ver <script> do gridEbooks) --
+  // esse segundo fetch redundante foi removido, era o que deixava titulo inativo com preço preso.
 });
 </script>
 <script src="js/beacon.js" defer></script>
