@@ -250,15 +250,28 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
     return new Response('Arquivo não configurado', { status: 404 });
   }
 
-  // Redirecionar para R2 público (ou URL pré-assinada)
-  if (!env.R2_PUBLIC_BUCKET_ID) {
-    return Response.json({ ok: false, erro: 'r2_not_configured' }, { status: 500 });
+  // Assina o arquivo no Supabase Storage (bucket "ebooks") -- mesmo mecanismo real que
+  // get-download (edge function) já usa pro leitor/biblioteca. Rota antiga apontava pra
+  // um bucket R2 que nunca chegou a ser configurado (achado real: TODO download por
+  // e-mail quebrava com 500, "r2_not_configured" -- corrigido nesta sessão).
+  if (produto.arquivo_url.startsWith('http')) {
+    return Response.redirect(produto.arquivo_url, 302);
   }
-  const pdfUrl = produto.arquivo_url.startsWith('http')
-    ? produto.arquivo_url
-    : `https://pub-${env.R2_PUBLIC_BUCKET_ID}.r2.dev/${produto.arquivo_url}`;
+  const signResp = await fetch(
+    `${env.SUPABASE_URL}/storage/v1/object/sign/ebooks/${encodeURIComponent(produto.arquivo_url)}`,
+    {
+      method: 'POST',
+      headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ expiresIn: 259200 }), // 72h, mesmo prazo já anunciado no e-mail
+    }
+  );
+  const signed = await signResp.json() as { signedURL?: string; message?: string };
+  if (!signed.signedURL) {
+    console.error('[download] falha ao assinar arquivo:', produto.arquivo_url, signed.message);
+    return Response.json({ ok: false, erro: 'assinatura_falhou' }, { status: 500 });
+  }
 
-  return Response.redirect(pdfUrl, 302);
+  return Response.redirect(`${env.SUPABASE_URL}/storage/v1${signed.signedURL}`, 302);
 }
 
 // ─── 4. Reembolso (admin) — CDC art.49, direito de arrependimento ────────────
@@ -529,6 +542,28 @@ async function enviarEmailCompra(
   }
 ): Promise<void> {
   const downloadUrl = `${WORKER_URL}/api/download?token=${opts.downloadToken}`;
+  const areaClienteUrl = `${SITE_URL}/area-cliente.html`;
+  // Anexa o arquivo (normalmente PDF) direto no e-mail, além do link de 72h -- pedido
+  // explícito do usuário. Se qualquer coisa falhar, o e-mail ainda sai sem anexo -- o
+  // link de download continua sendo o caminho garantido, nunca bloqueia a entrega.
+  let attachment: { filename: string; content: string } | null = null;
+  try {
+    const prodResp = await fetch(`${env.SUPABASE_URL}/rest/v1/products?slug=eq.${opts.productSlug}&select=arquivo_url`, { headers: supabaseHeaders(env) });
+    const [produto] = (await prodResp.json()) as any[];
+    if (produto?.arquivo_url) {
+      const fileResp = await fetch(downloadUrl, { redirect: 'follow' });
+      if (fileResp.ok) {
+        const bytes = new Uint8Array(await fileResp.arrayBuffer());
+        if (bytes.byteLength > 0 && bytes.byteLength < 15 * 1024 * 1024) {
+          let binary = '';
+          for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+          attachment = { filename: produto.arquivo_url, content: btoa(binary) };
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[email] falha ao preparar anexo, enviando só com o link:', err);
+  }
   const participacaoUrl = `${SITE_URL}/participacao-cultural.html?slug=${opts.productSlug}`;
   const valorFmt = 'R$ ' + opts.valor.toFixed(2).replace('.', ',');
 
@@ -564,6 +599,10 @@ async function enviarEmailCompra(
               text-align:center;font-size:15px;font-weight:500">
       Baixar ${escapeHtml(opts.ebookTitulo)} →
     </a>
+    <p style="margin:12px 0 0;font-size:12px;color:#888;text-align:center">
+      Prefere ler o EPUB no leitor do site?
+      <a href="${areaClienteUrl}" style="color:#1a4a2e;font-weight:600;text-decoration:none">Acesse sua área do cliente →</a>
+    </p>
   </td></tr>
 
   <!-- Biblioteca TT -->
@@ -626,6 +665,7 @@ async function enviarEmailCompra(
       to: opts.email,
       subject: `✦ Seu ebook "${opts.ebookTitulo}" chegou — Editora Três Trevo`,
       html,
+      ...(attachment ? { attachments: [attachment] } : {}),
     }),
   });
 }
