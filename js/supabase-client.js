@@ -15,19 +15,25 @@ window.sb             = sb;
 // URL base das Edge Functions
 const EDGE_BASE = `${SUPABASE_URL}/functions/v1`;
 
-// Catálogo local (espelha products no banco — fallback visual)
+// Catálogo local (espelha products no banco — fallback visual). Usado em 2 lugares:
+// (1) checkout.html só cai aqui se a query ao vivo falhar de verdade (rede fora);
+// (2) area-cliente.html usa como metadado de gênero pra agrupar a biblioteca do
+// cliente, incluindo títulos já INATIVOS que alguém comprou no passado -- por isso
+// as 5 entradas de títulos inativos continuam aqui de propósito, só com preço/cotas
+// corrigidos pro valor real (estavam congelados desde uma edição antiga do HTML,
+// nunca atualizados quando o preço mudou no admin). Ver commit desta correção.
 const CATALOGO = {
-  '3a-guerra':          { titulo: 'O Nascimento Silencioso da 3ª Guerra Mundial', autor: 'Said Anes', genero: 'Ficção Documental', cotas: 10, preco: 76.74 },
-  habitaculos:          { titulo: 'Habitáculos do Fim',                           autor: 'Said Anes', genero: 'Ensaio',            cotas: 10, preco: 76.74 },
-  'ultima-coisa':       { titulo: 'A Última Coisa que Ela Disse',                 autor: 'Anes Said', genero: 'Ficção Literária',  cotas: 10, preco: 76.74 },
-  'caminho-rubro-vol1': { titulo: 'Caminho Rubro — Vol. 1: A Engenharia da Tirania', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 46.04 },
-  'caminho-rubro-vol2': { titulo: 'Caminho Rubro — Vol. 2: As 7 Leis',           autor: 'Said Anes', genero: 'Ensaio Político',   cotas: 3,  preco: 46.04 },
-  'caminho-rubro-vol3': { titulo: 'Caminho Rubro — Vol. 3: Tiranos São Construídos', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 46.04 },
-  justicamento:         { titulo: 'Justiça(mento) para Orelha',                   autor: 'Said Anes', genero: 'Ensaio',            cotas: 1,  preco: 15.35 },
-  antifalencia:         { titulo: 'O Guia Antifalência do Empreendedor',           autor: 'Said Anes', genero: 'Manual',           cotas: 3,  preco: 46.04 },
+  '3a-guerra':          { titulo: 'O Nascimento Silencioso da 3ª Guerra Mundial', autor: 'Said Anes', genero: 'Ficção Documental', cotas: 10, preco: 35.00 },
+  habitaculos:          { titulo: 'Habitáculos do Fim',                           autor: 'Said Anes', genero: 'Ensaio',            cotas: 10, preco: 35.00 },
+  'ultima-coisa':       { titulo: 'A Última Coisa que Ela Disse',                 autor: 'Anes Said', genero: 'Ficção Literária',  cotas: 10, preco: 35.00 },
+  'caminho-rubro-vol1': { titulo: 'Caminho Rubro — Vol. 1: A Engenharia da Tirania', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 29.90 },
+  'caminho-rubro-vol2': { titulo: 'Caminho Rubro — Vol. 2: As 7 Leis',           autor: 'Said Anes', genero: 'Ensaio Político',   cotas: 3,  preco: 29.90 },
+  'caminho-rubro-vol3': { titulo: 'Caminho Rubro — Vol. 3: Tiranos São Construídos', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 29.90 },
+  justicamento:         { titulo: 'Justiça(mento) para Orelha',                   autor: 'Said Anes', genero: 'Ensaio',            cotas: 1,  preco: 10.00 },
+  antifalencia:         { titulo: 'O Guia Antifalência do Empreendedor Iniciante', autor: 'Said Anes', genero: 'Manual',          cotas: 3,  preco: 29.90 },
   'livre-das-dividas':  { titulo: 'Livre das Dívidas',                            autor: 'Said Anes', genero: 'Finanças Pessoais', cotas: 1,  preco: 15.35 },
-  'isa-isma-tintim':    { titulo: 'Isa, Isma e Tintim',                           autor: 'Said Anes', genero: 'Infantojuvenil',   cotas: 1,  preco: 15.35 },
-  'antes-do-app':       { titulo: 'Antes do App, o Método',                       autor: 'Said Anes', genero: 'Finanças / Método', cotas: 3,  preco: 37.00 },
+  'isa-isma-tintim':    { titulo: 'Isa, Isma e Tintim',                           autor: 'Said Anes', genero: 'Infantojuvenil',   cotas: 1,  preco: 19.90 },
+  'antes-do-app':       { titulo: 'Antes do App, o Método',                       autor: 'Said Anes', genero: 'Finanças / Método', cotas: 3,  preco: 29.90 },
 };
 
 // Catálogo live do Supabase (sobrepõe hardcoded quando disponível)
