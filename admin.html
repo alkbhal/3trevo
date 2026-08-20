@@ -994,12 +994,8 @@
           <input type="number" id="livro-preco" step="0.01" placeholder="15.35">
         </div>
         <div class="field">
-          <label>Cotas</label>
-          <select id="livro-cotas">
-            <option value="1">1 cota (Entrada)</option>
-            <option value="3">3 cotas (Intermediário)</option>
-            <option value="10">10 cotas (Premium)</option>
-          </select>
+          <label>Cotas (automático pelo preço)</label>
+          <div id="livro-cotas-display" style="padding:8px 0;font-weight:600">—</div>
         </div>
         <div class="field">
           <label>Categoria</label>
@@ -1347,7 +1343,7 @@ function abrirModalLivro(slug) {
   document.getElementById('livro-desc-en').value = livro?.descricao_en || '';
   document.getElementById('livro-desc-es').value = livro?.descricao_es || '';
   document.getElementById('livro-preco').value = livro?.preco || '';
-  document.getElementById('livro-cotas').value = String(livro?.cotas || 1);
+  atualizarCotasDisplay();
   document.getElementById('livro-cat').value = livro?.categoria || livro?.utm_campaign?.split('-')[0] || 'reflexao';
   document.getElementById('livro-ordem').value = livro?.ordem || 99;
   document.getElementById('livro-bg-color').value = livro?.bg_color || '#0d2415';
@@ -1374,6 +1370,21 @@ function abrirModalLivro(slug) {
   document.getElementById('livro-accent-txt').oninput = e => { document.getElementById('livro-accent-color').value = e.target.value; };
   document.getElementById('modal-livro').classList.add('open');
 }
+
+// Mesma regra do worker (cotasPorPreco em admin-catalog.ts) -- só pra preview aqui,
+// quem decide de verdade é o servidor ao salvar (nunca confia no que o admin.html manda).
+function cotasPorPreco(preco) {
+  if (preco <= 20) return 1;
+  if (preco <= 30) return 3;
+  return 10;
+}
+
+function atualizarCotasDisplay() {
+  const preco = parseFloat(document.getElementById('livro-preco').value) || 0;
+  const n = cotasPorPreco(preco);
+  document.getElementById('livro-cotas-display').textContent = `${n} cota${n > 1 ? 's' : ''} (até R$20 → 1 · R$20-30 → 3 · acima de R$30 → 10)`;
+}
+document.getElementById('livro-preco').addEventListener('input', atualizarCotasDisplay);
 
 function atualizarMotivoInativoVisivel() {
   const ativo = document.getElementById('livro-ativo').checked;
@@ -1406,7 +1417,6 @@ async function salvarLivro() {
     descricao_en: document.getElementById('livro-desc-en').value.trim(),
     descricao_es: document.getElementById('livro-desc-es').value.trim(),
     preco: parseFloat(document.getElementById('livro-preco').value) || 0,
-    cotas: parseInt(document.getElementById('livro-cotas').value) || 1,
     utm_campaign: document.getElementById('livro-utm').value.trim(),
     bg_color: document.getElementById('livro-bg-color').value,
     accent_color: document.getElementById('livro-accent-color').value,

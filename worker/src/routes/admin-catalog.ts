@@ -28,6 +28,18 @@ export async function verificarToken(request: Request, env: Env): Promise<boolea
 }
 
 
+// ─── Cotas por faixa de preço (regra de negócio, única fonte de verdade) ─────
+// products.cotas é o que registrar_compra_mp lê pra decidir quantos números o
+// comprador recebe no sorteio real (Programa Cultural, Lei 5.768/71) -- nunca deve
+// divergir do preço cobrado. Antes disto, "cotas" era um <select> manual em
+// admin.html, desconectado do preço (achado real: isa-isma-tintim custava R$19,90,
+// dentro da faixa de 1 cota, mas tinha 3 cotas gravadas por escolha manual errada).
+function cotasPorPreco(preco: number): number {
+  if (preco <= 20) return 1;
+  if (preco <= 30) return 3;
+  return 10;
+}
+
 // ─── Espelhar catalogo → products (fonte de verdade é catalogo; products é o que
 //     registrar_compra_mp exige pra liberar a compra após pagamento aprovado) ────
 async function mirrorParaProducts(env: Env, slug: string, campos: Record<string, any>): Promise<void> {
@@ -85,6 +97,9 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
   try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
   if (!body.slug || !body.titulo) return Response.json({ ok: false, erro: 'slug_e_titulo_obrigatorios' }, { status: 400 });
 
+  const preco = body.preco ?? 0;
+  const cotas = cotasPorPreco(preco); // sempre derivado do preço -- body.cotas é ignorado de propósito
+
   const r = await sb(env, 'catalogo', {
     method: 'POST',
     headers: { Prefer: 'return=representation' } as any,
@@ -101,8 +116,8 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
       genero_en: body.genero_en ?? null,
       genero_es: body.genero_es ?? null,
       autor: body.autor ?? 'Said Anes',
-      preco: body.preco ?? 0,
-      cotas: body.cotas ?? 1,
+      preco,
+      cotas,
       utm_campaign: body.utm_campaign ?? body.slug,
       bg_color: body.bg_color ?? '#0d2415',
       capa_url: body.capa_url ?? null,
@@ -121,8 +136,8 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
     slug: body.slug,
     titulo: body.titulo,
     autor: body.autor ?? 'Said Anes',
-    preco: body.preco ?? 0,
-    cotas: body.cotas ?? 1,
+    preco,
+    cotas,
     ativo: body.ativo !== false,
   });
 
@@ -135,14 +150,16 @@ export async function handleAdminCatalogoUpdate(request: Request, env: Env, slug
   let body: any;
   try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
 
-  // Campos permitidos para atualização
+  // Campos permitidos para atualização. "cotas" de propósito fora da lista -- nunca
+  // aceito direto do cliente, sempre recalculado de "preco" (ver cotasPorPreco acima).
   const updates: Record<string, any> = {};
   const allowed = [
     'titulo','titulo_en','titulo_es','descricao','descricao_en','descricao_es',
-    'genero','genero_pt','genero_en','genero_es','autor','preco','cotas',
+    'genero','genero_pt','genero_en','genero_es','autor','preco',
     'utm_campaign','bg_color','capa_url','ordem','ativo','slug','motivo_inativo',
   ];
   for (const k of allowed) { if (k in body) updates[k] = body[k]; }
+  if ('preco' in updates) updates.cotas = cotasPorPreco(updates.preco);
 
   const r = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}`, {
     method: 'PATCH',
