@@ -311,6 +311,9 @@ nav{
   letter-spacing:.3px;transition:all .2s;
 }
 .btn-leitor:hover{border-color:var(--ouro-escuro);color:var(--tinta);background:rgba(200,168,75,.06)}
+.btn-leitor:disabled{opacity:.35;cursor:default}
+.leitor-controles{display:flex;gap:10px;align-items:center}
+#leitor-pagina{font-size:12px;color:var(--t3)}
 #leitor-viewer{flex:1;overflow:hidden;background:#fbf8f2}
 #leitor-viewer iframe{width:100%;height:100%;border:none}
 
@@ -908,8 +911,13 @@ nav{
 <div id="tela-leitura">
   <div class="leitor-topo">
     <div class="leitor-titulo" id="leitor-titulo-texto">—</div>
-    <button class="btn-leitor" id="btn-trilha-livro" onclick="tocarTrilhaLivro()" style="display:none">🎵 Ouvir trilha</button>
-    <button class="btn-leitor" onclick="fecharLeitor()">✕ Fechar</button>
+    <div class="leitor-controles">
+      <button class="btn-leitor" id="btn-ant">‹ Anterior</button>
+      <span id="leitor-pagina">0%</span>
+      <button class="btn-leitor" id="btn-prox">Próxima ›</button>
+      <button class="btn-leitor" id="btn-trilha-livro" onclick="tocarTrilhaLivro()" style="display:none">🎵 Ouvir trilha</button>
+      <button class="btn-leitor" onclick="fecharLeitor()">✕ Fechar</button>
+    </div>
   </div>
   <div id="leitor-viewer"></div>
 </div>
@@ -1271,12 +1279,40 @@ async function baixar(productId, titulo, formato) {
 // PDF via iframe nativo do navegador. Prefere EPUB quando os dois formatos existem
 // (texto reflui, melhor em qualquer tamanho de tela).
 let trilhaLivroId = null;
+let leitorBook = null;
+let leitorRendition = null;
+
+function ativarNavegacaoLeitor(book, rendition) {
+  const btnAnt = document.getElementById('btn-ant');
+  const btnProx = document.getElementById('btn-prox');
+  const pagina = document.getElementById('leitor-pagina');
+  btnAnt.disabled = true;
+  btnProx.disabled = true;
+  btnAnt.onclick = () => rendition.prev();
+  btnProx.onclick = () => rendition.next();
+  document.onkeydown = (e) => {
+    if (e.key === 'ArrowRight') rendition.next();
+    if (e.key === 'ArrowLeft') rendition.prev();
+    if (e.key === 'Escape') fecharLeitor();
+  };
+  book.ready.then(() => book.locations.generate(1600)).then(() => {
+    btnAnt.disabled = false;
+    btnProx.disabled = false;
+  });
+  rendition.on('relocated', (location) => {
+    const pct = book.locations.length() ? book.locations.percentageFromCfi(location.start.cfi) * 100 : 0;
+    pagina.textContent = `${Math.round(pct)}%`;
+  });
+}
 
 async function abrirLeitor(productId, titulo) {
   document.getElementById('tela-leitura').style.display = 'flex';
   document.getElementById('leitor-titulo-texto').textContent = titulo;
   const viewer = document.getElementById('leitor-viewer');
   viewer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999">Carregando…</div>';
+  document.getElementById('leitor-pagina').textContent = '0%';
+  document.getElementById('btn-ant').style.display = 'none';
+  document.getElementById('btn-prox').style.display = 'none';
 
   trilhaLivroId = null;
   const btnTrilha = document.getElementById('btn-trilha-livro');
@@ -1302,18 +1338,27 @@ async function abrirLeitor(productId, titulo) {
 
     if (data.formatos?.epub) {
       viewer.innerHTML = '';
-      const book = ePub(data.formatos.epub.download_url, { openAs: 'epub' });
-      const rendition = book.renderTo('leitor-viewer', { width: '100%', height: '100%', flow: 'scrolled-doc' });
-      book.ready.then(() => {
-        // O sumario/nav.xhtml costuma ser o item 0 do spine (padrao do Ebook-lib) -- sem isso,
-        // "Ler agora" abre numa lista de links em vez do texto do livro. Pula pro proximo item real.
+      document.getElementById('btn-ant').style.display = '';
+      document.getElementById('btn-prox').style.display = '';
+      // spread:'none' = paginado (mesmo modo já testado e funcionando em minha-biblioteca.html).
+      // flow:'scrolled-doc' foi tentado antes e travava a leitura na 1a pagina — sem next()/prev()
+      // ligados a nenhum botao/tecla, não tinha como avançar pro capitulo seguinte.
+      leitorBook = ePub(data.formatos.epub.download_url, { openAs: 'epub' });
+      leitorRendition = leitorBook.renderTo('leitor-viewer', { width: '100%', height: '100%', spread: 'none' });
+      ativarNavegacaoLeitor(leitorBook, leitorRendition);
+      leitorBook.ready.then(() => {
+        // O sumario/nav.xhtml (Ebook-lib) ou a folha de rosto/capa (Calibre, sem manifest
+        // properties="nav") costumam ser os primeiros itens do spine -- sem pular, "Ler agora"
+        // abre num item sem texto de verdade. Pula pro 1o item de conteudo real: não é nav E
+        // não é a capa (id/href contendo "cover"), ambos comuns nos 2 pipelines usados no acervo.
         try {
-          const manifest = book.packaging?.manifest || {};
+          const manifest = leitorBook.packaging?.manifest || {};
           const navHref = Object.values(manifest).find(m => (m.properties || '').includes('nav'))?.href;
-          const primeiro = book.spine.items.find(i => i.linear !== 'no' && i.href !== navHref);
-          rendition.display(primeiro ? primeiro.href : undefined);
+          const primeiro = leitorBook.spine.items.find(i =>
+            i.linear !== 'no' && i.href !== navHref && !/cover/i.test(i.href));
+          leitorRendition.display(primeiro ? primeiro.href : undefined);
         } catch {
-          rendition.display();
+          leitorRendition.display();
         }
       });
     } else if (data.formatos?.pdf) {
@@ -1333,8 +1378,11 @@ function tocarTrilhaLivro() {
 function fecharLeitor() {
   document.getElementById('tela-leitura').style.display = 'none';
   document.getElementById('leitor-viewer').innerHTML = '';
+  if (leitorRendition) { leitorRendition.destroy(); leitorRendition = null; }
+  if (leitorBook) { leitorBook.destroy(); leitorBook = null; }
+  document.onkeydown = null;
 }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharLeitor(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !document.onkeydown) fecharLeitor(); });
 
 // ══════════════════════════════════════════════════════════
 // MÚSICAS
