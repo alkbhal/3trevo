@@ -777,81 +777,15 @@
 
 <script>
 // ── CAPAS ──────────────────────────────────────────────────────────────────────
-const CAPAS = [
-  {
-    slug: 'caminho-rubro-vol1',
-    classe: 'capa-antifalencia',
-    genero: 'Ensaio Político',
-    titulo: '<em>Caminho Rubro</em><br>A Engenharia<br>da Tirania',
-    autor: 'Said Anes',
-    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol1-1782321137532-601i5j.png',
-    infoPT: 'Ensaio Político · Vol. 1 · Série',
-    infoEN: 'Political Essay · Vol. 1 · Series',
-    infoES: 'Ensayo Político · Vol. 1 · Serie',
-    preco: 'R$46,04',
-    cotas: 3,
-    cat: 'ensaio',
-  },
-  {
-    slug: 'isa-isma-tintim',
-    classe: 'capa-justicamento',
-    genero: 'Infantojuvenil',
-    titulo: 'Isa, Isma<br>e <em>Tintim</em>',
-    autor: 'Said Anes',
-    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/isa-isma-tintim-1782321119350-hnjh8a.png',
-    infoPT: 'Infantojuvenil · 4 a 10 anos',
-    infoEN: 'Children\'s · Ages 4-10',
-    infoES: 'Infantil · 4 a 10 años',
-    preco: 'R$15,35',
-    cotas: 1,
-    cat: 'infantil',
-  },
-  {
-    slug: 'ultima-coisa',
-    classe: 'capa-justicamento',
-    genero: 'Ficção Literária',
-    titulo: 'A Última Coisa<br>que <em>Ela Disse</em>',
-    autor: 'Anes Said',
-    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/ultima-coisa-1782321114105-h9ozsj.png',
-    infoPT: 'Ficção Literária · Premium · 10 cotas',
-    infoEN: 'Literary Fiction · Premium · 10 entries',
-    infoES: 'Ficción Literaria · Premium · 10 participaciones',
-    preco: 'R$76,74',
-    cotas: 10,
-    cat: 'ficcao',
-    premium: true,
-  },
-  {
-    slug: '3a-guerra',
-    classe: 'capa-antifalencia',
-    genero: 'Ficção Documental',
-    titulo: 'O Nascimento<br>Silencioso da<br><em>3ª Guerra Mundial</em>',
-    autor: 'Said Anes',
-    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/3a-guerra-1782321102999-0xl7a8.png',
-    infoPT: 'Ficção Documental · Premium · 10 cotas',
-    infoEN: 'Documentary Fiction · Premium · 10 entries',
-    infoES: 'Ficción Documental · Premium · 10 participaciones',
-    preco: 'R$76,74',
-    cotas: 10,
-    cat: 'ficcao',
-    premium: true,
-  },
-  {
-    slug: 'habitaculos',
-    classe: 'capa-antifalencia',
-    genero: 'Ensaio',
-    titulo: '<em>Habitáculos</em><br>do Fim',
-    autor: 'Said Anes',
-    capa_url: 'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/habitaculos-1782321107993-katvre.png',
-    infoPT: 'Ensaio · Não ficção · Premium',
-    infoEN: 'Essay · Non-fiction · Premium',
-    infoES: 'Ensayo · No ficción · Premium',
-    preco: 'R$76,74',
-    cotas: 10,
-    cat: 'ensaio',
-    premium: true,
-  },
-];
+// Populado ao vivo via /api/public/catalogo (ver init no fim do arquivo) -- chegou a ter
+// 5 titulos com preco/capa fixados aqui a mao, 2 deles ja inativos ha muito tempo, mas
+// so eram "corrigidos" quando o fetch de enriquecimento por baixo achava o mesmo slug.
+let CAPAS = [];
+
+function cotaFrase(n, l) {
+  if (n === 1) return l === 'en' ? '1 entry' : l === 'es' ? '1 participación' : '1 cota';
+  return l === 'en' ? `${n} entries` : l === 'es' ? `${n} participaciones` : `${n} cotas`;
+}
 
 let capaAtual = 0;
 let capaInterval;
@@ -1083,7 +1017,7 @@ function setLang(lang) {
   renderProdutos(prodCache, filtroAtual);
   // Atualizar info do showcase
   const infoEl = document.getElementById('showcase-info');
-  if (infoEl) {
+  if (infoEl && CAPAS.length) {
     const c = CAPAS[capaAtual];
     const k = 'info' + lang.toUpperCase();
     infoEl.textContent = c[k] || c.infoPT || '';
@@ -1091,109 +1025,22 @@ function setLang(lang) {
 }
 
 // ── Produtos ──────────────────────────────────────────────────────────────────
-const PROD_BASE = [
-  {
-    slug:'3a-guerra', cat:'ficcao', cor:'#0e1018', corCapa:'capa-antifalencia', premium:true,
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/3a-guerra-1782321102999-0xl7a8.png',
-    titulo:{pt:'O Nascimento Silencioso da 3ª Guerra Mundial',en:'The Silent Birth of WWIII',es:'El Nacimiento Silencioso de la 3ª GM'},
-    genero:{pt:'Ficção Documental · Premium',en:'Documentary Fiction · Premium',es:'Ficción Documental · Premium'},
-    desc:{pt:'Um analista de logística percebe padrões nos dados que ninguém quer ver. A reorganização silenciosa das cadeias globais revela algo que não será anunciado como guerra.',en:'How modern wars happen without a shot fired. Frighteningly current.',es:'Cómo las guerras modernas ocurren sin disparos.'},
-    preco:'R$76,74',cotas:10,autor:'Said Anes',
-    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
-  },
-  {
-    slug:'habitaculos', cat:'ensaio', cor:'#0a1628', premium:true,
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/habitaculos-1782321107993-katvre.png',
-    titulo:{pt:'Habitáculos do Fim',en:'Habitats of the End',es:'Habitáculos del Fin'},
-    genero:{pt:'Ensaio · Não ficção · Premium',en:'Essay · Non-fiction · Premium',es:'Ensayo · No ficción · Premium'},
-    desc:{pt:'Superricos, testes globais e a corrida pelo último refúgio. Como bilionários constroem bunkers enquanto o mundo assiste.',en:'Billionaire bunkers, global tests, and the race for the last refuge.',es:'Superricos, pruebas globales y la carrera por el último refugio.'},
-    preco:'R$76,74',cotas:10,autor:'Said Anes',
-    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
-  },
-  {
-    slug:'ultima-coisa', cat:'ficcao', cor:'#2a1a0a', premium:true,
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/ultima-coisa-1782321114105-h9ozsj.png',
-    titulo:{pt:'A Última Coisa que Ela Disse',en:'The Last Thing She Said',es:'Lo Último que Ella Dijo'},
-    genero:{pt:'Ficção Literária · Premium',en:'Literary Fiction · Premium',es:'Ficción Literaria · Premium'},
-    desc:{pt:'Laura descobre uma caixa no porão da mãe falecida. Dentro, escritos em sete idiomas — sete vidas nunca contadas.',en:'Laura discovers a box in her late mother\'s basement. Inside, writings in seven languages.',es:'Laura descubre una caja en el sótano de su madre fallecida.'},
-    preco:'R$76,74',cotas:10,autor:'Anes Said',
-    pc:{pt:'10 cotas · mais chances no sorteio',en:'10 entries · more draw chances',es:'10 participaciones · más chances'}
-  },
-  {
-    slug:'caminho-rubro-vol1', cat:'ensaio', cor:'#1a0808',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol1-1782321137532-601i5j.png',
-    titulo:{pt:'Caminho Rubro — Vol. 1: A Engenharia da Tirania',en:'Red Path — Vol. 1: The Engineering of Tyranny',es:'Camino Rojo — Vol. 1'},
-    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
-    desc:{pt:'Como regimes autoritários são construídos por dentro. O mapa antes da jornada. Volume 1 da trilogia.',en:'How authoritarian regimes are built from within.',es:'Cómo los regímenes autoritarios se construyen desde adentro.'},
-    preco:'R$46,04',cotas:3,autor:'Said Anes',
-    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
-  },
-  {
-    slug:'caminho-rubro-vol2', cat:'ensaio', cor:'#1a0808',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol2-1782321142546-sqfts5.png',
-    titulo:{pt:'Caminho Rubro — Vol. 2: As 7 Leis',en:'Red Path — Vol. 2: The 7 Laws',es:'Camino Rojo — Vol. 2'},
-    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
-    desc:{pt:'Sete mecanismos que todo regime autoritário opera — do monopólio da narrativa à autopreservação sistêmica.',en:'Seven mechanisms every authoritarian regime operates.',es:'Siete mecanismos que todo régimen autoritario opera.'},
-    preco:'R$46,04',cotas:3,autor:'Said Anes',
-    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
-  },
-  {
-    slug:'caminho-rubro-vol3', cat:'ensaio', cor:'#1a0808',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/caminho-rubro-vol3-1782321147039-awykts.png',
-    titulo:{pt:'Caminho Rubro — Vol. 3: Tiranos São Construídos',en:'Red Path — Vol. 3: Tyrants Are Built',es:'Camino Rojo — Vol. 3'},
-    genero:{pt:'Ensaio Político · Série',en:'Political Essay · Series',es:'Ensayo Político · Serie'},
-    desc:{pt:'Casos comparados: Hungria, Turquia, Venezuela, Brasil. Como desmontar o que foi erguido.',en:'Comparative cases. How to dismantle what was built.',es:'Casos comparados. Cómo desmontar lo construido.'},
-    preco:'R$46,04',cotas:3,autor:'Said Anes',
-    pc:{pt:'3 cotas · trilogia completa',en:'3 entries · full trilogy',es:'3 participaciones · trilogía'}
-  },
-  {
-    slug:'justicamento', cat:'ensaio', cor:'#2a0d1a',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/justicamento-1782321124486-sctxd2.png',
-    titulo:{pt:'Justiça(mento) para Orelha',en:'Justice For Your Ears',es:'Justicia(mento) para el Oído'},
-    genero:{pt:'Ensaio',en:'Essay',es:'Ensayo'},
-    desc:{pt:'O que acontece quando a justiça fala mas não escuta? Ensaio sobre punição, escuta e os limites do sistema penal brasileiro.',en:'What happens when justice speaks but doesn\'t listen?',es:'¿Qué pasa cuando la justicia habla pero no escucha?'},
-    preco:'R$15,35',cotas:1,autor:'Said Anes',
-    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
-  },
-  {
-    slug:'antifalencia', cat:'manuais', cor:'#101820',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/antifalencia-1782321129445-lnp5d8.png',
-    titulo:{pt:'O Guia Antifalência do Empreendedor',en:'The Anti-Bankruptcy Guide',es:'La Guía Antiquiebra'},
-    genero:{pt:'Manual · Negócios',en:'Business Guide',es:'Guía · Negocios'},
-    desc:{pt:'A conta que ninguém te obriga a fazer. Custos, precificação e ponto de equilíbrio para sobreviver os primeiros 2 anos.',en:'The math nobody makes you do. Costs, pricing and break-even.',es:'Las cuentas que nadie te obliga a hacer.'},
-    preco:'R$46,04',cotas:3,autor:'Said Anes',
-    pc:{pt:'3 cotas · sorteio',en:'3 entries · draw',es:'3 participaciones · sorteo'}
-  },
-  {
-    slug:'livre-das-dividas', cat:'manuais', cor:'#0a1a2e',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/livre-das-dividas-1782321133512-yspj7p.png',
-    titulo:{pt:'Livre das Dívidas',en:'Debt Free',es:'Libre de Deudas'},
-    genero:{pt:'Finanças Pessoais',en:'Personal Finance',es:'Finanzas Personales'},
-    desc:{pt:'70 milhões de brasileiros negativados. Este guia mostra o caminho de volta — com scripts, direitos e um plano que funciona.',en:'70 million Brazilians in debt. This guide shows the way back.',es:'70 millones de brasileños endeudados. Esta guía muestra el camino.'},
-    preco:'R$15,35',cotas:1,autor:'Said Anes',
-    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
-  },
-  {
-    slug:'isa-isma-tintim', cat:'infantil', cor:'#1a2a1a',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/isa-isma-tintim-1782321119350-hnjh8a.png',
-    titulo:{pt:'Isa, Isma e Tintim',en:'Isa, Isma & Tintim',es:'Isa, Isma y Tintim'},
-    genero:{pt:'Infantojuvenil',en:'Children\'s',es:'Infantil'},
-    desc:{pt:'Coração, vitalidade e alegria. Três irmãos, uma porta colorida e aventuras que ensinam sem sermão.',en:'Heart, vitality and joy. Three siblings and adventures that teach without preaching.',es:'Corazón, vitalidad y alegría. Tres hermanos y aventuras.'},
-    preco:'R$15,35',cotas:1,autor:'Said Anes',
-    pc:{pt:'1 cota · sorteio',en:'1 entry · draw',es:'1 participación · sorteo'}
-  },
-  {
-    slug:'antes-do-app', cat:'manuais', cor:'#1a1a0a',
-    capa_url:'https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/antes-do-app-1782321151315-tg2b7y.png',
-    titulo:{pt:'Antes do App, o Método',en:'Before the App, the Method',es:'Antes de la App, el Método'},
-    genero:{pt:'Finanças · Método',en:'Finance · Method',es:'Finanzas · Método'},
-    desc:{pt:'O método Ático de gestão financeira pessoal. Cinco estados, oito grupos, um ciclo mensal. Entenda seu dinheiro antes de qualquer app.',en:'The Ático method. Five states, eight groups, one monthly cycle.',es:'El método Ático. Cinco estados, ocho grupos, un ciclo mensual.'},
-    preco:'R$37,00',cotas:3,autor:'Said Anes',
-    pc:{pt:'3 cotas · sorteio',en:'3 entries · draw',es:'3 participaciones · sorteo'}
-  },
-];
+// Populado ao vivo via /api/public/catalogo (ver init no fim do arquivo). Chegou a ter
+// os 11 titulos com preco/desc/capa fixados a mao, incluindo 5 ja inativos ha muito
+// tempo (habitaculos, caminho-rubro-vol1/2/3, antes-do-app) -- listados como compraveis
+// com preco congelado ate o clique cair em "indisponivel" no checkout. Ver commit desta correcao.
+//
+// Categoria de filtro (ficcao/ensaio/manuais/infantil) nao existe como coluna no banco,
+// e so rotulo de UI -- fica num mapa local, nao afeta preco/disponibilidade.
+const CATEGORIAS = {
+  '3a-guerra':'ficcao', 'habitaculos':'ensaio', 'ultima-coisa':'ficcao',
+  'caminho-rubro-vol1':'ensaio', 'caminho-rubro-vol2':'ensaio', 'caminho-rubro-vol3':'ensaio',
+  'justicamento':'ensaio', 'antifalencia':'manuais', 'livre-das-dividas':'manuais',
+  'isa-isma-tintim':'infantil', 'antes-do-app':'manuais',
+};
 
-let prodCache = [...PROD_BASE];
+let PROD_BASE = [];
+let prodCache = [];
 let filtroAtual = 'todos';
 
 function filtrar(btn, cat) {
@@ -1211,10 +1058,7 @@ function renderProdutos(prods, filtro) {
   const lista = filtro === 'todos' ? prods : prods.filter(p => p.cat === filtro);
   const adqLabel = l === 'en' ? 'Get it →' : l === 'es' ? 'Obtener →' : 'Adquirir →';
   const entregaLabel = l === 'en' ? 'Instant delivery' : l === 'es' ? 'Entrega inmediata' : 'Entrega imediata';
-  const cotaLabel = n => {
-    if (n === 1) return l === 'en' ? '1 entry' : l === 'es' ? '1 participación' : '1 cota';
-    return l === 'en' ? `${n} entries` : l === 'es' ? `${n} participaciones` : `${n} cotas`;
-  };
+  const sorteioLabel = l === 'en' ? '· draw' : l === 'es' ? '· sorteo' : '· sorteio';
   lista.forEach((p, i) => {
     const card = document.createElement('div');
     card.className = `pcard fi${p.premium ? ' premium' : ''}`;
@@ -1239,11 +1083,11 @@ function renderProdutos(prods, filtro) {
           <div class="pcard-preco-sub">PDF · ${entregaLabel}</div>
         </div>
         <div class="pcard-dir">
-          <span class="cotas-badge">✦ ${cotaLabel(p.cotas)}</span>
+          <span class="cotas-badge">✦ ${cotaFrase(p.cotas, l)}</span>
           <a href="/checkout.html?slug=${p.slug}" class="btn-adq">${adqLabel}</a>
         </div>
       </div>
-      <div class="pcard-pc">${p.pc[l] || p.pc.pt}</div>
+      <div class="pcard-pc">${cotaFrase(p.cotas, l)} ${sorteioLabel}</div>
     `;
     grid.appendChild(card);
     setTimeout(() => card.classList.add('vis'), 60 + i * 80);
@@ -1340,40 +1184,63 @@ const barraObs = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting){ setTimeout(()=>{ const b=document.getElementById('barra-prog'); if(b) b.style.width='15%'; },400); barraObs.unobserve(e.target); } });
 }, { threshold: 0.5 });
 
+// Monta os objetos {pt,en,es} que renderProdutos/renderCapa esperam a partir dos
+// campos planos que /api/public/catalogo devolve (mesmas colunas i18n que o admin edita).
+function montarCatalogoAoVivo(data) {
+  PROD_BASE = data.map((api, i) => ({
+    slug: api.slug,
+    cat: CATEGORIAS[api.slug] || 'ensaio',
+    cor: api.bg_color || '#101820',
+    corCapa: i % 2 === 0 ? 'capa-antifalencia' : 'capa-justicamento',
+    premium: api.cotas >= 10,
+    capa_url: api.capa_url || '',
+    titulo: { pt: api.titulo, en: api.titulo_en || api.titulo, es: api.titulo_es || api.titulo },
+    genero: { pt: api.genero_pt || api.genero || '', en: api.genero_en || api.genero_pt || api.genero || '', es: api.genero_es || api.genero_pt || api.genero || '' },
+    desc: { pt: api.descricao || '', en: api.descricao_en || api.descricao || '', es: api.descricao_es || api.descricao || '' },
+    preco: 'R$' + Number(api.preco).toFixed(2).replace('.', ','),
+    cotas: api.cotas || 0,
+    autor: api.autor || 'Said Anes',
+  }));
+  CAPAS = PROD_BASE.map(p => ({
+    slug: p.slug,
+    classe: p.corCapa,
+    genero: p.genero.pt,
+    titulo: p.titulo.pt,
+    autor: p.autor,
+    capa_url: p.capa_url,
+    bg_color: p.cor,
+    infoPT: `${p.genero.pt} · ${cotaFrase(p.cotas, 'pt')}`,
+    infoEN: `${p.genero.en} · ${cotaFrase(p.cotas, 'en')}`,
+    infoES: `${p.genero.es} · ${cotaFrase(p.cotas, 'es')}`,
+  }));
+  prodCache = [...PROD_BASE];
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  iniciarShowcase();
-  renderProdutos(PROD_BASE, 'todos');
   renderFaq();
   observeAll();
   const b = document.getElementById('barra-prog');
   if (b) barraObs.observe(b.parentElement);
 
-  // Enriquecer com Worker API
+  const grid = document.getElementById('prod-grid');
+  if (grid) grid.innerHTML = '<p style="padding:40px;opacity:.6">Carregando catálogo…</p>';
+
+  // Catálogo real (preço/capa/disponibilidade) vem só daqui -- nada mais fica hardcoded
+  // no HTML pra desalinhar do que o admin edita. Chegou a ter 11 títulos fixados a mão
+  // aqui, 5 já inativos, anunciados como compráveis com preço congelado. Ver commit desta correção.
   fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/public/catalogo')
-    .then(r => r.ok ? r.json() : null)
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('http_' + r.status)))
     .then(data => {
-      if (!Array.isArray(data) || !data.length) return;
-      data.forEach(api => {
-        const local = PROD_BASE.find(p => p.slug === api.slug);
-        if (local) {
-          local.preco = 'R$' + parseFloat(api.preco).toFixed(2).replace('.',',');
-          local.cotas = api.cotas || local.cotas;
-          if (api.capa_url) local.capa_url = api.capa_url;
-          if (api.bg_color) local.cor = api.bg_color;
-        }
-        // Enriquece showcase hero com imagem real
-        const ci = CAPAS.findIndex(c => c.slug === api.slug);
-        if (ci !== -1) {
-          if (api.capa_url) CAPAS[ci].capa_url = api.capa_url;
-          if (api.bg_color) CAPAS[ci].bg_color = api.bg_color;
-        }
-      });
-      prodCache = [...PROD_BASE];
+      if (!Array.isArray(data) || !data.length) throw new Error('catalogo_vazio');
+      montarCatalogoAoVivo(data);
+      iniciarShowcase();
       renderProdutos(prodCache, filtroAtual);
-      renderCapa(capaAtual);
+      observeAll();
     })
-    .catch(() => {});
+    .catch(() => {
+      if (grid) grid.innerHTML = '<p style="padding:40px;opacity:.6">Não foi possível carregar o catálogo agora. Recarregue a página em instantes.</p>';
+    });
 });
 </script>
 <script>
