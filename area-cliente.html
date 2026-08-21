@@ -1301,9 +1301,15 @@ function ativarNavegacaoLeitor(book, rendition) {
   // corte de página pra caber no espaço, nunca "transborda" de verdade. Mas scroll do
   // mouse/trackpad não fazia nada, o que parece quebrado pra quem espera rolar como
   // numa página normal. Mapeado pra avançar/voltar página, com debounce (1 virada por
-  // gesto de scroll). O conteúdo real fica DENTRO do iframe que o epub.js recria a cada
-  // página -- wheel não borbulha pra fora do iframe, por isso o listener é anexado no
-  // "rendered" hook (documento novo a cada página) em vez de uma vez só no container.
+  // gesto de scroll).
+  // ACHADO REAL (testado ao vivo em produção): o evento 'rendered' do epub.js NUNCA
+  // dispara nesse fluxo -- paginar dentro do mesmo capítulo só desloca a coluna CSS
+  // dentro do iframe já existente, não recria o documento. A primeira versão deste fix
+  // dependia de 'rendered' pra anexar o listener dentro do iframe e nunca funcionava de
+  // verdade (só passava no teste local por coincidência de timing). Corrigido: reanexa
+  // o listener no iframe ATUAL a cada 'relocated' (esse sim dispara sempre, já usado
+  // pro indicador de %) -- addEventListener com a mesma função é idempotente, seguro
+  // chamar de novo no mesmo documento.
   let scrollLock = false;
   const virarPagina = (e) => {
     if (scrollLock) return;
@@ -1311,10 +1317,14 @@ function ativarNavegacaoLeitor(book, rendition) {
     if (e.deltaY > 0) rendition.next(); else if (e.deltaY < 0) rendition.prev();
     setTimeout(() => { scrollLock = false; }, 400);
   };
+  const anexarWheelNoIframe = () => {
+    const f = document.querySelector('#leitor-viewer iframe');
+    if (f && f.contentDocument) f.contentDocument.addEventListener('wheel', virarPagina);
+  };
   document.getElementById('leitor-viewer').onwheel = virarPagina;
-  rendition.on('rendered', (_section, view) => {
-    if (view && view.document) view.document.addEventListener('wheel', virarPagina);
-  });
+  rendition.on('rendered', anexarWheelNoIframe);
+  rendition.on('relocated', anexarWheelNoIframe);
+  setTimeout(anexarWheelNoIframe, 300); // primeira página, antes do 1º 'relocated'
   book.ready.then(() => book.locations.generate(1600)).then(() => {
     btnAnt.disabled = false;
     btnProx.disabled = false;
