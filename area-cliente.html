@@ -314,7 +314,7 @@ nav{
 .btn-leitor:disabled{opacity:.35;cursor:default}
 .leitor-controles{display:flex;gap:10px;align-items:center}
 #leitor-pagina{font-size:12px;color:var(--t3)}
-#leitor-viewer{flex:1;overflow:hidden;background:#fbf8f2}
+#leitor-viewer{flex:1;overflow-x:hidden;overflow-y:auto;background:#fbf8f2}
 #leitor-viewer iframe{width:100%;height:100%;border:none}
 
 /* ══ CARROSSEL SECAO ══ */
@@ -1293,8 +1293,28 @@ function ativarNavegacaoLeitor(book, rendition) {
   document.onkeydown = (e) => {
     if (e.key === 'ArrowRight') rendition.next();
     if (e.key === 'ArrowLeft') rendition.prev();
+    if (e.key === 'Home') { e.preventDefault(); rendition.display(); }
+    if (e.key === 'End') { e.preventDefault(); const last = book.spine.items[book.spine.items.length - 1]; if (last) rendition.display(last.href); }
     if (e.key === 'Escape') fecharLeitor();
   };
+  // Leitor paginado (spread:'none') não tem overflow real -- epub.js sempre calcula o
+  // corte de página pra caber no espaço, nunca "transborda" de verdade. Mas scroll do
+  // mouse/trackpad não fazia nada, o que parece quebrado pra quem espera rolar como
+  // numa página normal. Mapeado pra avançar/voltar página, com debounce (1 virada por
+  // gesto de scroll). O conteúdo real fica DENTRO do iframe que o epub.js recria a cada
+  // página -- wheel não borbulha pra fora do iframe, por isso o listener é anexado no
+  // "rendered" hook (documento novo a cada página) em vez de uma vez só no container.
+  let scrollLock = false;
+  const virarPagina = (e) => {
+    if (scrollLock) return;
+    scrollLock = true;
+    if (e.deltaY > 0) rendition.next(); else if (e.deltaY < 0) rendition.prev();
+    setTimeout(() => { scrollLock = false; }, 400);
+  };
+  document.getElementById('leitor-viewer').onwheel = virarPagina;
+  rendition.on('rendered', (_section, view) => {
+    if (view && view.document) view.document.addEventListener('wheel', virarPagina);
+  });
   book.ready.then(() => book.locations.generate(1600)).then(() => {
     btnAnt.disabled = false;
     btnProx.disabled = false;
