@@ -140,6 +140,10 @@ export async function handleBibliotecaAcervo(_request: Request, env: Env): Promi
     env,
     'biblioteca_acervo?ativo=eq.true&order=featured.desc,titulo.asc&select=slug,titulo,autor,ano_publicacao,genero,sinopse,capa_url,paginas_estimadas,idioma,featured,acesso'
   );
+  if (!r.ok) {
+    console.error('[biblioteca] acervo publico falhou:', r.status, await r.text().catch(() => ''));
+    return Response.json({ ok: false, erro: 'acervo_indisponivel' }, { status: 502 });
+  }
   const data = await r.json();
   return new Response(JSON.stringify(data), {
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=300' },
@@ -366,6 +370,10 @@ export async function handleAdminBibliotecaLer(request: Request, env: Env): Prom
 export async function handleAdminBibliotecaAcervoGet(request: Request, env: Env): Promise<Response> {
   if (!(await verificarTokenAdmin(request, env))) return new Response('Unauthorized', { status: 401 });
   const r = await sb(env, 'biblioteca_acervo?order=featured.desc,titulo.asc&select=*');
+  if (!r.ok) {
+    console.error('[biblioteca] acervo get falhou:', r.status, await r.text().catch(() => ''));
+    return Response.json({ ok: false, erro: 'acervo_indisponivel' }, { status: 502 });
+  }
   return Response.json(await r.json());
 }
 

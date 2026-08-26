@@ -25,6 +25,10 @@ export async function handleFilaRevisao(request: Request, env: Env): Promise<Res
     },
     body: JSON.stringify({ p_limit: 100 }),
   });
+  if (!resp.ok) {
+    console.error('[apuracao] fila_revisao_manual falhou:', resp.status, await resp.text().catch(() => ''));
+    return Response.json({ ok: false, erro: 'fila_indisponivel' }, { status: 502 });
+  }
   return Response.json(await resp.json());
 }
 
@@ -49,5 +53,9 @@ export async function handleModerar(request: Request, env: Env): Promise<Respons
     },
     body: JSON.stringify({ p_dep_id: dep_id, p_aprovado: aprovado, p_motivo: motivo ?? null }),
   });
+  if (!resp.ok) {
+    console.error('[apuracao] aprovar_depoimento_manual falhou:', resp.status, await resp.text().catch(() => ''));
+    return Response.json({ ok: false, erro: 'moderacao_falhou' }, { status: 502 });
+  }
   return Response.json(await resp.json());
 }

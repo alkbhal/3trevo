@@ -23,6 +23,10 @@ export async function handleAdminDepoimentosList(request: Request, env: Env): Pr
     env,
     `depoimentos?estado=eq.${estado}&order=aprovado_em.desc&limit=50&select=id,texto,nome,email,slug,estado,aprovado_em,criado_em`
   );
+  if (!r.ok) {
+    console.error('[admin-depoimentos] list falhou:', r.status, await r.text().catch(() => ''));
+    return Response.json({ ok: false, erro: 'depoimentos_indisponivel' }, { status: 502 });
+  }
   const data = await r.json();
   return Response.json(data);
 }

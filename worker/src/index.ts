@@ -186,6 +186,10 @@ async function dispatch(request: Request, env: Env, path: string, method: string
         `${env.SUPABASE_URL}/rest/v1/depoimentos?estado=eq.aprovado&order=aprovado_em.desc&limit=20&select=id,texto,nome,slug`,
         { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
       );
+      if (!r.ok) {
+        console.error('[depoimentos publico] supabase error:', r.status, await r.text().catch(() => ''));
+        return Response.json({ ok: false, erro: 'depoimentos_indisponivel' }, { status: 502 });
+      }
       const data = await r.json();
       return new Response(JSON.stringify(data), {
         headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=120', ...corsHeaders(origin) },
@@ -209,6 +213,10 @@ async function dispatch(request: Request, env: Env, path: string, method: string
           },
         }
       );
+      if (!resp.ok) {
+        console.error('[catalogo publico] supabase error:', resp.status, await resp.text().catch(() => ''));
+        return Response.json({ ok: false, erro: 'catalogo_indisponivel' }, { status: 502 });
+      }
       const data = await resp.json();
       return new Response(JSON.stringify(data), {
         headers: {
