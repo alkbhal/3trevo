@@ -1,7 +1,7 @@
 /**
  * tt-client.js — Cliente único de catálogo público (Fonte Única)
  * Inclua com: <script src="/js/tt-client.js" onerror="console.error('tt-client falhou ao carregar')"></script>
- * API global: window.TTClient.getCatalogo(), .formatMoney(preco), .renderCatalogo(container, onSuccess)
+ * API global: window.TTClient.getCatalogo(slug?), .formatMoney(preco), .renderCatalogo(container, onSuccess)
  *
  * Substitui o padrão anterior (cada página lendo Supabase direto com a chave anônima
  * embutida) por uma única chamada ao worker, que já usa a service key no servidor.
@@ -13,11 +13,14 @@
   const API_BASE = 'https://tres-trevo-api.al-kbhal.workers.dev';
   const TIMEOUT_MS = 8000;
 
-  async function getCatalogo() {
+  async function getCatalogo(slug) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const url = slug
+      ? `${API_BASE}/api/public/catalogo?slug=${encodeURIComponent(slug)}`
+      : `${API_BASE}/api/public/catalogo`;
     try {
-      const resp = await fetch(`${API_BASE}/api/public/catalogo`, { signal: controller.signal });
+      const resp = await fetch(url, { signal: controller.signal });
       if (!resp.ok) throw new Error(`catalogo_http_${resp.status}`);
       const data = await resp.json();
       if (!Array.isArray(data)) throw new Error('catalogo_formato_invalido');
