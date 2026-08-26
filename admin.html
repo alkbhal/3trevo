@@ -1546,7 +1546,7 @@ async function decidirForge(destino) {
     // exclusiva | hero — ambos entram no catálogo (página própria = /checkout.html?slug=X)
     const rCat = await api('/api/admin/catalogo', 'POST', {
       slug, titulo, autor: 'Said Anes', genero: genero || 'reflexao', genero_pt: genero || 'reflexao',
-      descricao: descricao || '', preco, cotas: 1, utm_campaign: slug,
+      descricao: descricao || '', preco, utm_campaign: slug,
       bg_color: '#0d2415', capa_url: capaUrl, ordem: 99, ativo: true,
     });
     const dCat = await rCat.json();
