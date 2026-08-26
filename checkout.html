@@ -217,6 +217,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 </div>
 
 <script src="/js/supabase-client.js?v=427a408b"></script>
+<script src="/js/tt-client.js?v=3cf77e49" onerror="console.error('tt-client falhou ao carregar')"></script>
 <script>
 const WORKER = 'https://tres-trevo-api.al-kbhal.workers.dev';
 let produtoSlug = null;
@@ -248,13 +249,12 @@ async function init() {
 async function carregarPorSlug(slug) {
   let consultaFalhou = false;
   try {
-    const { data, error } = await sb.from('catalogo').select('*').eq('slug', slug).eq('ativo', true).limit(1);
-    if (error) throw error;
+    const data = await TTClient.getCatalogo(slug);
     if (data && data.length > 0) { renderProduto(data[0]); return; }
     mostrarIndisponivel();
     return;
   } catch (e) {
-    console.warn('Supabase catalogo:', e);
+    console.warn('Catalogo (worker):', e);
     consultaFalhou = true;
   }
 
@@ -265,7 +265,7 @@ async function carregarPorSlug(slug) {
     document.getElementById('prodAutor').textContent  = local.autor || 'Said Anes';
     document.getElementById('prodDesc').textContent   = local.descricao || '';
     document.getElementById('prodCotas').textContent  = local.cotas || 1;
-    document.getElementById('prodPreco').textContent  = 'R$ ' + Number(local.preco).toFixed(2).replace('.', ',');
+    document.getElementById('prodPreco').textContent  = 'R$ ' + TTClient.formatMoney(local.preco);
     return;
   }
 
@@ -291,7 +291,7 @@ function renderProduto(p) {
   document.getElementById('prodAutor').textContent  = p.autor || '';
   document.getElementById('prodDesc').textContent   = p.descricao || '';
   document.getElementById('prodCotas').textContent  = p.cotas;
-  document.getElementById('prodPreco').textContent  = 'R$ ' + Number(p.preco).toFixed(2).replace('.', ',');
+  document.getElementById('prodPreco').textContent  = 'R$ ' + TTClient.formatMoney(p.preco);
 }
 
 // ── VALIDAÇÃO ─────────────────────────────────────────────
