@@ -9,9 +9,42 @@
  * DELETE /api/admin/catalogo/:slug    — inativa livro (soft delete)
  */
 
+import { z } from 'zod';
 import type { Env } from '../types';
 import { sb } from '../sb';
 import { sha256 } from './admin-auth';
+
+// ─── Validação Zod — antes o worker só checava existência (slug/titulo), nunca
+// tipo/faixa (achado da auditoria "Fonte Única", 21/08). Um único schema pra
+// create/update: todo campo opcional aqui, quem exige slug/titulo é o handler.
+export const catalogoInputSchema = z.object({
+  slug: z.string().min(1).max(80).regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, 'slug deve ser kebab-case').optional(),
+  titulo: z.string().min(1).max(300).optional(),
+  titulo_en: z.string().max(300).nullable().optional(),
+  titulo_es: z.string().max(300).nullable().optional(),
+  descricao: z.string().max(5000).nullable().optional(),
+  descricao_en: z.string().max(5000).nullable().optional(),
+  descricao_es: z.string().max(5000).nullable().optional(),
+  genero: z.string().max(100).nullable().optional(),
+  genero_pt: z.string().max(100).nullable().optional(),
+  genero_en: z.string().max(100).nullable().optional(),
+  genero_es: z.string().max(100).nullable().optional(),
+  autor: z.string().max(200).nullable().optional(),
+  preco: z.number().min(0).max(10000).optional(),
+  utm_campaign: z.string().max(100).nullable().optional(),
+  bg_color: z.string().max(20).nullable().optional(),
+  capa_url: z.string().max(500).nullable().optional(),
+  ordem: z.number().int().min(0).max(9999).optional(),
+  ativo: z.boolean().optional(),
+  motivo_inativo: z.string().max(500).nullable().optional(),
+});
+
+function erroValidacao(issues: z.ZodIssue[]): Response {
+  return Response.json(
+    { ok: false, erro: 'validacao', detalhe: issues.map((i) => `${i.path.join('.')}: ${i.message}`) },
+    { status: 400 }
+  );
+}
 
 // ─── Auth helper ─────────────────────────────────────────────────────────────
 export async function verificarToken(request: Request, env: Env): Promise<boolean> {
@@ -93,8 +126,11 @@ export async function handleAdminCatalogoGet(request: Request, env: Env): Promis
 // ─── Criar livro ──────────────────────────────────────────────────────────────
 export async function handleAdminCatalogoCreate(request: Request, env: Env): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
-  let body: any;
-  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  let bodyRaw: any;
+  try { bodyRaw = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  const parsed = catalogoInputSchema.safeParse(bodyRaw);
+  if (!parsed.success) return erroValidacao(parsed.error.issues);
+  const body = parsed.data;
   if (!body.slug || !body.titulo) return Response.json({ ok: false, erro: 'slug_e_titulo_obrigatorios' }, { status: 400 });
 
   const preco = body.preco ?? 0;
@@ -147,8 +183,11 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
 // ─── Atualizar livro ──────────────────────────────────────────────────────────
 export async function handleAdminCatalogoUpdate(request: Request, env: Env, slug: string): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
-  let body: any;
-  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  let bodyRaw: any;
+  try { bodyRaw = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  const parsed = catalogoInputSchema.safeParse(bodyRaw);
+  if (!parsed.success) return erroValidacao(parsed.error.issues);
+  const body: Record<string, any> = parsed.data;
 
   // Campos permitidos para atualização. "cotas" de propósito fora da lista -- nunca
   // aceito direto do cliente, sempre recalculado de "preco" (ver cotasPorPreco acima).
@@ -204,6 +243,48 @@ export async function handleAdminCatalogoPatch(request: Request, env: Env): Prom
   return Response.json({ ok: true, results });
 }
 
+// ─── handleAdminTableInsert: 1 schema Zod por tabela permitida (nenhuma validação
+// existia antes -- schema real conferido em supabase/growth-engine.sql:21-118) ────
+const leadsRowSchema = z.object({
+  email: z.string().email().max(200),
+  nome: z.string().max(200).nullable().optional(),
+  whatsapp: z.string().max(30).nullable().optional(),
+  source: z.string().max(50).nullable().optional(),
+  utm_source: z.string().max(100).nullable().optional(),
+  utm_medium: z.string().max(100).nullable().optional(),
+  utm_campaign: z.string().max(100).nullable().optional(),
+  utm_content: z.string().max(100).nullable().optional(),
+  utm_term: z.string().max(100).nullable().optional(),
+  status: z.string().max(50).nullable().optional(),
+  score: z.number().int().optional(),
+});
+
+const campaignsRowSchema = z.object({
+  name: z.string().min(1).max(200),
+  utm_campaign: z.string().min(1).max(100),
+  channel: z.string().min(1).max(50),
+  budget_daily: z.number().min(0).optional(),
+  budget_total: z.number().min(0).optional(),
+  spent: z.number().min(0).optional(),
+  revenue: z.number().min(0).optional(),
+  tier: z.number().int().optional(),
+  status: z.string().max(50).optional(),
+  paused_reason: z.string().max(300).nullable().optional(),
+});
+
+const emailTemplatesRowSchema = z.object({
+  id: z.number().int(),
+  tag: z.string().min(1).max(100),
+  subject: z.string().min(1).max(300),
+  html: z.string().min(1),
+});
+
+export const tableRowSchemas: Record<string, z.ZodTypeAny> = {
+  email_templates: emailTemplatesRowSchema,
+  campaigns: campaignsRowSchema,
+  leads: leadsRowSchema,
+};
+
 // ─── Admin SQL-safe: insert em tabela permitida ─────────────────────────────
 export async function handleAdminTableInsert(request: Request, env: Env): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
@@ -211,14 +292,17 @@ export async function handleAdminTableInsert(request: Request, env: Env): Promis
   try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
 
   const { table, rows } = body;
-  const allowed = ['email_templates', 'campaigns', 'leads'];
-  if (!allowed.includes(table)) return Response.json({ ok: false, erro: 'tabela_nao_permitida' }, { status: 403 });
+  const schema = tableRowSchemas[table];
+  if (!schema) return Response.json({ ok: false, erro: 'tabela_nao_permitida' }, { status: 403 });
   if (!Array.isArray(rows)) return Response.json({ ok: false, erro: 'rows deve ser array' }, { status: 400 });
+
+  const parsed = z.array(schema).safeParse(rows);
+  if (!parsed.success) return erroValidacao(parsed.error.issues);
 
   const r = await sb(env, table, {
     method: 'POST',
     headers: { Prefer: 'return=minimal,resolution=ignore-duplicates' } as any,
-    body: JSON.stringify(rows),
+    body: JSON.stringify(parsed.data),
   });
   return Response.json({ ok: r.ok, status: r.status });
 }
