@@ -282,6 +282,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   </div>
 
   <div class="grid-ebooks" role="list" id="gridEbooks"></div>
+  <script src="/js/tt-client.js?v=3cf77e49" onerror="console.error('tt-client falhou ao carregar')"></script>
   <script>
   (function(){
     // Categoria de filtro (Ficção/Ensaio/Manuais/Infantil) não existe como coluna no banco --
@@ -296,12 +297,8 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
       'justicamento':'ensaio','antifalencia':'manuais','livre-das-dividas':'manuais',
       'isa-isma-tintim':'infantil','antes-do-app':'manuais'
     };
-    var SB='https://xfkepekffdyrtcgagwqo.supabase.co';
-    var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
     var grid = document.getElementById('gridEbooks');
-    fetch(SB+'/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,descricao,genero_pt,genero,autor,preco,cotas,capa_url,bg_color',
-      {headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}})
-      .then(function(r){return r.ok?r.json():[];})
+    TTClient.getCatalogo()
       .then(function(livros){
         var totalEl = document.getElementById('totalObras');
         if (totalEl) totalEl.textContent = livros.length;
@@ -325,7 +322,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
             '<p class="ebook-desc">'+(l.descricao||'')+'</p>'+
             '<div class="ebook-premio-box">✦ Participa do Programa Cultural · confirmação após D+7</div>'+
             '<div class="ebook-footer">'+
-              '<div><div class="ebook-preco" id="preco-'+l.slug+'">R$'+Number(l.preco).toFixed(2).replace('.',',')+'</div>'+
+              '<div><div class="ebook-preco" id="preco-'+l.slug+'">R$'+TTClient.formatMoney(l.preco)+'</div>'+
               '<div class="ebook-cotas">'+l.cotas+' cota'+(l.cotas>1?'s':'')+' inclusa'+(l.cotas>1?'s':'')+'</div></div>'+
               '<a href="/checkout.html?slug='+l.slug+'" class="ebook-btn" onclick="event.stopPropagation()">Adquirir</a>'+
             '</div>';
@@ -362,7 +359,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
               : 'Nenhum título ativo nesta faixa no momento.';
             var precoMin = titulosFaixa.length ? Math.min.apply(null, titulosFaixa.map(function(l) { return Number(l.preco); })) : null;
             var cta = titulosFaixa.length
-              ? '<a href="/checkout.html?slug=' + titulosFaixa[0].slug + '" class="faixa-btn">A partir de R$' + precoMin.toFixed(2).replace('.', ',') + '</a>'
+              ? '<a href="/checkout.html?slug=' + titulosFaixa[0].slug + '" class="faixa-btn">A partir de R$' + TTClient.formatMoney(precoMin) + '</a>'
               : '<a href="/catalogo.html" class="faixa-btn" style="opacity:.5;pointer-events:none">Indisponível</a>';
             return '<div class="faixa-card' + (f.destaque ? ' destaque' : '') + ' reveal" style="transition-delay:' + (i * 0.1) + 's">' +
               '<div class="faixa-tag">' + f.tag + '</div>' +
