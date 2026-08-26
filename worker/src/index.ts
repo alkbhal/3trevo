@@ -192,10 +192,16 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       });
     }
 
-    // Catálogo (leitura pública)
+    // Catálogo (leitura pública) — ?slug=X filtra 1 título, herda ativo=true e as mesmas
+    // colunas (sem motivo_inativo) do endpoint de lista, nunca reimplementar a query solto.
     if (path === '/api/public/catalogo' && method === 'GET') {
+      const slug = new URL(request.url).searchParams.get('slug');
+      if (slug !== null && !/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug)) {
+        return Response.json({ ok: false, erro: 'slug inválido' }, { status: 400 });
+      }
+      const filtroSlug = slug ? `&slug=eq.${slug}` : '';
       const resp = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem`,
+        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true${filtroSlug}&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem`,
         {
           headers: {
             apikey: env.SUPABASE_SERVICE_KEY,
