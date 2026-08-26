@@ -7,7 +7,8 @@ Sistema autônomo de publicação, venda e distribuição de ebooks com programa
 ```
 Frontend (GitHub Pages)         Backend (Cloudflare Worker)
 ├── HTML/CSS/JS puro      ───►  tres-trevo-api.al-kbhal.workers.dev
-├── Zero build step              │
+├── 1 script automático via CI    │
+│   (stamp.mjs, sem bundler)     │
 └── Deploy: git push             ├── Supabase (PostgreSQL)
                                  │   └── pedidos, catálogo, draws, depoimentos,
                                  │       biblioteca_acervo, slots, historico
