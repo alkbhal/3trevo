@@ -127,8 +127,18 @@ npx @claude-flow/cli@latest hooks post-task --task-id "[id]" --success true --st
 | `document` | After API changes |
 
 ```bash
-npx @claude-flow/cli@latest hooks worker dispatch --trigger audit
+node scripts/security-audit.mjs
 ```
+
+`audit` used to run via `npx @claude-flow/cli@latest hooks worker dispatch --trigger audit`, which
+failed 100% of the time on Windows with `spawn claude ENOENT` (see
+`.claude-flow/logs/headless/audit_*_result.log`) — Node's `spawn()` without `shell:true` only
+resolves `claude.exe`, but npm's global bin only installs `claude`/`claude.cmd`/`claude.ps1`. The
+daemon's own success tracking didn't check the actual audit output, so it kept reporting `success`
+while never producing a single real finding. `scripts/security-audit.mjs` spawns the same
+already-installed `claude` CLI correctly (`shell:true`) and lets it read the real repo files instead
+of a canned prompt, writing genuine results to `.claude-flow/metrics/security-audit.json` and
+`.claude-flow/security/audit-status.json`.
 
 ## Agents
 
