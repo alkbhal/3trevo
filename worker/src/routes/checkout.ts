@@ -216,7 +216,7 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
   const url = new URL(request.url);
   const token = url.searchParams.get('token');
 
-  if (!token) return new Response('Link inválido', { status: 400 });
+  if (!token || !/^[0-9a-f-]{36}$/i.test(token)) return new Response('Link inválido', { status: 400 });
 
   // Buscar token na tabela downloads
   const resp = await fetch(

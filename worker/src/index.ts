@@ -81,13 +81,16 @@ import {
 } from './routes/biblioteca';
 
 // ─── CORS helper ──────────────────────────────────────────────────────────────
+// :5500 = VS Code Live Server, o servidor local real usado pra abrir admin.html
+// (docs/specs/PLANO_EXECUCAO.md). Mantido de propósito -- Origin não é
+// spoofável por JS de terceiros, só importa se o dev já tiver algo malicioso
+// rodando na própria porta 5500 local. :8099 não tinha uso nenhum documentado
+// (achado da auditoria real, 01/09) -- removido.
 const ALLOWED_ORIGINS = [
   'https://3trevo.com.br',
   'https://www.3trevo.com.br',
   'http://localhost:5500',
   'http://127.0.0.1:5500',
-  'http://localhost:8099',
-  'http://127.0.0.1:8099',
 ];
 
 function corsHeaders(origin: string | null): HeadersInit {

@@ -24,9 +24,39 @@
  *   GET    /api/admin/biblioteca/stats         — métricas
  */
 
+import { z } from 'zod';
 import type { Env } from '../types';
 import { verificarToken as verificarTokenAdmin } from './admin-catalog';
 import { sb } from '../sb';
+
+// ─── Validação Zod do acervo — achado da auditoria real (01/09): create/update
+// gravavam o body admin cru sem schema, permitindo titulo/sinopse com HTML que
+// depois é injetado sem escape em minha-biblioteca.html/catalogo.html.
+export const bibliotecaAcervoSchema = z.object({
+  slug: z.string().min(1).max(80).regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, 'slug deve ser kebab-case').optional(),
+  titulo: z.string().min(1).max(300).optional(),
+  autor: z.string().max(200).optional(),
+  ano_publicacao: z.number().int().min(0).max(9999).nullable().optional(),
+  genero: z.string().max(100).nullable().optional(),
+  sinopse: z.string().max(5000).nullable().optional(),
+  capa_url: z.string().max(500).nullable().optional(),
+  epub_url: z.string().max(500).nullable().optional(),
+  paginas_estimadas: z.number().int().min(0).max(99999).nullable().optional(),
+  fonte: z.string().max(200).nullable().optional(),
+  fonte_url: z.string().max(500).nullable().optional(),
+  idioma: z.string().max(10).optional(),
+  ativo: z.boolean().optional(),
+  featured: z.boolean().optional(),
+  acesso: z.enum(['bonus', 'compra']).optional(),
+  product_id: z.string().uuid().nullable().optional(),
+});
+
+function erroValidacaoAcervo(issues: z.ZodIssue[]): Response {
+  return Response.json(
+    { ok: false, erro: 'validacao', detalhe: issues.map((i) => `${i.path.join('.')}: ${i.message}`) },
+    { status: 400 }
+  );
+}
 
 // ─── Auth: verificar sessão de leitor (KV) ───────────────────────────────────
 async function sessaoLeitor(request: Request, env: Env): Promise<string | null> {
@@ -52,6 +82,19 @@ async function temAcessoProduto(email: string, productId: string, env: Env): Pro
   );
   const rows = (await r.json()) as any[];
   return rows.length > 0;
+}
+
+// ─── Validar slot_id antes de interpolar em filtro PostgREST (achado real da
+// auditoria, 01/09: slot_id ia direto pra query sem checar tipo/formato) ─────
+export function parsePositiveInt(v: unknown): number | null {
+  // parseInt('1&status=eq.lendo') === 1 (ignora lixo à direita) -- por isso
+  // /^\d+$/ em vez de parseInt: string tem que ser só dígitos, ponta a ponta.
+  if (typeof v === 'number') return Number.isInteger(v) && v > 0 ? v : null;
+  if (typeof v === 'string' && /^\d+$/.test(v)) {
+    const n = Number(v);
+    return n > 0 ? n : null;
+  }
+  return null;
 }
 
 // ─── Token aleatório ──────────────────────────────────────────────────────────
@@ -237,7 +280,7 @@ export async function handleBibliotecaMarcarLida(request: Request, env: Env): Pr
   let body: any;
   try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
 
-  const { slot_id } = body;
+  const slot_id = parsePositiveInt(body.slot_id);
   if (!slot_id) return Response.json({ ok: false, erro: 'slot_id_obrigatorio' }, { status: 400 });
 
   const slotR = await sb(env, `biblioteca_slots?id=eq.${slot_id}&email=eq.${encodeURIComponent(email)}&status=eq.lendo&select=id,acervo_id&limit=1`);
@@ -270,7 +313,8 @@ export async function handleBibliotecaProgresso(request: Request, env: Env): Pro
   let body: any;
   try { body = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
 
-  const { slot_id, pagina_atual = 0, progresso_percentual = 0 } = body;
+  const { pagina_atual = 0, progresso_percentual = 0 } = body;
+  const slot_id = parsePositiveInt(body.slot_id);
   if (!slot_id) return Response.json({ ok: false, erro: 'slot_id_obrigatorio' }, { status: 400 });
   const pag = Math.max(0, Math.floor(Number(pagina_atual) || 0));
   const prog = Math.max(0, Math.min(100, Number(progresso_percentual) || 0));
@@ -379,17 +423,21 @@ export async function handleAdminBibliotecaAcervoGet(request: Request, env: Env)
 
 export async function handleAdminBibliotecaAcervoCreate(request: Request, env: Env): Promise<Response> {
   if (!(await verificarTokenAdmin(request, env))) return new Response('Unauthorized', { status: 401 });
-  let body: any;
-  try { body = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
-  const r = await sb(env, 'biblioteca_acervo', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(body) });
+  let bodyRaw: any;
+  try { bodyRaw = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
+  const parsed = bibliotecaAcervoSchema.safeParse(bodyRaw);
+  if (!parsed.success) return erroValidacaoAcervo(parsed.error.issues);
+  const r = await sb(env, 'biblioteca_acervo', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(parsed.data) });
   return Response.json({ ok: r.ok, data: await r.json() });
 }
 
 export async function handleAdminBibliotecaAcervoUpdate(request: Request, env: Env, slug: string): Promise<Response> {
   if (!(await verificarTokenAdmin(request, env))) return new Response('Unauthorized', { status: 401 });
-  let body: any;
-  try { body = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
-  const r = await sb(env, `biblioteca_acervo?slug=eq.${encodeURIComponent(slug)}`, { method: 'PATCH', body: JSON.stringify(body) });
+  let bodyRaw: any;
+  try { bodyRaw = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
+  const parsed = bibliotecaAcervoSchema.safeParse(bodyRaw);
+  if (!parsed.success) return erroValidacaoAcervo(parsed.error.issues);
+  const r = await sb(env, `biblioteca_acervo?slug=eq.${encodeURIComponent(slug)}`, { method: 'PATCH', body: JSON.stringify(parsed.data) });
   return Response.json({ ok: r.ok });
 }
 

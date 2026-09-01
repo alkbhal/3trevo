@@ -5,14 +5,44 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const MP_ACCESS_TOKEN = Deno.env.get("MP_ACCESS_TOKEN")!;
-const SUPABASE_URL    = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_KEY     = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const RESEND_API_KEY  = Deno.env.get("RESEND_API_KEY");
-const SITE_URL        = Deno.env.get("SITE_URL") ?? "https://3trevo.com.br";
-const FROM_EMAIL      = Deno.env.get("FROM_EMAIL") ?? "sac@3trevo.com.br";
+const MP_ACCESS_TOKEN     = Deno.env.get("MP_ACCESS_TOKEN")!;
+const SUPABASE_URL        = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_KEY         = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const RESEND_API_KEY      = Deno.env.get("RESEND_API_KEY");
+const SITE_URL            = Deno.env.get("SITE_URL") ?? "https://3trevo.com.br";
+const FROM_EMAIL          = Deno.env.get("FROM_EMAIL") ?? "sac@3trevo.com.br";
+const WEBHOOK_HMAC_SECRET = Deno.env.get("WEBHOOK_HMAC_SECRET");
 
 const sb = createClient(SUPABASE_URL, SERVICE_KEY);
+
+// Mesma verificação de worker/src/routes/checkout.ts::verificarAssinaturaMP — achado real da
+// auditoria (01/09): esta function aceitava qualquer POST sem checar o header x-signature do MP.
+async function verificarAssinaturaMP(req: Request, body: any, secret: string): Promise<boolean> {
+  const xSig = req.headers.get("x-signature") ?? "";
+  const xReqId = req.headers.get("x-request-id") ?? "";
+  const mpId = body?.data?.id ?? body?.id ?? "";
+
+  const ts = xSig.match(/ts=([^,]+)/)?.[1] ?? "";
+  const v1 = xSig.match(/v1=([^,]+)/)?.[1] ?? "";
+
+  const tsNum = parseInt(ts, 10);
+  const agora = Math.floor(Date.now() / 1000);
+  if (isNaN(tsNum) || Math.abs(agora - tsNum) > 300) return false;
+  if (!ts || !v1 || !mpId) return false;
+
+  const message = `id:${mpId};request-id:${xReqId};ts:${ts}`;
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sigBuf = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
+  const expected = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2, "0")).join("");
+
+  if (expected.length !== v1.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ v1.charCodeAt(i);
+  return diff === 0;
+}
 
 serve(async (req: Request) => {
   // MercadoPago envia GET com query params para validação inicial
@@ -24,8 +54,20 @@ serve(async (req: Request) => {
     return new Response("Method not allowed", { status: 405 });
   }
 
+  // Fail-closed: sem secret configurado, rejeita tudo (igual worker/src/routes/checkout.ts)
+  if (!WEBHOOK_HMAC_SECRET) {
+    console.error("WEBHOOK_HMAC_SECRET ausente — rejeitando");
+    return new Response("Service Unavailable", { status: 503 });
+  }
+
   try {
     const body = await req.json();
+
+    if (!(await verificarAssinaturaMP(req, body, WEBHOOK_HMAC_SECRET))) {
+      console.error("Assinatura x-signature inválida — rejeitando");
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     console.log("Webhook recebido:", JSON.stringify(body));
 
     // IPN format: { type: "payment", data: { id: "..." } }

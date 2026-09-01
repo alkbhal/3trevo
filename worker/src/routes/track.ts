@@ -65,9 +65,12 @@ export async function handleMetaCapi(request: Request, env: Env): Promise<Respon
       user_data: { em: [hashedEmail] },
       custom_data: value ? { value, currency: currency ?? 'BRL' } : undefined,
     }],
+    access_token: capiToken,
   };
 
-  await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${capiToken}`, {
+  // access_token vai no body, não na query string, pra não vazar em logs de
+  // edge/proxy (achado da auditoria real, 01/09) -- Graph API aceita os dois.
+  await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

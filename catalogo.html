@@ -291,6 +291,9 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
     // congelado direto no HTML (não sincronizava com o admin) e listava títulos já inativos como
     // se estivessem à venda -- causa raiz real do "corrigi o preço e não mudou" e de anunciar
     // título sem arquivo/quebrado.
+    function escapeHtml(str) {
+      return (str == null ? '' : String(str)).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
     var CATEGORIAS = {
       '3a-guerra':'ficcao','habitaculos':'ensaio','ultima-coisa':'ficcao',
       'caminho-rubro-vol1':'ensaio','caminho-rubro-vol2':'ensaio','caminho-rubro-vol3':'ensaio',
@@ -310,21 +313,21 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           card.setAttribute('role','listitem');
           card.dataset.genero = CATEGORIAS[l.slug] || 'ensaio';
           card.style.transitionDelay = (i * 0.08) + 's';
-          card.onclick = function(){ location.href='/checkout.html?slug='+l.slug; };
+          card.onclick = function(){ location.href='/checkout.html?slug='+encodeURIComponent(l.slug); };
           var capa = l.capa_url
-            ? '<div class="livro-mockup"><img src="'+l.capa_url+'" alt="Capa de '+l.titulo+'" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:2px"></div>'
-            : '<div class="livro-mockup" data-mockup-cor="'+(l.bg_color||'#1a4a2e')+'" data-mockup-titulo="'+l.titulo+'" data-mockup-w="80" data-mockup-h="110"></div>';
+            ? '<div class="livro-mockup"><img src="'+escapeHtml(l.capa_url)+'" alt="Capa de '+escapeHtml(l.titulo)+'" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:2px"></div>'
+            : '<div class="livro-mockup" data-mockup-cor="'+escapeHtml(l.bg_color||'#1a4a2e')+'" data-mockup-titulo="'+escapeHtml(l.titulo)+'" data-mockup-w="80" data-mockup-h="110"></div>';
           card.innerHTML =
             capa+
-            '<div class="ebook-genero">'+genero+'</div>'+
-            '<h2 class="ebook-titulo">'+l.titulo+'</h2>'+
-            '<p class="ebook-autor">'+autor+'</p>'+
-            '<p class="ebook-desc">'+(l.descricao||'')+'</p>'+
+            '<div class="ebook-genero">'+escapeHtml(genero)+'</div>'+
+            '<h2 class="ebook-titulo">'+escapeHtml(l.titulo)+'</h2>'+
+            '<p class="ebook-autor">'+escapeHtml(autor)+'</p>'+
+            '<p class="ebook-desc">'+escapeHtml(l.descricao||'')+'</p>'+
             '<div class="ebook-premio-box">✦ Participa do Programa Cultural · confirmação após D+7</div>'+
             '<div class="ebook-footer">'+
-              '<div><div class="ebook-preco" id="preco-'+l.slug+'">R$'+TTClient.formatMoney(l.preco)+'</div>'+
+              '<div><div class="ebook-preco" id="preco-'+encodeURIComponent(l.slug)+'">R$'+TTClient.formatMoney(l.preco)+'</div>'+
               '<div class="ebook-cotas">'+l.cotas+' cota'+(l.cotas>1?'s':'')+' inclusa'+(l.cotas>1?'s':'')+'</div></div>'+
-              '<a href="/checkout.html?slug='+l.slug+'" class="ebook-btn" onclick="event.stopPropagation()">Adquirir</a>'+
+              '<a href="/checkout.html?slug='+encodeURIComponent(l.slug)+'" class="ebook-btn" onclick="event.stopPropagation()">Adquirir</a>'+
             '</div>';
           grid.appendChild(card);
           if (!l.capa_url) {
@@ -355,11 +358,11 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           faixasGrid.innerHTML = FAIXAS.map(function(f, i) {
             var titulosFaixa = livros.filter(function(l) { return l.cotas === f.cotas; });
             var listaHtml = titulosFaixa.length
-              ? titulosFaixa.map(function(l) { return '— ' + l.titulo; }).join('<br>')
+              ? titulosFaixa.map(function(l) { return '— ' + escapeHtml(l.titulo); }).join('<br>')
               : 'Nenhum título ativo nesta faixa no momento.';
             var precoMin = titulosFaixa.length ? Math.min.apply(null, titulosFaixa.map(function(l) { return Number(l.preco); })) : null;
             var cta = titulosFaixa.length
-              ? '<a href="/checkout.html?slug=' + titulosFaixa[0].slug + '" class="faixa-btn">A partir de R$' + TTClient.formatMoney(precoMin) + '</a>'
+              ? '<a href="/checkout.html?slug=' + encodeURIComponent(titulosFaixa[0].slug) + '" class="faixa-btn">A partir de R$' + TTClient.formatMoney(precoMin) + '</a>'
               : '<a href="/catalogo.html" class="faixa-btn" style="opacity:.5;pointer-events:none">Indisponível</a>';
             return '<div class="faixa-card' + (f.destaque ? ' destaque' : '') + ' reveal" style="transition-delay:' + (i * 0.1) + 's">' +
               '<div class="faixa-tag">' + f.tag + '</div>' +
