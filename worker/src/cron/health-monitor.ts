@@ -19,6 +19,7 @@
 
 import type { Env } from '../types';
 import { logError, KV_HEALTH_LAST, KV_HEALTH_LOG, KV_FAIL_LOGINS, KV_HMAC_FAILURES } from '../routes/health';
+import { rodarGuardiao } from '../guardiao/monitor';
 
 const ALERTA_EMAIL  = 'sac@3trevo.com.br';
 const FROM_EMAIL    = 'sistema@3trevo.com.br';
@@ -210,11 +211,17 @@ export async function handleHealthMonitor(env: Env): Promise<void> {
     avisos.push(`Atenção: ${seg.hmac_failures} falhas HMAC no webhook na última hora`);
   }
 
-  // 6. Salvar resultado no KV
+  // 6. Guardião — contrato de segurança (o monitor acima responde "está no ar?";
+  //    este responde "continua seguro?"). Violação entra em `erros` e usa o
+  //    e-mail de alerta abaixo; "não deu para verificar" entra em `avisos`.
+  const guardiao = await rodarGuardiao(env, erros, avisos);
+
+  // 7. Salvar resultado no KV
   const resultado = {
     ok: erros.length === 0,
     erros,
     avisos,
+    guardiao,
     supabase: { ok: supabase.ok, latencia_ms: supabase.latencia_ms },
     kv: { ok: kv.ok },
     seguranca: seg,
@@ -225,7 +232,7 @@ export async function handleHealthMonitor(env: Env): Promise<void> {
     await env.TT_KV.put(KV_HEALTH_LAST, JSON.stringify(resultado), { expirationTtl: 7200 });
   }
 
-  // 7. Alertas por email
+  // 8. Alertas por email
   if (erros.length > 0) {
     const corpo = [
       `Timestamp: ${resultado.checked_at}`,
