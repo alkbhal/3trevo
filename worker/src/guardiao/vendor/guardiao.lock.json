@@ -1,0 +1,10 @@
+{
+  "origem": "guardiao",
+  "versao": "0.1.1",
+  "sincronizadoEm": "2026-09-29T22:02:48.337Z",
+  "arquivos": {
+    "guardiao-core.js": "67dce219d627bbe8a596693d27d6f17d7207ae2dee090781fa9c584b68860e43",
+    "guardiao-core.d.ts": "1d4b21d19c1b2ad7e6b449f55229e5862d84635ff47b037467464df4b30823cb",
+    "guardiao-deriva.mjs": "a36ed60710e128adbb91c57748d00b429b46fca3d16038aa24f8b9755e4fd4af"
+  }
+}
