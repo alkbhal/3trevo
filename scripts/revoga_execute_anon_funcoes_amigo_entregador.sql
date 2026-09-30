@@ -1,24 +1,33 @@
 -- ============================================================
--- Migration: revoga_execute_anon_funcoes_amigo_entregador
--- Revoga EXECUTE de anon/authenticated nas 32 funcoes SECURITY DEFINER
--- do modulo Amigo Entregador (vendas, capital, estoque, notas fiscais,
--- sorteio) — hoje chamaveis sem login nenhum via /rest/v1/rpc/ae_*,
--- protegidas so por 1 token estatico em amigo_entregador.app_config
--- comparado sem rate limit (ae_checar_token). RLS nas tabelas dessas
--- funcoes esta habilitado sem nenhuma policy (nega tudo por padrao),
--- entao essas 32 funcoes eram o unico portao de acesso publico.
+-- NAO EXECUTAR COMO ESTA — ver correcao abaixo (2026-09-30).
 --
--- Mesmo padrao ja aplicado em ae_checar_token e nas funcoes do lado
--- 3trevo (migration remota 20260929212926_revoga_execute_anon_funcoes_
--- servidor_3trevo, tambem nao espelhada em scripts/ ate esta correcao).
+-- Premissa original deste script estava errada: o app do Amigo Entregador
+-- roda no celular do usuario e chama estas 32 funcoes ae_* direto do
+-- cliente com a chave publica (anon) do Supabase — mesma coisa que toda
+-- app mobile/web faz, a chave anon nao e secreta, e embutida no build.
+-- Confirmado em producao: ~125 chamadas/24h de Android reais.
 --
--- Pre-requisito confirmado com o usuario em 2026-09-29: nenhum cliente
--- ativo depende de acesso anonimo a este modulo (app ainda migrando
--- pro Cloudflare). Apos rodar, so service_role pode chamar essas RPCs
--- — ou seja, so um backend com a service key, nunca o app direto com
--- a anon key.
+-- Rodar o REVOKE abaixo tira o EXECUTE do papel anon e derruba o app na
+-- hora (listar vendas, salvar lote, registrar movimento, catalogo — tudo
+-- passa a dar erro de permissao).
 --
--- Executar no SQL Editor do Supabase (projeto xfkepekffdyrtcgagwqo).
+-- A protecao real ja existe hoje: 31 das 32 funcoes conferem um token por
+-- dentro via ae_checar_token (que ja esta corretamente restrito a
+-- service_role — ninguem chama o checker direto). A excecao intencional e
+-- ae_catalogo_publico_listar, que nao pede token porque e o catalogo
+-- publico. O Security Advisor aponta essas 32 funcoes como
+-- SECURITY DEFINER executavel por anon — aceito como parte do desenho
+-- atual, nao como vulnerabilidade a corrigir com REVOKE.
+--
+-- Correcao real (Fase 2, quando a migracao pro Cloudflare avancar):
+-- colocar uma Edge Function / Cloudflare Worker entre o app e o banco,
+-- que passa a chamar estas funcoes com service_role. So entao revogar
+-- anon faz sentido — e so entao este script (ou equivalente) deve rodar.
+--
+-- Ganho marginal disponivel ja agora, sem risco (app nao usa login):
+-- revogar so de `authenticated` (nunca usado por este modulo). Efeito
+-- pratico é baixo; documentado aqui caso o usuario queira aplicar so essa
+-- parte — nao inclui `anon` no REVOKE abaixo por causa disso.
 -- ============================================================
 
 DO $$
@@ -28,8 +37,9 @@ BEGIN
     SELECT p.oid::regprocedure AS sig
     FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
     WHERE n.nspname = 'public' AND p.proname LIKE 'ae\_%' ESCAPE '\'
+      AND p.proname <> 'ae_catalogo_publico_listar'
   LOOP
-    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC, anon, authenticated', r.sig);
-    EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO service_role', r.sig);
+    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC, authenticated', r.sig);
+    -- anon NAO revogado — ver aviso acima.
   END LOOP;
 END $$;
