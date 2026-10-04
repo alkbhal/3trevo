@@ -21,6 +21,15 @@ export async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+// ponytail: mesmo helper em checkout.ts e forge-webhook.ts — duplicado pra evitar novo
+// arquivo compartilhado só por 3 call sites (CLAUDE.md: "prefer editing existing files")
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 async function derivarPinHash(pin: string, salt: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     'raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']
@@ -73,11 +82,11 @@ export async function handleAdminLogin(request: Request, env: Env): Promise<Resp
     let pinValido = false;
     if (usuario.pin_hash_v2 && usuario.pin_salt) {
       const hash = await derivarPinHash(pin, usuario.pin_salt);
-      pinValido = hash === usuario.pin_hash_v2;
+      pinValido = timingSafeEqualHex(hash, usuario.pin_hash_v2);
     } else {
       // ponytail: fallback SHA-256 legado — auto-upgrade na próxima linha
       const hash = await sha256(pin);
-      pinValido = hash === usuario.pin_hash;
+      pinValido = timingSafeEqualHex(hash, usuario.pin_hash);
       if (pinValido) {
         upgradeParaPbkdf2(env, usuario.id, pin).catch(e => console.error('[auth] upgrade PBKDF2 falhou:', e));
       }

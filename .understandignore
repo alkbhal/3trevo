@@ -1,0 +1,19 @@
+# economia de token (Mapa de Projetos, 2026-10-03)
+node_modules/
+.next/
+dist/
+build/
+.wrangler/
+coverage/
+.ua/
+*.lock
+package-lock.json
+pnpm-lock.yaml
+*.min.js
+auditoria/
+.claude/
+tests/fixtures/
+*.pfx
+*.pem
+.env*
+.dev.vars
