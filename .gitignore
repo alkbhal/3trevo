@@ -68,3 +68,6 @@ setup-*.ps1
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+# grafo do /understand (local)
+.ua/
