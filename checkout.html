@@ -152,13 +152,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
         <div class="produto-titulo" id="prodTitulo">—</div>
         <div class="produto-autor" id="prodAutor">—</div>
         <div class="produto-desc" id="prodDesc"></div>
-        <div class="produto-cotas-box">
-          <div class="produto-cotas-num" id="prodCotas">—</div>
-          <div class="produto-cotas-txt">
-            cotas no Programa Cultural<br>
-            <span style="color:rgba(26,26,22,.4);font-size:11px">Válidas após D+7 e validação do depoimento</span>
-          </div>
-        </div>
+        <!-- Programa Cultural pausado em 10/10/2026: o número segue preenchido pelo script, mas não aparece. -->
+        <div class="produto-cotas-box" style="display:none" aria-hidden="true"><div class="produto-cotas-num" id="prodCotas"></div></div>
         <div class="produto-preco-label">Valor</div>
         <div class="produto-preco-grande" id="prodPreco">—</div>
       </div>
