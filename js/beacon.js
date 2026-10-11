@@ -88,7 +88,7 @@
 
   // ── Gatilhos do pop-up: fim da página (acima) ou intenção de saída no desktop ──
   // Só existe se houver amostra real para entregar (AMOSTRA_PRONTA); sem arquivo, não promete.
-  var AMOSTRA_PRONTA = false;
+  var AMOSTRA_PRONTA = true;
   document.addEventListener('mouseout', function (e) {
     if (!e.relatedTarget && e.clientY <= 0) maybeShowLeadPopup();
   });
