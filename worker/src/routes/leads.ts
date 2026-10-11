@@ -11,6 +11,9 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// Amostra aberta (capítulo 1) servida pelo próprio site.
+const AMOSTRA_URL = 'https://3trevo.com.br/amostras/3a-guerra-capitulo-1.pdf';
+
 export async function handleLeadCapture(request: Request, env: Env): Promise<Response> {
   let body: any;
   try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
@@ -96,9 +99,9 @@ export async function handleLeadCapture(request: Request, env: Env): Promise<Res
     if (tpl) {
       const html = tpl.html
         .replace(/\{\{nome\}\}/g, escapeHtml(nome || 'Leitor(a)'))
-        .replace(/\{\{link\}\}/g, 'https://3trevo.com.br/catalogo.html');
+        .replace(/\{\{link\}\}/g, AMOSTRA_URL);
 
-      await fetch('https://api.resend.com/emails', {
+      const envio = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -107,12 +110,17 @@ export async function handleLeadCapture(request: Request, env: Env): Promise<Res
           subject: tpl.subject,
           html,
         }),
-      }).catch(e => console.error('[leads] email step0:', e));
+      }).catch(e => { console.error('[leads] email step0:', e); return null; });
 
-      await sb(env, `email_sequence?lead_id=eq.${lead.id}&sequence_step=eq.0`, {
-        method: 'PATCH',
-        body: JSON.stringify({ sent_at: new Date().toISOString() }),
-      }).catch(() => {});
+      // Só marca como enviado se o provedor aceitou; senão o erro fica visível no log.
+      if (envio && envio.ok) {
+        await sb(env, `email_sequence?lead_id=eq.${lead.id}&sequence_step=eq.0`, {
+          method: 'PATCH',
+          body: JSON.stringify({ sent_at: new Date().toISOString() }),
+        }).catch(() => {});
+      } else {
+        console.error('[leads] email step0 não aceito pelo provedor:', envio ? envio.status : 'sem resposta');
+      }
     }
   }
 
