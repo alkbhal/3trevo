@@ -380,13 +380,27 @@
     .ab-cena[data-cena="5"] .ab-fundo { --ab-pos: 50% 50%; --fx: 50%; --fy: 42%; }
     .ab-dica, .ab-pular { display: none; }
     /* Modo caminhada (com JS): a tela fica parada e a rolagem anda pelo apartamento, cena a cena */
-    #abertura.ab-andar { height: 700vh; height: 700svh; }
-    .ab-andar .ab-palco { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
-    .ab-andar .ab-cena { position: absolute; inset: 0; min-height: 0; padding: 0 24px 15vh; opacity: 0; place-items: end start; }
-    .ab-andar .ab-cena[data-cena="4"] { place-items: end end; }
-    .ab-andar .ab-fundo { inset: 0; transform: scale(1.06); transform-origin: var(--fx, 50%) var(--fy, 50%); transition: none; will-change: transform; }
-    .ab-andar .ab-fundo::after { background: linear-gradient(180deg, rgba(5,8,7,.2) 0%, rgba(5,8,7,.1) 35%, rgba(5,8,7,.82) 100%); }
-    .ab-andar .ab-texto { text-shadow: 0 2px 18px rgba(0,0,0,.85); will-change: opacity, transform; }
+    #abertura.ab-andar { height: 750vh; height: 750svh; }
+    .ab-andar .ab-palco { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #050807; }
+    .ab-andar .ab-cena { position: absolute; inset: 0; min-height: 0; padding: 0; display: block; opacity: 0; will-change: opacity, transform; }
+    /* O "mundo" tem sempre a proporção da foto (16:9); a câmera (JS) o move e aproxima */
+    .ab-andar .ab-fundo { position: absolute; inset: auto; left: 0; top: 0; right: auto; bottom: auto; transform-origin: 0 0; transition: none; will-change: transform; background: var(--ab-img, none) 0 0 / 100% 100% no-repeat, var(--ab-grad); }
+    .ab-andar .ab-fundo::after { display: none; }
+    .ab-andar .ab-texto { position: absolute; margin: 0; left: 22px; right: 22px; bottom: 13vh; bottom: 13svh; max-width: 24ch; isolation: isolate; text-shadow: 0 2px 18px rgba(0,0,0,.9); will-change: opacity, transform; }
+    .ab-andar .ab-texto::before { content: ''; position: absolute; z-index: -1; inset: -36px -44px; background: radial-gradient(closest-side, rgba(5,8,7,.66), rgba(5,8,7,0)); pointer-events: none; }
+    .ab-andar .ab-ultima .ab-texto { max-width: 28ch; }
+    .ab-andar .ab-ultima .ab-texto::before { background: radial-gradient(closest-side, rgba(5,8,7,.82), rgba(5,8,7,0)); }
+    .ab-brilho { display: none; }
+    .ab-andar .ab-brilho { display: block; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; will-change: opacity; }
+    @media (min-width: 900px) {
+      /* No desktop o texto fica nas partes escuras de cada foto, longe do que a câmera procura */
+      .ab-andar .ab-texto { left: auto; right: auto; bottom: auto; max-width: 22ch; }
+      .ab-andar .ab-cena[data-cena="1"] .ab-texto { right: 7vw; top: 26vh; top: 26svh; }
+      .ab-andar .ab-cena[data-cena="2"] .ab-texto { left: 6vw; top: 30vh; top: 30svh; }
+      .ab-andar .ab-cena[data-cena="3"] .ab-texto { left: 6vw; bottom: 14vh; bottom: 14svh; }
+      .ab-andar .ab-cena[data-cena="4"] .ab-texto { right: 4vw; top: 36vh; top: 36svh; max-width: 19ch; }
+      .ab-andar .ab-cena[data-cena="5"] .ab-texto { right: 5vw; top: 30vh; top: 30svh; max-width: 20ch; }
+    }
     .ab-andar .ab-dica { display: block; position: absolute; left: 0; right: 0; bottom: 5vh; text-align: center; font-family: var(--sans); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: #e4ded2; z-index: 3; pointer-events: none; opacity: 0; }
     .ab-andar .ab-pular { display: block; position: absolute; top: 18px; right: 18px; z-index: 3; font-family: var(--sans); font-size: 16px; color: #f3efe6; background: rgba(5,8,7,.6); border: 1px solid rgba(243,239,230,.45); padding: 10px 16px; text-decoration: none; }
     .ab-andar .ab-pular:focus-visible { outline: 3px solid var(--ouro); outline-offset: 2px; }
@@ -654,7 +668,7 @@
   <div class="ab-cena" data-cena="1"><div class="ab-fundo"></div><p class="ab-texto"><span class="ab-rot">Em breve · Said Anes</span>Há um homem neste quarto.<br><em>Ouve a rua inteira. Não ouve a casa.</em></p></div>
   <div class="ab-cena" data-cena="2"><div class="ab-fundo"></div><p class="ab-texto">Vê tudo o que acontece lá fora.<br><em>Nada do que acontece aqui dentro.</em></p></div>
   <div class="ab-cena" data-cena="3"><div class="ab-fundo"></div><p class="ab-texto">Sabe o rosto de todos os suspeitos.<br><em>Não o dele.</em></p></div>
-  <div class="ab-cena" data-cena="4"><div class="ab-fundo"></div><p class="ab-texto">Mantém a cidade inteira sob vigia.<br><em>Ninguém viu a cadeira ficar vazia.</em></p></div>
+  <div class="ab-cena" data-cena="4"><div class="ab-fundo"></div><p class="ab-texto">Mantém a cidade inteira sob vigilância.<br><em>Ninguém viu a cadeira ficar vazia.</em></p></div>
   <div class="ab-cena ab-ultima" data-cena="5"><div class="ab-fundo"></div>
     <div class="ab-texto">
       <p>A história de um homem que vigiou tudo e <em>perdeu de vista o que era seu.</em></p>
@@ -1248,35 +1262,117 @@ document.addEventListener('DOMContentLoaded', () => {
   var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (calmo || !window.requestAnimationFrame) return;
   sec.classList.add('ab-andar');
-  var N = cenas.length, dica = sec.querySelector('.ab-dica'), espera = false;
+  var N = cenas.length, dica = sec.querySelector('.ab-dica'), palco = sec.querySelector('.ab-palco');
   var fundos = cenas.map(function (c) { return c.querySelector('.ab-fundo'); });
   var textos = cenas.map(function (c) { return c.querySelector('.ab-texto'); });
+  var brilho = document.createElement('div'); brilho.className = 'ab-brilho'; palco.appendChild(brilho);
+  // Percurso da câmera em cada cena: [tempo 0..1, x% da foto, y% da foto, aproximação, inclinação em graus].
+  // O último ponto de cada cena é a luz em que a câmera mergulha para a cena seguinte.
+  var CAM = [
+    [[0, 50, 52, 1.0, 0], [0.40, 41, 50, 1.3, 0], [0.78, 30, 46, 2.0, 0], [1.08, 27, 46, 3.8, 0]],   // quarto: porta entreaberta
+    [[0, 50, 55, 1.0, 0], [0.30, 78, 62, 1.9, 0], [0.62, 60, 30, 2.3, 0], [1.08, 59, 27, 4.2, 0]],   // sala: a mão, o controle, a luz da TV
+    [[0, 55, 45, 1.0, 0], [0.45, 60, 38, 1.7, 0], [0.78, 60, 32, 2.4, 0], [1.08, 60, 30, 3.8, 0]],   // espelho: a lâmpada
+    [[0, 52, 52, 1.0, 0], [0.32, 32, 62, 1.7, 0], [0.68, 36, 38, 2.3, 0], [1.08, 34, 28, 4.6, -3]],  // cadeira e janela: quase cai pelo vidro
+    [[0, 50, 52, 1.0, 3], [0.22, 50, 50, 1.15, 0], [0.70, 50, 44, 1.4, 0], [1.0, 50, 42, 1.65, 0]]    // corredor: a porta acesa
+  ];
+  var LUZ = ['255,190,110', '175,208,232', '255,170,95', '175,28,38'];   // porta, TV, lâmpada, vidro vermelho
+  var vw = 0, vh = 0, Wc = 0, Hc = 0, luzAtual = -1;
   function lim(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
-  function quadro() {
-    espera = false;
-    var total = sec.offsetHeight - window.innerHeight;
-    var u = lim(-sec.getBoundingClientRect().top / total) * N;   // 0 a N: uma unidade por cena
+  function suave(x) { x = lim(x); return x * x * (3 - 2 * x); }
+  function medir() {
+    vw = palco.clientWidth; vh = palco.clientHeight;
+    Wc = vh > vw ? Math.max(vw * 1.9, vh * 1.1) : Math.max(vw, vh * 16 / 9);   // retrato: foto menor que a tela, com faixas escuras
+    Hc = Wc * 9 / 16;
+    fundos.forEach(function (f) { f.style.width = Wc + 'px'; f.style.height = Hc + 'px'; });
+  }
+  // Interpolação por Hermite: anda sem parar nos pontos; só acelera no mergulho final
+  function canal(w, k, idx, i) {
+    var n = w.length, tg = function (m) {
+      if (m === 0) return 0;
+      if (m === n - 1) return i < N - 1 ? 1.6 * (v(m) - v(m - 1)) / (w[m][0] - w[m - 1][0]) : 0;
+      return (v(m + 1) - v(m - 1)) / (w[m + 1][0] - w[m - 1][0]);
+    };
+    function v(m) { return idx === 3 ? Math.log(w[m][3]) : w[m][idx]; }
+    var t0 = w[k][0], t1 = w[k + 1][0], h = t1 - t0;
+    return { p0: v(k), p1: v(k + 1), m0: tg(k) * h, m1: tg(k + 1) * h, h: h, t0: t0 };
+  }
+  function pose(i, l) {
+    var w = CAM[i], n = w.length, k;
+    if (l <= w[0][0]) return { x: w[0][1], y: w[0][2], s: w[0][3], r: w[0][4] };
+    if (l >= w[n - 1][0]) return { x: w[n - 1][1], y: w[n - 1][2], s: w[n - 1][3], r: w[n - 1][4] };
+    for (k = 0; k < n - 2 && l > w[k + 1][0]; k++) {}
+    var out = {}, nomes = { 1: 'x', 2: 'y', 3: 's', 4: 'r' };
+    [1, 2, 3, 4].forEach(function (idx) {
+      var c = canal(w, k, idx, i), t = (l - c.t0) / c.h, t2 = t * t, t3 = t2 * t;
+      var val = (2 * t3 - 3 * t2 + 1) * c.p0 + (t3 - 2 * t2 + t) * c.m0 + (-2 * t3 + 3 * t2) * c.p1 + (t3 - t2) * c.m1;
+      out[nomes[idx]] = idx === 3 ? Math.exp(val) : val;
+    });
+    return out;
+  }
+  function camera(i, l) {
+    var p = pose(i, l), s = p.s;
+    var tx = vw * 0.5 - p.x / 100 * Wc * s, ty = vh * 0.5 - p.y / 100 * Hc * s;
+    var mx = vw - Wc * s, my = vh - Hc * s;
+    tx = mx <= 0 ? Math.min(0, Math.max(mx, tx)) : mx / 2;
+    ty = my <= 0 ? Math.min(0, Math.max(my, ty)) : my / 2;
+    return { tx: tx, ty: ty, s: s, r: p.r };
+  }
+  function desenhar(u) {
+    var balanco = Math.sin(u * 9.4) * 3, passo = Math.sin(u * 40) * 1.6;
     cenas.forEach(function (c, i) {
-      var op = 1;
-      if (i > 0) op = Math.min(op, lim((u - (i - 0.15)) / 0.3));
-      if (i < N - 1) op = Math.min(op, 1 - lim((u - (i + 0.85)) / 0.3));
-      c.style.opacity = op;
+      var l = u - i, op = 1;
+      if (i > 0) op = Math.min(op, suave((l + 0.12) / 0.2));
+      if (i < N - 1) op = Math.min(op, 1 - suave((l - 0.88) / 0.2));
+      c.style.opacity = op.toFixed(3);
       c.style.visibility = op > 0.01 ? 'visible' : 'hidden';
       if (op <= 0.01) return;
-      var avanco = lim((u - (i - 0.15)) / 1.3);                   // anda para dentro da cena
-      var balanco = Math.sin(u * 9.4) * 5, passo = Math.sin(u * 40) * 2.5;
-      fundos[i].style.transform = 'translate(' + balanco.toFixed(1) + 'px,' + passo.toFixed(1) + 'px) scale(' + (1.08 + 0.3 * avanco).toFixed(3) + ')';
-      var t = lim((u - (i + 0.1)) / 0.25);
-      if (i < N - 1) t = Math.min(t, 1 - lim((u - (i + 0.72)) / 0.15));
-      textos[i].style.opacity = t;
-      textos[i].style.transform = 'translateY(' + ((1 - t) * 22).toFixed(1) + 'px)';
+      var cam = camera(i, l);
+      fundos[i].style.transform = 'translate3d(' + (cam.tx + balanco).toFixed(1) + 'px,' + (cam.ty + passo).toFixed(1) + 'px,0) scale(' + cam.s.toFixed(3) + ')';
+      c.style.transform = 'rotate(' + cam.r.toFixed(2) + 'deg)';
+      // O texto aparece, passa um pouco com o movimento e some antes do mergulho
+      var t = suave((l - 0.10) / 0.14);
+      if (i < N - 1) t = Math.min(t, 1 - suave((l - 0.58) / 0.14));
+      var ref = camera(i, 0.10), lx = vw < 900 ? 10 : 60, ly = vw < 900 ? 8 : 40, dx = Math.max(-lx, Math.min(lx, (cam.tx - ref.tx) * 0.2)), dy = Math.max(-ly, Math.min(ly, (cam.ty - ref.ty) * 0.2));
+      textos[i].style.opacity = t.toFixed(3);
+      textos[i].style.transform = 'translate(' + dx.toFixed(1) + 'px,' + (dy + (1 - t) * 18).toFixed(1) + 'px)';
     });
+    // A luz "abre" ao se aproximar e se dissolve na cena seguinte
+    var g = 0, idx = -1;
+    for (var bb = 1; bb <= N - 1; bb++) {
+      if (u > bb - 0.3 && u < bb + 0.14) {
+        idx = bb - 1;
+        g = u < bb ? Math.pow(suave((u - (bb - 0.3)) / 0.3), 2) : 1 - suave((u - bb) / 0.14);
+      }
+    }
+    if (idx >= 0 && idx < LUZ.length) {
+      if (idx !== luzAtual) {
+        luzAtual = idx;
+        brilho.style.background = 'radial-gradient(circle at 50% 50%, rgba(' + LUZ[idx] + ',.95) 0%, rgba(' + LUZ[idx] + ',.55) 30%, rgba(' + LUZ[idx] + ',0) 74%)';
+      }
+      brilho.style.opacity = (g * 0.9).toFixed(3);
+    } else { brilho.style.opacity = 0; }
     if (dica) dica.style.opacity = 0.9 * (1 - lim(u / 0.12));
   }
-  function pedir() { if (!espera) { espera = true; window.requestAnimationFrame(quadro); } }
+  // A rolagem do mouse anda em saltos; suavizamos o avanço para o movimento ficar contínuo
+  var alvo = 0, atual = 0, ult = 0, rodando = false;
+  function lerAlvo() {
+    var total = sec.offsetHeight - window.innerHeight;
+    alvo = lim(-sec.getBoundingClientRect().top / total) * N;
+  }
+  function laco(ts) {
+    var dt = Math.min(0.05, ((ts - ult) / 1000) || 0.016); ult = ts;
+    atual += (alvo - atual) * (1 - Math.pow(0.5, dt / 0.07));
+    if (Math.abs(alvo - atual) < 0.0004) atual = alvo;
+    desenhar(atual);
+    if (atual !== alvo) window.requestAnimationFrame(laco); else rodando = false;
+  }
+  function pedir() {
+    lerAlvo();
+    if (!rodando) { rodando = true; ult = window.performance.now(); window.requestAnimationFrame(laco); }
+  }
   window.addEventListener('scroll', pedir, { passive: true });
-  window.addEventListener('resize', pedir);
-  quadro();
+  window.addEventListener('resize', function () { medir(); lerAlvo(); atual = alvo; desenhar(atual); });
+  medir(); lerAlvo(); atual = alvo; desenhar(atual);
 })();
 </script>
 <script src="js/beacon.js?v=3ac5ce03" defer></script>
