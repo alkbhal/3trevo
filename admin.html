@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <meta name="robots" content="noindex,nofollow">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q64TDCCL85"></script>
   <script>
@@ -361,8 +362,8 @@
   <div class="login-box">
     <div class="login-logo">Três Trevo</div>
     <div class="login-sub">Área Administrativa</div>
-    <label class="pin-label" for="pin-field">PIN de acesso</label>
-    <input type="password" id="pin-field" class="pin-input" maxlength="20" placeholder="••••••" autocomplete="off">
+    <label class="pin-label" for="pin-field">Senha de acesso</label>
+    <input type="password" id="pin-field" class="pin-input" maxlength="64" placeholder="Sua senha" autocomplete="current-password">
     <button class="pin-btn" id="pin-btn" onclick="fazerLogin()">Entrar</button>
     <div class="login-err" id="login-err"></div>
   </div>
@@ -1141,7 +1142,7 @@ async function fazerLogin() {
       document.getElementById('sb-user').textContent = 'Admin · ' + new Date().toLocaleDateString('pt-BR');
       inicializarApp();
     } else {
-      document.getElementById('login-err').textContent = 'PIN inválido.';
+      document.getElementById('login-err').textContent = 'Senha inválida.';
     }
   } catch(e) {
     document.getElementById('login-err').textContent = 'Erro de conexão com o servidor.';

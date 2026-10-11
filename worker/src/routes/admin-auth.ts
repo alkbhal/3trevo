@@ -56,13 +56,13 @@ export async function handleAdminLogin(request: Request, env: Env): Promise<Resp
   try { body = await request.json(); } catch { return json({ ok: false, erro: 'bad_request' }, 400); }
 
   const { pin } = body ?? {};
-  if (!pin) return json({ ok: false }, 400);
+  if (!pin || typeof pin !== 'string' || pin.length > 128) return json({ ok: false }, 400);
 
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   const rlKey = `rl:login:${ip}`;
   if (env.TT_KV) {
     const attempts = parseInt((await env.TT_KV.get(rlKey)) ?? '0', 10);
-    if (attempts >= 20) {
+    if (attempts >= 8) {
       await registrarFalhaLogin(env, ip);
       return json({ ok: false, erro: 'muitas_tentativas' }, 429);
     }
