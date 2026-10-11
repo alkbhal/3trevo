@@ -382,7 +382,16 @@
     /* Rolagem guiada: cada bloco entra do seu lado conforme a rolagem (só com JS e sem "reduzir movimento") */
     #nema, #faq, #sobre { overflow-x: clip; }
     #nema { position: relative; scroll-margin-top: 0; }
-    #nema::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 520px; pointer-events: none; opacity: var(--luz, 1); background: radial-gradient(ellipse 70% 85% at 50% 0%, rgba(255,240,205,1) 0%, rgba(255,205,125,.85) 28%, rgba(190,130,60,.45) 55%, rgba(120,84,40,0) 80%), linear-gradient(180deg, #050807 0%, rgba(5,8,7,0) 38%); }
+    #nema::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 420px; pointer-events: none; background: linear-gradient(180deg, #050807 0%, rgba(120,84,40,.55) 22%, rgba(255,214,150,.30) 52%, rgba(255,214,150,0) 100%); }
+    #nema::after { content: ''; position: absolute; left: 50%; top: -120px; width: 1500px; height: 900px; margin-left: -750px; pointer-events: none; opacity: 0; transform-origin: 50% 12%; background: radial-gradient(ellipse 50% 52% at 50% 12%, rgba(255,250,232,1) 0%, rgba(255,226,160,.92) 20%, rgba(255,184,96,.55) 45%, rgba(255,184,96,0) 72%); }
+    .ent-on #nema [data-k] { opacity: 0; }
+    .ent-on #nema.nema-go [data-k] { animation: nemaEntra .75s cubic-bezier(.16,.84,.26,1) both; animation-delay: var(--d, 0s); }
+    .ent-on #nema.nema-go::after { animation: nemaLuz 2.2s cubic-bezier(.2,.7,.2,1) both; }
+    #nema [data-k="0"] { --d: .10s } #nema [data-k="1"] { --d: .25s } #nema [data-k="2"] { --d: .40s }
+    #nema [data-k="3"] { --d: .60s } #nema [data-k="4"] { --d: .75s } #nema [data-k="5"] { --d: .90s }
+    #nema [data-k="6"] { --d: .40s } #nema [data-k="7"] { --d: .95s }
+    @keyframes nemaEntra { 0% { opacity: 0; filter: blur(10px); transform: perspective(700px) translate3d(0,-46px,-620px) scale(.6); } 60% { opacity: 1; } 100% { opacity: 1; filter: blur(0); transform: perspective(700px) translate3d(0,0,0) scale(1); } }
+    @keyframes nemaLuz { 0% { opacity: 0; transform: scale(.15); } 22% { opacity: 1; transform: scale(1); } 100% { opacity: .22; transform: scale(1.35); } }
     #nema > .sec-in { position: relative; }
     .nema-chamada { font-family: var(--serif); font-size: 26px; font-weight: 400; line-height: 1.3; color: var(--v3); margin: 10px 0 16px; }
     .nema-lista { list-style: none; margin: 14px 0 18px; padding: 0; }
@@ -393,7 +402,6 @@
     .ent-on [data-ent="l"] { transform: translate3d(calc((1 - var(--p)) * -90px), calc((1 - var(--p)) * -70px), 0) scale(calc(.45 + .55 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 7px)); }
     .ent-on [data-ent="r"] { transform: translate3d(calc((1 - var(--p)) * 90px), calc((1 - var(--p)) * -70px), 0) scale(calc(.45 + .55 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 7px)); }
     .ent-on [data-ent="u"] { transform: translate3d(0, calc((1 - var(--p)) * 34px), 0); }
-    .ent-on #nema [data-ent="u"] { transform: translate3d(0, calc((1 - var(--p)) * -60px), 0) scale(calc(.5 + .5 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 6px)); }
     .ent-on footer[data-ent="foot"] { opacity: 1; background: var(--v0); clip-path: inset(0 calc((1 - var(--p)) * 16%) 0 calc((1 - var(--p)) * 16%) round calc((1 - var(--p)) * 56px) calc((1 - var(--p)) * 56px) 0 0); }
     .ent-on footer[data-ent="foot"] { transform: none; }
     .ent-on footer[data-ent="foot"] > .ft-in { opacity: var(--p); }
@@ -700,19 +708,19 @@
 <!-- ── NEMA ──────────────────────────────────────────────────────────────────── -->
 <section id="nema">
   <div class="sec-in">
-    <p class="lbl" data-k="0" data-ent="u" style="color:var(--v3);margin-bottom:10px;" data-i18n="nema.label">Nema · N$</p>
+    <p class="lbl" data-k="0" style="color:var(--v3);margin-bottom:10px;" data-i18n="nema.label">Nema · N$</p>
     <div class="prog-grid">
       <div>
-        <h2 class="prog-titulo" data-k="1" data-ent="l" data-i18n-html="nema.titulo"><em>Sua compra</em> volta como desconto</h2>
-        <p class="prog-sub" data-k="2" data-ent="l" data-i18n="nema.sub">Nema é o ponto de fidelidade da Editora Três Trevo. Cada e-book que você compra rende Nema, e o seu saldo paga parte da próxima leitura.</p>
+        <h2 class="prog-titulo" data-k="1" data-i18n-html="nema.titulo"><em>Sua compra</em> volta como desconto</h2>
+        <p class="prog-sub" data-k="2" data-i18n="nema.sub">Nema é o ponto de fidelidade da Editora Três Trevo. Cada e-book que você compra rende Nema, e o seu saldo paga parte da próxima leitura.</p>
         <div class="passos">
-          <div class="passo" data-k="3" data-ent="l"><span class="passo-n">1</span><div><div class="passo-t" data-i18n="nema.p1.t">Compre um e-book</div><div class="passo-d" data-i18n="nema.p1.d">Cada compra rende Nema para você.</div></div></div>
-          <div class="passo" data-k="4" data-ent="l"><span class="passo-n">2</span><div><div class="passo-t" data-i18n="nema.p2.t">Acompanhe seu saldo</div><div class="passo-d" data-i18n="nema.p2.d">Ele aparece no seu espaço de cliente, sempre à mão.</div></div></div>
-          <div class="passo" data-k="5" data-ent="l"><span class="passo-n">3</span><div><div class="passo-t" data-i18n="nema.p3.t">Use na próxima compra</div><div class="passo-d" data-i18n="nema.p3.d">No pagamento, marque "Usar meu saldo Nema" e ganhe desconto.</div></div></div>
+          <div class="passo" data-k="3"><span class="passo-n">1</span><div><div class="passo-t" data-i18n="nema.p1.t">Compre um e-book</div><div class="passo-d" data-i18n="nema.p1.d">Cada compra rende Nema para você.</div></div></div>
+          <div class="passo" data-k="4"><span class="passo-n">2</span><div><div class="passo-t" data-i18n="nema.p2.t">Acompanhe seu saldo</div><div class="passo-d" data-i18n="nema.p2.d">Ele aparece no seu espaço de cliente, sempre à mão.</div></div></div>
+          <div class="passo" data-k="5"><span class="passo-n">3</span><div><div class="passo-t" data-i18n="nema.p3.t">Use na próxima compra</div><div class="passo-d" data-i18n="nema.p3.d">No pagamento, marque "Usar meu saldo Nema" e ganhe desconto.</div></div></div>
         </div>
       </div>
       <div>
-        <div class="nema-exemplo" data-k="6" data-ent="r">
+        <div class="nema-exemplo" data-k="6">
           <p class="lbl" data-i18n="nema.card.l">Seu espaço de cliente</p>
           <p class="nema-chamada" data-i18n="nema.card.t">Compre nossos produtos e ganhe Nema, a nossa moeda de descontos.</p>
           <p class="nema-ex-linha" data-i18n="nema.card.p">Ao adquirir nossos produtos, você ganha o seu espaço de cliente. Nele fica tudo reunido:</p>
@@ -726,7 +734,7 @@
           </ul>
           <p class="nema-ex-linha" data-i18n="nema.card.f">Acompanhe as campanhas de uso do Nema ou troque o seu saldo por novos produtos em nossas plataformas.</p>
         </div>
-        <p class="nema-links" data-k="7" data-ent="u"><a href="/area-cliente.html" data-i18n="nema.saldo">Ver meu saldo →</a> <a href="/nema.html" data-i18n="nema.regras">Regras completas</a></p>
+        <p class="nema-links" data-k="7"><a href="/area-cliente.html" data-i18n="nema.saldo">Ver meu saldo →</a> <a href="/nema.html" data-i18n="nema.regras">Regras completas</a></p>
       </div>
     </div>
   </div>
@@ -1408,14 +1416,12 @@ document.addEventListener('DOMContentLoaded', () => {
 (function () {
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var raiz = document.documentElement; raiz.classList.add('ent-on');
-  var rodando = false, ultimo = 0, luzAtual = 1;
+  var rodando = false, ultimo = 0;
   function suave(x) { return x * x * (3 - 2 * x); }
   function lim(x) { return Math.max(0, Math.min(1, x)); }
   function alvos() {
     var vh = window.innerHeight, els = document.querySelectorAll('[data-ent]');
-    var nema = document.getElementById('nema'), T = 0;
-    if (nema) T = (vh * 0.92 - nema.getBoundingClientRect().top) / vh;   // 0 quando o Nema entra; cresce ao rolar
-    var D = 0.20, PASSO = D * 0.7;
+    var T = 0;
     for (var i = 0; i < els.length; i++) {
       var el = els[i], tipo = el.getAttribute('data-ent'), r = el.getBoundingClientRect(), t;
       if (tipo === 'foot') {
@@ -1423,8 +1429,6 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         var top = r.top - (el._dy || 0);
         t = (vh * 0.97 - top) / (vh * 0.30);
-        var k = el.getAttribute('data-k');
-        if (k !== null) t = Math.min(t, (T - parseFloat(k) * PASSO) / D);
       }
       el._t = suave(lim(t));
     }
@@ -1441,12 +1445,6 @@ document.addEventListener('DOMContentLoaded', () => {
       var tp = el.getAttribute('data-ent');
       el._dy = tp === 'u' ? (1 - p) * ((el.closest && el.closest('#nema')) ? -60 : 34) : 0;
     }
-    var nema = document.getElementById('nema');
-    if (nema) {
-      var luz = 1 - 0.7 * suave(lim((T - 0.35) / 0.9));
-      var dl = luz - luzAtual; luzAtual += dl * k; if (Math.abs(dl) > 0.002) mexeu = true;
-      nema.style.setProperty('--luz', luzAtual.toFixed(3));
-    }
     if (mexeu) { requestAnimationFrame(quadro); } else { rodando = false; ultimo = 0; }
   }
   function pedir() { if (!rodando) { rodando = true; ultimo = 0; requestAnimationFrame(quadro); } }
@@ -1456,6 +1454,14 @@ document.addEventListener('DOMContentLoaded', () => {
   var fl = document.getElementById('faq-lista');
   if (fl) new MutationObserver(pedir).observe(fl, { childList: true });
   pedir();
+  // Nema: a entrada (explosão de luz + blocos vindo de longe) roda uma vez, no tempo, e nada some ao rolar de volta
+  var nm = document.getElementById('nema');
+  if (nm && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      if (es.some(function (e) { return e.isIntersecting; })) { nm.classList.add('nema-go'); io.disconnect(); }
+    }, { rootMargin: '0px 0px -22% 0px', threshold: 0 });
+    io.observe(nm);
+  } else if (nm) { nm.classList.add('nema-go'); }
 })();
 </script>
 </body>
