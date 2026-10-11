@@ -97,6 +97,12 @@
     if (localStorage.getItem(LEAD_CAPTURED_KEY)) return;
     if (sessionStorage.getItem(LEAD_SHOWN_KEY)) return;
     if (location.pathname.indexOf('admin') !== -1) return;
+    // Não interrompe a abertura imersiva: espera o leitor sair dela.
+    var ab = document.getElementById('abertura');
+    if (ab) {
+      var r = ab.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) { setTimeout(maybeShowLeadPopup, 10000); return; }
+    }
     popupShown = true;
     sessionStorage.setItem(LEAD_SHOWN_KEY, '1');
     showLeadPopup();
@@ -109,7 +115,7 @@
       '<div class="tt-lead-box">',
       '  <button class="tt-lead-close" aria-label="Fechar">&times;</button>',
       '  <h3 class="tt-lead-title">Leia o 1º capítulo de graça</h3>',
-      '  <p class="tt-lead-sub">Ficção documental que antecipa manchetes reais. Descubra por que este ebook está incomodando gente poderosa.</p>',
+      '  <p class="tt-lead-sub">Ficção documental que antecipa manchetes reais. Receba o primeiro capítulo no seu e-mail.</p>',
       '  <form id="tt-lead-form">',
       '    <input type="text" name="nome" placeholder="Seu nome" required class="tt-lead-input">',
       '    <input type="email" name="email" placeholder="Seu melhor e-mail" required class="tt-lead-input">',

@@ -16,7 +16,7 @@
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.googletagmanager.com; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com; img-src 'self' data: blob: *.supabase.co *.al-kbhal.workers.dev; font-src 'self' blob: fonts.gstatic.com; style-src 'self' 'unsafe-inline' blob: https://fonts.googleapis.com; frame-src 'self' *.supabase.co; object-src 'none';">
 <title>Minha Biblioteca — Editora Três Trevo</title>
-<meta name="description" content="Acesse sua biblioteca de ebooks, músicas e acompanhe o Programa Cultural da Editora Três Trevo.">
+<meta name="description" content="Acesse sua biblioteca de ebooks, músicas e acompanhe o seu saldo Nema na Editora Três Trevo.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -849,34 +849,6 @@ nav{
     </div>
   </div>
 
-  <!-- ── ABA: SORTEIOS ── -->
-  <div id="aba-sorteios" class="aba-conteudo" role="tabpanel">
-    <div class="sec-titulo">Programa Cultural — Premiações</div>
-    <!-- Meus números na rodada atual -->
-    <div id="meus-numeros-wrap" style="display:none;margin-bottom:24px">
-      <div style="background:rgba(200,168,75,.05);border:1px solid rgba(200,168,75,.18);padding:20px;position:relative">
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
-        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">Meus Números — Rodada Atual</div>
-        <div id="meus-numeros-lista" style="font-family:'Lora',serif;font-size:20px;color:var(--branco);line-height:1.8;margin-bottom:12px">—</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.35)">Cada número representa uma cota de participação</div>
-      </div>
-      <!-- Barra de progresso da meta -->
-      <div style="margin-top:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3)">Progresso da meta</div>
-          <div style="font-size:12px;color:var(--ouro)" id="meta-progresso-txt">—</div>
-        </div>
-        <div style="height:4px;background:rgba(255,255,255,.06);overflow:hidden">
-          <div id="meta-progresso-bar" style="height:100%;background:linear-gradient(90deg,var(--ouro),var(--ouro-c));transition:width .5s ease;width:0%"></div>
-        </div>
-        <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.25)" id="meta-faltam">—</div>
-      </div>
-    </div>
-    <div id="listaSorteios">
-      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
-    </div>
-  </div>
-
   <!-- ── ABA: EXTRATO ── -->
   <div id="aba-extrato" class="aba-conteudo" role="tabpanel">
     <div class="sec-titulo">Histórico de pagamentos</div>
@@ -1243,7 +1215,7 @@ function cardEbook(p, meta, i, libId) {
       <div class="ebook-titulo">${titulo}</div>
       <div class="ebook-autor">${autor}</div>
       <div class="ebook-footer">
-        <span class="ebook-cotas">${cotas} cota${cotas !== 1 ? 's' : ''}</span>
+
         <div style="display:flex;gap:6px;align-items:center">
           ${p.slug === 'atico' ? `<a href="ebook-atico-conteudo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(200,123,27,.12);border:1px solid rgba(200,123,27,.3);color:#7a5c1e;font-size:11px;font-weight:500;text-decoration:none;white-space:nowrap;border-radius:2px">⚡ Ler</a>` : ''}
           ${(temFormato(p, 'epub') || temFormato(p, 'pdf')) ? `<button class="btn-ler" onclick="abrirLeitor('${p.id}','${titulo.replace(/'/g, "\\'")}')">
@@ -1498,6 +1470,7 @@ function fmtTempo(seg) {
 // ══════════════════════════════════════════════════════════
 async function carregarSorteios() {
   const cont = document.getElementById('listaSorteios');
+  if (!cont) return; // aba de premiações fora do ar desde 10/10/2026
 
   const [drawsRes, purchasesRes] = await Promise.all([
     sb.from('draws')
@@ -1894,12 +1867,11 @@ async function carregarAssinatura() {
       <div class="plano-nome">Sem assinatura ativa</div>
       <span class="plano-badge sem-plano">Gratuito</span>
       <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:24px">
-        Com a assinatura você acessa músicas autorais, bônus exclusivos e
-        amplia sua elegibilidade no Programa Cultural.
+        Com a assinatura você acessa músicas autorais, lançamentos antecipados
+        e conteúdo exclusivo dos títulos.
       </p>
       <div class="plano-beneficios">
         <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso ilimitado às faixas da editora</div>
-        <div class="beneficio-item"><strong>Cotas bônus</strong>Multiplicador de cotas nas premiações</div>
         <div class="beneficio-item"><strong>Lançamentos antecipados</strong>Acesso antes do público geral</div>
         <div class="beneficio-item"><strong>Conteúdo exclusivo</strong>Material complementar dos títulos</div>
       </div>
@@ -1942,7 +1914,6 @@ async function carregarAssinatura() {
 
     ${isAtiva ? `<div class="plano-beneficios" style="margin-top:20px">
       <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso liberado</div>
-      <div class="beneficio-item"><strong>Cotas bônus</strong>Multiplicador ativo</div>
     </div>` : ''}
 
     <div style="margin-top:20px;font-size:12px;color:rgba(255,255,255,.3);line-height:1.7">
