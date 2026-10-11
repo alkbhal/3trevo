@@ -359,7 +359,7 @@
     /* Abertura: cada cena ocupa a tela; o texto aparece ao entrar na vista (sem JS, tudo já visível) */
     #abertura { background: #050807; color: #f3efe6; }
     .ab-cena { position: relative; min-height: 92vh; min-height: 92svh; display: grid; place-items: center; overflow: hidden; padding: 64px 24px; }
-    .ab-fundo { position: absolute; inset: -4%; background: var(--ab-img, none) center / cover no-repeat, var(--ab-grad); transform: scale(1.06); transition: transform 2.4s ease, opacity 1.6s ease; }
+    .ab-fundo { position: absolute; inset: -4%; background: var(--ab-img, none) var(--ab-pos, center) / cover no-repeat, var(--ab-grad); transform: scale(1.06); transition: transform 2.4s ease, opacity 1.6s ease; }
     .ab-fundo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,8,7,.55), rgba(5,8,7,.78)); }
     .ab-cena[data-cena="1"] .ab-fundo { --ab-grad: radial-gradient(ellipse at 30% 40%, #1b2a22 0%, #050807 70%); }
     .ab-cena[data-cena="2"] .ab-fundo { --ab-grad: radial-gradient(ellipse at 70% 30%, #2a2418 0%, #050807 72%); }
@@ -370,12 +370,26 @@
     .ab-texto em { color: var(--ouro); font-style: italic; }
     .ab-rot { display: block; font-family: var(--sans); font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: var(--ouro); margin-bottom: 20px; }
     .ab-ultima .ab-texto { max-width: 26ch; }
+    .ab-ultima .ab-texto > p:first-child { margin: 0; line-height: 1.3; }
     .ab-cta { font-family: var(--sans); font-size: 18px; line-height: 1.6; margin-top: 28px; color: #e4ded2; }
     .ab-cta a { color: var(--ouro); font-weight: 600; }
-    .js-ab .ab-texto { opacity: 0; transform: translateY(28px); transition: opacity 1.2s ease, transform 1.2s ease; }
-    .js-ab .ab-cena.vis .ab-texto { opacity: 1; transform: none; }
-    .js-ab .ab-cena.vis .ab-fundo { transform: scale(1); }
-    @media (prefers-reduced-motion: reduce) { .js-ab .ab-texto, .ab-fundo { transition: none; opacity: 1; transform: none; } }
+    .ab-cena[data-cena="1"] .ab-fundo { --ab-pos: 30% 50%; --fx: 28%; --fy: 45%; }
+    .ab-cena[data-cena="2"] .ab-fundo { --ab-pos: 58% 50%; --fx: 59%; --fy: 32%; }
+    .ab-cena[data-cena="3"] .ab-fundo { --ab-pos: 62% 50%; --fx: 62%; --fy: 45%; }
+    .ab-cena[data-cena="4"] .ab-fundo { --ab-pos: 32% 50%; --fx: 38%; --fy: 45%; }
+    .ab-cena[data-cena="5"] .ab-fundo { --ab-pos: 50% 50%; --fx: 50%; --fy: 42%; }
+    .ab-dica, .ab-pular { display: none; }
+    /* Modo caminhada (com JS): a tela fica parada e a rolagem anda pelo apartamento, cena a cena */
+    #abertura.ab-andar { height: 700vh; height: 700svh; }
+    .ab-andar .ab-palco { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+    .ab-andar .ab-cena { position: absolute; inset: 0; min-height: 0; padding: 0 24px 15vh; opacity: 0; place-items: end start; }
+    .ab-andar .ab-cena[data-cena="4"] { place-items: end end; }
+    .ab-andar .ab-fundo { inset: 0; transform: scale(1.06); transform-origin: var(--fx, 50%) var(--fy, 50%); transition: none; will-change: transform; }
+    .ab-andar .ab-fundo::after { background: linear-gradient(180deg, rgba(5,8,7,.2) 0%, rgba(5,8,7,.1) 35%, rgba(5,8,7,.82) 100%); }
+    .ab-andar .ab-texto { text-shadow: 0 2px 18px rgba(0,0,0,.85); will-change: opacity, transform; }
+    .ab-andar .ab-dica { display: block; position: absolute; left: 0; right: 0; bottom: 5vh; text-align: center; font-family: var(--sans); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: #e4ded2; z-index: 3; pointer-events: none; opacity: 0; }
+    .ab-andar .ab-pular { display: block; position: absolute; top: 18px; right: 18px; z-index: 3; font-family: var(--sans); font-size: 16px; color: #f3efe6; background: rgba(5,8,7,.6); border: 1px solid rgba(243,239,230,.45); padding: 10px 16px; text-decoration: none; }
+    .ab-andar .ab-pular:focus-visible { outline: 3px solid var(--ouro); outline-offset: 2px; }
     .prog-titulo { font-size: clamp(28px, 4vw, 44px); font-weight: 300; color: var(--t0); margin-bottom: 16px; }
     .prog-titulo em { color: var(--v3); }
     .prog-sub { font-size: 15px; color: var(--t2); line-height: 1.75; max-width: 480px; margin-bottom: 36px; }
@@ -634,6 +648,9 @@
 
 <!-- ── ABERTURA (próximo lançamento, sem nome) ──────────────────────────────── -->
 <section id="abertura" aria-label="Próximo lançamento de Said Anes">
+  <div class="ab-palco">
+  <a class="ab-pular" href="#nema">Pular ↓</a>
+  <p class="ab-dica" aria-hidden="true">Role devagar ↓</p>
   <div class="ab-cena" data-cena="1"><div class="ab-fundo"></div><p class="ab-texto"><span class="ab-rot">Em breve · Said Anes</span>Há um homem neste quarto.</p></div>
   <div class="ab-cena" data-cena="2"><div class="ab-fundo"></div><p class="ab-texto">Ele não vive a própria vida.<br><em>Assiste a ela.</em></p></div>
   <div class="ab-cena" data-cena="3"><div class="ab-fundo"></div><p class="ab-texto">Para sentir qualquer coisa, alguém precisa narrar a cena por ele.</p></div>
@@ -643,6 +660,7 @@
       <p>A história de quem só existe quando é contada.</p>
       <p class="ab-cta">Lançamento em breve. Acompanhe em <a href="https://www.instagram.com/3trevo" rel="noopener">@3trevo</a></p>
     </div>
+  </div>
   </div>
 </section>
 
@@ -1214,26 +1232,51 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 <script>
-// Abertura do próximo lançamento: as cenas aparecem ao rolar. Imagens opcionais em
-// assets/abertura/cena-N.jpg (N = 1 a 5); se o arquivo não existir, fica o fundo em gradiente.
+// Abertura do próximo lançamento: a rolagem "anda" pelo apartamento. Imagens em
+// assets/abertura/cena-N.jpg (N = 1 a 5); sem imagem, fica o fundo em gradiente.
+// Sem JS ou com "reduzir movimento", as cenas ficam empilhadas e o texto sempre visível.
 (function () {
   var sec = document.getElementById('abertura');
   if (!sec) return;
-  var cenas = sec.querySelectorAll('.ab-cena');
-  var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if ('IntersectionObserver' in window && !calmo) {
-    document.documentElement.classList.add('js-ab');
-    var obs = new IntersectionObserver(function (entradas) {
-      entradas.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
-    }, { threshold: 0.35 });
-    cenas.forEach(function (c) { obs.observe(c); });
-  }
+  var cenas = Array.prototype.slice.call(sec.querySelectorAll('.ab-cena'));
   cenas.forEach(function (c) {
     var n = c.getAttribute('data-cena');
     var img = new Image();
     img.onload = function () { c.querySelector('.ab-fundo').style.setProperty('--ab-img', 'url(assets/abertura/cena-' + n + '.jpg)'); };
     img.src = 'assets/abertura/cena-' + n + '.jpg';
   });
+  var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (calmo || !window.requestAnimationFrame) return;
+  sec.classList.add('ab-andar');
+  var N = cenas.length, dica = sec.querySelector('.ab-dica'), espera = false;
+  var fundos = cenas.map(function (c) { return c.querySelector('.ab-fundo'); });
+  var textos = cenas.map(function (c) { return c.querySelector('.ab-texto'); });
+  function lim(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function quadro() {
+    espera = false;
+    var total = sec.offsetHeight - window.innerHeight;
+    var u = lim(-sec.getBoundingClientRect().top / total) * N;   // 0 a N: uma unidade por cena
+    cenas.forEach(function (c, i) {
+      var op = 1;
+      if (i > 0) op = Math.min(op, lim((u - (i - 0.15)) / 0.3));
+      if (i < N - 1) op = Math.min(op, 1 - lim((u - (i + 0.85)) / 0.3));
+      c.style.opacity = op;
+      c.style.visibility = op > 0.01 ? 'visible' : 'hidden';
+      if (op <= 0.01) return;
+      var avanco = lim((u - (i - 0.15)) / 1.3);                   // anda para dentro da cena
+      var balanco = Math.sin(u * 9.4) * 5, passo = Math.sin(u * 40) * 2.5;
+      fundos[i].style.transform = 'translate(' + balanco.toFixed(1) + 'px,' + passo.toFixed(1) + 'px) scale(' + (1.08 + 0.3 * avanco).toFixed(3) + ')';
+      var t = lim((u - (i + 0.1)) / 0.25);
+      if (i < N - 1) t = Math.min(t, 1 - lim((u - (i + 0.72)) / 0.15));
+      textos[i].style.opacity = t;
+      textos[i].style.transform = 'translateY(' + ((1 - t) * 22).toFixed(1) + 'px)';
+    });
+    if (dica) dica.style.opacity = 0.9 * (1 - lim(u / 0.12));
+  }
+  function pedir() { if (!espera) { espera = true; window.requestAnimationFrame(quadro); } }
+  window.addEventListener('scroll', pedir, { passive: true });
+  window.addEventListener('resize', pedir);
+  quadro();
 })();
 </script>
 <script src="js/beacon.js?v=3ac5ce03" defer></script>
