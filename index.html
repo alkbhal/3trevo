@@ -382,7 +382,7 @@
     /* Rolagem guiada: cada bloco entra do seu lado conforme a rolagem (só com JS e sem "reduzir movimento") */
     #nema, #faq, #sobre { overflow-x: clip; }
     #nema { position: relative; scroll-margin-top: 0; }
-    #nema::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 240px; pointer-events: none; background: linear-gradient(180deg, #050807 0%, rgba(120,84,40,.55) 28%, rgba(255,214,150,.22) 55%, rgba(255,214,150,0) 100%); }
+    #nema::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 520px; pointer-events: none; opacity: var(--luz, 1); background: radial-gradient(ellipse 70% 85% at 50% 0%, rgba(255,240,205,1) 0%, rgba(255,205,125,.85) 28%, rgba(190,130,60,.45) 55%, rgba(120,84,40,0) 80%), linear-gradient(180deg, #050807 0%, rgba(5,8,7,0) 38%); }
     #nema > .sec-in { position: relative; }
     .nema-chamada { font-family: var(--serif); font-size: 26px; font-weight: 400; line-height: 1.3; color: var(--v3); margin: 10px 0 16px; }
     .nema-lista { list-style: none; margin: 14px 0 18px; padding: 0; }
@@ -390,9 +390,10 @@
     .nema-lista li:last-child { border-bottom: 1px solid var(--borda); }
     .nema-lista li::before { content: ''; position: absolute; left: 4px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--ouro); }
     .ent-on [data-ent] { --p: 0; opacity: var(--p); will-change: transform, opacity; }
-    .ent-on [data-ent="l"] { transform: translate3d(calc((1 - var(--p)) * -72px), 0, 0); filter: blur(calc((1 - var(--p)) * 5px)); }
-    .ent-on [data-ent="r"] { transform: translate3d(calc((1 - var(--p)) * 72px), 0, 0); }
+    .ent-on [data-ent="l"] { transform: translate3d(calc((1 - var(--p)) * -90px), calc((1 - var(--p)) * -70px), 0) scale(calc(.45 + .55 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 7px)); }
+    .ent-on [data-ent="r"] { transform: translate3d(calc((1 - var(--p)) * 90px), calc((1 - var(--p)) * -70px), 0) scale(calc(.45 + .55 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 7px)); }
     .ent-on [data-ent="u"] { transform: translate3d(0, calc((1 - var(--p)) * 34px), 0); }
+    .ent-on #nema [data-ent="u"] { transform: translate3d(0, calc((1 - var(--p)) * -60px), 0) scale(calc(.5 + .5 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 6px)); }
     .ent-on footer[data-ent="foot"] { opacity: 1; background: var(--v0); clip-path: inset(0 calc((1 - var(--p)) * 16%) 0 calc((1 - var(--p)) * 16%) round calc((1 - var(--p)) * 56px) calc((1 - var(--p)) * 56px) 0 0); }
     .ent-on footer[data-ent="foot"] { transform: none; }
     .ent-on footer[data-ent="foot"] > .ft-in { opacity: var(--p); }
@@ -699,19 +700,19 @@
 <!-- ── NEMA ──────────────────────────────────────────────────────────────────── -->
 <section id="nema">
   <div class="sec-in">
-    <p class="lbl" data-ent="u" style="color:var(--v3);margin-bottom:10px;" data-i18n="nema.label">Nema · N$</p>
+    <p class="lbl" data-k="0" data-ent="u" style="color:var(--v3);margin-bottom:10px;" data-i18n="nema.label">Nema · N$</p>
     <div class="prog-grid">
       <div>
-        <h2 class="prog-titulo" data-ent="l" data-i18n-html="nema.titulo"><em>Sua compra</em> volta como desconto</h2>
-        <p class="prog-sub" data-ent="l" data-i18n="nema.sub">Nema é o ponto de fidelidade da Editora Três Trevo. Cada e-book que você compra rende Nema, e o seu saldo paga parte da próxima leitura.</p>
+        <h2 class="prog-titulo" data-k="1" data-ent="l" data-i18n-html="nema.titulo"><em>Sua compra</em> volta como desconto</h2>
+        <p class="prog-sub" data-k="2" data-ent="l" data-i18n="nema.sub">Nema é o ponto de fidelidade da Editora Três Trevo. Cada e-book que você compra rende Nema, e o seu saldo paga parte da próxima leitura.</p>
         <div class="passos">
-          <div class="passo" data-ent="l"><span class="passo-n">1</span><div><div class="passo-t" data-i18n="nema.p1.t">Compre um e-book</div><div class="passo-d" data-i18n="nema.p1.d">Cada compra rende Nema para você.</div></div></div>
-          <div class="passo" data-ent="l"><span class="passo-n">2</span><div><div class="passo-t" data-i18n="nema.p2.t">Acompanhe seu saldo</div><div class="passo-d" data-i18n="nema.p2.d">Ele aparece no seu espaço de cliente, sempre à mão.</div></div></div>
-          <div class="passo" data-ent="l"><span class="passo-n">3</span><div><div class="passo-t" data-i18n="nema.p3.t">Use na próxima compra</div><div class="passo-d" data-i18n="nema.p3.d">No pagamento, marque "Usar meu saldo Nema" e ganhe desconto.</div></div></div>
+          <div class="passo" data-k="3" data-ent="l"><span class="passo-n">1</span><div><div class="passo-t" data-i18n="nema.p1.t">Compre um e-book</div><div class="passo-d" data-i18n="nema.p1.d">Cada compra rende Nema para você.</div></div></div>
+          <div class="passo" data-k="4" data-ent="l"><span class="passo-n">2</span><div><div class="passo-t" data-i18n="nema.p2.t">Acompanhe seu saldo</div><div class="passo-d" data-i18n="nema.p2.d">Ele aparece no seu espaço de cliente, sempre à mão.</div></div></div>
+          <div class="passo" data-k="5" data-ent="l"><span class="passo-n">3</span><div><div class="passo-t" data-i18n="nema.p3.t">Use na próxima compra</div><div class="passo-d" data-i18n="nema.p3.d">No pagamento, marque "Usar meu saldo Nema" e ganhe desconto.</div></div></div>
         </div>
       </div>
       <div>
-        <div class="nema-exemplo" data-ent="r">
+        <div class="nema-exemplo" data-k="6" data-ent="r">
           <p class="lbl" data-i18n="nema.card.l">Seu espaço de cliente</p>
           <p class="nema-chamada" data-i18n="nema.card.t">Compre nossos produtos e ganhe Nema, a nossa moeda de descontos.</p>
           <p class="nema-ex-linha" data-i18n="nema.card.p">Ao adquirir nossos produtos, você ganha o seu espaço de cliente. Nele fica tudo reunido:</p>
@@ -725,7 +726,7 @@
           </ul>
           <p class="nema-ex-linha" data-i18n="nema.card.f">Acompanhe as campanhas de uso do Nema ou troque o seu saldo por novos produtos em nossas plataformas.</p>
         </div>
-        <p class="nema-links" data-ent="u"><a href="/area-cliente.html" data-i18n="nema.saldo">Ver meu saldo →</a> <a href="/nema.html" data-i18n="nema.regras">Regras completas</a></p>
+        <p class="nema-links" data-k="7" data-ent="u"><a href="/area-cliente.html" data-i18n="nema.saldo">Ver meu saldo →</a> <a href="/nema.html" data-i18n="nema.regras">Regras completas</a></p>
       </div>
     </div>
   </div>
@@ -1402,33 +1403,58 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="js/beacon.js?v=3ac5ce03" defer></script>
 <script>
-/* Rolagem guiada: o progresso (0 a 1) de cada bloco acompanha a posição dele na tela */
+/* Rolagem guiada: o progresso (0 a 1) de cada bloco acompanha a rolagem, suavizado no tempo.
+   No Nema os blocos entram em sequência: cada um começa quando o anterior chegou a 70%. */
 (function () {
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var raiz = document.documentElement; raiz.classList.add('ent-on');
-  var pend = false;
+  var rodando = false, ultimo = 0, luzAtual = 1;
   function suave(x) { return x * x * (3 - 2 * x); }
-  function passo() {
-    pend = false;
+  function lim(x) { return Math.max(0, Math.min(1, x)); }
+  function alvos() {
     var vh = window.innerHeight, els = document.querySelectorAll('[data-ent]');
+    var nema = document.getElementById('nema'), T = 0;
+    if (nema) T = (vh * 0.92 - nema.getBoundingClientRect().top) / vh;   // 0 quando o Nema entra; cresce ao rolar
+    var D = 0.20, PASSO = D * 0.7;
     for (var i = 0; i < els.length; i++) {
-      var el = els[i], tipo = el.getAttribute('data-ent'), r = el.getBoundingClientRect(), p;
+      var el = els[i], tipo = el.getAttribute('data-ent'), r = el.getBoundingClientRect(), t;
       if (tipo === 'foot') {
-        var alvo = Math.min(r.height, vh * 0.7);
-        p = (vh - r.top) / alvo;
+        t = (vh - r.top) / Math.min(r.height, vh * 0.7);
       } else {
-        var top = r.top - (tipo === 'u' ? (1 - (el._p || 0)) * 34 : 0);
-        p = (vh * 0.97 - top) / (vh * 0.30);
+        var top = r.top - (el._dy || 0);
+        t = (vh * 0.97 - top) / (vh * 0.30);
+        var k = el.getAttribute('data-k');
+        if (k !== null) t = Math.min(t, (T - parseFloat(k) * PASSO) / D);
       }
-      p = suave(Math.max(0, Math.min(1, p)));
-      if (el._p !== p) { el._p = p; el.style.setProperty('--p', p.toFixed(3)); }
+      el._t = suave(lim(t));
     }
+    return T;
   }
-  function pedir() { if (!pend) { pend = true; requestAnimationFrame(passo); } }
+  function quadro(ts) {
+    var dt = Math.min(0.05, (ts - (ultimo || ts)) / 1000); ultimo = ts;
+    var T = alvos(), mexeu = false, k = 1 - Math.exp(-dt / 0.11);
+    var els = document.querySelectorAll('[data-ent]');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i], p0 = el._p == null ? el._t : el._p, d = el._t - p0;
+      var p = Math.abs(d) < 0.002 ? el._t : p0 + d * k;
+      if (p !== el._p) { el._p = p; el.style.setProperty('--p', p.toFixed(3)); mexeu = true; }
+      var tp = el.getAttribute('data-ent');
+      el._dy = tp === 'u' ? (1 - p) * ((el.closest && el.closest('#nema')) ? -60 : 34) : 0;
+    }
+    var nema = document.getElementById('nema');
+    if (nema) {
+      var luz = 1 - 0.7 * suave(lim((T - 0.35) / 0.9));
+      var dl = luz - luzAtual; luzAtual += dl * k; if (Math.abs(dl) > 0.002) mexeu = true;
+      nema.style.setProperty('--luz', luzAtual.toFixed(3));
+    }
+    if (mexeu) { requestAnimationFrame(quadro); } else { rodando = false; ultimo = 0; }
+  }
+  function pedir() { if (!rodando) { rodando = true; ultimo = 0; requestAnimationFrame(quadro); } }
   window.addEventListener('scroll', pedir, { passive: true });
   window.addEventListener('resize', pedir);
   window.addEventListener('load', pedir);
-  new MutationObserver(pedir).observe(document.getElementById('faq-lista') || document.body, { childList: true });
+  var fl = document.getElementById('faq-lista');
+  if (fl) new MutationObserver(pedir).observe(fl, { childList: true });
   pedir();
 })();
 </script>
