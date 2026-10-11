@@ -64,7 +64,7 @@
       if (pct >= m && !scrollMarks[m]) {
         scrollMarks[m] = true;
         track('scroll_depth', { depth: m });
-        if (m === 50) maybeShowLeadPopup();
+        if (m === 100) maybeShowLeadPopup();
       }
     });
   }
@@ -86,14 +86,19 @@
     track('time_on_page', { seconds: secs });
   });
 
-  // ── 30s timer for lead popup ───────────────────────────────────────────────
-  setTimeout(function () { maybeShowLeadPopup(); }, 30000);
+  // ── Gatilhos do pop-up: fim da página (acima) ou intenção de saída no desktop ──
+  // Só existe se houver amostra real para entregar (AMOSTRA_PRONTA); sem arquivo, não promete.
+  var AMOSTRA_PRONTA = false;
+  document.addEventListener('mouseout', function (e) {
+    if (!e.relatedTarget && e.clientY <= 0) maybeShowLeadPopup();
+  });
 
   // ── Lead capture pop-up ────────────────────────────────────────────────────
   var popupShown = false;
 
   function maybeShowLeadPopup() {
     if (popupShown) return;
+    if (!AMOSTRA_PRONTA) return;
     if (localStorage.getItem(LEAD_CAPTURED_KEY)) return;
     if (sessionStorage.getItem(LEAD_SHOWN_KEY)) return;
     if (location.pathname.indexOf('admin') !== -1) return;
