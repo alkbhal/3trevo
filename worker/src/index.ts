@@ -38,6 +38,7 @@ import {
   handleHeroConfigPut,
 } from './routes/admin-hero';
 import { handleAiStudio } from './routes/admin-ai-studio';
+import { handleNemaSaldo } from './routes/nema';
 import { handleAdminLogin, handleAdminStats } from './routes/admin-auth';
 import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
@@ -246,6 +247,10 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // ── Checkout / Pagamento ──────────────────────────────────────────────
     if (path === '/api/checkout/preferencia' && (method === 'POST' || method === 'OPTIONS')) {
       return handleCriarPreferencia(request, env);
+    }
+
+    if (path === '/api/nema/saldo' && method === 'GET') {
+      return handleNemaSaldo(request, env);
     }
 
     if (path === '/api/webhook/pagamento' && (method === 'POST' || method === 'GET')) {

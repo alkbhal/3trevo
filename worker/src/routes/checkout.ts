@@ -14,6 +14,10 @@
 import type { Env } from '../types';
 import { sb } from '../sb';
 import { verificarToken } from './admin-catalog';
+import {
+  usuarioDoToken, reservarNema, cancelarReservaNema, confirmarResgateNema,
+  creditarCompraNema, estornarCompraNema, reservaDoMetadata, valorNemaReais,
+} from './nema';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -32,7 +36,8 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   let body: any;
   try { body = await request.json(); } catch { return new Response('Bad Request', { status: 400 }); }
 
-  const { slug, email } = body;
+  const { slug } = body;
+  let email: string = body?.email;
   if (!slug || !email) {
     return Response.json({ ok: false, erro: 'slug e email obrigatórios' }, { status: 400 });
   }
@@ -56,17 +61,36 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     console.error('[checkout] registrarInicioCheckout falhou:', e)
   );
 
+  // Nema (fase 0): cliente logado pode usar o saldo como desconto. A reserva trava o
+  // saldo até o pagamento; se o pagamento não vier, ela expira sozinha.
+  const preco = Number(produto.preco);
+  let desconto = 0;
+  let nemaUsado = 0;
+  let reservaRef: string | null = null;
+  if (body?.usar_nema === true) {
+    const user = await usuarioDoToken(request, env);
+    if (!user) return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
+    email = user.email; // o pagamento fica no nome de quem é dono do saldo
+    const reserva = await reservarNema(env, user.id, preco);
+    if (reserva && reserva.quantidade > 0 && reserva.reserva_ref) {
+      desconto = reserva.desconto;
+      nemaUsado = reserva.quantidade;
+      reservaRef = reserva.reserva_ref;
+    }
+  }
+
   // Criar preferência no MP
   const prefBody = {
     items: [{
       id: slug,
       title: produto.titulo,
       quantity: 1,
-      unit_price: Number(produto.preco),
+      unit_price: Math.round((preco - desconto) * 100) / 100,
       currency_id: 'BRL',
     }],
     payer: { email },
     external_reference: slug,
+    ...(reservaRef ? { metadata: { nema_reserva: reservaRef, nema_quantidade: nemaUsado } } : {}),
     notification_url: `${WORKER_URL}/api/webhook/pagamento`,
     back_urls: {
       success: `${SITE_URL}/area-cliente.html?status=success&slug=${slug}`,
@@ -95,6 +119,7 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   if (!mpResp.ok) {
     const err = await mpResp.text();
     console.error('[preferencia] erro MP:', err);
+    if (reservaRef) await cancelarReservaNema(env, reservaRef);
     return Response.json({ ok: false, erro: 'falha_ao_criar_preferencia' }, { status: 502 });
   }
 
@@ -104,6 +129,8 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     init_point: pref.init_point,       // URL de checkout MP (produção)
     sandbox_init_point: pref.sandbox_init_point,
     preference_id: pref.id,
+    nema_usado: nemaUsado,
+    desconto,
   });
 }
 
@@ -181,14 +208,15 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
     return new Response('rpc_error', { status: 200 });
   }
 
-  // Novo pedido: distribuir números + enviar email
-  if (rpc.novo) {
-    await distribuirNumeros(env, {
-      userId: userId!,
-      purchaseId: rpc.purchase_id,
-      quantidade: rpc.cotas_base ?? 0,
-    });
+  // Nema: confirma o saldo usado nesta compra e credita o Nema que ela gera.
+  // As duas funções são idempotentes, então rodam também quando o MP reenvia o aviso.
+  // O sorteio está parado até a autorização legal: a compra não distribui números.
+  const reservaRef = reservaDoMetadata(mpPayment.metadata);
+  if (reservaRef) await confirmarResgateNema(env, reservaRef, String(mpPaymentId), rpc.purchase_id ?? null);
+  let nemaGanho = 0;
+  if (userId && rpc.purchase_id) nemaGanho = await creditarCompraNema(env, userId, rpc.purchase_id, valor);
 
+  if (rpc.novo) {
     if (env.RESEND_API_KEY) {
       await enviarEmailCompra(env, {
         email: emailPagador,
@@ -196,7 +224,8 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
         ebookTitulo: rpc.ebook_titulo ?? productSlug,
         downloadToken: rpc.download_token,
         productSlug,
-        cotas: rpc.cotas_base ?? 0,
+        nema: nemaGanho,
+        valorNema: nemaGanho > 0 ? await valorNemaReais(env) : 0,
         valor,
       }).catch(err => console.error('[webhook] email falhou:', err));
     }
@@ -333,6 +362,8 @@ export async function handleReembolso(request: Request, env: Env): Promise<Respo
     sb(env, `payments?id=eq.${payment.id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'refunded' }) }),
   ]);
 
+  await estornarCompraNema(env, purchaseId);
+
   await registrarAuditoria(env, 'reembolso_processado', { purchase_id: purchaseId, payment_id: payment.id, mp_payment_id: payment.mp_payment_id });
 
   return Response.json({ ok: true });
@@ -458,7 +489,9 @@ async function registrarCompraMp(opts: {
 }
 
 // ─── Helpers: Draw numbers ────────────────────────────────────────────────────
-async function distribuirNumeros(
+// Parado desde 10/10/2026 (Programa Cultural em habilitação legal). Mantido para
+// quando houver autorização: o Nema será a moeda de entrada, sem refazer este código.
+export async function distribuirNumeros(
   env: Env,
   opts: { userId: string; purchaseId: string; quantidade: number }
 ): Promise<void> {
@@ -537,7 +570,8 @@ async function enviarEmailCompra(
     ebookTitulo: string;
     downloadToken: string;
     productSlug: string;
-    cotas: number;
+    nema: number;
+    valorNema: number;
     valor: number;
   }
 ): Promise<void> {
@@ -564,7 +598,6 @@ async function enviarEmailCompra(
   } catch (err) {
     console.error('[email] falha ao preparar anexo, enviando só com o link:', err);
   }
-  const participacaoUrl = `${SITE_URL}/participacao-cultural.html?slug=${opts.productSlug}`;
   const valorFmt = 'R$ ' + opts.valor.toFixed(2).replace('.', ',');
 
   const html = `<!DOCTYPE html>
@@ -586,8 +619,7 @@ async function enviarEmailCompra(
       Seu pagamento foi aprovado. <strong>${escapeHtml(opts.ebookTitulo)}</strong> está pronto para leitura.
     </p>
     <p style="margin:0 0 8px;font-size:13px;color:#888">
-      Valor pago: <strong style="color:#1a4a2e">${valorFmt}</strong> &nbsp;·&nbsp;
-      ${opts.cotas} cota${opts.cotas !== 1 ? 's' : ''} no Programa Cultural
+      Valor pago: <strong style="color:#1a4a2e">${valorFmt}</strong>
     </p>
   </td></tr>
 
@@ -623,22 +655,21 @@ async function enviarEmailCompra(
     </table>
   </td></tr>
 
-  <!-- Programa Cultural -->
-  <tr><td style="padding:0 48px 28px">
+  <!-- Nema -->
+  ${opts.nema > 0 ? `<tr><td style="padding:0 48px 28px">
     <table width="100%" cellpadding="0" cellspacing="0"
            style="background:#f0f7f2;border:1px solid rgba(26,74,46,.15)">
     <tr><td style="padding:16px 20px">
-      <p style="margin:0 0 8px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a4a2e">✦ Programa Cultural</p>
-      <p style="margin:0;font-size:13px;color:#444;line-height:1.6">
-        Após 7 dias, acesse
-        <a href="${participacaoUrl}" style="color:#1a4a2e;font-weight:600;text-decoration:none">
-          sua página de participação →
-        </a>
-        , escreva um depoimento sobre o livro e suas cotas são liberadas para o sorteio.
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a4a2e">✦ Nema</p>
+      <p style="margin:0;font-size:14px;color:#444;line-height:1.6">
+        Esta compra rendeu <strong>N$ ${opts.nema.toFixed(2).replace('.', ',')}</strong>
+        (R$ ${(opts.nema * opts.valorNema).toFixed(2).replace('.', ',')} de desconto na sua próxima compra).
+        O saldo fica disponível em 7 dias, na sua
+        <a href="${areaClienteUrl}" style="color:#1a4a2e;font-weight:600;text-decoration:none">área do cliente</a>.
       </p>
     </td></tr>
     </table>
-  </td></tr>
+  </td></tr>` : ''}
 
   <!-- Rodapé -->
   <tr><td style="padding:20px 48px;border-top:1px solid rgba(26,74,46,.08)">
