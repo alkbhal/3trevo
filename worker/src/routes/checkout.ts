@@ -18,6 +18,7 @@ import {
   usuarioDoToken, reservarNema, cancelarReservaNema, confirmarResgateNema,
   creditarCompraNema, estornarCompraNema, reservaDoMetadata, valorNemaReais,
 } from './nema';
+import { referenciaForge, entregarArquivoForge } from '../forge-arquivo';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -283,6 +284,9 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
   // get-download (edge function) já usa pro leitor/biblioteca. Rota antiga apontava pra
   // um bucket R2 que nunca chegou a ser configurado (achado real: TODO download por
   // e-mail quebrava com 500, "r2_not_configured" -- corrigido nesta sessão).
+  // Livro do forge: entregue pelo servidor da loja, nunca por redirect ao forge.
+  const refForge = referenciaForge(produto.arquivo_url, env);
+  if (refForge) return entregarArquivoForge(refForge, env, produto.titulo ?? 'ebook');
   if (produto.arquivo_url.startsWith('http')) {
     return Response.redirect(produto.arquivo_url, 302);
   }

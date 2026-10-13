@@ -17,6 +17,10 @@ export interface Env {
   WEBHOOK_HMAC_SECRET: string;
   FORGE_WEBHOOK_SECRET?: string;
   FORGE_PUBLIC_URL?: string;
+  // Segredo do tr3vo-forge: a loja busca o livro no servidor (nunca expõe o forge ao comprador)
+  FORGE_API_SECRET?: string;
+  // Service binding para o tr3vo-forge (fetch entre workers.dev da mesma conta é bloqueado — erro 1042)
+  FORGE?: Fetcher;
 
   // IA
   ANTHROPIC_KEY: string;
