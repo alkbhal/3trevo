@@ -2,6 +2,10 @@
 
 ## Rules
 
+- **SEGURANÇA PRIMEIRO (regra permanente do dono, R-SEG-01, 13/10/2026):** fragilidade de segurança achada passa à
+  frente de qualquer tarefa e é corrigida já, com a medida mais forte e atual (fechar por padrão, segredo em tempo
+  constante, nada sensível público). Registrar em `mapa-projetos/PENDENCIAS.md` (item A) e provar com teste que o
+  código antigo reprova.
 - Do what has been asked; nothing more, nothing less
 - NEVER create files unless absolutely necessary — prefer editing existing files
 - NEVER create documentation files unless explicitly requested
