@@ -14,6 +14,7 @@ SUPABASE_URL = "https://xfkepekffdyrtcgagwqo.supabase.co"
 # WEBHOOK_HMAC_SECRET
 # ANTHROPIC_KEY
 # R2_PUBLIC_BUCKET_ID    (opcional — se usar R2 para PDFs)
+# FORGE_API_SECRET       (mesmo valor do tr3vo-forge — a loja busca o livro no servidor)
 
 # KV namespace para rate limiting e health monitor
 [[kv_namespaces]]
@@ -24,6 +25,12 @@ id = "34f4ad1650394b77a51ae527a0437a24"
 [[r2_buckets]]
 binding = "BIBLIOTECA_R2"
 bucket_name = "tt-biblioteca"
+
+# Livros do tr3vo-forge: buscados no servidor por canal interno (fetch entre
+# workers.dev da mesma conta é bloqueado — erro 1042). O comprador nunca vê o forge.
+[[services]]
+binding = "FORGE"
+service = "tr3vo-forge"
 
 # Crons:
 # - Toda hora: health monitor (checa componentes, detecta ataques, alerta via email)
