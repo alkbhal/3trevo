@@ -56,7 +56,7 @@ create index if not exists publicacao_registros_projeto on public.publicacao_reg
 create index if not exists publicacao_registros_evento on public.publicacao_registros (evento);
 
 create or replace function public.publicacao_registros_imutavel() returns trigger
-language plpgsql as $$
+language plpgsql set search_path = '' as $$
 begin
   raise exception 'publicacao_registros é só acréscimo: mudança vira registro novo';
 end $$;
