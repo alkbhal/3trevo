@@ -91,7 +91,9 @@ describe('POST /api/checkout/preferencia com Nema', () => {
       body: JSON.stringify({ slug: 'antifalencia', email: 'outro@x.com', usar_nema: true }),
     });
     const body: any = await (await handleCriarPreferencia(req, env)).json();
-    expect(body).toMatchObject({ ok: true, desconto: 5, nema_usado: 10 });
+    expect(body).toMatchObject({ ok: true, nema_usado: 10 });
+    // Nema → reais é contábil e interno: o navegador do cliente nunca recebe o desconto em reais.
+    expect(body).not.toHaveProperty('desconto');
     const mp = chamadas.find((c) => c.url.includes('/checkout/preferences'))!;
     const pref = JSON.parse(String(mp.init!.body));
     expect(pref.items[0].unit_price).toBe(41.04);

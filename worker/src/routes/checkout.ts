@@ -130,8 +130,7 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     init_point: pref.init_point,       // URL de checkout MP (produção)
     sandbox_init_point: pref.sandbox_init_point,
     preference_id: pref.id,
-    nema_usado: nemaUsado,
-    desconto,
+    nema_usado: nemaUsado, // o desconto em reais é contábil, interno: nunca vai ao cliente
   });
 }
 
