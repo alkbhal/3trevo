@@ -38,7 +38,7 @@ export const pacoteSchema = z.object({
   qualidade: z.object({
     aprovado: z.boolean(),
     motivos: z.array(z.string()),
-    nota: z.number().min(0).max(100).optional(),
+    nota: z.number().min(0).max(100).nullable().optional(),
   }),
   tamanho: z.object({ paginas_estimadas: z.number().int().positive() }),
   mercado: z.object({

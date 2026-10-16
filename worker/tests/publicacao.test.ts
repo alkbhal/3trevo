@@ -273,6 +273,15 @@ describe('publicação por idioma — fronteiras', () => {
     expect(c.propostas.size).toBe(0);
   });
 
+  it('nota de qualidade do forge posiciona o preço: 90 → mediana; null → início da faixa', async () => {
+    const c = cenario();
+    await c.entregar(pacote({ qualidade: { aprovado: true, motivos: [], nota: 90, nota_regra: 'x', capitulos_avaliados: 5, capitulos_limpos: 5 } }));
+    expect(c.propostas.get(PID)!.preco).toBe(19.9);
+    await c.entregar(pacote({ qualidade: { aprovado: true, motivos: [], nota: null, nota_regra: 'x', capitulos_avaliados: 0, capitulos_limpos: 0 } }));
+    expect(c.propostas.get(PID)!.preco).toBe(14.9);
+    expect(c.propostas.get(PID)!.precificacao!.posicao!.nota).toMatch(/qualidade não informada/);
+  });
+
   it('idioma sem biblioteca na loja (de-DE) → rascunho com motivo', async () => {
     const c = cenario();
     await c.entregar(pacote({ idioma: 'de-DE' }));
