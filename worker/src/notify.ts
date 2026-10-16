@@ -41,16 +41,23 @@ export async function notify(env: Env, text: string, alertType?: string): Promis
     }
   }
 
-  if (env.RESEND_API_KEY) {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: 'Editora Três Trevo <sac@3trevo.com.br>',
-        to: 'al_kbhal@yahoo.com.br',
-        subject: `[3Trevo] ${text.substring(0, 60)}`,
-        html: `<pre style="font-family:sans-serif;line-height:1.6">${fullText.replace(/</g, '&lt;')}</pre>`,
-      }),
-    }).catch(e => console.error('[notify] email falhou:', e));
+  await emailDono(env, text.substring(0, 60), fullText);
+}
+
+/** E-mail curto ao dono (avisos de publicação, R8 da spec por idioma). Sem Resend: só log. */
+export async function emailDono(env: Env, assunto: string, texto: string): Promise<void> {
+  if (!env.RESEND_API_KEY) {
+    console.warn('[notify] RESEND_API_KEY ausente — aviso não enviado:', assunto);
+    return;
   }
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: 'Editora Três Trevo <sac@3trevo.com.br>',
+      to: 'al_kbhal@yahoo.com.br',
+      subject: `[3Trevo] ${assunto}`,
+      html: `<pre style="font-family:sans-serif;line-height:1.6">${texto.replace(/</g, '&lt;')}</pre>`,
+    }),
+  }).catch(e => console.error('[notify] email falhou:', e));
 }

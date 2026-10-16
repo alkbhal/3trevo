@@ -45,6 +45,8 @@ import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
 import { handleAdminMarketingStats } from './routes/admin-marketing';
 import { handleAdminBI } from './routes/admin-bi';
 import { handleForgeDelivery } from './routes/forge-webhook';
+import { handleAdminPublicacaoLista, handleAdminPublicacaoAcao } from './routes/admin-publicacao';
+import { IDIOMAS_LOJA } from './publicacao/pacote';
 import { handleDrawProgress } from './routes/admin-draw';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
@@ -67,6 +69,7 @@ import {
   handleBibliotecaAcervo,
   handleBibliotecaAcesso,
   handleBibliotecaVerificar,
+  handleBibliotecaSessaoConta,
   handleBibliotecaStream,
   handleBibliotecaMinha,
   handleBibliotecaSelecionar,
@@ -203,13 +206,23 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // Catálogo (leitura pública) — ?slug=X filtra 1 título, herda ativo=true e as mesmas
     // colunas (sem motivo_inativo) do endpoint de lista, nunca reimplementar a query solto.
     if (path === '/api/public/catalogo' && method === 'GET') {
-      const slug = new URL(request.url).searchParams.get('slug');
+      const params = new URL(request.url).searchParams;
+      const slug = params.get('slug');
       if (slug !== null && !/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug)) {
         return Response.json({ ok: false, erro: 'slug inválido' }, { status: 400 });
       }
+      // Biblioteca nativa (spec por idioma, R2): a LISTA de cada idioma só tem livros escritos
+      // nele; sem ?idioma= é a pt-BR, onde fica todo o acervo anterior (D4). Busca por slug
+      // (checkout) acha o livro em qualquer idioma, a não ser que ?idioma= seja dado.
+      const idiomaParam = params.get('idioma');
+      if (idiomaParam !== null && !(IDIOMAS_LOJA as readonly string[]).includes(idiomaParam)) {
+        return Response.json({ ok: false, erro: 'idioma inválido' }, { status: 400 });
+      }
+      const idioma = idiomaParam ?? (slug ? null : 'pt-BR');
       const filtroSlug = slug ? `&slug=eq.${slug}` : '';
+      const filtroIdioma = idioma ? `&idioma=eq.${idioma}` : '';
       const resp = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true${filtroSlug}&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem`,
+        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true${filtroIdioma}${filtroSlug}&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem,idioma`,
         {
           headers: {
             apikey: env.SUPABASE_SERVICE_KEY,
@@ -339,6 +352,15 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleAdminCatalogoDelete(request, env, slug);
     }
 
+    // ── Publicação por idioma: propostas do forge, aprovação do dono ──────
+    if (path === '/api/admin/publicacao' && method === 'GET') {
+      return handleAdminPublicacaoLista(request, env);
+    }
+    const acaoPub = path.match(/^\/api\/admin\/publicacao\/([^/]+)\/(aprovar|recusar|despublicar)$/);
+    if (acaoPub && method === 'POST') {
+      return handleAdminPublicacaoAcao(request, env, acaoPub[1]!, acaoPub[2]!);
+    }
+
     if (path === '/api/admin/catalogo/patch' && method === 'POST') {
       return handleAdminCatalogoPatch(request, env);
     }
@@ -392,6 +414,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
     if (path === '/api/biblioteca/verificar' && method === 'GET') {
       return handleBibliotecaVerificar(request, env);
+    }
+    if (path === '/api/biblioteca/sessao-conta' && method === 'POST') {
+      return handleBibliotecaSessaoConta(request, env);
     }
     if (path === '/api/biblioteca/stream' && method === 'GET') {
       return handleBibliotecaStream(request, env);

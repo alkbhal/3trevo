@@ -156,19 +156,6 @@ nav{
 .dash-titulo{font-family:'Lora',serif;font-size:32px;font-weight:400;line-height:1.15;color:var(--tinta)}
 .dash-titulo em{font-style:italic;color:var(--verde-medio)}
 
-/* Stats row */
-.stats-row{
-  display:flex;gap:0;border-bottom:1px solid var(--borda);
-  background:var(--painel);
-}
-.stat-item{flex:1;padding:20px 28px;border-right:1px solid var(--borda2)}
-.stat-item:last-child{border-right:none}
-.stat-num{
-  font-family:'Lora',serif;font-size:27px;font-weight:600;
-  color:var(--verde-medio);line-height:1;
-}
-.stat-label{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--t3);margin-top:5px}
-
 /* ══ ABAS ══ */
 .abas{
   display:flex;gap:0;border-bottom:1px solid var(--borda);
@@ -297,25 +284,71 @@ nav{
 .btn-dl-mini{background:none;border:none;color:var(--t4);cursor:pointer;padding:4px;display:inline-flex;align-items:center;transition:color .2s}
 .btn-dl-mini:hover{color:var(--verde-medio)}
 
-/* ── Leitor embutido — cromo minimalista, referência Kindle Cloud Reader ── */
-#tela-leitura{display:none;position:fixed;inset:0;background:#fbf8f2;z-index:1000;flex-direction:column}
-.leitor-topo{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;height:52px;flex-shrink:0;
-  background:var(--painel);border-bottom:1px solid var(--borda);
-}
-.leitor-titulo{font-family:'Lora',serif;font-size:14.5px;font-weight:500;color:var(--t1)}
-.btn-leitor{
-  background:transparent;border:1px solid var(--borda);color:var(--t2);
-  border-radius:2px;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px;
-  letter-spacing:.3px;transition:all .2s;
-}
-.btn-leitor:hover{border-color:var(--ouro-escuro);color:var(--tinta);background:rgba(200,168,75,.06)}
-.btn-leitor:disabled{opacity:.35;cursor:default}
-.leitor-controles{display:flex;gap:10px;align-items:center}
-#leitor-pagina{font-size:12px;color:var(--t3)}
-#leitor-viewer{flex:1;overflow-x:hidden;overflow-y:auto;background:#fbf8f2}
-#leitor-viewer iframe{width:100%;height:100%;border:none}
+/* ══ PAINEL FREEMIUM — Início, Clássicos, Clube ══ */
+.dash-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.chip-nema{display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding:10px 16px;
+  border:1px solid rgba(200,168,75,.35);border-radius:4px;background:rgba(200,168,75,.07);max-width:100%}
+.chip-nema-valor{font-family:'Lora',serif;font-size:20px;font-weight:600;color:var(--verde-medio)}
+.chip-nema-rotulo{font-size:11px;color:var(--t2);text-align:right}
+.aba-conta{margin-left:auto}
+.uau{display:flex;align-items:center;gap:18px;padding:22px 24px;margin-bottom:40px;border-radius:8px;
+  background:radial-gradient(120% 140% at 0% 0%,#2a6b42 0%,#0f2d1a 60%);color:#fff;box-shadow:var(--sombra-card)}
+.uau[hidden]{display:none}
+.uau-play{flex-shrink:0;width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--ouro);color:#0f2d1a;display:flex;align-items:center;justify-content:center;padding-left:4px;
+  box-shadow:0 0 0 6px rgba(200,168,75,.18);transition:transform .2s var(--ease-out)}
+.uau-play:hover{transform:scale(1.06)}
+.uau-texto{flex:1;min-width:0}
+.uau-rotulo{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ouro-claro)}
+.uau-titulo{font-family:'Lora',serif;font-size:21px;margin:4px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uau-sub{font-size:12.5px;color:rgba(255,255,255,.7)}
+.uau-link,.link-ver{background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;white-space:nowrap}
+.uau-link{color:var(--ouro-claro)}
+.link-ver{color:var(--verde-medio)}
+#secMeusLivros{margin-bottom:44px}
+#secMeusLivros[hidden]{display:none}
+.bloco-topo{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.bloco-classicos{margin-bottom:48px}
+.faixa-classicos{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(128px,150px);gap:18px;overflow-x:auto;
+  padding-bottom:8px;scroll-snap-type:x mandatory}
+.faixa-classicos .classico{scroll-snap-align:start}
+.grade-classicos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:28px 18px}
+.classico{display:block;text-decoration:none;color:inherit}
+.classico-capa,.clube-capa{position:relative;aspect-ratio:2/3;border-radius:3px;overflow:hidden;box-shadow:var(--sombra-card);
+  transition:transform .25s var(--ease-out),box-shadow .25s}
+.classico:hover .classico-capa{transform:translateY(-3px);box-shadow:var(--sombra-card-hover)}
+.capa-img{width:100%;height:100%;object-fit:cover;display:block}
+.capa-tipo{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:30px 12px 14px;overflow:hidden;
+  background:linear-gradient(160deg,#1a4a2e,#0f2d1a);color:#f3ead2;text-align:center;
+  box-shadow:inset 0 0 0 1px rgba(200,168,75,.5),inset 0 0 0 5px #0f2d1a,inset 0 0 0 6px rgba(200,168,75,.35)}
+.capa-tipo-titulo{font-family:'Lora',serif;font-size:15px;line-height:1.3;overflow-wrap:anywhere;hyphens:auto}
+.clube-capa .capa-tipo{padding:28px 8px 10px;gap:6px}
+.clube-capa .capa-tipo-titulo{font-size:11.5px}
+.clube-capa .selo{font-size:9px;padding:2px 6px;top:6px;left:6px}
+.capa-tipo-autor{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ouro-claro)}
+.selo{position:absolute;top:8px;left:8px;font-size:10px;font-weight:600;letter-spacing:.6px;padding:3px 8px;border-radius:20px;
+  background:rgba(255,253,249,.92);color:var(--verde-medio)}
+.selo-ouro{background:var(--ouro);color:#0f2d1a}
+.classico-titulo{font-family:'Lora',serif;font-size:14px;color:var(--tinta);margin-top:10px;line-height:1.3}
+.classico-autor{font-size:11.5px;color:var(--t3);margin-top:2px}
+.classico-barra{height:3px;background:var(--borda);border-radius:2px;margin-top:8px;overflow:hidden}
+.classico-barra span{display:block;height:100%;background:var(--ouro)}
+.contador-classicos{font-size:12px;color:var(--t3)}
+.painel-intro{font-size:14px;color:var(--t2);line-height:1.6;margin:-12px 0 28px;max-width:60ch}
+.painel-aviso{font-size:14px;color:var(--t2);padding:12px 0}
+.bloco-clube{padding:32px;border-radius:8px;background:linear-gradient(180deg,#fffdf9,#f3ead2);border:1px solid rgba(200,168,75,.3)}
+.bloco-clube[hidden]{display:none}
+.clube-rotulo{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ouro-escuro);font-weight:600}
+.clube-chamada{font-family:'Lora',serif;font-weight:400;font-size:22px;color:var(--tinta);margin:6px 0 24px;max-width:34ch;line-height:1.3}
+.vitrine-clube{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.clube-card{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:start;background:var(--painel);padding:14px;border-radius:6px;
+  box-shadow:var(--sombra-card)}
+.clube-titulo{font-family:'Lora',serif;font-size:16px;color:var(--tinta);line-height:1.3}
+.clube-desc{font-size:12.5px;color:var(--t2);line-height:1.5;margin:6px 0 12px}
+.clube-cta{display:block;width:100%;padding:10px 12px;border:none;border-radius:3px;cursor:pointer;background:var(--verde-medio);color:#fff;
+  font-family:inherit;font-size:13px;font-weight:600}
+.clube-cta:hover{background:var(--verde)}
+.clube-avulso{display:block;margin-top:8px;font-size:12px;color:var(--t2);text-align:center}
 
 /* ══ CARROSSEL SECAO ══ */
 .secao-wrapper{margin-bottom:44px}
@@ -722,8 +755,6 @@ nav{
 @media(max-width:960px){
   nav{padding:0 20px}
   .dash-header,.abas,.aba-conteudo{padding-left:20px;padding-right:20px}
-  .stats-row{flex-wrap:wrap}
-  .stat-item{min-width:50%}
   .biblioteca-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:20px 14px}
   .player-fixo{padding:0 16px;grid-template-columns:1fr auto}
   .player-info{min-width:0}
@@ -733,11 +764,18 @@ nav{
   .plano-beneficios{grid-template-columns:1fr}
 }
 @media(max-width:600px){
+  .uau{padding:18px 16px;gap:14px;margin-bottom:32px}
+  .uau-link{display:none}
+  .uau-titulo{font-size:18px}
+  .chip-nema{align-items:flex-start;width:100%}
+  .chip-nema-rotulo{text-align:left}
+  .bloco-clube{padding:22px 16px}
+  .grade-classicos{grid-template-columns:repeat(2,1fr);gap:22px 14px}
+  .aba-conta{margin-left:0}
   .abas{padding:0 12px}
   .aba{font-size:10px;padding:12px 14px;letter-spacing:1.5px}
   .aba-conteudo{padding:24px 16px}
   .dash-header{padding:24px 16px}
-  .stats-row .stat-item{min-width:100%}
   .cotas-grid{grid-template-columns:1fr 1fr}
   .biblioteca-grid{grid-template-columns:repeat(2,1fr);gap:20px 10px}
   .player-nome{max-width:140px}
@@ -790,55 +828,51 @@ nav{
 
   <!-- Header -->
   <div class="dash-header">
-    <div class="dash-saudacao">Minha conta</div>
-    <h1 class="dash-titulo">Minha <em>biblioteca</em></h1>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-row" id="statsRow">
-    <div class="stat-item">
-      <div class="stat-num" id="statEbooks">—</div>
-      <div class="stat-label">Ebooks</div>
+    <div>
+      <div class="dash-saudacao">Minha conta</div>
+      <h1 class="dash-titulo">Sua <em>estante</em> Três Trevo</h1>
     </div>
-    <div class="stat-item">
-      <div class="stat-num" id="statMusicas">—</div>
-      <div class="stat-label">Músicas</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num" id="statNema">—</div>
-      <div class="stat-label" id="statNemaLabel">Nema (N$)</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num" id="statStatus">—</div>
-      <div class="stat-label">Assinatura</div>
+    <div class="chip-nema" title="Nema: desconto acumulado nas suas compras">
+      <span class="chip-nema-valor" id="statNema">—</span>
+      <span class="chip-nema-rotulo" id="statNemaLabel">Nema (N$)</span>
     </div>
   </div>
 
   <!-- Abas -->
   <div class="abas" role="tablist">
-    <button class="aba ativa" onclick="trocarAba('biblioteca',this)" role="tab" aria-selected="true">Biblioteca</button>
-    <button class="aba" onclick="trocarAba('musicas',this)" role="tab">Músicas</button>
-    <button class="aba" onclick="trocarAba('extrato',this)" role="tab">Extrato</button>
-    <button class="aba" onclick="trocarAba('assinatura',this)" role="tab">Assinatura</button>
-    <button class="aba" onclick="trocarAba('planilhaviva',this)" role="tab">Planilha Viva</button>
+    <button class="aba ativa" data-aba="inicio" onclick="trocarAba('inicio',this)" role="tab" aria-selected="true">Início</button>
+    <button class="aba" data-aba="musicas" onclick="trocarAba('musicas',this)" role="tab" aria-selected="false">🎵 Músicas</button>
+    <button class="aba" data-aba="classicos" onclick="trocarAba('classicos',this)" role="tab" aria-selected="false">📚 Clássicos</button>
+    <button class="aba" data-aba="clube" onclick="trocarAba('clube',this)" role="tab" aria-selected="false">👑 Clube TT</button>
+    <button class="aba aba-conta" data-aba="conta" onclick="trocarAba('conta',this)" role="tab" aria-selected="false">Conta</button>
   </div>
 
-  <!-- ── ABA: BIBLIOTECA ── -->
-  <div id="aba-biblioteca" class="aba-conteudo ativa" role="tabpanel">
-    <div class="sec-titulo">Meus ebooks</div>
-    <div id="listaEbooks">
-      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
-    </div>
+  <!-- ── ABA: INÍCIO ── -->
+  <div id="aba-inicio" class="aba-conteudo ativa" role="tabpanel">
+    <section class="uau" id="momentoUau" hidden aria-label="Trilha sonora da editora"></section>
 
-    <!-- Biblioteca Clássica TT -->
-    <div style="margin-top:36px;padding:28px 32px;background:linear-gradient(135deg,#0f2d1a 0%,#1e5c3a 100%);border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
-      <div>
-        <p style="color:var(--ouro);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin:0 0 8px;">Benefício incluído na sua compra</p>
-        <h3 style="font-family:'Lora',serif;font-weight:400;font-size:20px;color:#fff;margin:0 0 10px;">📚 Biblioteca Clássica TT</h3>
-        <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.6;margin:0;">Acesso ilimitado ao acervo de clássicos da literatura brasileira em domínio público. Leia até 3 obras ao mesmo tempo, com leitor integrado e progresso salvo.</p>
+    <section id="secMeusLivros">
+      <div class="sec-titulo">Meus livros</div>
+      <div id="listaEbooks">
+        <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
       </div>
-      <a id="link-bib-classica" href="/minha-biblioteca.html" style="flex-shrink:0;display:inline-block;background:var(--ouro);color:#0f2d1a;text-decoration:none;padding:13px 28px;border-radius:3px;font-size:14px;font-weight:600;white-space:nowrap;">Acessar biblioteca →</a>
-    </div>
+    </section>
+
+    <section class="bloco-classicos">
+      <div class="bloco-topo">
+        <div class="sec-titulo">Biblioteca Clássica TT · grátis com sua conta</div>
+        <button class="link-ver" type="button" onclick="irParaAba('classicos')">Ver todos →</button>
+      </div>
+      <div class="faixa-classicos" id="inicioClassicos"></div>
+    </section>
+
+    <section class="bloco-clube">
+      <div class="clube-cabeca">
+        <div class="clube-rotulo">👑 Clube Três Trevo</div>
+        <h2 class="clube-chamada">Obras autorais da editora, com trilha e lançamentos antes de todo mundo</h2>
+      </div>
+      <div class="vitrine-clube" id="vitrineClube"></div>
+    </section>
   </div>
 
   <!-- ── ABA: MÚSICAS ── -->
@@ -849,25 +883,31 @@ nav{
     </div>
   </div>
 
-  <!-- ── ABA: EXTRATO ── -->
-  <div id="aba-extrato" class="aba-conteudo" role="tabpanel">
-    <div class="sec-titulo">Histórico de pagamentos</div>
-    <div id="listaExtrato">
-      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+  <!-- ── ABA: CLÁSSICOS ── -->
+  <div id="aba-classicos" class="aba-conteudo" role="tabpanel">
+    <div class="bloco-topo">
+      <div class="sec-titulo">Biblioteca Clássica TT</div>
+      <span class="contador-classicos" id="classicosContador"></span>
     </div>
+    <p class="painel-intro">Clássicos de domínio público, grátis para quem tem conta. Até 3 obras abertas ao mesmo tempo; o leitor guarda onde você parou.</p>
+    <div class="grade-classicos" id="listaClassicos"></div>
   </div>
 
-  <!-- ── ABA: ASSINATURA ── -->
-  <div id="aba-assinatura" class="aba-conteudo" role="tabpanel">
-    <div class="sec-titulo">Minha assinatura</div>
+  <!-- ── ABA: CLUBE TT ── -->
+  <div id="aba-clube" class="aba-conteudo" role="tabpanel">
+    <div class="sec-titulo">Clube Três Trevo</div>
     <div id="conteudoAssinatura">
       <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
     </div>
   </div>
 
-  <!-- ── ABA: PLANILHA VIVA ── -->
-  <div id="aba-planilhaviva" class="aba-conteudo" role="tabpanel">
-    <div class="sec-titulo">Planilha Viva · SFDTT</div>
+  <!-- ── ABA: CONTA (extrato e Planilha Viva) ── -->
+  <div id="aba-conta" class="aba-conteudo" role="tabpanel">
+    <div class="sec-titulo">Histórico de pagamentos</div>
+    <div id="listaExtrato">
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+    </div>
+    <div class="sec-titulo" style="margin-top:40px">Planilha Viva · SFDTT</div>
     <div id="conteudoPlanilhaViva"></div>
   </div>
 
@@ -878,23 +918,12 @@ nav{
 <!-- Toast -->
 <div class="toast" id="toast" role="alert"></div>
 
-<!-- Leitor embutido -->
-<div id="tela-leitura">
-  <div class="leitor-topo">
-    <div class="leitor-titulo" id="leitor-titulo-texto">—</div>
-    <div class="leitor-controles">
-      <button class="btn-leitor" id="btn-ant">‹ Anterior</button>
-      <span id="leitor-pagina">0%</span>
-      <button class="btn-leitor" id="btn-prox">Próxima ›</button>
-      <button class="btn-leitor" id="btn-trilha-livro" onclick="tocarTrilhaLivro()" style="display:none">🎵 Ouvir trilha</button>
-      <button class="btn-leitor" onclick="fecharLeitor()">✕ Fechar</button>
-    </div>
-  </div>
-  <div id="leitor-viewer"></div>
-</div>
+<!-- Leitor: js/leitor-tt.js injeta o próprio (imersivo, tela cheia) -->
 
 <script src="/js/supabase-client.js?v=4c1ab884"></script>
 <script src="/js/player.js?v=af753349"></script>
+<script src="/js/leitor-tt.js?v=9da12777"></script>
+<script src="/js/area-cliente-painel.js?v=e78b4245"></script>
 <script>
 // ============================================================
 // ÁREA DO CLIENTE — Editora Três Trevo
@@ -1020,7 +1049,8 @@ function mostrarDashboard() {
   document.getElementById('navRight').style.display = 'flex';
   document.getElementById('navEmail').textContent = usuarioAtual.email;
   carregarBiblioteca();
-  carregarStats();
+  carregarNema();
+  carregarInicio();
 }
 
 // ── ABAS ──────────────────────────────────────────────────
@@ -1039,42 +1069,11 @@ function trocarAba(id, btn) {
     abasCarregadas[id] = true;
     if (id === 'musicas')    carregarMusicas();
     if (id === 'sorteios')   carregarSorteios();
-    if (id === 'extrato')    carregarExtrato();
-    if (id === 'assinatura') carregarAssinatura();
+    if (id === 'clube')      carregarAssinatura();
+    if (id === 'conta')      carregarExtrato();
   }
-  if (id === 'planilhaviva') carregarPlanilhaViva();
-}
-
-// ── STATS ─────────────────────────────────────────────────
-async function carregarStats() {
-  const [libRes, cotasRes, subRes, musicasRes] = await Promise.all([
-    sb.from('user_library')
-      .select('id, product_id')
-      .eq('user_id', usuarioAtual.id),
-    sb.from('draw_entries')
-      .select('cotas_base, cotas_bonus')
-      .eq('user_id', usuarioAtual.id),
-    sb.from('subscriptions')
-      .select('status')
-      .eq('user_id', usuarioAtual.id)
-      .eq('status', 'active')
-      .limit(1),
-    sb.from('musicas')
-      .select('id, produto_id, gratuita')
-      .eq('ativo', true),
-  ]);
-
-  const lib     = libRes.data  || [];
-  const ebooks  = lib.length;
-  const libProductIds = new Set(lib.map(l => l.product_id));
-  const musicas = (musicasRes.data || []).filter(m => m.gratuita || (m.produto_id && libProductIds.has(m.produto_id))).length;
-  const cotas   = (cotasRes.data || []).reduce((s, e) => s + (e.cotas_base || 0) + (e.cotas_bonus || 0), 0);
-  const hasSub  = (subRes.data  || []).length > 0;
-
-  animarNum('statEbooks',  ebooks);
-  animarNum('statMusicas', musicas);
-  carregarNema();
-  document.getElementById('statStatus').textContent = hasSub ? 'Ativa' : 'Sem plano';
+  if (id === 'classicos') renderClassicos('listaClassicos');
+  if (id === 'conta') carregarPlanilhaViva();
 }
 
 // Nema: saldo vem do worker (as regras ficam no banco). Disponível = pode usar no checkout.
@@ -1090,24 +1089,12 @@ async function carregarNema() {
     const d = await r.json();
     if (!d.ok) { el.textContent = '—'; return; }
     el.textContent = 'N$ ' + Number(d.disponivel).toFixed(2).replace('.', ',');
-    const partes = ['vale R$ ' + Number(d.disponivel_em_reais).toFixed(2).replace('.', ',') + ' na próxima compra'];
+    const partes = ['use nas compras e promoções da editora'];
     if (Number(d.pendente) > 0) partes.push('+ N$ ' + Number(d.pendente).toFixed(2).replace('.', ',') + ' liberam em até 7 dias');
     lbl.textContent = 'Nema · ' + partes.join(' · ');
   } catch (e) {
     el.textContent = '—';
   }
-}
-
-function animarNum(id, target) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  let cur = 0;
-  const step = Math.max(1, Math.ceil(target / 20));
-  const t = setInterval(() => {
-    cur = Math.min(cur + step, target);
-    el.textContent = cur;
-    if (cur >= target) clearInterval(t);
-  }, 40);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1130,6 +1117,7 @@ async function carregarBiblioteca() {
 
   const ebooks = lib || [];
 
+  document.getElementById('secMeusLivros').hidden = ebooks.length === 0;
   if (ebooks.length === 0) {
     cont.innerHTML = `<div class="vazio">
       <div class="vazio-icone">📚</div>
@@ -1267,152 +1255,32 @@ async function baixar(productId, titulo, formato) {
   }
 }
 
-// Leitor embutido — EPUB via epub.js (mesmo leitor já usado em minha-biblioteca.html),
-// PDF via iframe nativo do navegador. Prefere EPUB quando os dois formatos existem
-// (texto reflui, melhor em qualquer tamanho de tela).
-let trilhaLivroId = null;
-let leitorBook = null;
-let leitorRendition = null;
-
-function ativarNavegacaoLeitor(book, rendition) {
-  const btnAnt = document.getElementById('btn-ant');
-  const btnProx = document.getElementById('btn-prox');
-  const pagina = document.getElementById('leitor-pagina');
-  btnAnt.disabled = true;
-  btnProx.disabled = true;
-  // Trava compartilhada entre botão, teclado e scroll -- achado ao vivo: clique
-  // repetido/tecla segurada/scroll contínuo disparavam next()/prev() de novo antes da
-  // transição anterior terminar, empilhando chamadas no epub.js e deixando o indicador
-  // de % "travado" por vários segundos (não é debounce por tempo fixo, é esperar a
-  // PROMISE real de cada transição resolver antes de aceitar a próxima).
-  let virandoPagina = false;
-  const irPagina = (dir) => {
-    if (virandoPagina) return;
-    virandoPagina = true;
-    const p = dir > 0 ? rendition.next() : rendition.prev();
-    Promise.resolve(p).finally(() => { virandoPagina = false; });
-  };
-  btnAnt.onclick = () => irPagina(-1);
-  btnProx.onclick = () => irPagina(1);
-  document.onkeydown = (e) => {
-    if (e.key === 'ArrowRight') irPagina(1);
-    if (e.key === 'ArrowLeft') irPagina(-1);
-    if (e.key === 'Home') { e.preventDefault(); rendition.display(); }
-    if (e.key === 'End') { e.preventDefault(); const last = book.spine.items[book.spine.items.length - 1]; if (last) rendition.display(last.href); }
-    if (e.key === 'Escape') fecharLeitor();
-  };
-  // Leitor paginado (spread:'none') não tem overflow real -- epub.js sempre calcula o
-  // corte de página pra caber no espaço, nunca "transborda" de verdade. Mas scroll do
-  // mouse/trackpad não fazia nada, o que parece quebrado pra quem espera rolar como
-  // numa página normal. Mapeado pra avançar/voltar página, com debounce (1 virada por
-  // gesto de scroll).
-  // ACHADO REAL (testado ao vivo em produção): o evento 'rendered' do epub.js NUNCA
-  // dispara nesse fluxo -- paginar dentro do mesmo capítulo só desloca a coluna CSS
-  // dentro do iframe já existente, não recria o documento. A primeira versão deste fix
-  // dependia de 'rendered' pra anexar o listener dentro do iframe e nunca funcionava de
-  // verdade (só passava no teste local por coincidência de timing). Corrigido: reanexa
-  // o listener no iframe ATUAL a cada 'relocated' (esse sim dispara sempre, já usado
-  // pro indicador de %) -- addEventListener com a mesma função é idempotente, seguro
-  // chamar de novo no mesmo documento.
-  const virarPagina = (e) => {
-    if (e.deltaY > 0) irPagina(1); else if (e.deltaY < 0) irPagina(-1);
-  };
-  const anexarWheelNoIframe = () => {
-    const f = document.querySelector('#leitor-viewer iframe');
-    if (f && f.contentDocument) f.contentDocument.addEventListener('wheel', virarPagina);
-  };
-  document.getElementById('leitor-viewer').onwheel = virarPagina;
-  rendition.on('rendered', anexarWheelNoIframe);
-  rendition.on('relocated', anexarWheelNoIframe);
-  setTimeout(anexarWheelNoIframe, 300); // primeira página, antes do 1º 'relocated'
-  book.ready.then(() => book.locations.generate(1600)).then(() => {
-    btnAnt.disabled = false;
-    btnProx.disabled = false;
+// Leitor: js/leitor-tt.js (imersivo, zonas de toque, progresso, retoma onde parou).
+// EPUB tem preferência quando há os dois formatos (o texto reflui em qualquer tela).
+function abrirLeitor(productId, titulo) {
+  TTLeitor.abrir({
+    titulo,
+    chave: `produto:${productId}`,
+    obterArquivo: async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch(`${EDGE_BASE}/get-download`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+        body: JSON.stringify({ product_id: productId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error) throw new Error(data.error || 'Erro ao abrir a leitura.');
+      if (data.formatos?.epub) return { url: data.formatos.epub.download_url, formato: 'epub' };
+      if (data.formatos?.pdf) return { url: data.formatos.pdf.download_url, formato: 'pdf' };
+      throw new Error('Nenhum formato disponível para leitura.');
+    },
   });
-  rendition.on('relocated', (location) => {
-    const pct = book.locations.length() ? book.locations.percentageFromCfi(location.start.cfi) * 100 : 0;
-    pagina.textContent = `${Math.round(pct)}%`;
-  });
-}
-
-async function abrirLeitor(productId, titulo) {
-  document.getElementById('tela-leitura').style.display = 'flex';
-  document.getElementById('leitor-titulo-texto').textContent = titulo;
-  const viewer = document.getElementById('leitor-viewer');
-  viewer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999">Carregando…</div>';
-  document.getElementById('leitor-pagina').textContent = '0%';
-  document.getElementById('btn-ant').style.display = 'none';
-  document.getElementById('btn-prox').style.display = 'none';
-
-  trilhaLivroId = null;
-  const btnTrilha = document.getElementById('btn-trilha-livro');
-  btnTrilha.style.display = 'none';
+  // Trilha do livro, se houver: aparece no menu do leitor.
   sb.from('musicas').select('id').eq('produto_id', productId).eq('ativo', true).limit(1)
     .then(({ data }) => {
-      if (data && data[0]) { trilhaLivroId = data[0].id; btnTrilha.style.display = ''; }
+      if (data && data[0] && window.TTPlayer) TTLeitor.definirTrilha({ rotulo: '🎵 Trilha', tocar: () => TTPlayer.play(data[0].id) });
     });
-
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    const res = await fetch(`${EDGE_BASE}/get-download`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-      body: JSON.stringify({ product_id: productId }),
-    });
-    const data = await res.json();
-
-    if (!res.ok || data.error) {
-      viewer.innerHTML = `<div style="padding:40px;color:#999">${data.error || 'Erro ao abrir leitura.'}</div>`;
-      return;
-    }
-
-    if (data.formatos?.epub) {
-      viewer.innerHTML = '';
-      document.getElementById('btn-ant').style.display = '';
-      document.getElementById('btn-prox').style.display = '';
-      // spread:'none' = paginado (mesmo modo já testado e funcionando em minha-biblioteca.html).
-      // flow:'scrolled-doc' foi tentado antes e travava a leitura na 1a pagina — sem next()/prev()
-      // ligados a nenhum botao/tecla, não tinha como avançar pro capitulo seguinte.
-      leitorBook = ePub(data.formatos.epub.download_url, { openAs: 'epub' });
-      leitorRendition = leitorBook.renderTo('leitor-viewer', { width: '100%', height: '100%', spread: 'none' });
-      ativarNavegacaoLeitor(leitorBook, leitorRendition);
-      leitorBook.ready.then(() => {
-        // O sumario/nav.xhtml (Ebook-lib) ou a folha de rosto/capa (Calibre, sem manifest
-        // properties="nav") costumam ser os primeiros itens do spine -- sem pular, "Ler agora"
-        // abre num item sem texto de verdade. Pula pro 1o item de conteudo real: não é nav E
-        // não é a capa (id/href contendo "cover"), ambos comuns nos 2 pipelines usados no acervo.
-        try {
-          const manifest = leitorBook.packaging?.manifest || {};
-          const navHref = Object.values(manifest).find(m => (m.properties || '').includes('nav'))?.href;
-          const primeiro = leitorBook.spine.items.find(i =>
-            i.linear !== 'no' && i.href !== navHref && !/cover/i.test(i.href));
-          leitorRendition.display(primeiro ? primeiro.href : undefined);
-        } catch {
-          leitorRendition.display();
-        }
-      });
-    } else if (data.formatos?.pdf) {
-      viewer.innerHTML = `<iframe src="${data.formatos.pdf.download_url}"></iframe>`;
-    } else {
-      viewer.innerHTML = '<div style="padding:40px;color:#999">Nenhum formato disponível pra leitura.</div>';
-    }
-  } catch {
-    viewer.innerHTML = '<div style="padding:40px;color:#999">Erro de conexão.</div>';
-  }
 }
-
-function tocarTrilhaLivro() {
-  if (trilhaLivroId && window.TTPlayer) TTPlayer.play(trilhaLivroId);
-}
-
-function fecharLeitor() {
-  document.getElementById('tela-leitura').style.display = 'none';
-  document.getElementById('leitor-viewer').innerHTML = '';
-  if (leitorRendition) { leitorRendition.destroy(); leitorRendition = null; }
-  if (leitorBook) { leitorBook.destroy(); leitorBook = null; }
-  document.onkeydown = null;
-}
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !document.onkeydown) fecharLeitor(); });
 
 // ══════════════════════════════════════════════════════════
 // MÚSICAS
@@ -1421,11 +1289,7 @@ async function carregarMusicas() {
   const cont = document.getElementById('listaMusicas');
   cont.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>`;
 
-  const { data: todasMusicas } = await sb.from('musicas').select('*').eq('ativo', true).order('ordem');
-  const { data: lib } = await sb.from('user_library').select('product_id').eq('user_id', usuarioAtual.id);
-  const userLibrary = new Set((lib || []).map(l => l.product_id));
-
-  const musicas = (todasMusicas || []).filter(m => m.gratuita || (m.produto_id && userLibrary.has(m.produto_id)));
+  const musicas = await obterMusicasLiberadas();
 
   if (window.TTPlayer) TTPlayer.loadPlaylist(musicas);
 

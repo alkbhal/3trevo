@@ -1,0 +1,48 @@
+{
+  "versao": "1.0.0",
+  "moeda": "USD",
+  "unidade": "por milhão de tokens",
+  "nota": "Só entra preço com fonte e data de verificação. Modelo ausente ou nao_verificado = custo null e o portão recusa a reserva. Preço muda: nova versão do catálogo (semver minor), nunca edição silenciosa.",
+  "itens": [
+    {
+      "provedor": "anthropic", "modelo": "claude-opus-5-5",
+      "entrada_por_mtok": 4.00, "saida_por_mtok": 20.00, "cache_leitura_por_mtok": 0.20,
+      "estado": "verificado", "verificado_em": "2026-10-06",
+      "fonte": "tabela de preços da API da Anthropic (referência oficial claude-api, cache de 2026-10-06)"
+    },
+    {
+      "provedor": "anthropic", "modelo": "claude-sonnet-5-5",
+      "entrada_por_mtok": 2.00, "saida_por_mtok": 10.00, "cache_leitura_por_mtok": 0.20,
+      "estado": "verificado", "verificado_em": "2026-10-06",
+      "fonte": "tabela de preços da API da Anthropic (referência oficial claude-api, cache de 2026-10-06)"
+    },
+    {
+      "provedor": "anthropic", "modelo": "claude-haiku-5-5",
+      "entrada_por_mtok": 0.10, "saida_por_mtok": 0.50, "limite_entrada_tokens": 100000,
+      "estado": "verificado", "verificado_em": "2026-10-06",
+      "fonte": "tabela de preços da API da Anthropic (referência oficial claude-api, cache de 2026-10-06)",
+      "observacao": "preço vale até 100 mil tokens de entrada; acima disso a tarifa é outra e o custo fica null"
+    },
+    {
+      "provedor": "anthropic", "modelo": "claude-opus-4-7",
+      "entrada_por_mtok": 5.00, "saida_por_mtok": 25.00,
+      "estado": "verificado", "verificado_em": "2026-10-06",
+      "fonte": "tabela de preços da API da Anthropic (referência oficial claude-api, cache de 2026-10-06)",
+      "observacao": "usado hoje pelo tr3vo-forge, que registra US$ 15/75 (3× o preço real)"
+    },
+    {
+      "provedor": "anthropic", "modelo": "claude-sonnet-4-6",
+      "entrada_por_mtok": 3.00, "saida_por_mtok": 15.00,
+      "estado": "verificado", "verificado_em": "2026-10-06",
+      "fonte": "tabela de preços da API da Anthropic (referência oficial claude-api, cache de 2026-10-06)",
+      "observacao": "usado hoje pelo tr3vo-forge e pelo tr3vo-studio"
+    },
+    {
+      "provedor": "anthropic", "modelo": "claude-haiku-4-5", "aliases": ["claude-haiku-4-5-20251001"],
+      "entrada_por_mtok": 1.00, "saida_por_mtok": 5.00,
+      "estado": "verificado", "verificado_em": "2026-10-06",
+      "fonte": "tabela de preços da API da Anthropic (referência oficial claude-api, cache de 2026-10-06)",
+      "observacao": "o tr3vo-forge chama pelo id datado e registra US$ 0,80/4,00 (20% abaixo do real)"
+    }
+  ]
+}

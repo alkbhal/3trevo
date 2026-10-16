@@ -11,6 +11,7 @@ import { handleDownload } from '../src/routes/checkout';
 import { handleBibliotecaStream } from '../src/routes/biblioteca';
 import { handleForgeDelivery } from '../src/routes/forge-webhook';
 import type { Env } from '../src/types';
+import { bancoMemoria } from './helpers/banco-memoria';
 
 const PID = '5f388d27-fb17-4a19-903d-212723a8b9c0';
 const FORGE = 'https://tr3vo-forge.al-kbhal.workers.dev';
@@ -109,20 +110,23 @@ describe('handlers reais — o comprador nunca recebe o endereço do forge', () 
   });
 
   it('webhook do forge grava referência interna, nunca a URL pública', async () => {
-    const corpos: string[] = [];
-    vi.stubGlobal('fetch', vi.fn(async (_url: string, init: RequestInit) => {
-      corpos.push(String(init.body)); return new Response('[]', { status: 201 });
-    }));
-    const pkg = JSON.stringify({ projectId: PID, status: 'complete', arquivos: [`epub/${PID}/livro.epub`], summary: 'Obra "Livro" — 10 capítulos', timestamp: '2026-10-13T00:00:00Z' });
+    const mem = bancoMemoria([]);
+    const pkg = JSON.stringify({
+      projectId: PID, status: 'complete', idioma: 'pt-BR', titulo: 'Livro', descricao: '', parentProjectId: null,
+      qualidade: { aprovado: true, motivos: [] }, tamanho: { paginas_estimadas: 100 },
+      mercado: { estado: 'nao_coletado', coletadoEm: '2026-10-13', comparaveis: [] },
+      arquivos: [`epub/${PID}/livro.epub`], timestamp: '2026-10-13T00:00:00Z',
+    });
     const key = await crypto.subtle.importKey('raw', new TextEncoder().encode('wh'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
     const sig = [...new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(pkg)))].map((b) => b.toString(16).padStart(2, '0')).join('');
     const r = await handleForgeDelivery(
       new Request('https://api.test/api/webhook/forge-delivery', { method: 'POST', body: pkg, headers: { 'X-Webhook-Signature': `sha256=${sig}` } }),
       envBase({ FORGE_WEBHOOK_SECRET: 'wh' }),
+      { banco: mem.banco, hoje: '2026-10-13', avisar: async () => {} },
     );
     expect(r.status).toBe(200);
-    const gravado = JSON.parse(corpos[0]!);
-    expect(gravado.arquivo_url).toBe(`forge:${PID}/epub`);
-    expect(corpos[0]).not.toContain('workers.dev');
+    const gravado = mem.propostas.get(PID)!;
+    expect(gravado.arquivo_ref).toBe(`forge:${PID}/epub`);
+    expect(JSON.stringify(gravado)).not.toContain('workers.dev');
   });
 });

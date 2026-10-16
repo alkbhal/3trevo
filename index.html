@@ -818,7 +818,7 @@
   <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
-<script src="/js/tt-client.js?v=3cf77e49" onerror="console.error('tt-client falhou ao carregar')"></script>
+<script src="/js/tt-client.js?v=8a2b2dc0" onerror="console.error('tt-client falhou ao carregar')"></script>
 <script>
 // ── CAPAS ──────────────────────────────────────────────────────────────────────
 // Populado ao vivo via /api/public/catalogo (ver init no fim do arquivo) -- chegou a ter
@@ -1003,7 +1003,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-i18n]').forEach(el => { const v = d[el.dataset.i18n]; if(v) el.textContent = v; });
   document.querySelectorAll('[data-i18n-html]').forEach(el => { const v = d[el.dataset.i18nHtml]; if(v) el.innerHTML = v; });
   renderFaq();
-  renderProdutos(prodCache, filtroAtual);
+  carregarVitrine(lang);
   // Atualizar info do showcase
   const infoEl = document.getElementById('showcase-info');
   if (infoEl && CAPAS.length) {
@@ -1166,8 +1166,8 @@ const barraObs = new IntersectionObserver(entries => {
 
 // Monta os objetos {pt,en,es} que renderProdutos/renderCapa esperam a partir dos
 // campos planos que /api/public/catalogo devolve (mesmas colunas i18n que o admin edita).
-function montarCatalogoAoVivo(data) {
-  PROD_BASE = data.map((api, i) => ({
+function mapearProdutos(data) {
+  return data.map((api, i) => ({
     slug: api.slug,
     cat: CATEGORIAS[api.slug] || 'ensaio',
     cor: api.bg_color || '#101820',
@@ -1181,6 +1181,10 @@ function montarCatalogoAoVivo(data) {
     cotas: api.cotas || 0,
     autor: api.autor || 'Said Anes',
   }));
+}
+
+function montarCatalogoAoVivo(data) {
+  PROD_BASE = mapearProdutos(data);
   CAPAS = PROD_BASE.map(p => ({
     slug: p.slug,
     classe: p.corCapa,
@@ -1194,6 +1198,30 @@ function montarCatalogoAoVivo(data) {
     infoES: `${p.genero.es}`,
   }));
   prodCache = [...PROD_BASE];
+}
+
+// Biblioteca nativa (spec publicação por idioma, R2): em EN/ES a vitrine mostra só
+// livros ESCRITOS nesse idioma, não o acervo em português com título traduzido.
+const IDIOMA_LOJA = { pt: 'pt-BR', en: 'en-US', es: 'es-ES' };
+const VITRINE_VAZIA = {
+  en: 'Coming soon: books written in English.',
+  es: 'Próximamente: libros escritos en español.',
+};
+const vitrinePorIdioma = {};
+
+async function carregarVitrine(lang) {
+  const grid = document.getElementById('prod-grid');
+  if (lang === 'pt') { prodCache = [...PROD_BASE]; renderProdutos(prodCache, filtroAtual); observeAll(); return; }
+  try {
+    if (!vitrinePorIdioma[lang]) vitrinePorIdioma[lang] = mapearProdutos(await TTClient.getCatalogo(null, IDIOMA_LOJA[lang]));
+    if (langAtual !== lang) return; // trocou de idioma enquanto carregava
+    prodCache = [...vitrinePorIdioma[lang]];
+    if (!prodCache.length) { if (grid) grid.innerHTML = `<p style="padding:40px;opacity:.6">${VITRINE_VAZIA[lang]}</p>`; return; }
+    renderProdutos(prodCache, filtroAtual);
+    observeAll();
+  } catch (e) {
+    if (grid && langAtual === lang) grid.innerHTML = '<p style="padding:40px;opacity:.6">Catalog unavailable. Please reload.</p>';
+  }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

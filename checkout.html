@@ -218,7 +218,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 </div>
 
 <script src="/js/supabase-client.js?v=4c1ab884"></script>
-<script src="/js/tt-client.js?v=3cf77e49" onerror="console.error('tt-client falhou ao carregar')"></script>
+<script src="/js/tt-client.js?v=8a2b2dc0" onerror="console.error('tt-client falhou ao carregar')"></script>
 <script>
 const WORKER = 'https://tres-trevo-api.al-kbhal.workers.dev';
 let produtoSlug = null;
@@ -363,7 +363,7 @@ async function carregarNemaCheckout() {
     nemaToken = session.access_token;
     document.getElementById('nemaTxt').textContent =
       'Usar meu saldo Nema: N$ ' + Number(d.disponivel).toFixed(2).replace('.', ',') +
-      ' (até R$ ' + Number(d.disponivel_em_reais).toFixed(2).replace('.', ',') + ' de desconto, limitado à metade do preço). ' +
+      ', aplicado conforme a promoção em vigor (até metade do preço). ' +
       'O pagamento fica no e-mail da sua conta: ' + session.user.email + '.';
     document.getElementById('nemaBox').style.display = 'flex';
   } catch (e) { /* sem saldo visível, o checkout segue normal */ }

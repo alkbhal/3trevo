@@ -58,7 +58,7 @@ describe('GET /api/nema/saldo', () => {
     expect(res.status).toBe(401);
   });
 
-  it('devolve o saldo e o valor em reais', async () => {
+  it('devolve o saldo só em Nema, sem conversão em reais para o cliente', async () => {
     mockFetch((url) => {
       if (url.endsWith('/auth/v1/user')) return { id: 'u1', email: 'leitor@x.com' };
       if (url.includes('rpc/nema_saldo')) return [{ disponivel: 4.98, pendente: 0, reservado: 0 }];
@@ -67,7 +67,10 @@ describe('GET /api/nema/saldo', () => {
     });
     const req = new Request('https://w/api/nema/saldo', { headers: { Authorization: `Bearer ${TOKEN}` } });
     const body: any = await (await handleNemaSaldo(req, env)).json();
-    expect(body).toMatchObject({ ok: true, disponivel: 4.98, disponivel_em_reais: 2.49 });
+    expect(body).toMatchObject({ ok: true, disponivel: 4.98 });
+    expect(body).not.toHaveProperty('disponivel_em_reais');
+    expect(body).not.toHaveProperty('valor_nema_reais');
+    expect(JSON.stringify(body)).not.toMatch(/reais/);
   });
 });
 
@@ -88,7 +91,9 @@ describe('POST /api/checkout/preferencia com Nema', () => {
       body: JSON.stringify({ slug: 'antifalencia', email: 'outro@x.com', usar_nema: true }),
     });
     const body: any = await (await handleCriarPreferencia(req, env)).json();
-    expect(body).toMatchObject({ ok: true, desconto: 5, nema_usado: 10 });
+    expect(body).toMatchObject({ ok: true, nema_usado: 10 });
+    // Nema → reais é contábil e interno: o navegador do cliente nunca recebe o desconto em reais.
+    expect(body).not.toHaveProperty('desconto');
     const mp = chamadas.find((c) => c.url.includes('/checkout/preferences'))!;
     const pref = JSON.parse(String(mp.init!.body));
     expect(pref.items[0].unit_price).toBe(41.04);

@@ -37,3 +37,32 @@ service = "tr3vo-forge"
 # Sorteio puro RNG: disparado manualmente via POST /api/admin/sorteio (sem data fixa)
 [triggers]
 crons = ["0 * * * *"]
+
+# ── STAGING (cópia de teste, isolada da produção) ─────────────────────────────
+# Sobe com: npm run deploy:staging → https://tres-trevo-api-staging.<conta>.workers.dev
+# No wrangler, vars, KV, R2 e services NÃO são herdados pelo [env]: o que não estiver
+# declarado aqui não existe no staging. Isso é proposital — staging nunca toca o banco,
+# o KV, o R2 nem o forge de produção. Segredos próprios, com --env staging:
+#   npx wrangler secret put SUPABASE_URL --env staging          (projeto Supabase DE TESTE)
+#   npx wrangler secret put SUPABASE_SERVICE_KEY --env staging  (chave do projeto de teste)
+#   npx wrangler secret put ADMIN_SECRET --env staging
+#   npx wrangler secret put FORGE_WEBHOOK_SECRET --env staging  (opcional, p/ testar o webhook)
+# NÃO configure RESEND_API_KEY, MP_ACCESS_TOKEN de produção nem WHATSAPP_* no staging.
+[env.staging]
+name = "tres-trevo-api-staging"
+workers_dev = true
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+# KV e R2 PRÓPRIOS do staging (sem id: o wrangler cria na primeira subida e grava aqui).
+[[env.staging.kv_namespaces]]
+binding = "TT_KV"
+
+[[env.staging.r2_buckets]]
+binding = "BIBLIOTECA_R2"
+bucket_name = "tt-biblioteca-staging"
+
+# Sem cron no staging: nada de monitor, e-mail ou sorteio automático rodando em teste.
+[env.staging.triggers]
+crons = []

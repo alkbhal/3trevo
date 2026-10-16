@@ -28,7 +28,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var VERSAO = '0.1.1';
+  var VERSAO = '0.4.0';
 
   var NIVEL_ORDEM = { violacao: 0, divergente: 1, nao_confirmado: 2, confirmado: 3 };
   var NIVEL_ICONE = { violacao: '🔴', divergente: '🟠', nao_confirmado: '🟡', confirmado: '🟢' };
