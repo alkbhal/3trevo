@@ -337,7 +337,7 @@ describe('PTAX e biblioteca nativa', () => {
     expect(await buscarPtax("USD'&x", HOJE)).toBeNull();
   });
 
-  it('catálogo público filtra pelo idioma (padrão pt-BR) e recusa idioma desconhecido', async () => {
+  it('catálogo público: lista por idioma (padrão pt-BR), slug acha em qualquer idioma, idioma desconhecido recusado', async () => {
     const worker = (await import('../src/index')).default;
     const urls: string[] = [];
     vi.stubGlobal('fetch', vi.fn(async (url: string) => { urls.push(String(url)); return Response.json([]); }));
@@ -345,9 +345,13 @@ describe('PTAX e biblioteca nativa', () => {
     expect((await pedir('')).status).toBe(200);
     expect((await pedir('?idioma=en-US')).status).toBe(200);
     expect((await pedir('?idioma=fr-FR')).status).toBe(400);
+    expect((await pedir('?slug=money-without-mystery-7a1e0c55')).status).toBe(200);
     expect(urls[0]).toContain('idioma=eq.pt-BR');
     expect(urls[1]).toContain('idioma=eq.en-US');
-    expect(urls).toHaveLength(2);
+    // checkout busca pelo slug: o livro en precisa ser achado sem informar o idioma
+    expect(urls[2]).toContain('slug=eq.money-without-mystery-7a1e0c55');
+    expect(urls[2]).not.toContain('idioma=eq.');
+    expect(urls).toHaveLength(3);
   });
 });
 

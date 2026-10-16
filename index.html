@@ -1003,7 +1003,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-i18n]').forEach(el => { const v = d[el.dataset.i18n]; if(v) el.textContent = v; });
   document.querySelectorAll('[data-i18n-html]').forEach(el => { const v = d[el.dataset.i18nHtml]; if(v) el.innerHTML = v; });
   renderFaq();
-  renderProdutos(prodCache, filtroAtual);
+  carregarVitrine(lang);
   // Atualizar info do showcase
   const infoEl = document.getElementById('showcase-info');
   if (infoEl && CAPAS.length) {
@@ -1166,8 +1166,8 @@ const barraObs = new IntersectionObserver(entries => {
 
 // Monta os objetos {pt,en,es} que renderProdutos/renderCapa esperam a partir dos
 // campos planos que /api/public/catalogo devolve (mesmas colunas i18n que o admin edita).
-function montarCatalogoAoVivo(data) {
-  PROD_BASE = data.map((api, i) => ({
+function mapearProdutos(data) {
+  return data.map((api, i) => ({
     slug: api.slug,
     cat: CATEGORIAS[api.slug] || 'ensaio',
     cor: api.bg_color || '#101820',
@@ -1181,6 +1181,10 @@ function montarCatalogoAoVivo(data) {
     cotas: api.cotas || 0,
     autor: api.autor || 'Said Anes',
   }));
+}
+
+function montarCatalogoAoVivo(data) {
+  PROD_BASE = mapearProdutos(data);
   CAPAS = PROD_BASE.map(p => ({
     slug: p.slug,
     classe: p.corCapa,
@@ -1194,6 +1198,30 @@ function montarCatalogoAoVivo(data) {
     infoES: `${p.genero.es}`,
   }));
   prodCache = [...PROD_BASE];
+}
+
+// Biblioteca nativa (spec publicação por idioma, R2): em EN/ES a vitrine mostra só
+// livros ESCRITOS nesse idioma, não o acervo em português com título traduzido.
+const IDIOMA_LOJA = { pt: 'pt-BR', en: 'en-US', es: 'es-ES' };
+const VITRINE_VAZIA = {
+  en: 'Coming soon: books written in English.',
+  es: 'Próximamente: libros escritos en español.',
+};
+const vitrinePorIdioma = {};
+
+async function carregarVitrine(lang) {
+  const grid = document.getElementById('prod-grid');
+  if (lang === 'pt') { prodCache = [...PROD_BASE]; renderProdutos(prodCache, filtroAtual); observeAll(); return; }
+  try {
+    if (!vitrinePorIdioma[lang]) vitrinePorIdioma[lang] = mapearProdutos(await TTClient.getCatalogo(null, IDIOMA_LOJA[lang]));
+    if (langAtual !== lang) return; // trocou de idioma enquanto carregava
+    prodCache = [...vitrinePorIdioma[lang]];
+    if (!prodCache.length) { if (grid) grid.innerHTML = `<p style="padding:40px;opacity:.6">${VITRINE_VAZIA[lang]}</p>`; return; }
+    renderProdutos(prodCache, filtroAtual);
+    observeAll();
+  } catch (e) {
+    if (grid && langAtual === lang) grid.innerHTML = '<p style="padding:40px;opacity:.6">Catalog unavailable. Please reload.</p>';
+  }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

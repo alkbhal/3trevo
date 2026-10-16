@@ -210,15 +210,18 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       if (slug !== null && !/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug)) {
         return Response.json({ ok: false, erro: 'slug inválido' }, { status: 400 });
       }
-      // Biblioteca nativa (spec por idioma, R2): cada idioma só vê livros escritos nele.
-      // Sem ?idioma= é a biblioteca pt-BR, onde fica todo o acervo anterior (D4).
-      const idioma = params.get('idioma') ?? 'pt-BR';
-      if (!(IDIOMAS_LOJA as readonly string[]).includes(idioma)) {
+      // Biblioteca nativa (spec por idioma, R2): a LISTA de cada idioma só tem livros escritos
+      // nele; sem ?idioma= é a pt-BR, onde fica todo o acervo anterior (D4). Busca por slug
+      // (checkout) acha o livro em qualquer idioma, a não ser que ?idioma= seja dado.
+      const idiomaParam = params.get('idioma');
+      if (idiomaParam !== null && !(IDIOMAS_LOJA as readonly string[]).includes(idiomaParam)) {
         return Response.json({ ok: false, erro: 'idioma inválido' }, { status: 400 });
       }
+      const idioma = idiomaParam ?? (slug ? null : 'pt-BR');
       const filtroSlug = slug ? `&slug=eq.${slug}` : '';
+      const filtroIdioma = idioma ? `&idioma=eq.${idioma}` : '';
       const resp = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true&idioma=eq.${idioma}${filtroSlug}&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem,idioma`,
+        `${env.SUPABASE_URL}/rest/v1/catalogo?ativo=eq.true${filtroIdioma}${filtroSlug}&order=ordem.asc&select=slug,titulo,titulo_en,titulo_es,descricao,descricao_en,descricao_es,genero,genero_pt,genero_en,genero_es,autor,preco,cotas,utm_campaign,bg_color,capa_url,ordem,idioma`,
         {
           headers: {
             apikey: env.SUPABASE_SERVICE_KEY,
