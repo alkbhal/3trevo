@@ -22,6 +22,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+  <script src="/js/leitor-tt.js?v=9da12777"></script>
   <style>
     :root {
       --verde: #1e5c3a;
@@ -172,19 +173,6 @@
     .hist-meta { font-size: 12px; color: var(--cinza); }
     .hist-vazio { color: var(--cinza); font-size: 14px; padding: 20px 0; }
 
-    /* ── Leitor ── */
-    #tela-leitura { display: none; position: fixed; inset: 0; background: #fff; z-index: 1000; flex-direction: column; }
-    .leitor-topo {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 20px; border-bottom: 1px solid var(--borda);
-      background: var(--verde-escuro); color: #fff; flex-shrink: 0;
-    }
-    .leitor-titulo { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; }
-    .leitor-controles { display: flex; gap: 10px; align-items: center; }
-    .btn-leitor { background: rgba(255,255,255,.15); border: none; color: #fff; border-radius: 3px; padding: 6px 14px; cursor: pointer; font-family: inherit; font-size: 13px; }
-    .btn-leitor:hover { background: rgba(255,255,255,.25); }
-    #viewer { flex: 1; overflow: hidden; }
-
     /* Modal */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 2000; align-items: center; justify-content: center; }
     .modal-overlay.ativo { display: flex; }
@@ -255,19 +243,7 @@
   </div>
 </div>
 
-<!-- ── Leitor ── -->
-<div id="tela-leitura">
-  <div class="leitor-topo">
-    <div class="leitor-titulo" id="leitor-titulo-texto">—</div>
-    <div class="leitor-controles">
-      <button class="btn-leitor" id="btn-ant">‹ Anterior</button>
-      <span id="leitor-pagina" style="font-size:12px;color:#ccc">p. 0</span>
-      <button class="btn-leitor" id="btn-prox">Próxima ›</button>
-      <button class="btn-leitor" onclick="fecharLeitor()">✕ Fechar</button>
-    </div>
-  </div>
-  <div id="viewer"></div>
-</div>
+<!-- Leitor: js/leitor-tt.js (imersivo, mesmo da área do cliente) -->
 
 <!-- ── Modal Confirmar Lida ── -->
 <div class="modal-overlay" id="modal-lida">
@@ -299,9 +275,6 @@ let sessaoToken = localStorage.getItem('bib_token') || '';
 let sessaoEmail = localStorage.getItem('bib_email') || '';
 let slotParaMarcar = null;
 let slugParaSelecionar = null;
-let livroAtual = null;
-let book = null;
-let rendition = null;
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
@@ -541,61 +514,25 @@ document.getElementById('btn-confirmar-lida').addEventListener('click', async ()
   btn.disabled = false; btn.textContent = 'Sim, concluí!';
 });
 
-// ── Leitor EPUB ───────────────────────────────────────────────────────────────
-async function abrirLeitor(slug, titulo, slotId) {
-  livroAtual = { slug, titulo, slotId };
-
-  // Solicitar URL de stream
-  let streamUrl;
-  try {
-    const r = await fetch(`${API}/api/biblioteca/ler`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessaoToken}` },
-      body: JSON.stringify({ slug }),
-    });
-    const d = await r.json();
-    if (!d.ok) { alert(d.msg || 'Não foi possível abrir o livro.'); return; }
-    streamUrl = d.stream_url;
-  } catch { alert('Erro de conexão.'); return; }
-
-  document.getElementById('tela-leitura').style.display = 'flex';
-  document.getElementById('leitor-titulo-texto').textContent = titulo;
-  document.getElementById('viewer').innerHTML = '';
-
-  book = ePub(streamUrl, { openAs: 'epub' });
-  rendition = book.renderTo('viewer', { width: '100%', height: '100%', spread: 'none' });
-  book.ready.then(() => {
-    try {
-      const manifest = book.packaging?.manifest || {};
-      const navHref = Object.values(manifest).find(m => (m.properties || '').includes('nav'))?.href;
-      const primeiro = book.spine.items.find(i => i.linear !== 'no' && i.href !== navHref);
-      rendition.display(primeiro ? primeiro.href : undefined);
-    } catch {
-      rendition.display();
-    }
+// ── Leitor EPUB: js/leitor-tt.js (zonas de toque, progresso, retoma onde parou) ──
+function abrirLeitor(slug, titulo, slotId) {
+  TTLeitor.abrir({
+    titulo,
+    chave: `classico:${slug}`,
+    obterArquivo: async () => {
+      const r = await fetch(`${API}/api/biblioteca/ler`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessaoToken}` },
+        body: JSON.stringify({ slug }),
+      });
+      if (r.status === 401) { sair(); throw new Error('Sessão expirada. Entre de novo.'); }
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.msg || 'Não foi possível abrir o livro.');
+      return { url: d.stream_url, formato: 'epub' };
+    },
+    aoProgresso: (pct) => salvarProgresso(slotId, null, pct),
+    aoFechar: () => carregarMinha(),
   });
-
-  book.ready.then(() => {
-    book.locations.generate(1600).then(() => {
-      salvarProgresso(slotId);
-    });
-  });
-
-  rendition.on('relocated', (location) => {
-    const pct = book.locations.percentageFromCfi(location.start.cfi) * 100;
-    document.getElementById('leitor-pagina').textContent = `${Math.round(pct)}%`;
-    salvarProgresso(slotId, null, pct);
-  });
-
-  document.getElementById('btn-ant').onclick = () => rendition?.prev();
-  document.getElementById('btn-prox').onclick = () => rendition?.next();
-
-  // Navegação por teclas
-  document.onkeydown = (e) => {
-    if (e.key === 'ArrowRight') rendition?.next();
-    if (e.key === 'ArrowLeft') rendition?.prev();
-    if (e.key === 'Escape') fecharLeitor();
-  };
 }
 
 async function salvarProgresso(slotId, paginaAtual, pct) {
@@ -606,15 +543,6 @@ async function salvarProgresso(slotId, paginaAtual, pct) {
       body: JSON.stringify({ slot_id: slotId, pagina_atual: paginaAtual ?? 0, progresso_percentual: pct ?? 0 }),
     });
   } catch { /* silencioso */ }
-}
-
-function fecharLeitor() {
-  document.getElementById('tela-leitura').style.display = 'none';
-  if (rendition) { rendition.destroy(); rendition = null; }
-  if (book) { book.destroy(); book = null; }
-  document.onkeydown = null;
-  livroAtual = null;
-  carregarMinha();
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

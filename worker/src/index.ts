@@ -69,6 +69,7 @@ import {
   handleBibliotecaAcervo,
   handleBibliotecaAcesso,
   handleBibliotecaVerificar,
+  handleBibliotecaSessaoConta,
   handleBibliotecaStream,
   handleBibliotecaMinha,
   handleBibliotecaSelecionar,
@@ -413,6 +414,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
     if (path === '/api/biblioteca/verificar' && method === 'GET') {
       return handleBibliotecaVerificar(request, env);
+    }
+    if (path === '/api/biblioteca/sessao-conta' && method === 'POST') {
+      return handleBibliotecaSessaoConta(request, env);
     }
     if (path === '/api/biblioteca/stream' && method === 'GET') {
       return handleBibliotecaStream(request, env);

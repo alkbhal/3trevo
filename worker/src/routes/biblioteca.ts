@@ -7,6 +7,8 @@
  *   GET  /api/biblioteca/acervo       — lista livros ativos (sem URL do EPUB)
  *   POST /api/biblioteca/acesso       — envia magic link para email com pedido pago
  *   GET  /api/biblioteca/verificar    — troca magic token por sessão (24h)
+ *   POST /api/biblioteca/sessao-conta — troca o login da área do cliente (Supabase) por
+ *                                       sessão de leitor: clássicos grátis para quem tem conta
  *   GET  /api/biblioteca/stream       — serve EPUB com token temporário (1h)
  *
  * Autenticadas (Bearer sessão):
@@ -28,6 +30,7 @@ import { z } from 'zod';
 import type { Env } from '../types';
 import { verificarToken as verificarTokenAdmin } from './admin-catalog';
 import { sb } from '../sb';
+import { usuarioDoToken } from './nema';
 import { referenciaForge, entregarArquivoForge } from '../forge-arquivo';
 
 // ─── Validação Zod do acervo — achado da auditoria real (01/09): create/update
@@ -175,6 +178,27 @@ export async function handleBibliotecaVerificar(request: Request, env: Env): Pro
   const sessao = await gerarToken(40);
   await env.TT_KV.put(`bib:session:${sessao}`, email, { expirationTtl: 86400 }); // 24h
 
+  return Response.json({ ok: true, token: sessao, email });
+}
+
+// ─── POST /api/biblioteca/sessao-conta — sessão de leitor a partir da conta ─────
+// Freemium: quem entrou na área do cliente (e-mail confirmado pelo Supabase) lê os
+// clássicos de domínio público sem precisar de compra. Títulos pagos continuam
+// exigindo a compra daquele produto — essa checagem fica em /selecionar e /ler.
+export async function handleBibliotecaSessaoConta(request: Request, env: Env): Promise<Response> {
+  if (!env.TT_KV) return Response.json({ ok: false, erro: 'indisponivel' }, { status: 503 });
+  const user = await usuarioDoToken(request, env);
+  if (!user) return Response.json({ ok: false, erro: 'nao_autenticado' }, { status: 401 });
+  const email = user.email.trim().toLowerCase();
+
+  // Limite por conta: cada chamada cria uma sessão no KV.
+  const rlKey = `rl:bib-conta:${user.id}`;
+  const c = parseInt((await env.TT_KV.get(rlKey)) ?? '0', 10);
+  if (c >= 30) return Response.json({ ok: false, erro: 'muitas_tentativas' }, { status: 429 });
+  await env.TT_KV.put(rlKey, String(c + 1), { expirationTtl: 3600 });
+
+  const sessao = await gerarToken(40);
+  await env.TT_KV.put(`bib:session:${sessao}`, email, { expirationTtl: 86400 }); // 24h, igual ao magic link
   return Response.json({ ok: true, token: sessao, email });
 }
 
