@@ -363,7 +363,7 @@ async function carregarNemaCheckout() {
     nemaToken = session.access_token;
     document.getElementById('nemaTxt').textContent =
       'Usar meu saldo Nema: N$ ' + Number(d.disponivel).toFixed(2).replace('.', ',') +
-      ' (até R$ ' + Number(d.disponivel_em_reais).toFixed(2).replace('.', ',') + ' de desconto, limitado à metade do preço). ' +
+      '. O desconto desta compra aparece no pagamento, conforme a promoção em vigor (até metade do preço). ' +
       'O pagamento fica no e-mail da sua conta: ' + session.user.email + '.';
     document.getElementById('nemaBox').style.display = 'flex';
   } catch (e) { /* sem saldo visível, o checkout segue normal */ }

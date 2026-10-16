@@ -16,7 +16,7 @@ import { sb } from '../sb';
 import { verificarToken } from './admin-catalog';
 import {
   usuarioDoToken, reservarNema, cancelarReservaNema, confirmarResgateNema,
-  creditarCompraNema, estornarCompraNema, reservaDoMetadata, valorNemaReais,
+  creditarCompraNema, estornarCompraNema, reservaDoMetadata,
 } from './nema';
 import { referenciaForge, entregarArquivoForge } from '../forge-arquivo';
 
@@ -226,7 +226,6 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
         downloadToken: rpc.download_token,
         productSlug,
         nema: nemaGanho,
-        valorNema: nemaGanho > 0 ? await valorNemaReais(env) : 0,
         valor,
       }).catch(err => console.error('[webhook] email falhou:', err));
     }
@@ -575,7 +574,6 @@ async function enviarEmailCompra(
     downloadToken: string;
     productSlug: string;
     nema: number;
-    valorNema: number;
     valor: number;
   }
 ): Promise<void> {
@@ -666,8 +664,8 @@ async function enviarEmailCompra(
     <tr><td style="padding:16px 20px">
       <p style="margin:0 0 8px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a4a2e">✦ Nema</p>
       <p style="margin:0;font-size:14px;color:#444;line-height:1.6">
-        Esta compra rendeu <strong>N$ ${opts.nema.toFixed(2).replace('.', ',')}</strong>
-        (R$ ${(opts.nema * opts.valorNema).toFixed(2).replace('.', ',')} de desconto na sua próxima compra).
+        Esta compra rendeu <strong>N$ ${opts.nema.toFixed(2).replace('.', ',')}</strong>,
+        para usar nas próximas compras e promoções da editora.
         O saldo fica disponível em 7 dias, na sua
         <a href="${areaClienteUrl}" style="color:#1a4a2e;font-weight:600;text-decoration:none">área do cliente</a>.
       </p>

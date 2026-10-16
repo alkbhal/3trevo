@@ -55,11 +55,6 @@ export async function saldoNema(env: Env, userId: string): Promise<Saldo | null>
   return { disponivel: Number(s.disponivel), pendente: Number(s.pendente), reservado: Number(s.reservado) };
 }
 
-export async function valorNemaReais(env: Env): Promise<number> {
-  const r = await rpc<number>(env, 'nema_param', { p_chave: 'valor_nema_reais' });
-  return typeof r === 'number' ? r : Number(r ?? 0.5);
-}
-
 export interface Reserva { quantidade: number; desconto: number; reserva_ref: string | null }
 
 export async function reservarNema(env: Env, userId: string, preco: number): Promise<Reserva | null> {
@@ -94,12 +89,9 @@ export function reservaDoMetadata(metadata: unknown): string | null {
 export async function handleNemaSaldo(request: Request, env: Env): Promise<Response> {
   const user = await usuarioDoToken(request, env);
   if (!user) return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
-  const [saldo, valor] = await Promise.all([saldoNema(env, user.id), valorNemaReais(env)]);
+  // Ao cliente, Nema é só Nema: o valor em reais é decidido na hora do uso, pela
+  // promoção em vigor, e fica no servidor (decisão do dono, 16/10/2026).
+  const saldo = await saldoNema(env, user.id);
   if (!saldo) return Response.json({ ok: false, erro: 'saldo_indisponivel' }, { status: 503 });
-  return Response.json({
-    ok: true,
-    ...saldo,
-    valor_nema_reais: valor,
-    disponivel_em_reais: Math.round(saldo.disponivel * valor * 100) / 100,
-  });
+  return Response.json({ ok: true, ...saldo });
 }

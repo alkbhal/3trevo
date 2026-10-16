@@ -1089,7 +1089,7 @@ async function carregarNema() {
     const d = await r.json();
     if (!d.ok) { el.textContent = '—'; return; }
     el.textContent = 'N$ ' + Number(d.disponivel).toFixed(2).replace('.', ',');
-    const partes = ['vale R$ ' + Number(d.disponivel_em_reais).toFixed(2).replace('.', ',') + ' na próxima compra'];
+    const partes = ['use nas compras e promoções da editora'];
     if (Number(d.pendente) > 0) partes.push('+ N$ ' + Number(d.pendente).toFixed(2).replace('.', ',') + ' liberam em até 7 dias');
     lbl.textContent = 'Nema · ' + partes.join(' · ');
   } catch (e) {
