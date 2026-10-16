@@ -1,0 +1,293 @@
+{
+  "index_desktop": {
+    "scrollW": 1280,
+    "clientW": 1280,
+    "cardsCatalogo": 3,
+    "grid": "Livre das Dívidas\nFINANÇAS\nLivre das Dívidas\nSaid Anes\n\nPlano prático para sair ",
+    "dataEnt": 11,
+    "willChange": 27,
+    "imgsSemLazy": 0,
+    "imgs": 0,
+    "tempoCarregamentoMs": 3020,
+    "erros": [
+      "console: Failed to load resource: net::ERR_FAILED",
+      "console: Failed to load resource: net::ERR_FAILED",
+      "console: Failed to load resource: net::ERR_FAILED"
+    ]
+  },
+  "index_celular": {
+    "scrollW": 375,
+    "clientW": 375,
+    "cardsCatalogo": 3,
+    "grid": "Livre das Dívidas\nFINANÇAS\nLivre das Dívidas\nSaid Anes\n\nPlano prático para sair ",
+    "dataEnt": 11,
+    "willChange": 27,
+    "imgsSemLazy": 0,
+    "imgs": 0,
+    "tempoCarregamentoMs": 2633,
+    "erros": [
+      "console: Failed to load resource: net::ERR_FAILED",
+      "console: Failed to load resource: net::ERR_FAILED",
+      "console: Failed to load resource: net::ERR_FAILED"
+    ]
+  },
+  "axe_index.html": [
+    {
+      "id": "heading-order",
+      "impacto": "moderate",
+      "n": 1,
+      "exemplo": "h5[data-i18n=\"ft.nav\"]"
+    },
+    {
+      "id": "region",
+      "impacto": "moderate",
+      "n": 20,
+      "exemplo": ".hero-video-bg"
+    }
+  ],
+  "axe_catalogo.html": [
+    {
+      "id": "aria-allowed-role",
+      "impacto": "minor",
+      "n": 3,
+      "exemplo": "article[data-genero=\"manuais\"]:nth-child(1)"
+    },
+    {
+      "id": "color-contrast",
+      "impacto": "serious",
+      "n": 20,
+      "exemplo": "article[data-genero=\"manuais\"]:nth-child(1) > .ebook-autor"
+    },
+    {
+      "id": "heading-order",
+      "impacto": "moderate",
+      "n": 1,
+      "exemplo": ".footer-col:nth-child(2) > h4"
+    },
+    {
+      "id": "region",
+      "impacto": "moderate",
+      "n": 1,
+      "exemplo": "#waBtn"
+    }
+  ],
+  "axe_nema.html": [],
+  "movimento_padrao": {
+    "deltas": {
+      "RecalcStyleCount": 199,
+      "LayoutCount": 19,
+      "ScriptDuration": 0.036,
+      "LayoutDuration": 0.005,
+      "RecalcStyleDuration": 0.075,
+      "TaskDuration": 0.312
+    },
+    "quadroMs": {
+      "p50": 16.7,
+      "p95": 33.4,
+      "max": 83.4,
+      "quadros": 172
+    },
+    "estado": {
+      "entOn": true,
+      "entVisiveis": 1,
+      "entTotal": 11,
+      "entOpacidadeMin": 0,
+      "nemaK": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ]
+    },
+    "errosNoLab": 3
+  },
+  "movimento_reduzido": {
+    "deltas": {
+      "RecalcStyleCount": 145,
+      "LayoutCount": 19,
+      "ScriptDuration": 0.013,
+      "LayoutDuration": 0.003,
+      "RecalcStyleDuration": 0.031,
+      "TaskDuration": 0.163
+    },
+    "quadroMs": {
+      "p50": 16.7,
+      "p95": 16.8,
+      "max": 16.8,
+      "quadros": 137
+    },
+    "estado": {
+      "entOn": false,
+      "entVisiveis": 11,
+      "entTotal": 11,
+      "entOpacidadeMin": 1,
+      "nemaK": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ]
+    },
+    "errosNoLab": 3
+  },
+  "teclado_index": {
+    "passos": 255,
+    "alcancaLinkAdquirir": 18,
+    "focosSemContornoVisivel": 72,
+    "amostra": [
+      {
+        "tag": "A",
+        "texto": "Editora Três Trevo",
+        "cls": "logo",
+        "outline": "auto 1px",
+        "cardBtnAdq": false
+      },
+      {
+        "tag": "A",
+        "texto": "Catálogo",
+        "cls": "",
+        "outline": "auto 1px",
+        "cardBtnAdq": false
+      },
+      {
+        "tag": "A",
+        "texto": "Nema",
+        "cls": "",
+        "outline": "auto 1px",
+        "cardBtnAdq": false
+      },
+      {
+        "tag": "A",
+        "texto": "FAQ",
+        "cls": "",
+        "outline": "auto 1px",
+        "cardBtnAdq": false
+      },
+      {
+        "tag": "A",
+        "texto": "Sobre",
+        "cls": "",
+        "outline": "auto 1px",
+        "cardBtnAdq": false
+      },
+      {
+        "tag": "A",
+        "texto": "Minha Biblioteca",
+        "cls": "",
+        "outline": "auto 1px",
+        "cardBtnAdq": false
+      }
+    ],
+    "total": 255
+  },
+  "toque_index.html": {
+    "visiveisNaTela": 9,
+    "abaixo44px": 7,
+    "exemplos": [
+      {
+        "tag": "BUTTON",
+        "texto": "PT",
+        "w": 33,
+        "h": 24
+      },
+      {
+        "tag": "BUTTON",
+        "texto": "EN",
+        "w": 35,
+        "h": 24
+      },
+      {
+        "tag": "BUTTON",
+        "texto": "ES",
+        "w": 34,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "texto": "Adquirir ebook",
+        "w": 129,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "texto": "Menu",
+        "w": 30,
+        "h": 33
+      },
+      {
+        "tag": "A",
+        "texto": "Ver catálogo →",
+        "w": 158,
+        "h": 43
+      }
+    ]
+  },
+  "toque_catalogo.html": {
+    "visiveisNaTela": 9,
+    "abaixo44px": 8,
+    "exemplos": [
+      {
+        "tag": "A",
+        "texto": "Editora Três Trevo",
+        "w": 193,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "texto": "Menu",
+        "w": 30,
+        "h": 21
+      },
+      {
+        "tag": "A",
+        "texto": "EDITORA TRÊS TREVO",
+        "w": 175,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "texto": "TODOS",
+        "w": 83,
+        "h": 28
+      },
+      {
+        "tag": "BUTTON",
+        "texto": "FICÇÃO",
+        "w": 88,
+        "h": 28
+      },
+      {
+        "tag": "BUTTON",
+        "texto": "ENSAIOS",
+        "w": 97,
+        "h": 28
+      }
+    ]
+  },
+  "menu_catalogo": {
+    "ariaExpandedInicial": "false",
+    "ariaExpandedAposClique": "true",
+    "ariaExpandedAposEscape": "false"
+  },
+  "menu_mob_index": {
+    "ariaExpanded": null,
+    "scrollAntes": 0,
+    "scrollDepois": 1161,
+    "temMenuAberto": false
+  },
+  "falha_catalogo_index": {
+    "texto": "Não foi possível carregar o catálogo agora. Recarregue a página em instantes.",
+    "botaoTentar": false
+  },
+  "clique_card": {
+    "url": "/checkout.html?slug=livre-das-dividas"
+  }
+}

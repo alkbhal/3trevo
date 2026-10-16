@@ -1,0 +1,122 @@
+{
+  "ambiente": {
+    "navegador": "Chromium do Playwright (headless, renderização por software)",
+    "viewports": [
+      "1280x800",
+      "375x812 (toque)"
+    ],
+    "limitacoes": [
+      "CDNs externos bloqueados (Google Fonts, gtag, Facebook, Supabase CDN servido localmente)",
+      "API do worker simulada (catálogo fixo de 3 livros)",
+      "Chromium sem codec H.264: o vídeo do herói não toca aqui",
+      "sem dispositivo físico, sem rede móvel real, sem Lighthouse"
+    ]
+  },
+  "F01_revelacao_apos_salto": {
+    "link_ancora_#faq_2s": "opacidade 0 em todos os 8 blocos",
+    "apos_roda_30px": "opacidade 0 em todos",
+    "roda_40px_ate_o_fim_3s_apos_salto": "opacidade 0 em todos",
+    "roda_continua_desde_o_topo_40px_16ms": "maior opacidade por item = 1,00",
+    "roda_continua_desde_o_topo_120px_60ms": "maior opacidade por item = 0,98 a 0,99"
+  },
+  "F03_movimento_padrao_vs_reduzido_3_execucoes": {
+    "padrao": {
+      "quadros_acima_20ms": [
+        38,
+        43,
+        44
+      ],
+      "p95_ms": 33.4,
+      "recalc_style": [
+        466,
+        464,
+        456
+      ],
+      "script_ms": [
+        76,
+        76,
+        77
+      ]
+    },
+    "reduzido": {
+      "quadros_acima_20ms": [
+        1,
+        3,
+        1
+      ],
+      "p95_ms": 16.8,
+      "recalc_style": [
+        251,
+        235,
+        244
+      ],
+      "script_ms": [
+        20,
+        19,
+        21
+      ]
+    }
+  },
+  "F05_video_herói": {
+    "tamanho_mb": 7.48,
+    "duracao_s": 10.02,
+    "pedidos_com_reduzir_movimento_ativo_e_inativo": [
+      2,
+      2
+    ],
+    "controle_de_pausa": false
+  },
+  "F06_contraste_catalogo": {
+    "nos_medidos": "1,63:1 a 3,74:1 (texto de 10 a 13 px)",
+    "axe_color_contrast": "serious, 20 nós"
+  },
+  "F07_botao_menu_index": {
+    "aria_expanded": null,
+    "rolagem_ao_clicar": "0 -> 1161 px (vai até o catálogo, não abre menu)"
+  },
+  "F08_foco_sem_contorno": {
+    "controles": 9,
+    "exemplos": [
+      "PT/EN/ES",
+      "filtros Todos/Ficção/Ensaios/Manuais/Infantil",
+      "Como funciona o Nema"
+    ]
+  },
+  "F09_alcance_por_teclado_card": {
+    "link_adquirir_alcancado": 18,
+    "passos_de_tab": 255
+  },
+  "F10_alvos_toque": {
+    "index_abaixo_44px": "7 de 9 visíveis",
+    "catalogo_abaixo_44px": "8 de 9 visíveis"
+  },
+  "F12_falha_catalogo_index": {
+    "texto": "Não foi possível carregar o catálogo agora. Recarregue a página em instantes.",
+    "botao_tentar": false
+  },
+  "P0_paginas_sem_erro_de_pagina_375px": [
+    "checkout.html?slug=livre-das-dividas (botão 'Pagar com PIX ou Cartão')",
+    "area-cliente.html",
+    "nema.html",
+    "minha-biblioteca.html",
+    "catalogo.html"
+  ],
+  "axe": {
+    "index": [
+      "heading-order (moderate)",
+      "region (moderate, 20 nós)"
+    ],
+    "catalogo": [
+      "color-contrast (serious, 20)",
+      "aria-allowed-role (minor, 3)",
+      "heading-order (moderate)",
+      "region (moderate)"
+    ],
+    "nema": []
+  },
+  "will_change_persistente_no_carregamento": 27,
+  "sem_overflow_horizontal": {
+    "375px": true,
+    "1280px": true
+  }
+}
