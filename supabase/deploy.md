@@ -15,6 +15,8 @@
 8. [Webhook MercadoPago](#7-webhook-mercadopago)
 9. [Testes com sandbox](#8-testes-com-sandbox)
 10. [Checklist de go-live](#9-checklist-de-go-live)
+11. [Worker: staging e subida gradual (Blue/Green)](#10-worker-staging-e-subida-gradual-bluegreen)
+12. [Publicação por idioma: ordem de subida](#11-publicação-por-idioma-ordem-de-subida)
 
 ---
 
@@ -335,6 +337,66 @@ window.location.href = data.init_point;
 - [ ] Verificar área do cliente em mobile (responsividade)
 - [ ] Google Search Console: adicionar sitemap `https://3trevo.com.br/sitemap.xml`
 - [ ] Analytics/monitoramento configurado (opcional)
+
+---
+
+## 10. Worker: staging e subida gradual (Blue/Green)
+
+A produção não cai durante uma subida: a versão nova é testada numa cópia isolada,
+depois liberada aos poucos, e volta em segundos se der problema.
+
+### 10.1 Staging (cópia de teste) — uma vez só
+
+O `[env.staging]` do `worker/wrangler.toml` é um worker separado
+(`tres-trevo-api-staging`), com KV e R2 próprios e **sem** acesso ao banco, ao forge
+nem às crons da produção.
+
+1. Criar um projeto Supabase **de teste** (plano grátis) e rodar nele os `.sql` desta pasta.
+2. Segredos do staging (valores do projeto de teste, nunca os da produção):
+   ```bash
+   cd worker
+   npx wrangler secret put SUPABASE_URL --env staging
+   npx wrangler secret put SUPABASE_SERVICE_KEY --env staging
+   npx wrangler secret put ADMIN_SECRET --env staging
+   ```
+   Não configure no staging `RESEND_API_KEY`, `MP_ACCESS_TOKEN` de produção nem `WHATSAPP_*`.
+3. `npm run deploy:staging` — na primeira vez o wrangler cria o KV e o bucket
+   `tt-biblioteca-staging`.
+
+### 10.2 Cada mudança
+
+```bash
+cd worker
+npm test                     # tudo verde
+npm run deploy:staging       # testa no staging
+npm run versao:subir         # sobe a versão nova SEM tráfego (azul segue no ar)
+npm run versao:liberar       # escolhe as versões e a fatia: ex. 10% nova / 90% antiga
+#   olhar /api/health/status e os logs (npx wrangler tail); se ok, liberar 100%
+npm run versao:voltar        # se der problema: volta a versão anterior na hora
+```
+
+### 10.3 Banco: expandir e só depois contrair
+
+As duas versões do worker usam o **mesmo** banco durante a subida. Por isso toda
+mudança de banco é feita em partes: (1) cria a coluna/tabela nova, sem apagar nada;
+(2) sobe o worker que usa as duas; (3) copia os dados; (4) só numa subida seguinte
+apaga a velha. Migração que apaga ou renomeia algo usado pela versão no ar derruba a
+produção no meio da troca.
+
+---
+
+## 11. Publicação por idioma: ordem de subida
+
+Spec: `docs/specs/publicacao-por-idioma-v2.md`. Nessa ordem, nada sai do ar:
+
+1. `FORGE_API_SECRET` na loja (mesmo valor do `tr3vo-forge`) — loja #18.
+2. Rodar `supabase/publicacao-idioma.sql` (só acrescenta; o worker no ar ignora).
+3. Subir a loja (staging → gradual → 100%).
+4. Subir o forge com as rotas fechadas, a coleta de mercado e a nota de qualidade
+   (migrações 003 e 004; `TAVILY_API_KEY` no `tr3vo-forge-delivery`).
+5. Preencher `precificacao_parametros` com os valores reais (imposto, taxa do Mercado
+   Pago, estorno, custo por exemplar, fixos do mês). Enquanto faltar algum, todo livro
+   do forge fica em rascunho com o motivo — é o comportamento esperado.
 
 ---
 

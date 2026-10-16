@@ -3,6 +3,10 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy --config wrangler.toml",
+    "deploy:staging": "wrangler deploy --env staging",
+    "versao:subir": "wrangler versions upload",
+    "versao:liberar": "wrangler versions deploy",
+    "versao:voltar": "wrangler rollback",
     "dev": "wrangler dev",
     "test": "vitest run"
   },
