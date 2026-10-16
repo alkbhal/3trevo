@@ -1,10 +1,19 @@
 {
   "origem": "guardiao",
-  "versao": "0.1.1",
-  "sincronizadoEm": "2026-09-29T22:02:48.337Z",
+  "versao": "0.4.0",
+  "catalogo": {
+    "versao": "1.0.0",
+    "itens": 6
+  },
+  "sincronizadoEm": "2026-10-16T01:13:46.526Z",
   "arquivos": {
-    "guardiao-core.js": "67dce219d627bbe8a596693d27d6f17d7207ae2dee090781fa9c584b68860e43",
+    "guardiao-core.js": "0e2a6b8355e690091860891ca24ef57c33e90c632a948843ee839fad9fa00570",
     "guardiao-core.d.ts": "1d4b21d19c1b2ad7e6b449f55229e5862d84635ff47b037467464df4b30823cb",
-    "guardiao-deriva.mjs": "a36ed60710e128adbb91c57748d00b429b46fca3d16038aa24f8b9755e4fd4af"
+    "guardiao-deriva.mjs": "a36ed60710e128adbb91c57748d00b429b46fca3d16038aa24f8b9755e4fd4af",
+    "economia.js": "780cb0db50f89be9ab66cda521511a0d68091d06f021c343e4a01451d03e9bc3",
+    "economia.d.ts": "c6988cf3d06a3c79a7d21f89b3f084cd071099490d8b7a3536ad594bded672b2",
+    "precificacao.js": "2b499d90ae76acf2c0f44478fb19bc74ebd71a671bb5182b897ce4d76df387e9",
+    "precificacao.d.ts": "89851073863219bef3cf1f7c8b0d381da0d44bbad623c231257fb404ed0add79",
+    "catalogo-precos.json": "45a3a9b0d2f89305d2894c4a226a96e30038217e34dde6be21f6507727a44283"
   }
 }

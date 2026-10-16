@@ -1,22 +1,20 @@
 /**
  * forge-webhook.ts — Três Trevo Worker
- * Recebe o webhook HMAC-assinado do tr3vo-forge quando um livro completa
- * e cria o produto (rascunho, ativo=false) na tabela `products`.
+ * Recebe o pacote HMAC-assinado do tr3vo-forge e o transforma em PROPOSTA de
+ * publicação no idioma da obra (spec docs/specs/publicacao-por-idioma-v2.md).
+ * Nunca publica: o melhor resultado é `pronto_para_aprovacao`, e o dono aprova
+ * no painel (D3). Fora das condições de R4, rascunho com o motivo escrito (R5).
  *
  * POST /api/webhook/forge-delivery
  */
 
 import type { Env } from '../types';
-import { sb } from '../sb';
-import { refInterna } from '../forge-arquivo';
-
-interface DeliveryPackage {
-  projectId: string;
-  status: string; // 'complete' | 'awaiting_character_images'
-  arquivos: string[];
-  summary: string;
-  timestamp: string;
-}
+import type { Cotacao } from '../guardiao/engine';
+import { emailDono } from '../notify';
+import { pacoteSchema } from '../publicacao/pacote';
+import { montarProposta, moedasEstrangeiras, registroDe } from '../publicacao/proposta';
+import { buscarPtax } from '../publicacao/ptax';
+import { bancoSupabase, type Banco } from '../publicacao/banco';
 
 // ponytail: comparação hex constant-time duplicada em checkout.ts — sem util
 // compartilhado pra 2 call sites, per CLAUDE.md ("prefer editing existing files")
@@ -36,54 +34,89 @@ async function assinaturaValida(body: string, sigHeader: string, secret: string)
   return timingSafeEqualHex(sigHeader, expected);
 }
 
-export async function handleForgeDelivery(request: Request, env: Env): Promise<Response> {
+export interface Dependencias {
+  banco?: Banco;
+  ptax?: typeof buscarPtax;
+  hoje?: string;
+  avisar?: (assunto: string, texto: string) => Promise<void>;
+}
+
+// Já decidido pelo dono: reenvio do forge não mexe (R9, N5). Recusado pode voltar
+// como proposta nova — continua precisando de aprovação.
+const ESTADOS_FIXOS = new Set(['publicado', 'despublicado']);
+
+export async function handleForgeDelivery(request: Request, env: Env, dep: Dependencias = {}): Promise<Response> {
   if (!env.FORGE_WEBHOOK_SECRET) {
     console.error('[forge-webhook] FORGE_WEBHOOK_SECRET ausente — rejeitando');
     return new Response('Service Unavailable', { status: 503 });
   }
 
+  // R4.1 / N4: assinatura antes de ler qualquer coisa do corpo.
   const body = await request.text();
   const sigHeader = request.headers.get('X-Webhook-Signature') ?? '';
   if (!(await assinaturaValida(body, sigHeader, env.FORGE_WEBHOOK_SECRET))) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  let pkg: DeliveryPackage;
-  try { pkg = JSON.parse(body); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  let bruto: unknown;
+  try { bruto = JSON.parse(body); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  if ((bruto as { status?: unknown })?.status !== 'complete') {
+    return Response.json({ ok: true, ignorado: (bruto as { status?: unknown })?.status ?? null });
+  }
+  const lido = pacoteSchema.safeParse(bruto);
+  if (!lido.success) {
+    const detalhe = lido.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);
+    console.error('[forge-webhook] pacote incompleto:', detalhe);
+    return Response.json({ ok: false, erro: 'pacote_incompleto', detalhe }, { status: 422 });
+  }
+  const pkg = lido.data;
 
-  if (pkg.status !== 'complete') {
-    return Response.json({ ok: true, ignorado: pkg.status });
+  // N3: reprovado no portão (qualidade ou idioma) não vira proposta nem rascunho.
+  if (!pkg.qualidade.aprovado || pkg.qualidade.motivos.length) {
+    console.error(`[forge-webhook] ${pkg.projectId} reprovado no portão:`, pkg.qualidade.motivos);
+    return Response.json({ ok: false, erro: 'reprovado_no_portao', motivos: pkg.qualidade.motivos }, { status: 422 });
   }
 
-  // Referência interna, não URL pública: o download resolve no servidor com o segredo.
-  const temEpub = pkg.arquivos.some((a) => a.startsWith(`epub/${pkg.projectId}/`));
-  const arquivoUrl = refInterna(pkg.projectId, temEpub ? 'epub' : 'html');
+  const banco = dep.banco ?? bancoSupabase(env);
+  const hoje = dep.hoje ?? new Date().toISOString().slice(0, 10);
+  const avisar = dep.avisar ?? ((assunto: string, texto: string) => emailDono(env, assunto, texto));
 
-  const titulo = pkg.summary.match(/^Obra "(.+?)"/)?.[1] ?? `Forge ${pkg.projectId.slice(0, 8)}`;
-  const slug = `forge-${pkg.projectId.slice(0, 8)}`;
+  try {
+    const atual = await banco.proposta(pkg.projectId);
+    if (atual && ESTADOS_FIXOS.has(atual.estado)) {
+      await banco.registrar(registroDe(atual, 'reenvio_ignorado', 'forge', `reenvio do forge com o livro ${atual.estado}`));
+      return Response.json({ ok: true, ignorado: atual.estado, slug: atual.slug });
+    }
 
-  // Portão humano: cria como rascunho (ativo=false, preço placeholder).
-  // Precificação real e ativação ficam pro admin, via /api/admin/catalogo já existente.
-  const r = await sb(env, 'products', {
-    method: 'POST',
-    headers: { Prefer: 'return=representation' } as any,
-    body: JSON.stringify({
-      slug,
-      tipo: 'ebook',
-      titulo,
-      descricao: pkg.summary,
-      preco: 0,
-      ativo: false,
-      arquivo_url: arquivoUrl,
-    }),
-  });
+    const cotacoes: Record<string, Cotacao> = {};
+    for (const moeda of moedasEstrangeiras(pkg)) {
+      const c = await (dep.ptax ?? buscarPtax)(moeda, hoje);
+      if (!c) continue;
+      cotacoes[moeda] = c;
+      await banco.gravarCotacao(moeda, c);
+    }
 
-  if (!r.ok) {
-    const err = await r.text();
-    console.error('[forge-webhook] supabase error:', r.status, err);
+    const proposta = montarProposta(pkg, await banco.parametros(), cotacoes, hoje);
+    // Slug estável: reenvio com título diferente não cria outro produto (N5).
+    if (atual) proposta.slug = atual.slug;
+    if (!(await banco.salvarProposta(proposta))) {
+      return Response.json({ ok: true, ignorado: 'decidido_pelo_dono', slug: proposta.slug });
+    }
+    const pronta = proposta.estado === 'pronto_para_aprovacao';
+    await banco.registrar(registroDe(proposta, pronta ? 'proposta' : 'rascunho', 'forge'));
+
+    // R8: aviso curto ao dono. Falha no aviso não desfaz a proposta.
+    await avisar(
+      pronta ? `Livro pronto para aprovação: ${proposta.titulo}` : `Livro em rascunho: ${proposta.titulo}`,
+      pronta
+        ? `${proposta.titulo} (${proposta.idioma}) — preço proposto R$ ${proposta.preco?.toFixed(2)}. Aprove ou recuse no painel.`
+        : `${proposta.titulo} (${proposta.idioma}) ficou em rascunho: ${proposta.motivos.join('; ')}`,
+    ).catch((e) => console.error('[forge-webhook] aviso ao dono falhou:', e));
+
+    console.log(`[forge-webhook] ${proposta.slug}: ${proposta.estado}`);
+    return Response.json({ ok: true, slug: proposta.slug, estado: proposta.estado, motivos: proposta.motivos });
+  } catch (err) {
+    console.error('[forge-webhook] falha ao gravar proposta:', err);
     return Response.json({ ok: false, erro: 'supabase_error' }, { status: 502 });
   }
-
-  console.log(`[forge-webhook] produto rascunho criado: ${slug} (projeto ${pkg.projectId})`);
-  return Response.json({ ok: true, slug, projectId: pkg.projectId });
 }

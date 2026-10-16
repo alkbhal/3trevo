@@ -493,6 +493,11 @@
           </div>
         </div>
         <div class="card" style="margin-bottom:16px;">
+          <div class="card-hdr"><span class="card-titulo">Propostas de publicação (preço do Guardião, você aprova)</span>
+            <button class="btn-ghost" style="margin-left:auto;" onclick="carregarPropostas()">Atualizar</button></div>
+          <div class="card-body" id="propostas-lista">—</div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
           <div class="card-body" style="display:flex;gap:10px;align-items:center;">
             <input type="text" id="forge-project-id" class="input" placeholder="projectId (UUID)" style="flex:1;">
             <button class="btn btn-p" onclick="carregarForgeProjeto()">Carregar</button>
@@ -517,7 +522,7 @@
                 <div class="field"><label>Slug (usado no catálogo/checkout)</label><input type="text" id="forge-slug" class="input"></div>
                 <div class="field"><label>Descrição</label><textarea id="forge-descricao" class="input" rows="4"></textarea></div>
                 <div class="field"><label>Gênero</label><input type="text" id="forge-genero" class="input"></div>
-                <div class="field"><label>Preço (R$)</label><input type="number" id="forge-preco" class="input" step="0.01" value="19.90"></div>
+                <div class="field" style="font-size:12px;color:var(--t3);">Preço: só pelo Guardião, na lista de propostas acima.</div>
               </div>
             </div>
           </div>
@@ -1176,6 +1181,7 @@ function irPara(panel, btn) {
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
+  if (panel === 'forge') carregarPropostas();
   if (panel === 'hero') carregarHeroConfig();
   if (panel === 'depoimentos') carregarDepoimentos();
   if (panel === 'sorteio' && statsCache) renderSorteio(statsCache);
@@ -1524,7 +1530,6 @@ async function decidirForge(destino) {
   const slug = slugify(document.getElementById('forge-slug').value.trim() || titulo);
   const descricao = document.getElementById('forge-descricao').value.trim();
   const genero = document.getElementById('forge-genero').value.trim();
-  const preco = parseFloat(document.getElementById('forge-preco').value) || 0;
 
   if (!titulo || !slug) { toast('Preencha título e slug.', 'err'); return; }
 
@@ -1544,28 +1549,92 @@ async function decidirForge(destino) {
       return;
     }
 
-    // exclusiva | hero — ambos entram no catálogo (página própria = /checkout.html?slug=X)
-    const rCat = await api('/api/admin/catalogo', 'POST', {
-      slug, titulo, autor: 'Said Anes', genero: genero || 'reflexao', genero_pt: genero || 'reflexao',
-      descricao: descricao || '', preco, utm_campaign: slug,
-      bg_color: '#0d2415', capa_url: capaUrl, ordem: 99, ativo: true,
-    });
-    const dCat = await rCat.json();
-    if (!dCat.ok) throw new Error(dCat.erro || 'erro ao criar no catálogo');
+    // exclusiva | hero — o livro entra na loja só pela proposta aprovada (preço do Guardião, N1/N2).
+    const rProp = await api('/api/admin/publicacao');
+    const props = await rProp.json();
+    const pub = Array.isArray(props) && props.find(p => p.forge_project_id === forgeProjectId && p.estado === 'publicado');
+    if (!pub) throw new Error('aprove a proposta deste livro primeiro (lista de propostas acima)');
 
     if (destino === 'hero') {
       const rHero = await api('/api/admin/hero-config');
       const heroAtual = await rHero.json();
       await api('/api/admin/hero-config', 'PUT', {
-        ...heroAtual, destaque_slug: slug, destaque_titulo: titulo, destaque_badge: 'Novo',
+        ...heroAtual, destaque_slug: pub.slug, destaque_titulo: pub.titulo, destaque_badge: 'Novo',
       });
-      statusEl.textContent = 'Publicado no catálogo e destacado no hero.';
+      statusEl.textContent = 'Destacado no hero.';
       toast('Publicado com destaque no hero.', 'ok');
     } else {
-      statusEl.textContent = 'Publicado no catálogo (página própria via checkout).';
-      toast('Publicado no catálogo.', 'ok');
+      statusEl.textContent = `Já publicado: página própria em /checkout.html?slug=${pub.slug}`;
+      toast('Livro publicado pela proposta.', 'ok');
     }
   } catch(e) { toast('Erro: ' + e.message, 'err'); }
+}
+
+// ── PROPOSTAS DE PUBLICAÇÃO (spec publicação por idioma v2) ─────────────────────
+const ESTADO_PROPOSTA = { rascunho:'🟡 Rascunho', pronto_para_aprovacao:'🟢 Pronto para aprovar', publicado:'✅ Publicado', recusado:'⛔ Recusado', despublicado:'⏸ Fora do ar' };
+const brl = v => v == null ? '—' : 'R$ ' + Number(v).toFixed(2).replace('.', ',');
+
+async function carregarPropostas() {
+  const el = document.getElementById('propostas-lista');
+  el.textContent = 'Carregando…';
+  try {
+    const r = await api('/api/admin/publicacao');
+    const lista = await r.json();
+    if (!Array.isArray(lista)) { el.textContent = 'Erro: ' + (lista.erro || 'resposta inválida'); return; }
+    if (!lista.length) { el.textContent = 'Nenhum livro do forge recebido ainda.'; return; }
+    el.innerHTML = lista.map(renderProposta).join('');
+  } catch(e) { el.textContent = 'Erro de conexão: ' + e.message; }
+}
+
+function renderProposta(p) {
+  const r = p.precificacao || {};
+  const m = r.mercado || {};
+  const pos = r.posicao;
+  const v = r.venda;
+  const id = escapeHtml(p.forge_project_id);
+  const comparaveis = (m.usados || []).map(u =>
+    `<li><a href="${escapeHtml(u.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(u.titulo || u.url)}</a> — ` +
+    `${escapeHtml(u.referencia.moeda)} ${escapeHtml(u.referencia.preco)}` +
+    (u.conversao ? ` × ${escapeHtml(u.conversao.taxa)} (PTAX ${escapeHtml(u.conversao.data)}) = ${brl(u.preco)}` : '') + `</li>`).join('');
+  const estimados = (r.estimados || []).map(e => `${escapeHtml(e.campo)} (${escapeHtml(e.estado)})`).join(', ');
+  let acoes = '';
+  if (p.estado === 'pronto_para_aprovacao') acoes += `<button class="btn btn-p" onclick="decidirProposta('${id}','aprovar',${Number(p.preco)})">Aprovar ${brl(p.preco)} e publicar</button>`;
+  if (p.estado === 'pronto_para_aprovacao' || p.estado === 'rascunho') acoes += `<button class="btn-ghost" onclick="decidirProposta('${id}','recusar')">Recusar</button>`;
+  if (p.estado === 'publicado') acoes += `<button class="btn-ghost" onclick="decidirProposta('${id}','despublicar')">Tirar do ar</button>`;
+  return `<div style="border-bottom:1px solid var(--borda);padding:12px 0;">
+    <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;">
+      <strong>${escapeHtml(p.titulo)}</strong><span style="color:var(--t3);font-size:12px;">${escapeHtml(p.idioma)} · ${escapeHtml(p.slug)}</span>
+      <span style="margin-left:auto;">${ESTADO_PROPOSTA[p.estado] || escapeHtml(p.estado)}</span>
+    </div>
+    <div style="font-size:13px;color:var(--t2);margin:4px 0;">${escapeHtml(p.descricao || '')}</div>
+    ${(p.motivos || []).length ? `<div style="font-size:12px;color:var(--ouro);">Por que não está pronto: ${p.motivos.map(escapeHtml).join('; ')}</div>` : ''}
+    ${m.n != null ? `<details style="font-size:12px;margin-top:6px;"><summary>Preço ${brl(p.preco)} · mercado p25 ${brl(m.p25)} · mediana ${brl(m.mediana)} · p75 ${brl(m.p75)} (${m.n} comparáveis)</summary>
+      ${pos ? `<div>${escapeHtml(pos.faixa)}${pos.nota ? ' — ' + escapeHtml(pos.nota) : ''}${pos.ajustado_ao_piso ? ' — subiu ao piso de custo' : ''}</div>` : ''}
+      <div>Piso de custo: ${brl(r.piso && r.piso.valor)}</div>
+      ${v ? `<div>Divisão da venda: taxa ${brl(v.componentes.taxasPagamento)} · imposto ${brl(v.componentes.impostos)} · estorno ${brl(v.componentes.estornos)} → líquido ${brl(v.liquido)} · Nema ${brl(v.nema)} · operação ${brl(v.operacao)}</div>` : ''}
+      ${estimados ? `<div>Ainda estimado: ${estimados}</div>` : ''}
+      <ul style="margin:6px 0 0 16px;">${comparaveis}</ul></details>` : ''}
+    <div style="display:flex;gap:8px;margin-top:8px;">${acoes}</div>
+  </div>`;
+}
+
+async function decidirProposta(id, acao, preco) {
+  let body = {};
+  if (acao === 'aprovar') {
+    if (!confirm(`Publicar este livro por ${brl(preco)}?`)) return;
+    body = { preco };
+  } else {
+    const motivo = prompt(acao === 'recusar' ? 'Motivo da recusa:' : 'Motivo para tirar do ar (opcional):');
+    if (motivo === null) return;
+    body = acao === 'recusar' ? { motivo } : (motivo ? { motivo } : {});
+  }
+  try {
+    const r = await api(`/api/admin/publicacao/${encodeURIComponent(id)}/${acao}`, 'POST', body);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.detalhe ? (Array.isArray(d.detalhe) ? d.detalhe.join('; ') : d.detalhe) : d.erro);
+    toast(acao === 'aprovar' ? 'Publicado.' : acao === 'recusar' ? 'Recusado.' : 'Fora do ar.', 'ok');
+  } catch(e) { toast('Erro: ' + e.message, 'err'); }
+  carregarPropostas();
 }
 
 async function gerarBibliotecaLocal() {

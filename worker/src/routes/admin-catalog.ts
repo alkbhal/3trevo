@@ -67,11 +67,30 @@ export async function verificarToken(request: Request, env: Env): Promise<boolea
 // divergir do preço cobrado. Antes disto, "cotas" era um <select> manual em
 // admin.html, desconectado do preço (achado real: isa-isma-tintim custava R$19,90,
 // dentro da faixa de 1 cota, mas tinha 3 cotas gravadas por escolha manual errada).
-function cotasPorPreco(preco: number): number {
+export function cotasPorPreco(preco: number): number {
   if (preco <= 20) return 1;
   if (preco <= 30) return 3;
   return 10;
 }
+
+// ─── Livro do forge: preço e ativo só pelo fluxo de publicação (spec por idioma v2,
+//     N1/N2/R7) — editar aqui furaria a aprovação do dono e o registro da decisão ─────
+async function mexeNoGeridoPelaPublicacao(env: Env, slug: string, updates: Record<string, any> = {}, apagar = false): Promise<boolean> {
+  const r = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}&select=forge_project_id,preco,ativo`);
+  if (!r.ok) throw new Error(`catalogo ${r.status}`);
+  const atual = ((await r.json()) as Array<{ forge_project_id: string | null; preco: number; ativo: boolean }>)[0];
+  if (!atual?.forge_project_id) return false;
+  // O editor manda o formulário inteiro: só recusa se preço, ativo ou slug MUDAREM.
+  return apagar
+    || ('preco' in updates && Number(updates.preco) !== Number(atual.preco))
+    || ('ativo' in updates && updates.ativo !== atual.ativo)
+    || ('slug' in updates && updates.slug !== slug);
+}
+
+const usePublicacao = () => Response.json(
+  { ok: false, erro: 'gerido_pela_publicacao', detalhe: 'livro do forge: preço e publicação só por /api/admin/publicacao' },
+  { status: 409 }
+);
 
 // ─── Espelhar catalogo → products (fonte de verdade é catalogo; products é o que
 //     registrar_compra_mp exige pra liberar a compra após pagamento aprovado) ────
@@ -198,6 +217,7 @@ export async function handleAdminCatalogoUpdate(request: Request, env: Env, slug
     'utm_campaign','bg_color','capa_url','ordem','ativo','slug','motivo_inativo',
   ];
   for (const k of allowed) { if (k in body) updates[k] = body[k]; }
+  if (await mexeNoGeridoPelaPublicacao(env, slug, updates)) return usePublicacao();
   if ('preco' in updates) updates.cotas = cotasPorPreco(updates.preco);
 
   const r = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}`, {
@@ -310,6 +330,7 @@ export async function handleAdminTableInsert(request: Request, env: Env): Promis
 // ─── Inativar livro (soft delete) ─────────────────────────────────────────────
 export async function handleAdminCatalogoDelete(request: Request, env: Env, slug: string): Promise<Response> {
   if (!(await verificarToken(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (await mexeNoGeridoPelaPublicacao(env, slug, {}, true)) return usePublicacao();
 
   const r = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}`, {
     method: 'PATCH',
