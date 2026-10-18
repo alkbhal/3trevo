@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q64TDCCL85"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Q64TDCCL85');
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" data-i18n-attr="content:meta.inicio.desc" content="Três Trevo is an independent digital publisher from Brazil. Read public-domain classics for free in our reader while our English editions are on their way.">
+  <meta property="og:title" data-i18n-attr="content:meta.inicio.og.titulo" content="Três Trevo — Literature, Knowledge and Culture">
+  <meta property="og:description" data-i18n-attr="content:meta.inicio.og.desc" content="Read the great classics for free in the Três Trevo reader. Our English editions are on their way.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://3trevo.com.br/en/">
+  <meta property="og:image" content="https://www.3trevo.com.br/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0f2d1a">
+  <title data-i18n="meta.inicio.titulo">Três Trevo — Literature, Knowledge and Culture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --v0: #050f07; --v1: #0a1f0e; --v2: #0f2d1a;
+      --v3: #1e5c3a; --v4: #2d7a50; --v5: #4a9966;
+      --v6: #a8c5a0; --v7: #d4e8d0; --v8: #edf5eb;
+      --ouro: #c9a84c;
+      --bg: #f8f5ef; --bg2: #f0f7f0;
+      --branco: #ffffff;
+      --borda: #e0dbd2; --borda-v: rgba(30,92,58,.15);
+      --t0: #111a0e; --t1: #2a3a26; --t2: #5a6a54; --t3: #8a9a84;
+      --serif: 'Fraunces', Georgia, serif;
+      --sans:  'Instrument Sans', system-ui, sans-serif;
+      --max: 1160px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--t0); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    h1,h2,h3,h4 { font-family: var(--serif); font-weight: 300; line-height: 1.15; }
+    p { line-height: 1.72; }
+    a { text-decoration: none; }
+    em { font-style: italic; }
+    .lbl { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; font-family: var(--sans); font-weight: 500; }
+
+    /* ── HEADER ──────────────────────────────────────────────────────────────── */
+    #hdr {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,31,14,.97); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .hdr-in {
+      max-width: var(--max); margin: 0 auto; padding: 0 24px;
+      height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .logo { font-family: var(--serif); font-weight: 400; font-size: 16px; color: rgba(255,255,255,.92); letter-spacing: .02em; }
+    .logo span { color: var(--v6); }
+    nav { display: flex; align-items: center; gap: 24px; }
+    nav a { font-size: 13px; color: rgba(255,255,255,.5); transition: color .2s; }
+    nav a:hover { color: rgba(255,255,255,.9); }
+    .hdr-right { display: flex; align-items: center; gap: 12px; }
+    .lang-toggle { display: flex; border: 1px solid rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; }
+    .lang-btn { background: none; border: none; cursor: pointer; padding: 5px 9px; font-size: 11px; font-family: var(--sans); letter-spacing: .06em; color: rgba(255,255,255,.4); transition: all .2s; }
+    .lang-btn + .lang-btn { border-left: 1px solid rgba(255,255,255,.1); }
+    .lang-btn.ativo { background: var(--v3); color: #fff; }
+    .lang-toggle a { padding: 6px 9px; font-size: 11px; letter-spacing: .06em; color: rgba(255,255,255,.55); text-decoration: none; }
+    .lang-toggle a + a { border-left: 1px solid rgba(255,255,255,.1); }
+    .lang-toggle a.ativo { background: var(--v3); color: #fff; }
+    .lang-toggle .tt-idiomas-nome { display: none; }
+    .hdr-cta { background: var(--v3); color: #fff !important; padding: 8px 18px; border-radius: 2px; font-size: 13px; font-weight: 600; transition: background .2s; white-space: nowrap; }
+    .hdr-cta:hover { background: var(--v4) !important; }
+    .menu-mob { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .menu-mob span { display: block; width: 22px; height: 1.5px; background: rgba(255,255,255,.6); margin: 5px 0; }
+
+    /* ── HERO ────────────────────────────────────────────────────────────────── */
+    #inicio {
+      background: var(--v0); padding-top: 58px;
+      min-height: 94vh; display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
+
+    /* Vídeo de fundo */
+    .hero-video-bg {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .hero-video-bg video {
+      width: 100%; height: 100%; object-fit: cover; opacity: .55;
+    }
+    .hero-video-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        105deg,
+        rgba(5,15,7,.92) 0%,
+        rgba(10,31,14,.7) 35%,
+        rgba(10,31,14,.25) 65%,
+        rgba(10,31,14,.1) 100%
+      );
+    }
+
+    .hero-in {
+      max-width: var(--max); margin: 0 auto; padding: 72px 24px 96px;
+      display: grid; grid-template-columns: minmax(320px, 520px) 1fr; gap: 48px; align-items: center;
+      position: relative; z-index: 1; width: 100%;
+    }
+
+    .hero-ebook-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+      padding: 14px 32px;
+      display: flex; align-items: center; gap: 18px;
+    }
+    .hero-ebook-bar .heb-progress {
+      position: absolute; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, #ffa028, #ff6a00);
+      width: 0%; transition: width .2s linear;
+      box-shadow: 0 0 8px rgba(255,106,0,.5);
+    }
+    .hero-ebook-bar .heb-badge { font-size: 9px; text-transform: uppercase; letter-spacing: .2em; color: #ffa028; font-weight: 600; white-space: nowrap; }
+    .hero-ebook-bar .heb-sep { width: 1px; height: 20px; background: rgba(255,255,255,.15); }
+    .hero-ebook-bar .heb-title { font-family: var(--serif); font-size: clamp(14px,2vw,18px); color: #fff; font-weight: 300; }
+    .hero-ebook-bar .heb-cta {
+      margin-left: auto; color: #ffa028; font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+      text-transform: uppercase; letter-spacing: .1em; white-space: nowrap;
+      transition: color .2s;
+    }
+    .hero-ebook-bar .heb-cta:hover { color: #fff; }
+    @media(max-width:768px) {
+      .hero-ebook-bar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+      .hero-ebook-bar .heb-sep { display: none; }
+      .hero-ebook-bar .heb-cta { margin-left: 0; width: 100%; justify-content: center; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); }
+    }
+
+    .hero-sup { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .hero-sup::before { content: ''; display: block; width: 24px; height: 1px; background: var(--v6); }
+    .hero-sup span { color: var(--v6); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; }
+    h1.hero-t { font-size: clamp(34px, 5.2vw, 62px); font-weight: 200; color: #fff; line-height: 1.08; margin-bottom: 22px; }
+    h1.hero-t em { color: var(--v6); font-style: italic; }
+    .hero-sub { font-size: 16px; color: rgba(255,255,255,.5); line-height: 1.78; max-width: 480px; margin-bottom: 32px; }
+    .hero-btns { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+    .btn-pri { background: var(--v3); color: #fff; padding: 13px 28px; border-radius: 2px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, transform .1s; }
+    .btn-pri:hover { background: var(--v4); }
+    .btn-pri:active { transform: scale(.97); }
+    .btn-ghost { color: rgba(255,255,255,.5); font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(255,255,255,.18); padding-bottom: 1px; transition: all .2s; }
+    .btn-ghost:hover { color: rgba(255,255,255,.9); border-color: rgba(255,255,255,.5); }
+
+    /* Stats inline */
+    .hero-stats-row { display: flex; align-items: center; gap: 24px; }
+    .hsr-item { display: flex; flex-direction: column; }
+    .hsr-n { font-family: var(--serif); font-size: 22px; font-weight: 300; color: #fff; line-height: 1; }
+    .hsr-l { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-top: 3px; }
+    .hsr-sep { width: 1px; height: 28px; background: rgba(255,255,255,.1); }
+
+    /* ─── MOCKUP SHOWCASE ────────────────────────────────────────────────────── */
+    .showcase {
+      display: flex; flex-direction: column; align-items: center; gap: 28px;
+      position: relative;
+    }
+
+    /* Perspectiva */
+    .livro-stage {
+      perspective: 1000px;
+      width: 220px; height: 300px;
+      position: relative;
+    }
+
+    /* O livro em si */
+    .livro {
+      width: 200px; height: 280px;
+      position: absolute; top: 10px; left: 10px;
+      transform: perspective(1000px) rotateY(-18deg) rotateX(4deg);
+      animation: livro-float 7s ease-in-out infinite;
+      transition: opacity .6s ease, transform .6s ease;
+      filter: drop-shadow(-18px 24px 40px rgba(0,0,0,.6));
+    }
+    @keyframes livro-float {
+      0%,100% { transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(0); }
+      50%      { transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(-14px); }
+    }
+    .livro.saindo { opacity: 0; transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(-8px) scale(.96); }
+    .livro.entrando { opacity: 0; transform: perspective(1000px) rotateY(-18deg) rotateX(4deg) translateY(10px) scale(.96); }
+
+    /* Capa: face principal */
+    .capa {
+      width: 200px; height: 280px;
+      border-radius: 2px 5px 5px 2px;
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column; padding: 22px 20px 18px;
+      box-shadow: inset -4px 0 12px rgba(0,0,0,.25);
+    }
+
+    /* Lombada ilusória (sombra lateral) */
+    .capa::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 18px;
+      background: linear-gradient(to right, rgba(0,0,0,.5) 0%, rgba(0,0,0,.0) 100%);
+      border-radius: 2px 0 0 2px;
+    }
+
+    /* Brilho superior */
+    .capa::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 60px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.07), transparent);
+      pointer-events: none;
+    }
+
+    /* Ornamento gráfico (único por livro, via CSS) */
+    .capa-ornamento { position: absolute; pointer-events: none; }
+
+    .capa-genero { font-size: 8px; letter-spacing: .2em; text-transform: uppercase; font-family: var(--sans); font-weight: 500; margin-bottom: 14px; opacity: .65; position: relative; z-index: 1; }
+    .capa-titulo { font-family: var(--serif); font-size: 19px; font-weight: 200; color: #fff; line-height: 1.22; flex: 1; position: relative; z-index: 1; }
+    .capa-titulo em { font-style: italic; }
+    .capa-divisor { width: 20px; height: 1px; margin: 14px 0; position: relative; z-index: 1; }
+    .capa-autor { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; font-family: var(--sans); opacity: .45; position: relative; z-index: 1; color: #fff; }
+    .capa-editora { font-size: 8px; letter-spacing: .06em; font-family: var(--sans); opacity: .22; margin-top: 4px; position: relative; z-index: 1; color: #fff; }
+
+    /* ── Capas individuais ─────────────────────────────────────────────────── */
+
+    /* 1 · Justiça(mento) — Verde profundo, linhas finas */
+    .capa-justicamento {
+      background: linear-gradient(155deg, #0d2415 0%, #071a0d 100%);
+    }
+    .capa-justicamento .capa-genero { color: #7ab88a; }
+    .capa-justicamento .capa-divisor { background: #7ab88a; }
+    .capa-justicamento .capa-ornamento {
+      right: -10px; top: 40px;
+      width: 120px; height: 120px;
+      border: 1px solid rgba(122,184,138,.12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 24px rgba(122,184,138,.05), 0 0 0 48px rgba(122,184,138,.03);
+    }
+
+    /* 4 · Antifalência — Chumbo quente */
+    .capa-antifalencia {
+      background: linear-gradient(150deg, #101820 0%, #08101a 100%);
+    }
+    .capa-antifalencia .capa-genero { color: #c9a84c; }
+    .capa-antifalencia .capa-divisor { background: #c9a84c; }
+    .capa-antifalencia .capa-ornamento {
+      right: 14px; bottom: 60px;
+      width: 48px; height: 2px;
+      background: rgba(201,168,76,.3);
+      box-shadow: 0 10px 0 rgba(201,168,76,.15), 0 20px 0 rgba(201,168,76,.08);
+    }
+
+    /* Navegação das capas */
+    .showcase-nav { display: flex; gap: 10px; align-items: center; }
+    .snav-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,.2); border: none; cursor: pointer;
+      transition: all .25s; padding: 0;
+    }
+    .snav-dot.ativo { width: 20px; border-radius: 3px; background: var(--v6); }
+
+    /* Título atual debaixo */
+    .showcase-label {
+      text-align: center; min-height: 36px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .showcase-label-titulo { font-size: 12px; color: rgba(255,255,255,.6); font-family: var(--serif); font-style: italic; }
+    .showcase-label-info { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.25); }
+
+    /* Scroll indicator */
+    .scroll-ind { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; animation: sc-bob 2.4s ease-in-out infinite; }
+    @keyframes sc-bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+    .scroll-ind span { font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.22); }
+    .scroll-line { width: 1px; height: 28px; background: linear-gradient(to bottom, rgba(255,255,255,.22), transparent); }
+
+    /* ── FAIXA CONFIANÇA ─────────────────────────────────────────────────────── */
+    .faixa { background: var(--branco); border-bottom: 1px solid var(--borda); padding: 14px 24px; }
+    .faixa-in { max-width: var(--max); margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 36px; flex-wrap: wrap; }
+    .faixa-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--t2); }
+    .faixa-item strong { color: var(--t1); font-weight: 600; }
+    .faixa-sep { width: 1px; height: 14px; background: var(--borda); }
+
+    /* ── CATÁLOGO ─────────────────────────────────────────────────────────────── */
+    #catalogo { padding: 88px 24px 72px; background: var(--bg); }
+    .sec-in { max-width: var(--max); margin: 0 auto; }
+    .sec-hdr { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 48px; }
+    h2.sec-t { font-size: clamp(26px, 3.8vw, 42px); font-weight: 300; color: var(--t0); }
+    h2.sec-t em { color: var(--v3); }
+    .sec-desc { font-size: 14px; color: var(--t2); margin-top: 8px; max-width: 440px; line-height: 1.65; }
+    .filtros { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fbtn { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--borda); background: transparent; font-size: 11px; color: var(--t2); cursor: pointer; font-family: var(--sans); transition: all .2s; letter-spacing: .04em; }
+    .fbtn:hover, .fbtn.ativo { border-color: var(--v3); color: var(--v3); background: var(--v8); }
+    .prod-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+
+    /* Cards de produto */
+    .pcard { background: var(--branco); border: 1px solid var(--borda); border-radius: 16px; overflow: hidden; transition: transform .3s cubic-bezier(.25,.1,.25,1), box-shadow .3s; cursor: pointer; box-shadow: 0 2px 12px rgba(10,31,14,.06); }
+    .pcard:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 16px 48px rgba(10,31,14,.12); z-index: 2; }
+    .pcard:active { transform: scale(0.985); }
+    .pcard-cor { height: 5px; border-radius: 16px 16px 0 0; }
+
+    /* Capa do livro no card */
+    .pcard-capa-mini {
+      display: block; margin: 24px auto 0; float: none;
+      width: 100px; height: 142px; border-radius: 3px 8px 8px 3px;
+      position: relative; overflow: hidden; flex-shrink: 0;
+      box-shadow: -4px 8px 24px rgba(0,0,0,.35);
+      animation: mini-float 5s ease-in-out infinite;
+    }
+    @keyframes mini-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .pcard-capa-mini::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(to right, rgba(0,0,0,.4), transparent); }
+    .pcard-capa-mini-titulo { padding: 8px 6px; font-family: var(--serif); font-size: 8px; font-style: italic; color: rgba(255,255,255,.85); line-height: 1.3; }
+
+    .pcard-corpo { padding: 20px 24px 0; overflow: hidden; text-align: center; }
+    .pcard-genero { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--v4); font-weight: 600; margin-bottom: 8px; }
+    h3.pcard-t { font-size: 20px; font-weight: 500; color: var(--t0); line-height: 1.25; margin-bottom: 6px; font-family: var(--serif); }
+    .pcard-autor { font-size: 13px; color: var(--t3); font-style: italic; margin-bottom: 14px; }
+    .pcard-desc { font-size: 13.5px; color: var(--t1); line-height: 1.7; clear: both; text-align: left; }
+    .pcard-rodape { margin-top: 16px; padding: 16px 24px; border-top: 1px solid var(--borda); display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--bg); }
+    .pcard-preco { font-family: var(--serif); font-size: 26px; font-weight: 400; color: var(--t0); line-height: 1; }
+    .pcard-preco-sub { font-size: 10px; color: var(--t3); margin-top: 4px; }
+    .pcard-dir { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .cotas-badge { background: var(--v8); border: 1px solid var(--borda-v); color: var(--v3); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
+    .pcard.premium .cotas-badge { animation: badge-shine 2.5s ease-in-out infinite; }
+    @keyframes badge-shine { 0%,100% { background: var(--v8); } 50% { background: #d0ecd0; box-shadow: 0 0 8px rgba(30,92,58,.12); } }
+    .btn-adq { background: var(--v2); color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: background .2s, transform .15s; white-space: nowrap; box-shadow: 0 2px 8px rgba(26,92,56,.25); }
+    .btn-adq:hover { background: var(--v3); transform: scale(1.04); }
+    .pcard-pc { font-size: 11px; color: var(--v4); padding: 8px 20px; background: var(--v8); border-top: 1px solid rgba(30,92,58,.08); display: flex; align-items: center; gap: 6px; }
+    .pcard-pc::before { content: '✦'; font-size: 9px; }
+
+    /* Garantia */
+    .garantia { background: var(--branco); border: 1px solid var(--borda); border-radius: 3px; padding: 20px 28px; display: flex; align-items: center; gap: 16px; margin-top: 28px; }
+    .garantia-i { font-size: 24px; flex-shrink: 0; }
+    .garantia-t h4 { font-family: var(--serif); font-size: 17px; font-weight: 400; color: var(--t0); margin-bottom: 3px; }
+    .garantia-t p { font-size: 13px; color: var(--t2); line-height: 1.55; }
+
+    /* ── DEPOIMENTOS ─────────────────────────────────────────────────────────── */
+    #depoimentos { padding: 80px 24px; background: var(--branco); border-top: 1px solid var(--borda); }
+    .dep-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+    .dcard { background: var(--bg); border: 1px solid var(--borda); border-radius: 3px; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .dcard-stars { color: var(--ouro); font-size: 11px; letter-spacing: 3px; }
+    .dcard-aspas { font-family: var(--serif); font-size: 34px; color: var(--v7); line-height: 1; }
+    .dcard-texto { font-family: var(--serif); font-size: 15px; font-style: italic; color: var(--t1); line-height: 1.7; flex: 1; }
+    .dcard-rod { border-top: 1px solid var(--borda); padding-top: 12px; }
+    .dcard-nome { font-size: 13px; font-weight: 600; color: var(--t0); }
+    .dcard-livro { font-size: 11px; color: var(--t3); margin-top: 2px; }
+
+    /* ── PROGRAMA CULTURAL ───────────────────────────────────────────────────── */
+    #nema { padding: 88px 24px; background: var(--bg2); }
+    .prog-grid { display: grid; grid-template-columns: 1fr 360px; gap: 72px; align-items: start; margin-top: 56px; }
+    .sistema-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,168,76,.1); border: 1px solid rgba(201,168,76,.3); border-radius: 3px; padding: 8px 14px; margin-bottom: 28px; }
+    .sistema-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ouro); animation: pulse-dot 2s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: .6; } }
+    .sistema-badge span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ouro); font-weight: 500; }
+    .nema-exemplo { background: var(--branco); border: 1px solid var(--borda); border-left: 4px solid var(--v3); padding: 24px 26px; }
+    .nema-ex-linha { font-size: 16px; color: var(--t1); line-height: 1.6; }
+    .nema-ex-num { font-family: var(--serif); font-size: 44px; font-weight: 300; color: var(--v3); line-height: 1.2; margin: 6px 0; }
+    .nema-nota { font-size: 15px; color: var(--t1); line-height: 1.7; margin-top: 18px; }
+    .nema-links { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; font-size: 16px; }
+    .nema-links a { color: var(--v3); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--borda-v); padding-bottom: 2px; }
+    /* Abertura: cada cena ocupa a tela; o texto aparece ao entrar na vista (sem JS, tudo já visível) */
+    #abertura { background: #050807; color: #f3efe6; }
+    .ab-cena { position: relative; min-height: 92vh; min-height: 92svh; display: grid; place-items: center; overflow: hidden; padding: 64px 24px; }
+    .ab-fundo { position: absolute; inset: -4%; background: var(--ab-img, none) var(--ab-pos, center) / cover no-repeat, var(--ab-grad); transform: scale(1.06); transition: transform 2.4s ease, opacity 1.6s ease; }
+    .ab-fundo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,8,7,.55), rgba(5,8,7,.78)); }
+    .ab-cena[data-cena="1"] .ab-fundo { --ab-grad: radial-gradient(ellipse at 30% 40%, #1b2a22 0%, #050807 70%); }
+    .ab-cena[data-cena="2"] .ab-fundo { --ab-grad: radial-gradient(ellipse at 70% 30%, #2a2418 0%, #050807 72%); }
+    .ab-cena[data-cena="3"] .ab-fundo { --ab-grad: radial-gradient(ellipse at 50% 80%, #16261d 0%, #050807 70%); }
+    .ab-cena[data-cena="4"] .ab-fundo { --ab-grad: linear-gradient(110deg, #050807 30%, #1a1f1c 50%, #050807 70%); }
+    .ab-cena[data-cena="5"] .ab-fundo { --ab-grad: radial-gradient(circle at 50% 50%, #12201a 0%, #050807 65%); }
+    .ab-texto { position: relative; max-width: 22ch; font-family: var(--serif); font-weight: 300; font-size: clamp(30px, 6vw, 60px); line-height: 1.22; text-align: left; text-wrap: balance; color: #f3efe6; }
+    .ab-texto em { color: var(--ouro); font-style: italic; }
+    .ab-rot { display: block; font-family: var(--sans); font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: var(--ouro); margin-bottom: 20px; }
+    .ab-ultima .ab-texto { max-width: 26ch; }
+    .ab-ultima .ab-texto > p:first-child { margin: 0; line-height: 1.3; }
+    .ab-cta { font-family: var(--sans); font-size: 19px; line-height: 1.5; margin-top: 28px; color: #f3efe6; display: inline-block; padding: 12px 16px; background: rgba(5,8,7,.9); border: 1px solid rgba(201,168,76,.45); border-radius: 4px; text-shadow: none; box-shadow: 0 0 0 10px rgba(5,8,7,.55); }
+    .ab-cta a { color: var(--ouro); font-weight: 700; }
+    .ab-cena[data-cena="1"] .ab-fundo { --ab-pos: 30% 50%; --fx: 28%; --fy: 45%; }
+    .ab-cena[data-cena="2"] .ab-fundo { --ab-pos: 58% 50%; --fx: 59%; --fy: 32%; }
+    .ab-cena[data-cena="3"] .ab-fundo { --ab-pos: 62% 50%; --fx: 62%; --fy: 45%; }
+    .ab-cena[data-cena="4"] .ab-fundo { --ab-pos: 32% 50%; --fx: 38%; --fy: 45%; }
+    .ab-cena[data-cena="5"] .ab-fundo { --ab-pos: 50% 50%; --fx: 50%; --fy: 42%; }
+
+    /* Rolagem guiada: cada bloco entra do seu lado conforme a rolagem (só com JS e sem "reduzir movimento") */
+    #nema, #faq, #sobre { overflow-x: clip; }
+    #nema { position: relative; scroll-margin-top: 0; }
+    #nema::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 420px; pointer-events: none; background: linear-gradient(180deg, #050807 0%, rgba(120,84,40,.55) 22%, rgba(255,214,150,.30) 52%, rgba(255,214,150,0) 100%); }
+    #nema::after { content: ''; position: absolute; left: 50%; top: -120px; width: 1500px; height: 900px; margin-left: -750px; pointer-events: none; opacity: 0; transform-origin: 50% 12%; background: radial-gradient(ellipse 50% 52% at 50% 12%, rgba(255,250,232,1) 0%, rgba(255,226,160,.92) 20%, rgba(255,184,96,.55) 45%, rgba(255,184,96,0) 72%); }
+    .ent-on #nema [data-k] { opacity: 0; }
+    .ent-on #nema.nema-go [data-k] { animation: nemaEntra .75s cubic-bezier(.16,.84,.26,1) both; animation-delay: var(--d, 0s); }
+    .ent-on #nema.nema-go::after { animation: nemaLuz 2.2s cubic-bezier(.2,.7,.2,1) both; }
+    #nema [data-k="0"] { --d: .10s } #nema [data-k="1"] { --d: .25s } #nema [data-k="2"] { --d: .40s }
+    #nema [data-k="3"] { --d: .60s } #nema [data-k="4"] { --d: .75s } #nema [data-k="5"] { --d: .90s }
+    #nema [data-k="6"] { --d: .40s } #nema [data-k="7"] { --d: .95s }
+    @keyframes nemaEntra { 0% { opacity: 0; filter: blur(10px); transform: perspective(700px) translate3d(0,-46px,-620px) scale(.6); } 60% { opacity: 1; } 100% { opacity: 1; filter: blur(0); transform: perspective(700px) translate3d(0,0,0) scale(1); } }
+    @keyframes nemaLuz { 0% { opacity: 0; transform: scale(.15); } 22% { opacity: 1; transform: scale(1); } 100% { opacity: .22; transform: scale(1.35); } }
+    #nema > .sec-in { position: relative; }
+    .nema-chamada { font-family: var(--serif); font-size: 26px; font-weight: 400; line-height: 1.3; color: var(--v3); margin: 10px 0 16px; }
+    .nema-lista { list-style: none; margin: 14px 0 18px; padding: 0; }
+    .nema-lista li { font-size: 17px; line-height: 1.5; color: var(--t0); padding: 9px 0 9px 26px; position: relative; border-top: 1px solid var(--borda); }
+    .nema-lista li:last-child { border-bottom: 1px solid var(--borda); }
+    .nema-lista li::before { content: ''; position: absolute; left: 4px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--ouro); }
+    .ent-on [data-ent] { --p: 0; opacity: var(--p); will-change: transform, opacity; }
+    .ent-on [data-ent="l"] { transform: translate3d(calc((1 - var(--p)) * -90px), calc((1 - var(--p)) * -70px), 0) scale(calc(.45 + .55 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 7px)); }
+    .ent-on [data-ent="r"] { transform: translate3d(calc((1 - var(--p)) * 90px), calc((1 - var(--p)) * -70px), 0) scale(calc(.45 + .55 * var(--p))); transform-origin: 50% 0; filter: blur(calc((1 - var(--p)) * 7px)); }
+    .ent-on [data-ent="u"] { transform: translate3d(0, calc((1 - var(--p)) * 34px), 0); }
+    .ent-on footer[data-ent="foot"] { opacity: 1; background: var(--v0); clip-path: inset(0 calc((1 - var(--p)) * 16%) 0 calc((1 - var(--p)) * 16%) round calc((1 - var(--p)) * 56px) calc((1 - var(--p)) * 56px) 0 0); }
+    .ent-on footer[data-ent="foot"] { transform: none; }
+    .ent-on footer[data-ent="foot"] > .ft-in { opacity: var(--p); }
+    .ab-dica, .ab-pular { display: none; }
+    /* Modo caminhada (com JS): a tela fica parada e a rolagem anda pelo apartamento, cena a cena */
+    #abertura.ab-andar { height: 750vh; height: 750svh; }
+    .ab-andar .ab-palco { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #050807; }
+    .ab-andar .ab-cena { position: absolute; inset: 0; min-height: 0; padding: 0; display: block; opacity: 0; will-change: opacity, transform; }
+    /* O "mundo" tem sempre a proporção da foto (16:9); a câmera (JS) o move e aproxima */
+    .ab-andar .ab-fundo { position: absolute; inset: auto; left: 0; top: 0; right: auto; bottom: auto; transform-origin: 0 0; transition: none; will-change: transform; background: var(--ab-img, none) 0 0 / 100% 100% no-repeat, var(--ab-grad); }
+    .ab-andar .ab-fundo::after { display: none; }
+    .ab-andar .ab-texto { position: absolute; margin: 0; left: 22px; right: 22px; bottom: 13vh; bottom: 13svh; max-width: 24ch; isolation: isolate; text-shadow: 0 2px 18px rgba(0,0,0,.9); will-change: opacity, transform; }
+    .ab-andar .ab-texto::before { content: ''; position: absolute; z-index: -1; inset: -36px -44px; background: radial-gradient(closest-side, rgba(5,8,7,.66), rgba(5,8,7,0)); pointer-events: none; }
+    .ab-andar .ab-ultima .ab-texto { max-width: 28ch; }
+    .ab-andar .ab-ultima .ab-texto::before { background: radial-gradient(closest-side, rgba(5,8,7,.82), rgba(5,8,7,0)); }
+    .ab-brilho { display: none; }
+    .ab-andar .ab-brilho { display: block; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; will-change: opacity; }
+    @media (min-width: 900px) {
+      /* No desktop o texto fica nas partes escuras de cada foto, longe do que a câmera procura */
+      .ab-andar .ab-texto { left: auto; right: auto; bottom: auto; max-width: 22ch; }
+      .ab-andar .ab-cena[data-cena="1"] .ab-texto { right: 7vw; top: 26vh; top: 26svh; }
+      .ab-andar .ab-cena[data-cena="2"] .ab-texto { left: 6vw; top: 30vh; top: 30svh; }
+      .ab-andar .ab-cena[data-cena="3"] .ab-texto { left: 6vw; bottom: 14vh; bottom: 14svh; }
+      .ab-andar .ab-cena[data-cena="4"] .ab-texto { right: 4vw; top: 36vh; top: 36svh; max-width: 19ch; }
+      .ab-andar .ab-cena[data-cena="5"] .ab-texto { right: 5vw; top: 30vh; top: 30svh; max-width: 20ch; }
+    }
+    .ab-andar .ab-dica { display: block; position: absolute; left: 0; right: 0; bottom: 5vh; text-align: center; font-family: var(--sans); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: #e4ded2; z-index: 3; pointer-events: none; opacity: 0; }
+    .ab-andar .ab-pular { display: block; position: absolute; top: 18px; right: 18px; z-index: 3; font-family: var(--sans); font-size: 16px; color: #f3efe6; background: rgba(5,8,7,.6); border: 1px solid rgba(243,239,230,.45); padding: 10px 16px; text-decoration: none; }
+    .ab-andar .ab-pular:focus-visible { outline: 3px solid var(--ouro); outline-offset: 2px; }
+    .prog-titulo { font-size: clamp(28px, 4vw, 44px); font-weight: 300; color: var(--t0); margin-bottom: 16px; }
+    .prog-titulo em { color: var(--v3); }
+    .prog-sub { font-size: 15px; color: var(--t2); line-height: 1.75; max-width: 480px; margin-bottom: 36px; }
+    .passos { display: flex; flex-direction: column; }
+    .passo { display: flex; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--borda); }
+    .passo:last-child { border-bottom: none; }
+    .passo-n { font-family: var(--serif); font-size: 30px; font-weight: 200; color: var(--v3); line-height: 1; width: 36px; flex-shrink: 0; }
+    .passo-t { font-size: 15px; font-weight: 600; color: var(--t0); margin-bottom: 5px; }
+    .passo-d { font-size: 13px; color: var(--t2); line-height: 1.6; }
+
+    /* Painel prêmios */
+    .premios-painel { background: var(--branco); border: 1px solid var(--borda); border-radius: 3px; overflow: hidden; position: sticky; top: 76px; }
+    .pp-hdr { padding: 18px 22px; border-bottom: 1px solid var(--borda); background: var(--bg); }
+    .pp-hdr-l { color: var(--v3); margin-bottom: 4px; }
+    .pp-hdr-t { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--t0); }
+    .pp-item { display: flex; align-items: center; padding: 14px 22px; border-bottom: 1px solid var(--borda); gap: 12px; }
+    .pp-item:last-of-type { border-bottom: none; }
+    .pp-pos { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); width: 36px; }
+    .pp-val { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--t0); flex: 1; }
+    .pp-item.grande .pp-val { color: var(--v3); font-size: 26px; }
+    .pp-tag { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; background: var(--v8); color: var(--v3); border: 1px solid var(--borda-v); border-radius: 2px; padding: 3px 7px; }
+    .pp-item.grande .pp-tag { background: rgba(201,168,76,.1); color: var(--ouro); border-color: rgba(201,168,76,.3); }
+    .pp-cotas { padding: 16px 22px; border-top: 1px solid var(--borda); background: var(--bg); }
+    .pp-cotas-l { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-bottom: 10px; font-weight: 500; }
+    .cota-linha { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--borda); }
+    .cota-linha:last-child { border-bottom: none; }
+    .cota-linha .cn { color: var(--t2); }
+    .cota-linha .cv { color: var(--v3); font-weight: 600; }
+    .pp-prog { padding: 16px 22px; }
+    .pp-prog-l { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .pp-prog-l .pi { color: var(--t3); }
+    .pp-prog-l .pf { color: var(--v3); font-weight: 600; }
+    .barra { height: 3px; background: var(--borda); border-radius: 2px; overflow: hidden; }
+    .barra-fill { height: 100%; background: linear-gradient(90deg, var(--v3), var(--v5)); border-radius: 2px; width: 0; transition: width 1.8s ease; }
+    .pp-prog-st { font-size: 11px; color: var(--t3); text-align: center; margin-top: 8px; }
+
+    /* ── FAQ ──────────────────────────────────────────────────────────────────── */
+    #faq { padding: 88px 24px; background: var(--branco); border-top: 1px solid var(--borda); }
+    .faq-in { max-width: 740px; margin: 0 auto; }
+    .faq-lista { margin-top: 48px; }
+    .faq-item { border-top: 1px solid var(--borda); }
+    .faq-item:last-child { border-bottom: 1px solid var(--borda); }
+    .faq-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0; background: none; border: none; cursor: pointer; text-align: left; font-family: var(--sans); }
+    .faq-p { font-size: 15px; font-weight: 500; color: var(--t0); line-height: 1.4; }
+    .faq-ic { width: 24px; height: 24px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--t2); flex-shrink: 0; transition: all .25s; border: 1px solid var(--borda); }
+    .faq-item.open .faq-ic { background: var(--v2); color: #fff; border-color: var(--v2); transform: rotate(45deg); }
+    .faq-r { font-size: 14px; color: var(--t1); line-height: 1.78; max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .35s ease; }
+    .faq-item.open .faq-r { max-height: 400px; padding-bottom: 20px; }
+
+    /* ── SOBRE ────────────────────────────────────────────────────────────────── */
+    #sobre { padding: 88px 24px; background: var(--bg); border-top: 1px solid var(--borda); }
+    .sobre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; max-width: var(--max); margin: 0 auto; }
+    .sobre-t { font-size: clamp(26px, 3.5vw, 38px); font-weight: 300; color: var(--t0); margin-bottom: 18px; }
+    .sobre-t em { color: var(--v3); }
+    .sobre-p { font-size: 14px; color: var(--t1); line-height: 1.8; margin-bottom: 14px; }
+    .autor-bloco { background: var(--v2); border-radius: 3px; padding: 28px; }
+    .autor-l { color: var(--v6); margin-bottom: 10px; }
+    .autor-nome { font-family: var(--serif); font-size: 24px; font-weight: 300; color: #fff; margin-bottom: 3px; }
+    .autor-sub { font-size: 12px; color: rgba(255,255,255,.4); font-style: italic; margin-bottom: 18px; }
+    .autor-bio { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.75; }
+
+    /* ── FOOTER ──────────────────────────────────────────────────────────────── */
+    footer { background: var(--v0); padding: 56px 24px 36px; }
+    .ft-in { max-width: var(--max); margin: 0 auto; }
+    .ft-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 44px; }
+    .ft-logo { font-family: var(--serif); font-size: 19px; font-weight: 300; color: rgba(255,255,255,.8); margin-bottom: 10px; }
+    .ft-tag { font-size: 13px; color: rgba(255,255,255,.3); line-height: 1.65; max-width: 260px; margin-bottom: 16px; }
+    #membros { padding: 96px 24px; background: var(--bg2, #0d1a12); }
+    #membros .sec-in { max-width: 920px; margin: 0 auto; }
+    .membros-lista { list-style: none; padding: 0; margin: 32px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .membros-lista li { display: flex; flex-direction: column; gap: 6px; padding: 18px; border: 1px solid rgba(255,255,255,.1); border-radius: 6px; }
+    .membros-lista strong { font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 400; color: var(--t1, #f5f0e8); }
+    .membros-lista span { font-size: 15px; line-height: 1.55; color: var(--t2, rgba(245,240,232,.72)); }
+    .membros-acoes { display: flex; flex-wrap: wrap; gap: 14px; }
+    .ft-cnpj { font-size: 11px; color: rgba(255,255,255,.2); line-height: 1.65; }
+    .ft-col h5 { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 14px; font-weight: 500; }
+    .ft-links { display: flex; flex-direction: column; gap: 9px; }
+    .ft-links a { font-size: 13px; color: rgba(255,255,255,.4); transition: color .2s; }
+    .ft-links a:hover { color: rgba(255,255,255,.8); }
+    .ft-bottom { border-top: 1px solid rgba(255,255,255,.06); padding-top: 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ft-copy { font-size: 11px; color: rgba(255,255,255,.2); }
+    .ft-badges { display: flex; gap: 10px; align-items: center; }
+    .badge { font-size: 10px; color: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.1); border-radius: 2px; padding: 3px 7px; }
+    .ft-admin { color: rgba(255,255,255,.12); font-size: 16px; transition: color .2s; }
+    .ft-admin:hover { color: rgba(255,255,255,.4); }
+
+    /* WA */
+    .wa { position: fixed; bottom: 24px; right: 24px; width: 50px; height: 50px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(37,211,102,.4); z-index: 90; transition: transform .2s, box-shadow .2s; }
+    .wa:hover { transform: scale(1.08); box-shadow: 0 6px 26px rgba(37,211,102,.5); }
+    .wa svg { width: 25px; height: 25px; fill: #fff; }
+
+    /* Fade-in com stagger para cards */
+    .fi { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+    .fi.vis { opacity: 1; transform: translateY(0); }
+    .pcard { opacity: 0; transform: translateY(24px); transition: opacity .5s ease, transform .5s ease, box-shadow .25s; }
+    .pcard.vis { opacity: 1; transform: translateY(0); }
+    .pcard.vis:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 16px 48px rgba(10,31,14,.12); }
+    .dcard { opacity: 0; transform: translateY(20px); transition: opacity .45s ease, transform .45s ease; }
+    .dcard.vis { opacity: 1; transform: translateY(0); }
+
+    /* Header shrink on scroll */
+    #hdr { transition: background .3s, box-shadow .3s; }
+    #hdr.scrolled { background: rgba(5,15,7,.99); box-shadow: 0 2px 20px rgba(0,0,0,.3); }
+    #hdr.scrolled .hdr-in { height: 48px; transition: height .3s; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .hero-in { grid-template-columns: 1fr; }
+      .showcase { display: flex; justify-content: center; margin-top: 32px; }
+      .livro-stage { width: 160px; height: 220px; }
+      .livro { width: 140px; height: 200px; top: 10px; left: 10px; }
+      nav { display: none; }
+      .menu-mob { display: block; }
+      .prog-grid { grid-template-columns: 1fr; }
+      .premios-painel { position: static; }
+      .dep-grid { grid-template-columns: 1fr; }
+      .sobre-grid { grid-template-columns: 1fr; }
+      .ft-grid { grid-template-columns: 1fr; gap: 28px; }
+      .ft-bottom { flex-direction: column; align-items: flex-start; }
+      .sec-hdr { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 620px) {
+      .prod-grid { grid-template-columns: 1fr; }
+      .faixa-sep { display: none; }
+    }
+  </style>
+  <!-- Meta Pixel — diferido para não bloquear render -->
+  <script>window.addEventListener('load',function(){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','296545814480082');fbq('track','PageView');});</script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=296545814480082&ev=PageView&noscript=1"/></noscript>
+  <script>window.addEventListener('load',function(){var v=document.getElementById('hero-video');if(v){v.load();v.play();}});</script>
+<script id="tt-textos">window.TT_LANG="en";window.TT_TEXTOS={"js.ac.baixar.epub":"Download the EPUB file","js.ac.baixar.pdf":"Download the PDF file","js.ac.email.invalido":"Please enter a valid email address.","js.ac.entrando":"Signing in…","js.ac.entrar":"Sign in","js.ac.enviando":"Sending…","js.ac.erro.carregar":"Couldn’t load","js.ac.erro.leitura":"Couldn’t open this book.","js.ac.erro.link":"We couldn’t send the link right now. Please try again in a moment.","js.ac.erro.login":"We couldn’t sign you in right now. Please try again.","js.ac.ler":"Read now","js.ac.link":"Email me a sign-in link","js.ac.link.ok":"Link sent! Check your email and click the link to sign in.<br><small style=\"opacity:.6\">It can take up to 2 minutes. Check your spam folder.</small>","js.ac.nema":"Nema points","js.ac.nema.pendente":"Nema points · + {n} released within 7 days","js.ac.plano.ativa":"Active","js.ac.plano.membro":"Free member","js.ac.plano.sem":"No plan","js.ac.recarregue":"Please reload the page.","js.ac.remover":"Remove from library","js.ac.sem.acesso":"This title isn’t in your account.","js.ac.sem.titulo":"Title unavailable","js.ac.senha.errada":"Wrong email or password.","js.ac.senha.vazia":"Enter your password, or get a sign-in link by email.","js.cad.botao":"Create my free member area →","js.cad.criando":"Creating…","js.cad.email":"Your best email","js.cad.erro.conexao":"No connection. Check your internet and try again.","js.cad.erro.email":"Please check the email address.","js.cad.erro.geral":"We couldn’t create it right now. Please try again in a moment.","js.cad.erro.tentativas":"Too many attempts in a row. Please wait a few minutes and try again.","js.cad.fechar":"Close","js.cad.fino":"No password: we email you a sign-in link.","js.cad.fino.intl":"No password: we email you a sign-in link. We never share your email.","js.cad.kicker":"Free · no card needed","js.cad.mala":"Send me new releases and news by email","js.cad.nome":"Your name","js.cad.ok":"Done! We sent the sign-in link to {email}.<br>Open the email and your member area will be ready. Check your spam folder if it doesn’t arrive within 2 minutes.","js.cad.sub":"Choose a public-domain classic of English literature and read it in our reader, with your place always saved.","js.cad.titulo":"Create your free member area","js.carregando":"Loading","js.erro.conexao":"Can’t reach the server. Check your internet and try again.","js.erro.sessao":"Your session has expired. Please sign in again to keep reading.","js.estante.dica":"Start with one of our readers’ favorites: {titulos}.","js.estante.filtro":"Filter by genre","js.estante.obra1":"1 book","js.estante.obras":"{n} books","js.estante.outros":"Other","js.estante.paginas":"{n} pages","js.estante.seculo":"{n} century","js.estante.sobre":"About the book","js.estante.todos":"All","js.estante.vazia":"We’re still arranging this shelf. Please come back soon.","js.faq":[{"q":"What is the free member area?","r":"It’s your personal space at Três Trevo. You create it with just your email — no password and no card — and use it to read a public-domain classic in our reader."},{"q":"Which books can I read?","r":"Great classics of English literature that are in the public domain. You choose one from the shelf in your member area."},{"q":"Why one classic at a time?","r":"Your free membership includes one reading space. When you finish a book, tap “Finish and switch” and choose the next one."},{"q":"Does it work on my phone?","r":"Yes. The reader adapts to any screen, with large type, night mode and your place saved wherever you stop."},{"q":"Are your own books available in English?","r":"Not yet. Our English editions are on their way, and they will appear in your member area as soon as they are published."},{"q":"What is Nema?","r":"Our loyalty program. Once our English editions arrive, 10% of every purchase comes back as Nema, which becomes a discount on your next book. The full rules are on the Nema page."}],"js.gratis.carregando":"Loading… please try again in a moment.","js.leitor.abrindo":"Opening the book…","js.leitor.abrir.pdf":"Open the PDF","js.leitor.ajustes":"Reading settings","js.leitor.ajustes.dica":"Text size and night mode","js.leitor.anterior":"Previous","js.leitor.cap.anterior":"Previous chapter","js.leitor.cap.proximo":"Next chapter","js.leitor.colofao":"Três Trevo · digital edition<br>Thank you for reading with us.","js.leitor.concluir":"Finish","js.leitor.dia":"Day","js.leitor.erro.ajuda":"If it keeps happening, write to sac@3trevo.com.br","js.leitor.erro.titulo":"We couldn’t open the book","js.leitor.fechar":"Close","js.leitor.fechar.livro":"Close the book","js.leitor.fim.conhecer":"Learn more","js.leitor.fim.mesmo.autor":"By the same author","js.leitor.fim.reler":"Read again from the start","js.leitor.fim.sobre":"You’ve reached the end of","js.leitor.fim.voltar":"Back to the library","js.leitor.ilegivel":"The book file couldn’t be read.","js.leitor.lento":"The book is taking a while to load. Your connection may be slow.","js.leitor.maior":"Larger text","js.leitor.menor":"Smaller text","js.leitor.modo":"Mode","js.leitor.noite":"Night","js.leitor.pdf.celular":"This title is a PDF. It opens in your device’s PDF viewer.","js.leitor.proximo":"Next","js.leitor.sem.formato":"No readable format is available.","js.leitor.tentar":"Try again","js.leitor.texto":"Text","js.leitor.trilha":"Listen to the book’s soundtrack","js.marca":"Três Trevo","js.membro.amostra.completo":"Full book · your purchase earns Nema","js.membro.amostra.gostou":"Enjoyed the chapter?","js.membro.amostra.ler":"Read chapter 1","js.membro.amostra.ler.completo":"Read the full book","js.membro.amostra.secao":"Free sample","js.membro.amostra.selo":"Free sample","js.membro.classico.secao":"Your free classic","js.membro.comecar":"Start reading","js.membro.continuar":"Continue","js.membro.erro.abrir":"We couldn’t open the classic right now. Please try again in a moment.","js.membro.erro.escolher":"We couldn’t save your choice. Please try again.","js.membro.erro.liberar":"We couldn’t free the space right now. Please try again.","js.membro.escolha":"Choose a classic for your reading space. You read one at a time and can switch when you finish.","js.membro.escolher":"Choose this one","js.membro.escolhido":"“{titulo}” is now in your reading space.","js.membro.espaco":"1 reading space","js.membro.fim.nema":"Your first purchase earns Nema","js.membro.fim.nema.intl":"When they arrive, every purchase earns Nema","js.membro.fim.rotulo":"From Três Trevo","js.membro.fim.titulo":"Discover our books","js.membro.fim.titulo.intl":"Our English editions are on their way","js.membro.intro":"Choose a classic and read it in our reader, with your place always saved.","js.membro.intro.pt":"Choose a classic and read it in our reader, with your place always saved.","js.membro.lido":"{n}% read","js.membro.nota":"Free members read one classic at a time.","js.membro.nota.intl":"Free members read one classic at a time and can switch when they finish.","js.membro.rotulo":"Free member","js.membro.seu.classico":"Your classic","js.membro.titulo":"Your reading room at Três Trevo","js.membro.trocar":"Finish and switch","js.membro.trocar.confirma":"Finish this classic and free the space for another one?","js.nema.aria":"Nema, the Três Trevo loyalty program","js.nema.catalogo":"See the catalog","js.nema.como":"How Nema works","js.nema.rotulo":"Nema · loyalty points","js.nema.texto":"Once our English editions arrive, 10% of every e-book you buy comes back to you as Nema, and your balance becomes a discount on your next book (up to half the price), released 7 days after the purchase.","js.nema.titulo":"Nema: your reading pays you back"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
+<link rel="canonical" href="https://3trevo.com.br/en/">
+<link rel="alternate" hreflang="pt-BR" href="https://3trevo.com.br/">
+<link rel="alternate" hreflang="en" href="https://3trevo.com.br/en/">
+<link rel="alternate" hreflang="es" href="https://3trevo.com.br/es/">
+<link rel="alternate" hreflang="x-default" href="https://3trevo.com.br/">
+</head>
+<body>
+
+<!-- ── HEADER ───────────────────────────────────────────────────────────────── -->
+<header id="hdr">
+  <div class="hdr-in">
+    <a href="#inicio" class="logo" data-i18n-html="nav.logo">Três <span>Trevo</span></a>
+    <nav>
+      
+      <a href="#membros" data-i18n="nav.membros">Free classics</a>
+      <a href="#nema" data-i18n="nav.programa">Nema</a>
+      <a href="#faq">FAQ</a>
+      <a href="#sobre" data-i18n="nav.sobre">About</a>
+      <a href="/en/area-cliente.html" data-i18n="nav.biblioteca">My library</a>
+    </nav>
+    <div class="hdr-right">
+      <div data-tt-idiomas class="lang-toggle" aria-label="Language" data-i18n-attr="aria-label:nav.idioma"><a href="/" hreflang="pt-BR" lang="pt-BR">PT<span class="tt-idiomas-nome"> · Português</span></a><a href="/en/" hreflang="en" lang="en" aria-current="true" class="ativo">EN<span class="tt-idiomas-nome"> · English</span></a><a href="/es/" hreflang="es" lang="es">ES<span class="tt-idiomas-nome"> · Español</span></a></div>
+      
+      <a href="#membros" class="hdr-cta" data-i18n="nav.cta.intl">Free member area</a>
+    </div>
+    <button class="menu-mob" onclick="document.getElementById(document.getElementById('catalogo') ? 'catalogo' : 'membros').scrollIntoView({behavior:'smooth'})" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────────────── -->
+<section id="inicio">
+
+  <!-- Vídeo de fundo — substituir src pelo arquivo produzido -->
+  <!-- Recomendado: 1920×1080, H.264, ~15s loop, sem áudio -->
+  <div class="hero-video-bg">
+    <video muted loop playsinline preload="none" id="hero-video">
+      <source src="/assets/hero-reel.mp4" type="video/mp4">
+    </video>
+    <div class="hero-video-overlay"></div>
+  </div>
+
+  
+
+  <div class="hero-in">
+
+    <!-- Texto principal -->
+    <div>
+      <div class="hero-sup"><span data-i18n="hero.label">Três Trevo Publishing · Brazil</span></div>
+      <h1 class="hero-t" data-i18n-html="hero.titulo">Words that<br><em>transform</em><br>the real world</h1>
+      <p class="hero-sub" data-i18n="hero.sub">We publish books that change the way you see the world. Our English editions are on their way — in the meantime, read the great classics with us, free.</p>
+      <div class="hero-btns">
+        
+          <a href="#membros" class="btn-pri" data-i18n="hero.cta.intl">Read a classic for free →</a>
+        <a href="#nema" class="btn-ghost" data-i18n="hero.cta2">How Nema works</a>
+      </div>
+      <!-- Stats inline -->
+      
+    </div>
+
+    <!-- Showcase de capas 3D -->
+    
+
+  </div>
+
+  
+</section>
+
+<!-- ── FAIXA ─────────────────────────────────────────────────────────────────── -->
+
+
+<!-- ── CATÁLOGO ──────────────────────────────────────────────────────────────── -->
+
+
+<!-- ── ABERTURA (próximo lançamento, sem nome) ──────────────────────────────── -->
+
+
+<!-- ── MEMBROS (três idiomas) ──────────────────────────────────────────────── -->
+<section id="membros">
+  <div class="sec-in">
+    <p class="lbl" style="color:var(--v3);margin-bottom:10px;" data-i18n="membros.label">Free member area</p>
+    <h2 class="sec-t" data-i18n-html="membros.titulo"><em>Read a classic</em> without paying a thing</h2>
+    <p class="sec-desc" data-i18n="membros.desc">Create your member area in a minute, with just your email. Pick a public-domain classic of English literature and read it in our reader, on your phone or computer.</p>
+    <ul class="membros-lista">
+      
+      <li><strong data-i18n="membros.i1.t">One classic at a time</strong><span data-i18n="membros.i1.d">Choose from the shelf, read at your own pace and switch when you finish.</span></li>
+      <li><strong data-i18n="membros.i2.t">Our reader</strong><span data-i18n="membros.i2.d">Large type, night mode, and your place saved wherever you stop.</span></li>
+      <li><strong data-i18n="membros.i3.t">Nema</strong><span data-i18n="membros.i3.d">Our loyalty points: once our English editions arrive, every purchase turns into a discount on your next book.</span></li>
+    </ul>
+    <div class="membros-acoes">
+      <a href="/en/gratis.html" class="btn-pri" data-i18n="membros.cta">Create my free member area →</a>
+      <a href="/en/area-cliente.html" class="btn-ghost" data-i18n="membros.entrar">I’m already a member</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEMA ──────────────────────────────────────────────────────────────────── -->
+<section id="nema">
+  <div class="sec-in">
+    <p class="lbl" data-k="0" style="color:var(--v3);margin-bottom:10px;" data-i18n="nema.label">Nema · N$</p>
+    <div class="prog-grid">
+      <div>
+        <h2 class="prog-titulo" data-k="1" data-i18n-html="nema.titulo"><em>Your purchase</em> comes back as a discount</h2>
+        <p class="prog-sub" data-k="2" data-i18n="nema.sub">Nema is the Três Trevo loyalty program. Once our English editions arrive, every book you buy earns Nema, and your balance pays for part of the next one.</p>
+        <div class="passos">
+          <div class="passo" data-k="3"><span class="passo-n">1</span><div><div class="passo-t" data-i18n="nema.p1.t">Buy an e-book</div><div class="passo-d" data-i18n="nema.p1.d">Once our English editions arrive, every purchase earns you Nema.</div></div></div>
+          <div class="passo" data-k="4"><span class="passo-n">2</span><div><div class="passo-t" data-i18n="nema.p2.t">Track your balance</div><div class="passo-d" data-i18n="nema.p2.d">It shows up in your member area, always at hand.</div></div></div>
+          <div class="passo" data-k="5"><span class="passo-n">3</span><div><div class="passo-t" data-i18n="nema.p3.t">Use it on your next book</div><div class="passo-d" data-i18n="nema.p3.d">At checkout, tick “Use my Nema balance” and get your discount.</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="nema-exemplo" data-k="6">
+          <p class="lbl" data-i18n="nema.card.l">Your member area</p>
+          <p class="nema-chamada" data-i18n="nema.card.t">Buy our books and earn Nema, our discount points.</p>
+          <p class="nema-ex-linha" data-i18n="nema.card.p">Your member area keeps everything in one place:</p>
+          <ul class="nema-lista">
+            <li data-i18n="nema.li1">Your e-book library</li>
+            
+            
+            
+            
+            <li data-i18n="nema.li6">Your Nema balance, ready to use</li>
+          </ul>
+          <p class="nema-ex-linha" data-i18n="nema.card.f">Follow our Nema campaigns, or trade your balance for new titles on our platforms.</p>
+        </div>
+        <p class="nema-links" data-k="7"><a href="/en/area-cliente.html" data-i18n="nema.saldo">See my balance →</a> <a href="/en/nema.html" data-i18n="nema.regras">Full rules</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ──────────────────────────────────────────────────────────────────── -->
+<section id="faq">
+  <div class="faq-in">
+    <p class="lbl" data-ent="u" style="color:var(--v3);margin-bottom:8px;" data-i18n="faq.label">Frequently asked questions</p>
+    <h2 class="sec-t" data-ent="u"><em data-i18n="faq.titulo">Questions</em></h2>
+    <div class="faq-lista" id="faq-lista"></div>
+  </div>
+</section>
+
+<!-- ── SOBRE ─────────────────────────────────────────────────────────────────── -->
+<section id="sobre">
+  <div class="sobre-grid">
+    <div data-ent="l">
+      <p class="lbl" style="color:var(--v3);margin-bottom:10px;" data-i18n="sobre.label">About us</p>
+      <h2 class="sobre-t"><em data-i18n="sobre.titulo.em">Três</em> <span data-i18n="sobre.titulo.rest">Trevo</span></h2>
+      <p class="sobre-p" data-i18n="sobre.p1">Três Trevo was born with a simple, direct purpose: to publish what matters. Literature that provokes, knowledge that transforms, writing that respects the reader’s intelligence.</p>
+      <p class="sobre-p" data-i18n="sobre.p2">We are an independent digital publisher based in Montauri, in southern Brazil. Our model connects author and reader directly — no middlemen watering down the value of the work.</p>
+      <p class="sobre-p" data-i18n="sobre.p3">With Nema, part of every purchase comes back to you as a discount on your next book.</p>
+      <p class="sobre-p" style="font-size:13px;color:var(--t3);">
+        <strong style="color:var(--t1);" data-i18n="sobre.autores">For authors:</strong>
+        <span data-i18n="sobre.autores.texto"> We are open to acquiring publishing rights.</span>
+        <a href="mailto:sac@3trevo.com.br?subject=Manuscrito" style="color:var(--v3);font-weight:500;"> sac@3trevo.com.br →</a>
+      </p>
+    </div>
+    <div data-ent="r">
+      <div class="autor-bloco">
+        <p class="lbl autor-l" data-i18n="autor.label">✦ Pen name</p>
+        <h3 class="autor-nome">Said Anes</h3>
+        <p class="autor-sub" data-i18n="autor.sub">The editorial voice of Três Trevo</p>
+        <p class="autor-bio" data-i18n="autor.bio">Said Anes is the pen name under which Três Trevo publishes its books. A space where writing meets clarity — free from the weight of a name, carried only by the strength of ideas. The titles move between political essay, literary fiction and documentary narrative, always precise and always restless.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────────────── -->
+<footer data-ent="foot">
+  <div class="ft-in">
+    <div class="ft-grid">
+      <div>
+        <div class="ft-logo" data-i18n="ft.logo">Três Trevo Publishing</div>
+        <p class="ft-tag" data-i18n="ft.tag">Literature and applied knowledge. We publish what matters, for people who truly read.</p>
+        <p class="ft-cnpj" data-i18n-html="ft.cnpj">Brazilian company ID (CNPJ) 18.928.966/0001-59<br>Montauri, RS · Brazil</p>
+      </div>
+      <div class="ft-col">
+        <h5 data-i18n="ft.nav">Explore</h5>
+        <div class="ft-links">
+          <a href="#inicio" data-i18n="ft.inicio">Home</a>
+          
+          <a href="#membros" data-i18n="ft.membros">Free classics</a>
+          <a href="#nema" data-i18n="ft.programa">Nema</a>
+          <a href="#faq">FAQ</a>
+          <a href="#sobre" data-i18n="ft.sobre">About</a>
+          <a href="/en/nema.html" data-i18n="ft.regulamento">Nema rules</a>
+          <a href="/en/privacidade.html" data-i18n="ft.privacidade">Privacy</a>
+        </div>
+      </div>
+      <div class="ft-col">
+        <h5 data-i18n="ft.contato">Contact</h5>
+        <div class="ft-links">
+          <a href="mailto:sac@3trevo.com.br" style="display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> sac@3trevo.com.br</a>
+          <a href="https://wa.me/5554999467085" style="display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> (54) 99946-7085</a>
+          <a href="https://www.instagram.com/3trevo" style="display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg> @3trevo</a>
+          <a href="/en/area-cliente.html" data-i18n="ft.biblioteca">My library</a>
+        </div>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <p class="ft-copy" data-i18n="ft.copy">© 2026 Três Trevo Publishing · All rights reserved · Said Anes is a registered trademark</p>
+      
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/5554999467085?text=Hello!%20I%27d%20like%20to%20know%20more%20about%20Tr%C3%AAs%20Trevo." data-i18n-attr="href:wa.link" class="wa" aria-label="WhatsApp" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script src="/js/tt-client.js?v=3cf77e49" onerror="console.error('tt-client falhou ao carregar')"></script>
+<script>
+// ── CAPAS ──────────────────────────────────────────────────────────────────────
+// Populado ao vivo via /api/public/catalogo (ver init no fim do arquivo) -- chegou a ter
+// 5 titulos com preco/capa fixados aqui a mao, 2 deles ja inativos ha muito tempo, mas
+// so eram "corrigidos" quando o fetch de enriquecimento por baixo achava o mesmo slug.
+let CAPAS = [];
+
+
+let capaAtual = 0;
+let capaInterval;
+
+function renderCapa(idx) {
+  const c = CAPAS[idx];
+  const el = document.getElementById('livro-ativo');
+  const tituloEl = document.getElementById('showcase-titulo');
+  const infoEl = document.getElementById('showcase-info');
+  if (!el) return;
+
+  const imgStyle = c.capa_url
+    ? ` style="background-image:url('${c.capa_url}');background-size:cover;background-position:center;background-color:${c.bg_color||'#0d2415'}"`
+    : '';
+
+  el.innerHTML = `
+    <div class="capa ${c.classe}"${imgStyle}>
+      <div class="capa-ornamento"></div>
+      <div class="capa-genero">${c.genero}</div>
+      <div class="capa-titulo">${c.titulo}</div>
+      <div class="capa-divisor"></div>
+      <div class="capa-autor">${c.autor}</div>
+      <div class="capa-editora">Editora Três Trevo</div>
+    </div>
+  `;
+
+  const infoKey = 'info' + langAtual.toUpperCase();
+  if (tituloEl) tituloEl.innerHTML = c.titulo.replace(/<br>/g,' ').replace(/<\/?em>/g,'');
+  if (infoEl) infoEl.textContent = c[infoKey] || c.infoPT || '';
+
+  // Dots
+  const nav = document.getElementById('showcase-nav');
+  if (nav) {
+    nav.querySelectorAll('.snav-dot').forEach((d,i) => d.classList.toggle('ativo', i === idx));
+  }
+}
+
+function trocarCapa(idx, direcao = 'next') {
+  const el = document.getElementById('livro-ativo');
+  if (!el) return;
+  el.classList.add('saindo');
+  setTimeout(() => {
+    capaAtual = idx;
+    renderCapa(idx);
+    el.classList.remove('saindo');
+    el.classList.add('entrando');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { el.classList.remove('entrando'); });
+    });
+  }, 500);
+}
+
+function iniciarShowcase() {
+  const nav = document.getElementById('showcase-nav');
+  if (!nav) return;
+  CAPAS.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'snav-dot' + (i === 0 ? ' ativo' : '');
+    btn.onclick = () => { clearInterval(capaInterval); trocarCapa(i); resetInterval(); };
+    btn.setAttribute('aria-label', `Livro ${i+1}`);
+    nav.appendChild(btn);
+  });
+  renderCapa(0);
+  resetInterval();
+}
+
+function resetInterval() {
+  clearInterval(capaInterval);
+  capaInterval = setInterval(() => {
+    trocarCapa((capaAtual + 1) % CAPAS.length);
+  }, 4500);
+}
+
+// ── Idioma ── cada idioma é uma página própria (scripts/i18n.mjs); aqui só lemos qual é.
+let langAtual = window.TT_LANG || 'pt';
+
+// ── Produtos ──────────────────────────────────────────────────────────────────
+// Populado ao vivo via /api/public/catalogo (ver init no fim do arquivo). Chegou a ter
+// os 11 titulos com preco/desc/capa fixados a mao, incluindo 5 ja inativos ha muito
+// tempo (habitaculos, caminho-rubro-vol1/2/3, antes-do-app) -- listados como compraveis
+// com preco congelado ate o clique cair em "indisponivel" no checkout. Ver commit desta correcao.
+//
+// Categoria de filtro (ficcao/ensaio/manuais/infantil) nao existe como coluna no banco,
+// e so rotulo de UI -- fica num mapa local, nao afeta preco/disponibilidade.
+const CATEGORIAS = {
+  '3a-guerra':'ficcao', 'habitaculos':'ensaio', 'ultima-coisa':'ficcao',
+  'caminho-rubro-vol1':'ensaio', 'caminho-rubro-vol2':'ensaio', 'caminho-rubro-vol3':'ensaio',
+  'justicamento':'ensaio', 'antifalencia':'manuais', 'livre-das-dividas':'manuais',
+  'isa-isma-tintim':'infantil', 'antes-do-app':'manuais',
+};
+
+let PROD_BASE = [];
+let prodCache = [];
+let filtroAtual = 'todos';
+
+function filtrar(btn, cat) {
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  filtroAtual = cat;
+  renderProdutos(prodCache, cat);
+}
+
+function renderProdutos(prods, filtro) {
+  const grid = document.getElementById('prod-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const l = langAtual;
+  const lista = filtro === 'todos' ? prods : prods.filter(p => p.cat === filtro);
+  const adqLabel = l === 'en' ? 'Get it →' : l === 'es' ? 'Obtener →' : 'Adquirir →';
+  const entregaLabel = l === 'en' ? 'Instant delivery' : l === 'es' ? 'Entrega inmediata' : 'Entrega imediata';
+  lista.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = `pcard fi${p.premium ? ' premium' : ''}`;
+    card.dataset.slug = p.slug;
+    card.style.transitionDelay = `${i * 0.07}s`;
+    card.style.cursor = 'pointer';
+    card.onclick = function(e) { if (e.target.closest('.btn-adq')) return; window.location.href = '/checkout.html?slug=' + p.slug; };
+    card.innerHTML = `
+      <div class="pcard-cor" style="background:${p.cor}"></div>
+      <div class="pcard-corpo">
+        <div class="pcard-capa-mini ${p.corCapa}" style="animation-delay:${i*0.4}s${p.capa_url ? `;background-image:url('${p.capa_url}');background-size:cover;background-position:center` : ''}">
+          <div class="pcard-capa-mini-titulo">${p.capa_url ? '' : (p.titulo[l] || p.titulo.pt)}</div>
+        </div>
+        <div class="pcard-genero">${p.genero[l] || p.genero.pt}</div>
+        <h3 class="pcard-t">${p.titulo[l] || p.titulo.pt}</h3>
+        <div class="pcard-autor">${p.autor}</div>
+        <p class="pcard-desc">${p.desc[l] || p.desc.pt}</p>
+      </div>
+      <div class="pcard-rodape">
+        <div>
+          <div class="pcard-preco">${p.preco}</div>
+          <div class="pcard-preco-sub">PDF · ${entregaLabel}</div>
+        </div>
+        <div class="pcard-dir">
+          <a href="/checkout.html?slug=${p.slug}" class="btn-adq">${adqLabel}</a>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => card.classList.add('vis'), 60 + i * 80);
+  });
+}
+
+// ── FAQ ───────────────────────────────────────────────────────────────────────
+function renderFaq() {
+  const lista = document.getElementById('faq-lista');
+  if (!lista) return;
+  lista.innerHTML = '';
+  (window.T ? window.T('js.faq') : []).forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'faq-item';
+    div.dataset.ent = (lista.children.length % 2) ? 'r' : 'l';
+    div.innerHTML = `
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        <span class="faq-p">${item.q}</span>
+        <span class="faq-ic">+</span>
+      </button>
+      <div class="faq-r">${item.r}</div>
+    `;
+    lista.appendChild(div);
+  });
+}
+
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const was = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!was) item.classList.add('open');
+}
+
+// ── Observer com stagger para cards ──────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+const cardObs = new IntersectionObserver(entries => {
+  const visible = entries.filter(e => e.isIntersecting);
+  visible.forEach((e, i) => {
+    setTimeout(() => { e.target.classList.add('vis'); cardObs.unobserve(e.target); }, i * 120);
+  });
+}, { threshold: 0.05 });
+
+function observeAll() {
+  document.querySelectorAll('.fi').forEach(el => { if (!el.classList.contains('vis')) obs.observe(el); });
+  document.querySelectorAll('.pcard, .dcard').forEach(el => { if (!el.classList.contains('vis')) cardObs.observe(el); });
+}
+
+// Header shrink on scroll
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const hdr = document.getElementById('hdr');
+  if (window.scrollY > 80) hdr.classList.add('scrolled');
+  else hdr.classList.remove('scrolled');
+  lastScroll = window.scrollY;
+}, { passive: true });
+
+const barraObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ setTimeout(()=>{ const b=document.getElementById('barra-prog'); if(b) b.style.width='15%'; },400); barraObs.unobserve(e.target); } });
+}, { threshold: 0.5 });
+
+// Monta os objetos {pt,en,es} que renderProdutos/renderCapa esperam a partir dos
+// campos planos que /api/public/catalogo devolve (mesmas colunas i18n que o admin edita).
+function montarCatalogoAoVivo(data) {
+  PROD_BASE = data.map((api, i) => ({
+    slug: api.slug,
+    cat: CATEGORIAS[api.slug] || 'ensaio',
+    cor: api.bg_color || '#101820',
+    corCapa: i % 2 === 0 ? 'capa-antifalencia' : 'capa-justicamento',
+    premium: api.cotas >= 10,
+    capa_url: api.capa_url || '',
+    titulo: { pt: api.titulo, en: api.titulo_en || api.titulo, es: api.titulo_es || api.titulo },
+    genero: { pt: api.genero_pt || api.genero || '', en: api.genero_en || api.genero_pt || api.genero || '', es: api.genero_es || api.genero_pt || api.genero || '' },
+    desc: { pt: api.descricao || '', en: api.descricao_en || api.descricao || '', es: api.descricao_es || api.descricao || '' },
+    preco: 'R$' + TTClient.formatMoney(api.preco),
+    cotas: api.cotas || 0,
+    autor: api.autor || 'Said Anes',
+  }));
+  CAPAS = PROD_BASE.map(p => ({
+    slug: p.slug,
+    classe: p.corCapa,
+    genero: p.genero.pt,
+    titulo: p.titulo.pt,
+    autor: p.autor,
+    capa_url: p.capa_url,
+    bg_color: p.cor,
+    infoPT: `${p.genero.pt}`,
+    infoEN: `${p.genero.en}`,
+    infoES: `${p.genero.es}`,
+  }));
+  prodCache = [...PROD_BASE];
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderFaq();
+  observeAll();
+  const b = document.getElementById('barra-prog');
+  if (b) barraObs.observe(b.parentElement);
+
+  const grid = document.getElementById('prod-grid');
+  if (grid) grid.innerHTML = '<p style="padding:40px;opacity:.6">Carregando catálogo…</p>';
+
+  // Catálogo real (preço/capa/disponibilidade) vem só daqui -- nada mais fica hardcoded
+  // no HTML pra desalinhar do que o admin edita. Chegou a ter 11 títulos fixados a mão
+  // aqui, 5 já inativos, anunciados como compráveis com preço congelado. Ver commit desta correção.
+  TTClient.getCatalogo()
+    .then(data => {
+      if (!Array.isArray(data) || !data.length) throw new Error('catalogo_vazio');
+      montarCatalogoAoVivo(data);
+      iniciarShowcase();
+      renderProdutos(prodCache, filtroAtual);
+      observeAll();
+      var st = document.getElementById('statTitulos');
+      if (st) st.textContent = String(prodCache.length);
+    })
+    .catch(() => {
+      if (grid) grid.innerHTML = '<p style="padding:40px;opacity:.6">Não foi possível carregar o catálogo agora. Recarregue a página em instantes.</p>';
+    });
+});
+</script>
+<script>
+(function(){
+  var v = document.getElementById('hero-video');
+  var prog = document.getElementById('heb-progress');
+  if (v && prog) {
+    v.addEventListener('timeupdate', function(){
+      if (!v.duration) return;
+      prog.style.width = (v.currentTime / v.duration) * 100 + '%';
+    });
+  }
+
+  // Hero dinâmico via KV — carrega config do admin
+  fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/hero-public')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(cfg){
+      if (!cfg) return;
+      // Vídeo
+      if (cfg.video_url && v) {
+        v.querySelector('source').src = cfg.video_url;
+        v.load();
+      }
+      // Título hero
+      if (cfg.titulo_pt) {
+        var ht = document.querySelector('.hero-t');
+        if (ht) ht.innerHTML = cfg.titulo_pt;
+      }
+      // Subtítulo hero
+      if (cfg.sub_pt) {
+        var hs = document.querySelector('.hero-sub');
+        if (hs) hs.textContent = cfg.sub_pt;
+      }
+      // Barra destaque
+      if (cfg.destaque_titulo) {
+        var t = document.getElementById('heb-title');
+        if (t) t.textContent = cfg.destaque_titulo;
+      }
+      if (cfg.destaque_badge) {
+        var b = document.getElementById('heb-badge');
+        if (b) b.textContent = cfg.destaque_badge;
+      }
+      // CTA → scroll ao card do slug destaque
+      var slug = cfg.destaque_slug;
+      if (slug) {
+        var cta = document.getElementById('heb-cta-link');
+        if (cta) cta.onclick = function(e){
+          e.preventDefault();
+          var c = document.querySelector('[data-slug=' + slug + ']');
+          if (c) { c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.transition='box-shadow .3s'; c.style.boxShadow='0 0 0 3px #ffa028'; setTimeout(function(){c.style.boxShadow=''},2000); }
+          else { document.getElementById('catalogo').scrollIntoView({behavior:'smooth'}); }
+        };
+      }
+    })
+    .catch(function(){});
+})();
+</script>
+<script>
+// Abertura do próximo lançamento: a rolagem "anda" pelo apartamento. Imagens em
+// assets/abertura/cena-N.jpg (N = 1 a 5); sem imagem, fica o fundo em gradiente.
+// Sem JS ou com "reduzir movimento", as cenas ficam empilhadas e o texto sempre visível.
+(function () {
+  var sec = document.getElementById('abertura');
+  if (!sec) return;
+  var cenas = Array.prototype.slice.call(sec.querySelectorAll('.ab-cena'));
+  cenas.forEach(function (c) {
+    var n = c.getAttribute('data-cena');
+    var img = new Image();
+    img.onload = function () { c.querySelector('.ab-fundo').style.setProperty('--ab-img', 'url(assets/abertura/cena-' + n + '.jpg)'); };
+    img.src = 'assets/abertura/cena-' + n + '.jpg';
+  });
+  var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (calmo || !window.requestAnimationFrame) return;
+  sec.classList.add('ab-andar');
+  var N = cenas.length, dica = sec.querySelector('.ab-dica'), palco = sec.querySelector('.ab-palco');
+  var fundos = cenas.map(function (c) { return c.querySelector('.ab-fundo'); });
+  var textos = cenas.map(function (c) { return c.querySelector('.ab-texto'); });
+  var brilho = document.createElement('div'); brilho.className = 'ab-brilho'; palco.appendChild(brilho);
+  // Percurso da câmera em cada cena: [tempo 0..1, x% da foto, y% da foto, aproximação, inclinação em graus].
+  // O último ponto de cada cena é a luz em que a câmera mergulha para a cena seguinte.
+  var CAM = [
+    [[0, 50, 52, 1.0, 0], [0.40, 41, 50, 1.3, 0], [0.78, 30, 46, 2.0, 0], [1.08, 27, 46, 3.8, 0]],   // quarto: porta entreaberta
+    [[0, 50, 55, 1.0, 0], [0.30, 78, 62, 1.9, 0], [0.62, 60, 30, 2.3, 0], [1.08, 59, 27, 4.2, 0]],   // sala: a mão, o controle, a luz da TV
+    [[0, 55, 45, 1.0, 0], [0.45, 60, 38, 1.7, 0], [0.78, 60, 32, 2.4, 0], [1.08, 60, 30, 3.8, 0]],   // espelho: a lâmpada
+    [[0, 52, 52, 1.0, 0], [0.32, 32, 62, 1.7, 0], [0.68, 36, 38, 2.3, 0], [1.08, 34, 28, 4.6, -3]],  // cadeira e janela: quase cai pelo vidro
+    [[0, 50, 52, 1.0, 3], [0.22, 50, 50, 1.15, 0], [0.70, 50, 44, 1.4, 0], [1.0, 50, 42, 1.65, 0]]    // corredor: a porta acesa
+  ];
+  var LUZ = ['255,190,110', '175,208,232', '255,170,95', '175,28,38'];   // porta, TV, lâmpada, vidro vermelho
+  var vw = 0, vh = 0, Wc = 0, Hc = 0, luzAtual = -1;
+  function lim(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function suave(x) { x = lim(x); return x * x * (3 - 2 * x); }
+  function medir() {
+    vw = palco.clientWidth; vh = palco.clientHeight;
+    Wc = vh > vw ? Math.max(vw * 1.9, vh * 1.1) : Math.max(vw, vh * 16 / 9);   // retrato: foto menor que a tela, com faixas escuras
+    Hc = Wc * 9 / 16;
+    fundos.forEach(function (f) { f.style.width = Wc + 'px'; f.style.height = Hc + 'px'; });
+  }
+  // Interpolação por Hermite: anda sem parar nos pontos; só acelera no mergulho final
+  function canal(w, k, idx, i) {
+    var n = w.length, tg = function (m) {
+      if (m === 0) return 0;
+      if (m === n - 1) return i < N - 1 ? 1.6 * (v(m) - v(m - 1)) / (w[m][0] - w[m - 1][0]) : 0;
+      return (v(m + 1) - v(m - 1)) / (w[m + 1][0] - w[m - 1][0]);
+    };
+    function v(m) { return idx === 3 ? Math.log(w[m][3]) : w[m][idx]; }
+    var t0 = w[k][0], t1 = w[k + 1][0], h = t1 - t0;
+    return { p0: v(k), p1: v(k + 1), m0: tg(k) * h, m1: tg(k + 1) * h, h: h, t0: t0 };
+  }
+  function pose(i, l) {
+    var w = CAM[i], n = w.length, k;
+    if (l <= w[0][0]) return { x: w[0][1], y: w[0][2], s: w[0][3], r: w[0][4] };
+    if (l >= w[n - 1][0]) return { x: w[n - 1][1], y: w[n - 1][2], s: w[n - 1][3], r: w[n - 1][4] };
+    for (k = 0; k < n - 2 && l > w[k + 1][0]; k++) {}
+    var out = {}, nomes = { 1: 'x', 2: 'y', 3: 's', 4: 'r' };
+    [1, 2, 3, 4].forEach(function (idx) {
+      var c = canal(w, k, idx, i), t = (l - c.t0) / c.h, t2 = t * t, t3 = t2 * t;
+      var val = (2 * t3 - 3 * t2 + 1) * c.p0 + (t3 - 2 * t2 + t) * c.m0 + (-2 * t3 + 3 * t2) * c.p1 + (t3 - t2) * c.m1;
+      out[nomes[idx]] = idx === 3 ? Math.exp(val) : val;
+    });
+    return out;
+  }
+  function camera(i, l) {
+    var p = pose(i, l), s = p.s;
+    var tx = vw * 0.5 - p.x / 100 * Wc * s, ty = vh * 0.5 - p.y / 100 * Hc * s;
+    var mx = vw - Wc * s, my = vh - Hc * s;
+    tx = mx <= 0 ? Math.min(0, Math.max(mx, tx)) : mx / 2;
+    ty = my <= 0 ? Math.min(0, Math.max(my, ty)) : my / 2;
+    return { tx: tx, ty: ty, s: s, r: p.r };
+  }
+  function desenhar(u) {
+    var balanco = Math.sin(u * 9.4) * 3, passo = Math.sin(u * 40) * 1.6;
+    cenas.forEach(function (c, i) {
+      var l = u - i, op = 1;
+      if (i > 0) op = Math.min(op, suave((l + 0.12) / 0.2));
+      if (i < N - 1) op = Math.min(op, 1 - suave((l - 0.88) / 0.2));
+      c.style.opacity = op.toFixed(3);
+      c.style.visibility = op > 0.01 ? 'visible' : 'hidden';
+      if (op <= 0.01) return;
+      var cam = camera(i, l);
+      fundos[i].style.transform = 'translate3d(' + (cam.tx + balanco).toFixed(1) + 'px,' + (cam.ty + passo).toFixed(1) + 'px,0) scale(' + cam.s.toFixed(3) + ')';
+      c.style.transform = 'rotate(' + cam.r.toFixed(2) + 'deg)';
+      // O texto aparece, passa um pouco com o movimento e some antes do mergulho
+      var t = suave((l - 0.10) / 0.14);
+      if (i < N - 1) t = Math.min(t, 1 - suave((l - 0.58) / 0.14));
+      var ref = camera(i, 0.10), lx = vw < 900 ? 10 : 60, ly = vw < 900 ? 8 : 40, dx = Math.max(-lx, Math.min(lx, (cam.tx - ref.tx) * 0.2)), dy = Math.max(-ly, Math.min(ly, (cam.ty - ref.ty) * 0.2));
+      textos[i].style.opacity = t.toFixed(3);
+      textos[i].style.transform = 'translate(' + dx.toFixed(1) + 'px,' + (dy + (1 - t) * 18).toFixed(1) + 'px)';
+    });
+    // A luz "abre" ao se aproximar e se dissolve na cena seguinte
+    var g = 0, idx = -1;
+    for (var bb = 1; bb <= N - 1; bb++) {
+      if (u > bb - 0.3 && u < bb + 0.14) {
+        idx = bb - 1;
+        g = u < bb ? Math.pow(suave((u - (bb - 0.3)) / 0.3), 2) : 1 - suave((u - bb) / 0.14);
+      }
+    }
+    if (idx >= 0 && idx < LUZ.length) {
+      if (idx !== luzAtual) {
+        luzAtual = idx;
+        brilho.style.background = 'radial-gradient(circle at 50% 50%, rgba(' + LUZ[idx] + ',.95) 0%, rgba(' + LUZ[idx] + ',.55) 30%, rgba(' + LUZ[idx] + ',0) 74%)';
+      }
+      brilho.style.opacity = (g * 0.9).toFixed(3);
+    } else { brilho.style.opacity = 0; }
+    if (dica) dica.style.opacity = 0.9 * (1 - lim(u / 0.12));
+  }
+  // A rolagem do mouse anda em saltos; suavizamos o avanço para o movimento ficar contínuo
+  var alvo = 0, atual = 0, ult = 0, rodando = false;
+  function lerAlvo() {
+    var total = sec.offsetHeight - window.innerHeight;
+    alvo = lim(-sec.getBoundingClientRect().top / total) * N;
+  }
+  function laco(ts) {
+    var dt = Math.min(0.05, ((ts - ult) / 1000) || 0.016); ult = ts;
+    atual += (alvo - atual) * (1 - Math.pow(0.5, dt / 0.07));
+    if (Math.abs(alvo - atual) < 0.0004) atual = alvo;
+    desenhar(atual);
+    if (atual !== alvo) window.requestAnimationFrame(laco); else rodando = false;
+  }
+  function pedir() {
+    lerAlvo();
+    if (!rodando) { rodando = true; ult = window.performance.now(); window.requestAnimationFrame(laco); }
+  }
+  window.addEventListener('scroll', pedir, { passive: true });
+  window.addEventListener('resize', function () { medir(); lerAlvo(); atual = alvo; desenhar(atual); });
+  medir(); lerAlvo(); atual = alvo; desenhar(atual);
+})();
+</script>
+<script src="/js/beacon.js?v=a4453a06" defer></script>
+<script>
+/* Rolagem guiada: o progresso (0 a 1) de cada bloco acompanha a rolagem, suavizado no tempo.
+   No Nema os blocos entram em sequência: cada um começa quando o anterior chegou a 70%. */
+(function () {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var raiz = document.documentElement; raiz.classList.add('ent-on');
+  var rodando = false, ultimo = 0;
+  function suave(x) { return x * x * (3 - 2 * x); }
+  function lim(x) { return Math.max(0, Math.min(1, x)); }
+  function alvos() {
+    var vh = window.innerHeight, els = document.querySelectorAll('[data-ent]');
+    var T = 0;
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i], tipo = el.getAttribute('data-ent'), r = el.getBoundingClientRect(), t;
+      if (tipo === 'foot') {
+        t = (vh - r.top) / Math.min(r.height, vh * 0.7);
+      } else {
+        var top = r.top - (el._dy || 0);
+        t = (vh * 0.97 - top) / (vh * 0.30);
+      }
+      el._t = suave(lim(t));
+    }
+    return T;
+  }
+  function quadro(ts) {
+    var dt = Math.min(0.05, (ts - (ultimo || ts)) / 1000); ultimo = ts;
+    var T = alvos(), mexeu = false, k = 1 - Math.exp(-dt / 0.11);
+    var els = document.querySelectorAll('[data-ent]');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i], p0 = el._p == null ? el._t : el._p, d = el._t - p0;
+      var p = Math.abs(d) < 0.002 ? el._t : p0 + d * k;
+      if (p !== el._p) { el._p = p; el.style.setProperty('--p', p.toFixed(3)); mexeu = true; }
+      var tp = el.getAttribute('data-ent');
+      el._dy = tp === 'u' ? (1 - p) * ((el.closest && el.closest('#nema')) ? -60 : 34) : 0;
+    }
+    if (mexeu) { requestAnimationFrame(quadro); } else { rodando = false; ultimo = 0; }
+  }
+  function pedir() { if (!rodando) { rodando = true; ultimo = 0; requestAnimationFrame(quadro); } }
+  window.addEventListener('scroll', pedir, { passive: true });
+  window.addEventListener('resize', pedir);
+  window.addEventListener('load', pedir);
+  var fl = document.getElementById('faq-lista');
+  if (fl) new MutationObserver(pedir).observe(fl, { childList: true });
+  pedir();
+  // Nema: a entrada (explosão de luz + blocos vindo de longe) roda uma vez, no tempo, e nada some ao rolar de volta
+  var nm = document.getElementById('nema');
+  if (nm && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      if (es.some(function (e) { return e.isIntersecting; })) { nm.classList.add('nema-go'); io.disconnect(); }
+    }, { rootMargin: '0px 0px -22% 0px', threshold: 0 });
+    io.observe(nm);
+  } else if (nm) { nm.classList.add('nema-go'); }
+})();
+</script>
+</body>
+</html>

@@ -117,6 +117,9 @@
   // Cria a conta pelo link de acesso do Supabase (sem senha): o e-mail leva direto à
   // área do cliente, onde ficam a amostra, o clássico grátis e o cartão do Nema.
   // A mala direta (sequência de e-mails do Worker) só entra com o consentimento marcado.
+  var T = function (k, v) { return window.T ? window.T(k, v) : k; };
+  var LANG = window.TT_LANG || 'pt';
+  var PREFIXO = LANG === 'pt' ? '' : '/' + LANG;
   var SB_URL = 'https://xfkepekffdyrtcgagwqo.supabase.co';
   var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
 
@@ -124,21 +127,22 @@
     var email = (dados.email || '').trim().toLowerCase();
     var nome = (dados.nome || '').trim().slice(0, 120);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return Promise.resolve({ ok: false, erro: 'email_invalido' });
-    var destino = location.origin + '/area-cliente.html';
+    var destino = location.origin + PREFIXO + '/area-cliente.html';
     var conta = fetch(SB_URL + '/auth/v1/otp?redirect_to=' + encodeURIComponent(destino), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON },
       body: JSON.stringify({
         email: email,
         create_user: true,
-        data: { nome: nome, origem: dados.origem || 'amostra', mala_direta: !!dados.malaDireta, consentimento_em: dados.malaDireta ? new Date().toISOString() : null }
+        data: { nome: nome, idioma: LANG, origem: dados.origem || 'amostra', mala_direta: !!dados.malaDireta, consentimento_em: dados.malaDireta ? new Date().toISOString() : null }
       })
     }).then(function (r) {
       if (r.ok) return { ok: true };
       return { ok: false, erro: r.status === 429 ? 'muitas_tentativas' : 'falha' };
     }).catch(function () { return { ok: false, erro: 'conexao' }; });
 
-    if (dados.malaDireta) {
+    // A sequência de e-mails do Worker é só em português: só entra no site PT.
+    if (dados.malaDireta && LANG === 'pt') {
       fetch(API + '/api/leads/capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -155,10 +159,10 @@
   }
 
   function mensagemErro(erro) {
-    if (erro === 'email_invalido') return 'Confira o e-mail digitado.';
-    if (erro === 'muitas_tentativas') return 'Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.';
-    if (erro === 'conexao') return 'Sem conexão. Verifique a internet e tente de novo.';
-    return 'Não foi possível criar agora. Tente de novo em instantes.';
+    if (erro === 'email_invalido') return T('js.cad.erro.email');
+    if (erro === 'muitas_tentativas') return T('js.cad.erro.tentativas');
+    if (erro === 'conexao') return T('js.cad.erro.conexao');
+    return T('js.cad.erro.geral');
   }
 
   function showLeadPopup() {
@@ -169,18 +173,18 @@
     overlay.setAttribute('aria-labelledby', 'tt-lead-title');
     overlay.innerHTML = [
       '<div class="tt-lead-box">',
-      '  <button class="tt-lead-close" aria-label="Fechar">&times;</button>',
-      '  <p class="tt-lead-kicker">✦ Grátis · sem cartão</p>',
-      '  <h3 class="tt-lead-title" id="tt-lead-title">Crie grátis sua área de membro</h3>',
-      '  <p class="tt-lead-sub">Leia o 1º capítulo de <em>O Nascimento Silencioso da 3ª Guerra Mundial</em> e escolha um clássico da literatura brasileira para ler no leitor da editora.</p>',
+      '  <button class="tt-lead-close" aria-label="' + T('js.cad.fechar') + '">&times;</button>',
+      '  <p class="tt-lead-kicker">✦ ' + T('js.cad.kicker') + '</p>',
+      '  <h3 class="tt-lead-title" id="tt-lead-title">' + T('js.cad.titulo') + '</h3>',
+      '  <p class="tt-lead-sub">' + T('js.cad.sub') + '</p>',
       '  <form id="tt-lead-form" novalidate>',
-      '    <input type="text" name="nome" placeholder="Seu nome" autocomplete="given-name" required class="tt-lead-input">',
-      '    <input type="email" name="email" placeholder="Seu melhor e-mail" autocomplete="email" required class="tt-lead-input">',
-      '    <label class="tt-lead-check"><input type="checkbox" name="mala_direta" value="1"> Quero receber lançamentos e novidades da editora por e-mail</label>',
-      '    <button type="submit" class="tt-lead-btn">Criar minha área grátis →</button>',
+      '    <input type="text" name="nome" placeholder="' + T('js.cad.nome') + '" autocomplete="given-name" required class="tt-lead-input">',
+      '    <input type="email" name="email" placeholder="' + T('js.cad.email') + '" autocomplete="email" required class="tt-lead-input">',
+      (LANG === 'pt' ? '    <label class="tt-lead-check"><input type="checkbox" name="mala_direta" value="1"> ' + T('js.cad.mala') + '</label>' : ''),
+      '    <button type="submit" class="tt-lead-btn">' + T('js.cad.botao') + '</button>',
       '    <p class="tt-lead-msg" id="tt-lead-msg" role="status"></p>',
       '  </form>',
-      '  <p class="tt-lead-fine">Sem senha: enviamos um link de acesso para o seu e-mail. Novidades só se você marcar a opção acima, e você cancela quando quiser.</p>',
+      '  <p class="tt-lead-fine">' + (LANG === 'pt' ? T('js.cad.fino') : T('js.cad.fino.intl')) + '</p>',
       '</div>'
     ].join('\n');
 
@@ -221,19 +225,19 @@
       var btn = form.querySelector('.tt-lead-btn');
       var msg = document.getElementById('tt-lead-msg');
       btn.disabled = true;
-      btn.textContent = 'Criando…';
+      btn.textContent = T('js.cad.criando');
       msg.textContent = '';
       msg.style.color = '';
-      criarMembro({ nome: form.nome.value, email: form.email.value, malaDireta: form.mala_direta.checked, origem: 'popup' })
+      criarMembro({ nome: form.nome.value, email: form.email.value, malaDireta: !!(form.mala_direta && form.mala_direta.checked), origem: 'popup' })
         .then(function (res) {
           if (res.ok) {
-            form.innerHTML = '<p class="tt-lead-msg" style="color:#1e5c3a;font-size:15px">✦ Pronto! Enviamos o link de acesso para <strong>' +
-              form.email.value.replace(/[<>&"]/g, '') + '</strong>.<br>Abra o e-mail e sua área de membro já estará criada. Confira o spam se não chegar em 2 minutos.</p>';
+            form.innerHTML = '<p class="tt-lead-msg" style="color:#1e5c3a;font-size:15px">✦ ' +
+              T('js.cad.ok', { email: '<strong>' + form.email.value.replace(/[<>&"]/g, '') + '</strong>' }) + '</p>';
           } else {
             msg.style.color = '#b23b2e';
             msg.textContent = mensagemErro(res.erro);
             btn.disabled = false;
-            btn.textContent = 'Criar minha área grátis →';
+            btn.textContent = T('js.cad.botao');
           }
         });
     });

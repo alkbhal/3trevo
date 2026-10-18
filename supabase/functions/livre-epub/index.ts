@@ -37,8 +37,13 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Escolha este clássico no seu espaço de leitura antes de abrir." }, 403);
   }
 
-  const { data: obra } = await sb.from("biblioteca_acervo")
+  // Clássicos PT (Biblioteca TT, acesso bônus) ou das estantes EN/ES (estante_intl).
+  let { data: obra } = await sb.from("biblioteca_acervo")
     .select("epub_url").eq("slug", slug).eq("ativo", true).eq("acesso", "bonus").maybeSingle();
+  if (!obra) {
+    ({ data: obra } = await sb.from("estante_intl")
+      .select("epub_url").eq("slug", slug).eq("ativo", true).maybeSingle());
+  }
   if (!obra?.epub_url) return json({ error: "Obra indisponível no momento." }, 404);
 
   let origem: URL;

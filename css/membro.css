@@ -30,3 +30,33 @@
 .mb-btn{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;background:#c8a84b;color:#0f2d1a;font-weight:600;font-size:14px;text-decoration:none;border-radius:3px}
 .mb-link{color:#e8c96a;font-size:14px;font-weight:500}
 @media (max-width:480px){.mb-nema{flex-direction:column;gap:12px;padding:20px}.mb-boasvindas{padding:18px}}
+
+/* Estante de clássicos (js/estante.js) */
+.es{display:flex;flex-direction:column;gap:16px}
+.es-dica{font-size:14px;line-height:1.55;color:var(--t2,rgba(38,32,22,.65));margin:0}
+.es-filtros{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.es-filtros::-webkit-scrollbar{display:none}
+.es-filtro{flex-shrink:0;min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--borda,rgba(38,32,22,.15));background:var(--painel,#fffdf9);color:var(--t1,#262016);font:inherit;font-size:13.5px;cursor:pointer;white-space:nowrap}
+.es-filtro.ativo{background:var(--verde,#0f2d1a);border-color:var(--verde,#0f2d1a);color:#f7f2e6}
+.es-prateleiras{display:flex;flex-direction:column;gap:26px}
+.es-prateleira-topo{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--ouro,#c8a84b);padding-bottom:6px;margin-bottom:14px}
+.es-prateleira-topo h4{font-family:'Fraunces','Lora',Georgia,serif;font-size:17px;font-weight:600;color:var(--tinta,#262016);margin:0}
+.es-prateleira-topo span{font-size:12px;letter-spacing:.4px;color:var(--t3,rgba(38,32,22,.5))}
+.es-linha{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.es-obra{display:flex;gap:14px;align-items:flex-start;padding:12px;background:var(--painel,#fffdf9);border:1px solid var(--borda2,rgba(38,32,22,.08));border-radius:6px}
+.es-capa{flex-shrink:0;width:86px;aspect-ratio:2/3;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:9px 8px;color:#f7f2e6;
+  background:linear-gradient(160deg,var(--es-a) 0%,var(--es-b) 100%);box-shadow:0 2px 8px rgba(38,32,22,.18)}
+.es-capa::before{content:'';position:absolute;inset:4px;border:1px solid rgba(200,168,75,.45)}
+.es-capa-ano{position:absolute;top:9px;left:8px;font-size:9px;letter-spacing:1.2px;color:#e8c96a}
+.es-capa-titulo{font-family:'Fraunces','Lora',Georgia,serif;font-size:11.5px;font-weight:600;line-height:1.15;overflow-wrap:break-word}
+.es-capa-filete{display:block;width:16px;height:1.5px;background:#c8a84b;margin:5px 0 4px}
+.es-capa-autor{font-size:8.5px;line-height:1.25;color:rgba(247,242,230,.8)}
+.es-info{min-width:0;display:flex;flex-direction:column;gap:3px;flex:1}
+.es-titulo{font-family:'Fraunces','Lora',Georgia,serif;font-size:16px;font-weight:600;line-height:1.25;color:var(--tinta,#262016);margin:0}
+.es-autor{font-size:13px;color:var(--t2,rgba(38,32,22,.65));margin:0}
+.es-meta{font-size:12px;color:var(--t3,rgba(38,32,22,.5));margin:0}
+.es-sinopse{margin:4px 0 2px;font-size:13.5px;line-height:1.55;color:var(--t2,rgba(38,32,22,.7))}
+.es-sinopse summary{cursor:pointer;color:var(--verde-claro,#2a6b42);font-weight:500;min-height:32px;display:flex;align-items:center}
+.es-sinopse p{margin:4px 0 0}
+.es-escolher{align-self:flex-start;margin-top:6px}
+.es-vazia{font-size:14px;color:var(--t3,rgba(38,32,22,.55))}

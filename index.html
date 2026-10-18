@@ -12,16 +12,15 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Editora Três Trevo — editora digital independente de Montauri/RS. Ebooks de ficção, ensaio e negócios, com um programa de incentivo à leitura como bônus.">
-  <meta property="og:title" content="Editora Três Trevo — Literatura, Conhecimento e Cultura">
-  <meta property="og:description" content="Ebooks que mudam perspectivas, publicados pela Editora Três Trevo — e cada compra rende Nema, desconto na próxima leitura.">
+  <meta name="description" data-i18n-attr="content:meta.inicio.desc" content="Editora Três Trevo — editora digital independente de Montauri/RS. Ebooks de ficção, ensaio e negócios, com um programa de incentivo à leitura como bônus.">
+  <meta property="og:title" data-i18n-attr="content:meta.inicio.og.titulo" content="Editora Três Trevo — Literatura, Conhecimento e Cultura">
+  <meta property="og:description" data-i18n-attr="content:meta.inicio.og.desc" content="Ebooks que mudam perspectivas, publicados pela Editora Três Trevo — e cada compra rende Nema, desconto na próxima leitura.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.3trevo.com.br">
   <meta property="og:image" content="https://www.3trevo.com.br/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0f2d1a">
-  <title>Editora Três Trevo — Literatura, Conhecimento e Cultura | Montauri RS</title>
-  <link rel="canonical" href="https://www.3trevo.com.br/">
+  <title data-i18n="meta.inicio.titulo">Editora Três Trevo — Literatura, Conhecimento e Cultura | Montauri RS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -72,6 +71,10 @@
     .lang-btn { background: none; border: none; cursor: pointer; padding: 5px 9px; font-size: 11px; font-family: var(--sans); letter-spacing: .06em; color: rgba(255,255,255,.4); transition: all .2s; }
     .lang-btn + .lang-btn { border-left: 1px solid rgba(255,255,255,.1); }
     .lang-btn.ativo { background: var(--v3); color: #fff; }
+    .lang-toggle a { padding: 6px 9px; font-size: 11px; letter-spacing: .06em; color: rgba(255,255,255,.55); text-decoration: none; }
+    .lang-toggle a + a { border-left: 1px solid rgba(255,255,255,.1); }
+    .lang-toggle a.ativo { background: var(--v3); color: #fff; }
+    .lang-toggle .tt-idiomas-nome { display: none; }
     .hdr-cta { background: var(--v3); color: #fff !important; padding: 8px 18px; border-radius: 2px; font-size: 13px; font-weight: 600; transition: background .2s; white-space: nowrap; }
     .hdr-cta:hover { background: var(--v4) !important; }
     .menu-mob { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
@@ -498,6 +501,13 @@
     .ft-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 44px; }
     .ft-logo { font-family: var(--serif); font-size: 19px; font-weight: 300; color: rgba(255,255,255,.8); margin-bottom: 10px; }
     .ft-tag { font-size: 13px; color: rgba(255,255,255,.3); line-height: 1.65; max-width: 260px; margin-bottom: 16px; }
+    #membros { padding: 96px 24px; background: var(--bg2, #0d1a12); }
+    #membros .sec-in { max-width: 920px; margin: 0 auto; }
+    .membros-lista { list-style: none; padding: 0; margin: 32px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .membros-lista li { display: flex; flex-direction: column; gap: 6px; padding: 18px; border: 1px solid rgba(255,255,255,.1); border-radius: 6px; }
+    .membros-lista strong { font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 400; color: var(--t1, #f5f0e8); }
+    .membros-lista span { font-size: 15px; line-height: 1.55; color: var(--t2, rgba(245,240,232,.72)); }
+    .membros-acoes { display: flex; flex-wrap: wrap; gap: 14px; }
     .ft-cnpj { font-size: 11px; color: rgba(255,255,255,.2); line-height: 1.65; }
     .ft-col h5 { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 14px; font-weight: 500; }
     .ft-links { display: flex; flex-direction: column; gap: 9px; }
@@ -554,29 +564,33 @@
   <script>window.addEventListener('load',function(){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','296545814480082');fbq('track','PageView');});</script>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=296545814480082&ev=PageView&noscript=1"/></noscript>
   <script>window.addEventListener('load',function(){var v=document.getElementById('hero-video');if(v){v.load();v.play();}});</script>
+<script id="tt-textos">window.TT_LANG="pt";window.TT_TEXTOS={"js.ac.baixar.epub":"Baixar arquivo EPUB","js.ac.baixar.pdf":"Baixar arquivo PDF","js.ac.email.invalido":"Digite um e-mail válido.","js.ac.entrando":"Entrando…","js.ac.entrar":"Entrar","js.ac.enviando":"Enviando…","js.ac.erro.carregar":"Erro ao carregar","js.ac.erro.leitura":"Erro ao abrir a leitura.","js.ac.erro.link":"Não foi possível enviar o link agora. Tente de novo em instantes.","js.ac.erro.login":"Não foi possível entrar agora. Tente de novo.","js.ac.ler":"Ler agora","js.ac.link":"Receber link por e-mail","js.ac.link.ok":"Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style=\"opacity:.6\">Pode levar até 2 minutos. Cheque o spam.</small>","js.ac.nema":"Pontos Nema","js.ac.nema.pendente":"Pontos Nema · + {n} liberam em até 7 dias","js.ac.plano.ativa":"Ativa","js.ac.plano.membro":"Membro grátis","js.ac.plano.sem":"Sem plano","js.ac.recarregue":"Recarregue a página.","js.ac.remover":"Remover da biblioteca","js.ac.sem.acesso":"Este título não está na sua conta.","js.ac.sem.titulo":"Título indisponível","js.ac.senha.errada":"E-mail ou senha incorretos.","js.ac.senha.vazia":"Digite sua senha ou use o link por e-mail.","js.cad.botao":"Criar minha área grátis →","js.cad.criando":"Criando…","js.cad.email":"Seu melhor e-mail","js.cad.erro.conexao":"Sem conexão. Verifique a internet e tente de novo.","js.cad.erro.email":"Confira o e-mail digitado.","js.cad.erro.geral":"Não foi possível criar agora. Tente de novo em instantes.","js.cad.erro.tentativas":"Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.","js.cad.fechar":"Fechar","js.cad.fino":"Sem senha: enviamos um link de acesso para o seu e-mail. Novidades só se você marcar a opção acima, e você cancela quando quiser.","js.cad.fino.intl":"Sem senha: enviamos um link de acesso para o seu e-mail.","js.cad.kicker":"Grátis · sem cartão","js.cad.mala":"Quero receber lançamentos e novidades da editora por e-mail","js.cad.nome":"Seu nome","js.cad.ok":"Pronto! Enviamos o link de acesso para {email}.<br>Abra o e-mail e sua área de membro já estará criada. Confira o spam se não chegar em 2 minutos.","js.cad.sub":"Leia o 1º capítulo de <em>O Nascimento Silencioso da 3ª Guerra Mundial</em> e escolha um clássico da literatura brasileira para ler no leitor da editora.","js.cad.titulo":"Crie grátis sua área de membro","js.carregando":"Carregando","js.erro.conexao":"Sem conexão com o servidor. Verifique a internet e tente de novo.","js.erro.sessao":"Sua sessão expirou. Entre de novo para continuar lendo.","js.estante.dica":"Comece por um dos favoritos dos leitores: {titulos}.","js.estante.filtro":"Filtrar por gênero","js.estante.obra1":"1 obra","js.estante.obras":"{n} obras","js.estante.outros":"Outros","js.estante.paginas":"{n} páginas","js.estante.seculo":"século {n}","js.estante.sobre":"Sobre o livro","js.estante.todos":"Todos","js.estante.vazia":"A estante está sendo organizada. Volte em breve.","js.faq":[{"q":"Como recebo meu ebook?","r":"Logo após a confirmação do pagamento, você recebe o PDF por e-mail (sac@3trevo.com.br) e tem acesso permanente ao EPUB na sua área do cliente, com leitor integrado."},{"q":"O que é o Nema?","r":"É o ponto de fidelidade da editora: a nossa moeda de descontos. Você ganha Nema ao comprar e usa o saldo em novas compras. As regras de emissão e uso, inclusive de campanhas e promoções futuras, estão nas Regras do Nema."},{"q":"Quando posso usar meu Nema?","r":"Assim que o saldo for liberado, ele aparece no seu espaço de cliente. O prazo de liberação de cada Nema está nas Regras do Nema."},{"q":"Como uso o Nema?","r":"Entre no seu espaço de cliente e vá ao pagamento da próxima compra. Marque \"Usar meu saldo Nema\" e ganhe desconto. Também há campanhas de uso: acompanhe por aqui e pelas nossas redes."},{"q":"Posso trocar Nema por dinheiro?","r":"Não. Nema só vale como desconto em compras na editora e não pode ser transferido para outra pessoa."},{"q":"Posso pedir reembolso?","r":"Sim. Pelo art. 49 do CDC, você tem 7 dias corridos após a compra para pedir reembolso integral. Escreva para sac@3trevo.com.br. O Nema daquela compra é cancelado."}],"js.gratis.carregando":"Carregando… tente de novo em um instante.","js.leitor.abrindo":"Abrindo o livro…","js.leitor.abrir.pdf":"Abrir o PDF","js.leitor.ajustes":"Ajustes de leitura","js.leitor.ajustes.dica":"Tamanho do texto e modo noite","js.leitor.anterior":"Anterior","js.leitor.cap.anterior":"Capítulo anterior","js.leitor.cap.proximo":"Próximo capítulo","js.leitor.colofao":"Editora Três Trevo · edição digital<br>Obrigado por ler com a gente.","js.leitor.concluir":"Concluir","js.leitor.dia":"Dia","js.leitor.erro.ajuda":"Se continuar, escreva para sac@3trevo.com.br","js.leitor.erro.titulo":"Não foi possível abrir o livro","js.leitor.fechar":"Fechar","js.leitor.fechar.livro":"Fechar o livro","js.leitor.fim.conhecer":"Conhecer o livro","js.leitor.fim.mesmo.autor":"Do mesmo autor","js.leitor.fim.reler":"Reler do início","js.leitor.fim.sobre":"Você chegou ao fim de","js.leitor.fim.voltar":"Voltar à biblioteca","js.leitor.ilegivel":"O arquivo do livro não pôde ser lido.","js.leitor.lento":"O livro está demorando para carregar. A conexão pode estar lenta.","js.leitor.maior":"Aumentar texto","js.leitor.menor":"Diminuir texto","js.leitor.modo":"Modo","js.leitor.noite":"Noite","js.leitor.pdf.celular":"Este título está em PDF. Ele abre no leitor de PDF do seu aparelho.","js.leitor.proximo":"Próximo","js.leitor.sem.formato":"Nenhum formato disponível para leitura.","js.leitor.tentar":"Tentar de novo","js.leitor.texto":"Texto","js.leitor.trilha":"Ouvir a trilha do livro","js.marca":"Editora Três Trevo","js.membro.amostra.completo":"Livro completo · a compra rende Nema","js.membro.amostra.gostou":"Gostou do capítulo?","js.membro.amostra.ler":"Ler o capítulo 1","js.membro.amostra.ler.completo":"Ler o livro completo","js.membro.amostra.secao":"Amostra grátis","js.membro.amostra.selo":"Amostra grátis","js.membro.classico.secao":"Clássico grátis","js.membro.comecar":"Começar a ler","js.membro.continuar":"Continuar","js.membro.erro.abrir":"Não foi possível abrir o clássico agora. Tente de novo em instantes.","js.membro.erro.escolher":"Não foi possível escolher agora. Tente de novo.","js.membro.erro.liberar":"Não foi possível liberar agora. Tente de novo.","js.membro.escolha":"Escolha um clássico para o seu espaço de leitura. Você lê um de cada vez e pode trocar quando terminar.","js.membro.escolher":"Escolher este","js.membro.escolhido":"\"{titulo}\" está no seu espaço de leitura.","js.membro.espaco":"1 espaço de leitura","js.membro.fim.nema":"Sua primeira compra rende Nema","js.membro.fim.nema.intl":"Quando chegarem, cada compra rende Nema","js.membro.fim.rotulo":"Da Editora Três Trevo","js.membro.fim.titulo":"Conheça os livros da casa","js.membro.fim.titulo.intl":"Nossas edições estão a caminho","js.membro.intro":"Escolha um clássico e leia no leitor da editora, com o progresso salvo.","js.membro.intro.pt":"Comece pela amostra e escolha um clássico da literatura brasileira. Tudo no leitor da editora, com o progresso salvo.","js.membro.lido":"{n}% lido","js.membro.nota":"Membros grátis leem um clássico por vez. Quem compra qualquer livro da editora ganha três espaços na Biblioteca TT.","js.membro.nota.intl":"Membros grátis leem um clássico por vez e podem trocar quando terminarem.","js.membro.rotulo":"Membro grátis","js.membro.seu.classico":"Seu clássico","js.membro.titulo":"Sua área de leitura na Três Trevo","js.membro.trocar":"Concluir e trocar","js.membro.trocar.confirma":"Concluir este clássico e liberar o espaço para outro?","js.nema.aria":"Nema, o ponto de fidelidade da editora","js.nema.catalogo":"Ver o catálogo","js.nema.como":"Como o Nema funciona","js.nema.rotulo":"Nema · ponto de fidelidade","js.nema.texto":"10% do valor de cada e-book volta para você em Nema, e o saldo vira desconto na próxima leitura (até metade do preço). Liberado 7 dias depois da compra.","js.nema.titulo":"Sua primeira compra já rende Nema"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
+<link rel="canonical" href="https://3trevo.com.br/">
+<link rel="alternate" hreflang="pt-BR" href="https://3trevo.com.br/">
+<link rel="alternate" hreflang="en" href="https://3trevo.com.br/en/">
+<link rel="alternate" hreflang="es" href="https://3trevo.com.br/es/">
+<link rel="alternate" hreflang="x-default" href="https://3trevo.com.br/">
 </head>
 <body>
 
 <!-- ── HEADER ───────────────────────────────────────────────────────────────── -->
 <header id="hdr">
   <div class="hdr-in">
-    <a href="#inicio" class="logo">Editora Três <span>Trevo</span></a>
+    <a href="#inicio" class="logo" data-i18n-html="nav.logo">Editora Três <span>Trevo</span></a>
     <nav>
-      <a href="#catalogo" data-i18n="nav.catalogo">Catálogo</a>
+      <a href="#catalogo" data-i18n="nav.catalogo" data-so-pt>Catálogo</a>
+      <a href="#membros" data-i18n="nav.membros">Clássicos grátis</a>
       <a href="#nema" data-i18n="nav.programa">Nema</a>
       <a href="#faq">FAQ</a>
       <a href="#sobre" data-i18n="nav.sobre">Sobre</a>
       <a href="https://3trevo.com.br/area-cliente.html" data-i18n="nav.biblioteca">Minha Biblioteca</a>
     </nav>
     <div class="hdr-right">
-      <div class="lang-toggle">
-        <button class="lang-btn ativo" onclick="setLang('pt')">PT</button>
-        <button class="lang-btn" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" onclick="setLang('es')">ES</button>
-      </div>
-      <a href="#catalogo" class="hdr-cta" data-i18n="nav.cta">Adquirir ebook</a>
+      <div data-tt-idiomas class="lang-toggle" aria-label="Idioma" data-i18n-attr="aria-label:nav.idioma"><a href="/" hreflang="pt-BR" lang="pt-BR" aria-current="true" class="ativo">PT<span class="tt-idiomas-nome"> · Português</span></a><a href="/en/" hreflang="en" lang="en">EN<span class="tt-idiomas-nome"> · English</span></a><a href="/es/" hreflang="es" lang="es">ES<span class="tt-idiomas-nome"> · Español</span></a></div>
+      <a href="#catalogo" class="hdr-cta" data-i18n="nav.cta" data-so-pt>Adquirir ebook</a>
+      <template data-so-intl><a href="#membros" class="hdr-cta" data-i18n="nav.cta.intl">Área de membro grátis</a></template>
     </div>
-    <button class="menu-mob" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})" aria-label="Menu">
+    <button class="menu-mob" onclick="document.getElementById(document.getElementById('catalogo') ? 'catalogo' : 'membros').scrollIntoView({behavior:'smooth'})" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -594,7 +608,7 @@
     <div class="hero-video-overlay"></div>
   </div>
 
-  <div class="hero-ebook-bar" id="hero-ebook-bar">
+  <div class="hero-ebook-bar" id="hero-ebook-bar" data-so-pt>
     <div class="heb-progress" id="heb-progress"></div>
     <span class="heb-badge" id="heb-badge">Destaque</span>
     <span class="heb-sep"></span>
@@ -614,11 +628,12 @@
         Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial.
       </p>
       <div class="hero-btns">
-        <a href="#catalogo" class="btn-pri" data-i18n="hero.cta1">Ver catálogo →</a>
+        <a href="#catalogo" class="btn-pri" data-i18n="hero.cta1" data-so-pt>Ver catálogo →</a>
+          <template data-so-intl><a href="#membros" class="btn-pri" data-i18n="hero.cta.intl">Ler um clássico grátis →</a></template>
         <a href="#nema" class="btn-ghost" data-i18n="hero.cta2">Como funciona o Nema</a>
       </div>
       <!-- Stats inline -->
-      <div class="hero-stats-row">
+      <div class="hero-stats-row" data-so-pt>
         <div class="hsr-item">
           <span class="hsr-n" id="statTitulos">—</span>
           <span class="hsr-l" data-i18n="hero.stat.titulos">títulos</span>
@@ -627,7 +642,7 @@
     </div>
 
     <!-- Showcase de capas 3D -->
-    <div class="showcase" id="showcase">
+    <div class="showcase" id="showcase" data-so-pt>
       <div class="livro-stage">
         <div class="livro" id="livro-ativo">
           <!-- Capa injetada via JS -->
@@ -642,14 +657,14 @@
 
   </div>
 
-  <div class="scroll-ind" aria-hidden="true">
+  <div class="scroll-ind" aria-hidden="true" data-so-pt>
     <span data-i18n="hero.scroll">Catálogo</span>
     <div class="scroll-line"></div>
   </div>
 </section>
 
 <!-- ── FAIXA ─────────────────────────────────────────────────────────────────── -->
-<div class="faixa">
+<div class="faixa" data-so-pt>
   <div class="faixa-in">
     <div class="faixa-item">✦ <strong data-i18n="trust.garantia">Garantia de 7 dias</strong> <span data-i18n="trust.cdc">(CDC art. 49)</span></div>
     <div class="faixa-sep"></div>
@@ -660,7 +675,7 @@
 </div>
 
 <!-- ── CATÁLOGO ──────────────────────────────────────────────────────────────── -->
-<section id="catalogo">
+<section id="catalogo" data-so-pt>
   <div class="sec-in fi">
     <div class="sec-hdr">
       <div>
@@ -688,7 +703,7 @@
 </section>
 
 <!-- ── ABERTURA (próximo lançamento, sem nome) ──────────────────────────────── -->
-<section id="abertura" aria-label="Próximo lançamento de Said Anes">
+<section id="abertura" aria-label="Próximo lançamento de Said Anes" data-so-pt>
   <div class="ab-palco">
   <a class="ab-pular" href="#nema">Pular ↓</a>
   <p class="ab-dica" aria-hidden="true">Role devagar ↓</p>
@@ -702,6 +717,25 @@
       <p class="ab-cta">Em breve. Fique atento: <a href="https://www.instagram.com/3trevo" rel="noopener">@3trevo</a></p>
     </div>
   </div>
+  </div>
+</section>
+
+<!-- ── MEMBROS (três idiomas) ──────────────────────────────────────────────── -->
+<section id="membros">
+  <div class="sec-in">
+    <p class="lbl" style="color:var(--v3);margin-bottom:10px;" data-i18n="membros.label">Área de membro grátis</p>
+    <h2 class="sec-t" data-i18n-html="membros.titulo"><em>Leia um clássico</em> sem pagar nada</h2>
+    <p class="sec-desc" data-i18n="membros.desc">Crie sua área de membro em um minuto, só com o e-mail. Você escolhe um clássico da literatura brasileira em domínio público e lê no leitor da editora, no celular ou no computador.</p>
+    <ul class="membros-lista">
+      <li data-so-pt><strong data-i18n="membros.i0.t">1º capítulo grátis</strong><span data-i18n="membros.i0.d">De O Nascimento Silencioso da 3ª Guerra Mundial, de Said Anes.</span></li>
+      <li><strong data-i18n="membros.i1.t">Um clássico por vez</strong><span data-i18n="membros.i1.d">Escolha na estante, leia no seu ritmo e troque quando terminar.</span></li>
+      <li><strong data-i18n="membros.i2.t">Leitor da editora</strong><span data-i18n="membros.i2.d">Letra grande, modo noite e o progresso salvo onde você parou.</span></li>
+      <li><strong data-i18n="membros.i3.t">Nema</strong><span data-i18n="membros.i3.d">O ponto de fidelidade da editora: cada compra vira desconto na próxima leitura.</span></li>
+    </ul>
+    <div class="membros-acoes">
+      <a href="/gratis.html" class="btn-pri" data-i18n="membros.cta">Criar minha área grátis →</a>
+      <a href="/area-cliente.html" class="btn-ghost" data-i18n="membros.entrar">Já sou membro</a>
+    </div>
   </div>
 </section>
 
@@ -726,10 +760,10 @@
           <p class="nema-ex-linha" data-i18n="nema.card.p">Ao adquirir nossos produtos, você ganha o seu espaço de cliente. Nele fica tudo reunido:</p>
           <ul class="nema-lista">
             <li data-i18n="nema.li1">Sua biblioteca de e-books</li>
-            <li data-i18n="nema.li2">Suas músicas</li>
-            <li data-i18n="nema.li3">Seu extrato de compras</li>
-            <li data-i18n="nema.li4">Sua assinatura</li>
-            <li data-i18n="nema.li5">Sua Planilha Viva</li>
+            <li data-i18n="nema.li2" data-so-pt>Suas músicas</li>
+            <li data-i18n="nema.li3" data-so-pt>Seu extrato de compras</li>
+            <li data-i18n="nema.li4" data-so-pt>Sua assinatura</li>
+            <li data-i18n="nema.li5" data-so-pt>Sua Planilha Viva</li>
             <li data-i18n="nema.li6">Seu saldo de Nema disponível para uso</li>
           </ul>
           <p class="nema-ex-linha" data-i18n="nema.card.f">Acompanhe as campanhas de uso do Nema ou troque o seu saldo por novos produtos em nossas plataformas.</p>
@@ -780,19 +814,21 @@
   <div class="ft-in">
     <div class="ft-grid">
       <div>
-        <div class="ft-logo">Editora Três Trevo</div>
+        <div class="ft-logo" data-i18n="ft.logo">Editora Três Trevo</div>
         <p class="ft-tag" data-i18n="ft.tag">Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.</p>
-        <p class="ft-cnpj">CNPJ 18.928.966/0001-59<br>Montauri/RS · Brasil</p>
+        <p class="ft-cnpj" data-i18n-html="ft.cnpj">CNPJ 18.928.966/0001-59<br>Montauri/RS · Brasil</p>
       </div>
       <div class="ft-col">
         <h5 data-i18n="ft.nav">Navegação</h5>
         <div class="ft-links">
           <a href="#inicio" data-i18n="ft.inicio">Início</a>
-          <a href="#catalogo" data-i18n="ft.catalogo">Catálogo</a>
+          <a href="#catalogo" data-i18n="ft.catalogo" data-so-pt>Catálogo</a>
+          <a href="#membros" data-i18n="ft.membros">Clássicos grátis</a>
           <a href="#nema" data-i18n="ft.programa">Nema</a>
           <a href="#faq">FAQ</a>
           <a href="#sobre" data-i18n="ft.sobre">Sobre</a>
           <a href="https://3trevo.com.br/nema.html" data-i18n="ft.regulamento">Regras do Nema</a>
+          <a href="/privacidade.html" data-i18n="ft.privacidade">Privacidade</a>
         </div>
       </div>
       <div class="ft-col">
@@ -807,14 +843,14 @@
     </div>
     <div class="ft-bottom">
       <p class="ft-copy" data-i18n="ft.copy">© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada</p>
-      <div class="ft-badges">
+      <div class="ft-badges" data-so-pt>
         <span class="badge">CNPJ</span><span class="badge">SSL</span><span class="badge">CDC Art.49</span>
       </div>
     </div>
   </div>
 </footer>
 
-<a href="https://wa.me/5554999467085?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20ebooks%20da%20Editora%20Três%20Trevo." class="wa" aria-label="WhatsApp" target="_blank" rel="noopener">
+<a href="https://wa.me/5554999467085?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20ebooks%20da%20Editora%20Três%20Trevo." data-i18n-attr="href:wa.link" class="wa" aria-label="WhatsApp" target="_blank" rel="noopener">
   <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
@@ -899,119 +935,8 @@ function resetInterval() {
   }, 4500);
 }
 
-// ── i18n ──────────────────────────────────────────────────────────────────────
-const LANG = {
-  pt: {
-    'nav.catalogo':'Catálogo','nav.programa':'Nema','nav.sobre':'Sobre',
-    'nav.biblioteca':'Minha Biblioteca','nav.cta':'Adquirir ebook',
-    'hero.label':'Editora Três Trevo · Montauri/RS',
-    'hero.titulo':'Palavras que<br><em>transformam</em><br>o mundo real',
-    'hero.sub':'Publicamos ebooks que mudam perspectivas — de ficção geopolítica a manuais de sobrevivência empresarial.',
-    'hero.cta1':'Ver catálogo →','hero.cta2':'Como funciona o Nema',
-    'hero.stat.leitores':'leitores','hero.stat.titulos':'títulos',
-    'hero.scroll':'Catálogo',
-    'trust.garantia':'Garantia de 7 dias','trust.cdc':'(CDC art. 49)',
-    'trust.entrega':'Entrega imediata por e-mail',
-    'cat.label':'Catálogo completo','cat.titulo.em':'Todos os títulos',
-    'cat.desc':'Ficção literária, ensaio político e manuais práticos — publicados por Said Anes.',
-    'cat.f.todos':'Todos','cat.f.reflexao':'Reflexão','cat.f.ficcao':'Ficção','cat.f.manuais':'Manuais',
-    'gar.titulo':'Garantia de 7 dias',
-    'gar.texto':'Não gostou? Reembolso integral sem perguntas em até 7 dias corridos (CDC art. 49). Contato: sac@3trevo.com.br · Ao pedir reembolso, o Nema daquela compra é cancelado.',
-    'nema.label':'Nema · N$','nema.titulo':'<em>Sua compra</em> volta como desconto','nema.sub':'Nema é o ponto de fidelidade da Editora Três Trevo. Cada e-book que você compra rende Nema, e o seu saldo paga parte da próxima leitura.','nema.p1.t':'Compre um e-book','nema.p1.d':'Cada compra rende Nema para você.','nema.p2.t':'Acompanhe seu saldo','nema.p2.d':'Ele aparece no seu espaço de cliente, sempre à mão.','nema.p3.t':'Use na próxima compra','nema.p3.d':'No pagamento, marque "Usar meu saldo Nema" e ganhe desconto.','nema.card.l':'Seu espaço de cliente','nema.card.t':'Compre nossos produtos e ganhe Nema, a nossa moeda de descontos.','nema.card.p':'Ao adquirir nossos produtos, você ganha o seu espaço de cliente. Nele fica tudo reunido:','nema.li1':'Sua biblioteca de e-books','nema.li2':'Suas músicas','nema.li3':'Seu extrato de compras','nema.li4':'Sua assinatura','nema.li5':'Sua Planilha Viva','nema.li6':'Seu saldo de Nema disponível para uso','nema.card.f':'Acompanhe as campanhas de uso do Nema ou troque o seu saldo por novos produtos em nossas plataformas.','nema.nota':'Nema não é dinheiro: não pode ser sacado nem transferido para outra pessoa. Se você pedir reembolso de uma compra, o Nema que ela gerou é cancelado.','nema.saldo':'Ver meu saldo →','nema.regras':'Regras completas',
-    'faq.label':'Perguntas frequentes','faq.titulo':'Dúvidas',
-    'sobre.label':'Quem somos','sobre.titulo.em':'Editora','sobre.titulo.rest':'Três Trevo',
-    'sobre.p1':'A Editora Três Trevo nasceu com um propósito simples e direto: publicar o que importa. Literatura que provoca, conhecimento que transforma, conteúdo que respeita a inteligência do leitor.',
-    'sobre.p2':'Somos uma editora digital independente, sediada em Montauri/RS. Nosso modelo conecta diretamente autor e leitor — sem intermediários que diluem o valor do conteúdo.',
-    'sobre.p3':'Com o Nema, parte de cada compra volta para você como desconto na próxima leitura.',
-    'sobre.autores':'Para autores:','sobre.autores.texto':' A Editora está aberta à aquisição de direitos autorais.',
-    'autor.label':'✦ Pseudônimo literário','autor.sub':'Voz editorial da Editora Três Trevo',
-    'autor.bio':'Said Anes é o pseudônimo literário sob o qual a Editora Três Trevo publica suas obras. Um espaço onde a escrita encontra a clareza — sem as amarras do nome, apenas a força das ideias. Seus títulos transitam entre o ensaio político, a ficção literária e a narrativa documental, sempre com a marca da precisão e da inconformidade.',
-    'ft.tag':'Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.',
-    'ft.nav':'Navegação','ft.inicio':'Início','ft.catalogo':'Catálogo','ft.programa':'Nema',
-    'ft.sobre':'Sobre','ft.regulamento':'Regras do Nema','ft.contato':'Contato','ft.biblioteca':'Minha Biblioteca',
-    'ft.copy':'© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada',
-  },
-  en: {
-    'nav.catalogo':'Catalog','nav.programa':'Nema','nav.sobre':'About',
-    'nav.biblioteca':'My Library','nav.cta':'Get ebook',
-    'hero.label':'Editora Três Trevo · Montauri/RS · Brazil',
-    'hero.titulo':'Words that<br><em>transform</em><br>the real world',
-    'hero.sub':'We publish ebooks that shift perspectives — from geopolitical fiction to practical business guides.',
-    'hero.cta1':'View catalog →','hero.cta2':'How Nema works',
-    'hero.stat.leitores':'readers','hero.stat.titulos':'titles',
-    'hero.scroll':'Catalog',
-    'trust.garantia':'7-day guarantee','trust.cdc':'(consumer code)',
-    'trust.entrega':'Instant delivery via email',
-    'cat.label':'Full catalog','cat.titulo.em':'All titles',
-    'cat.desc':'Literary fiction, political essays and practical guides — published by Said Anes.',
-    'cat.f.todos':'All','cat.f.reflexao':'Essays','cat.f.ficcao':'Fiction','cat.f.manuais':'Guides',
-    'gar.titulo':'7-day guarantee',
-    'gar.texto':'Not satisfied? Full refund, no questions, within 7 days. Contact: sac@3trevo.com.br · On a refund, the Nema earned from that purchase is cancelled.',
-    'nema.label':'Nema · N$','nema.titulo':'<em>Your purchase</em> comes back as a discount','nema.sub':'Nema is the loyalty point of Editora Três Trevo. Every ebook you buy earns Nema, and your balance pays part of your next read.','nema.p1.t':'Buy an ebook','nema.p1.d':'Every purchase earns you Nema.','nema.p2.t':'Follow your balance','nema.p2.d':'It shows up in your customer space, always at hand.','nema.p3.t':'Use it on your next purchase','nema.p3.d':'At checkout, choose "Use my Nema balance" and get a discount.','nema.card.l':'Your customer space','nema.card.t':'Buy our products and earn Nema, our discount currency.','nema.card.p':'When you buy our products, you get your own customer space. Everything is in one place:','nema.li1':'Your ebook library','nema.li2':'Your music','nema.li3':'Your purchase statement','nema.li4':'Your subscription','nema.li5':'Your Living Spreadsheet','nema.li6':'Your Nema balance available to use','nema.card.f':'Follow the Nema campaigns or trade your balance for new products on our platforms.','nema.nota':'Nema is not money: it cannot be withdrawn or transferred to someone else. If you ask for a refund, the Nema from that purchase is cancelled.','nema.saldo':'See my balance →','nema.regras':'Full rules',
-    'faq.label':'Frequently asked questions','faq.titulo':'FAQs',
-    'sobre.label':'Who we are','sobre.titulo.em':'Editora','sobre.titulo.rest':'Três Trevo',
-    'sobre.p1':'Editora Três Trevo was born with a simple and direct purpose: to publish what matters. Literature that provokes, knowledge that transforms, content that respects the reader\'s intelligence.',
-    'sobre.p2':'We are an independent digital publisher based in Montauri, RS, Brazil. Our model connects authors directly with readers — no intermediaries diluting the value of content.',
-    'sobre.p3':'With Nema, part of every purchase comes back to you as a discount on your next read.',
-    'sobre.autores':'For authors:','sobre.autores.texto':' We are open to acquiring publishing rights.',
-    'autor.label':'✦ Literary pseudonym','autor.sub':'Editorial voice of Editora Três Trevo',
-    'autor.bio':'Said Anes is the literary pseudonym under which Editora Três Trevo publishes its works. A space where writing meets clarity — free from the constraints of a name, only the force of ideas.',
-    'ft.tag':'Literature and applied knowledge. We publish what matters, for those who truly read.',
-    'ft.nav':'Navigation','ft.inicio':'Home','ft.catalogo':'Catalog','ft.programa':'Nema',
-    'ft.sobre':'About','ft.regulamento':'Nema rules','ft.contato':'Contact','ft.biblioteca':'My Library',
-    'ft.copy':'© 2026 Editora Três Trevo · All rights reserved · Said Anes is a registered trademark',
-  },
-  es: {
-    'nav.catalogo':'Catálogo','nav.programa':'Nema','nav.sobre':'Sobre nosotros',
-    'nav.biblioteca':'Mi Biblioteca','nav.cta':'Obtener ebook',
-    'hero.label':'Editora Três Trevo · Montauri/RS · Brasil',
-    'hero.titulo':'Palabras que<br><em>transforman</em><br>el mundo real',
-    'hero.sub':'Publicamos ebooks que cambian perspectivas — de ficción geopolítica a guías prácticas de supervivencia empresarial.',
-    'hero.cta1':'Ver catálogo →','hero.cta2':'Como funciona o Nema',
-    'hero.stat.leitores':'lectores','hero.stat.titulos':'títulos',
-    'hero.scroll':'Catálogo',
-    'trust.garantia':'Garantía de 7 días','trust.cdc':'(código consumidor)',
-    'trust.entrega':'Entrega inmediata por e-mail',
-    'cat.label':'Catálogo completo','cat.titulo.em':'Todos los títulos',
-    'cat.desc':'Ficción literaria, ensayo político y guías prácticas — publicados por Said Anes.',
-    'cat.f.todos':'Todos','cat.f.reflexao':'Ensayos','cat.f.ficcao':'Ficción','cat.f.manuais':'Guías',
-    'gar.titulo':'Garantía de 7 días',
-    'gar.texto':'¿No te gustó? Reembolso total sin preguntas en 7 días. Contacto: sac@3trevo.com.br · Al pedir reembolso, el Nema de esa compra se cancela.',
-    'nema.label':'Nema · N$','nema.titulo':'<em>Tu compra</em> vuelve como descuento','nema.sub':'Nema es el punto de fidelidad de la Editora Três Trevo. Cada ebook que compras genera Nema, y tu saldo paga parte de tu próxima lectura.','nema.p1.t':'Compra un ebook','nema.p1.d':'Cada compra te genera Nema.','nema.p2.t':'Sigue tu saldo','nema.p2.d':'Aparece en tu espacio de cliente, siempre a mano.','nema.p3.t':'Úsalo en tu próxima compra','nema.p3.d':'Al pagar, elige "Usar mi saldo Nema" y obtén descuento.','nema.card.l':'Tu espacio de cliente','nema.card.t':'Compra nuestros productos y gana Nema, nuestra moneda de descuentos.','nema.card.p':'Al adquirir nuestros productos, obtienes tu espacio de cliente. Todo queda reunido ahí:','nema.li1':'Tu biblioteca de ebooks','nema.li2':'Tu música','nema.li3':'Tu extracto de compras','nema.li4':'Tu suscripción','nema.li5':'Tu Planilla Viva','nema.li6':'Tu saldo de Nema disponible para usar','nema.card.f':'Sigue las campañas de uso del Nema o cambia tu saldo por nuevos productos en nuestras plataformas.','nema.nota':'Nema no es dinero: no se puede retirar ni transferir a otra persona. Si pides un reembolso, el Nema de esa compra se cancela.','nema.saldo':'Ver mi saldo →','nema.regras':'Reglas completas',
-    'faq.label':'Preguntas frecuentes','faq.titulo':'Dudas',
-    'sobre.label':'Quiénes somos','sobre.titulo.em':'Editora','sobre.titulo.rest':'Três Trevo',
-    'sobre.p1':'Editora Três Trevo nació con un propósito simple y directo: publicar lo que importa.',
-    'sobre.p2':'Somos una editorial digital independiente, con sede en Montauri/RS, Brasil.',
-    'sobre.p3':'Con Nema, parte de cada compra vuelve a ti como descuento en tu próxima lectura.',
-    'sobre.autores':'Para autores:','sobre.autores.texto':' Estamos abiertos a adquirir derechos de autor.',
-    'autor.label':'✦ Seudónimo literario','autor.sub':'Voz editorial de Editora Três Trevo',
-    'autor.bio':'Said Anes es el seudónimo literario bajo el cual Editora Três Trevo publica sus obras.',
-    'ft.tag':'Literatura y conocimiento aplicado. Publicamos lo que importa.',
-    'ft.nav':'Navegación','ft.inicio':'Inicio','ft.catalogo':'Catálogo','ft.programa':'Nema',
-    'ft.sobre':'Sobre nosotros','ft.regulamento':'Reglas de Nema','ft.contato':'Contacto','ft.biblioteca':'Mi Biblioteca',
-    'ft.copy':'© 2026 Editora Três Trevo · Todos los derechos reservados',
-  }
-};
-
-let langAtual = 'pt';
-
-function setLang(lang) {
-  langAtual = lang;
-  document.documentElement.setAttribute('lang', lang === 'pt' ? 'pt-BR' : lang);
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('ativo', b.textContent.toLowerCase() === lang));
-  const d = LANG[lang];
-  document.querySelectorAll('[data-i18n]').forEach(el => { const v = d[el.dataset.i18n]; if(v) el.textContent = v; });
-  document.querySelectorAll('[data-i18n-html]').forEach(el => { const v = d[el.dataset.i18nHtml]; if(v) el.innerHTML = v; });
-  renderFaq();
-  renderProdutos(prodCache, filtroAtual);
-  // Atualizar info do showcase
-  const infoEl = document.getElementById('showcase-info');
-  if (infoEl && CAPAS.length) {
-    const c = CAPAS[capaAtual];
-    const k = 'info' + lang.toUpperCase();
-    infoEl.textContent = c[k] || c.infoPT || '';
-  }
-}
+// ── Idioma ── cada idioma é uma página própria (scripts/i18n.mjs); aqui só lemos qual é.
+let langAtual = window.TT_LANG || 'pt';
 
 // ── Produtos ──────────────────────────────────────────────────────────────────
 // Populado ao vivo via /api/public/catalogo (ver init no fim do arquivo). Chegou a ter
@@ -1081,38 +1006,11 @@ function renderProdutos(prods, filtro) {
 }
 
 // ── FAQ ───────────────────────────────────────────────────────────────────────
-const FAQ = {
-  pt: [
-    {q:'Como recebo meu ebook?',r:'Logo após a confirmação do pagamento, você recebe o PDF por e-mail (sac@3trevo.com.br) e tem acesso permanente ao EPUB na sua área do cliente, com leitor integrado.'},
-    {q:'O que é o Nema?',r:'É o ponto de fidelidade da editora: a nossa moeda de descontos. Você ganha Nema ao comprar e usa o saldo em novas compras. As regras de emissão e uso, inclusive de campanhas e promoções futuras, estão nas Regras do Nema.'},
-    {q:'Quando posso usar meu Nema?',r:'Assim que o saldo for liberado, ele aparece no seu espaço de cliente. O prazo de liberação de cada Nema está nas Regras do Nema.'},
-    {q:'Como uso o Nema?',r:'Entre no seu espaço de cliente e vá ao pagamento da próxima compra. Marque "Usar meu saldo Nema" e ganhe desconto. Também há campanhas de uso: acompanhe por aqui e pelas nossas redes.'},
-    {q:'Posso trocar Nema por dinheiro?',r:'Não. Nema só vale como desconto em compras na editora e não pode ser transferido para outra pessoa.'},
-    {q:'Posso pedir reembolso?',r:'Sim. Pelo art. 49 do CDC, você tem 7 dias corridos após a compra para pedir reembolso integral. Escreva para sac@3trevo.com.br. O Nema daquela compra é cancelado.'},
-  ],
-  en: [
-    {q:'How do I receive my ebook?',r:'Right after payment confirmation, you receive the PDF by email (sac@3trevo.com.br) and get permanent access to the EPUB in your account area, with a built-in reader.'},
-    {q:'What is Nema?',r:'Our loyalty point: our discount currency. You earn Nema when you buy and use the balance on new purchases. The rules for earning and using it, including future campaigns and promotions, are in the Nema Rules.'},
-    {q:'When can I use my Nema?',r:'Once the balance is released, it shows up in your customer space. The release period for each Nema is in the Nema Rules.'},
-    {q:'How do I use Nema?',r:'Sign in to your customer space and go to the checkout of your next purchase. Tick "Use my Nema balance" and get a discount. There are also usage campaigns: follow them here and on our social media.'},
-    {q:'Can I exchange Nema for money?',r:'No. Nema only works as a discount on purchases from the publisher and cannot be transferred to someone else.'},
-    {q:'Can I get a refund?',r:'Yes. You have 7 calendar days after purchase to request a full refund. Write to sac@3trevo.com.br. The Nema from that purchase is cancelled.'},
-  ],
-  es: [
-    {q:'¿Cómo recibo mi ebook?',r:'Tras la confirmación del pago, recibes el PDF por e-mail (sac@3trevo.com.br) y tienes acceso permanente al EPUB en tu área de cliente.'},
-    {q:'¿Qué es Nema?',r:'Es el punto de fidelidad de la editorial: nuestra moneda de descuentos. Ganas Nema al comprar y usas el saldo en nuevas compras. Las reglas de emisión y uso, incluidas campañas y promociones futuras, están en las Reglas de Nema.'},
-    {q:'¿Cuándo puedo usar mi Nema?',r:'Cuando el saldo se libera, aparece en tu espacio de cliente. El plazo de liberación de cada Nema está en las Reglas de Nema.'},
-    {q:'¿Cómo uso Nema?',r:'Entra en tu espacio de cliente y ve al pago de tu próxima compra. Marca "Usar mi saldo Nema" y obtén descuento. También hay campañas de uso: síguelas aquí y en nuestras redes.'},
-    {q:'¿Puedo cambiar Nema por dinero?',r:'No. Nema solo vale como descuento en compras de la editorial y no se puede transferir a otra persona.'},
-    {q:'¿Puedo pedir reembolso?',r:'Sí. Tienes 7 días corridos tras la compra para pedir el reembolso integral. Escribe a sac@3trevo.com.br. El Nema de esa compra se cancela.'},
-  ],
-};
-
 function renderFaq() {
   const lista = document.getElementById('faq-lista');
   if (!lista) return;
   lista.innerHTML = '';
-  (FAQ[langAtual] || FAQ.pt).forEach(item => {
+  (window.T ? window.T('js.faq') : []).forEach(item => {
     const div = document.createElement('div');
     div.className = 'faq-item';
     div.dataset.ent = (lista.children.length % 2) ? 'r' : 'l';
@@ -1409,7 +1307,7 @@ document.addEventListener('DOMContentLoaded', () => {
   medir(); lerAlvo(); atual = alvo; desenhar(atual);
 })();
 </script>
-<script src="js/beacon.js?v=db6c8192" defer></script>
+<script src="/js/beacon.js?v=a4453a06" defer></script>
 <script>
 /* Rolagem guiada: o progresso (0 a 1) de cada bloco acompanha a rolagem, suavizado no tempo.
    No Nema os blocos entram em sequência: cada um começa quando o anterior chegou a 70%. */
