@@ -1,0 +1,4 @@
+{
+  "version": 1,
+  "scope": ["*.html", "js/", "assets/", "worker/src/", "worker/tests/", ".producao-segura/"]
+}
