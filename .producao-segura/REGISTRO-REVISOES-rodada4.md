@@ -16,8 +16,8 @@ Limite: os revisores não executam shell neste fluxo e não recomputaram os hash
 | Item | Decisão | Situação |
 |---|---|---|
 | Valores de *k* (protocolo §4.1) | Críticos: 5. Não críticos: 3. | Confirmado pelo responsável. |
-| Matriz de produtos (protocolo §5) | Produto: Claude (Claude Code, no terminal do PC do responsável). Demais linhas fora desta rodada. | Confirmado pelo responsável. **Falta:** identificador exato do modelo, a ser registrado antes da primeira execução. |
-| Avaliador da mesma família de modelo (protocolo §2.2) | — | **Pendente.** Não foi decidido. Se o avaliador for Claude, a rodada exige revisão humana independente dos casos críticos. |
+| Matriz de produtos (protocolo §5) | Produto: Claude (Claude Code, no terminal do PC do responsável). Demais linhas fora desta rodada. | Confirmado pelo responsável. **Falta:** identificador exato do modelo. "Claude Code" é o produto, não o modelo; registrar antes da primeira execução. |
+| Avaliador da mesma família de modelo (protocolo §2.2) | Claude Code como avaliador, com supervisão humana. | **Parcial.** Exige revisão humana independente dos casos críticos. **Pendente:** quem é o supervisor humano e se é independente do operador. |
 
 ## 3. Relação com o protocolo congelado
 
