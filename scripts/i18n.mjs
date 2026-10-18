@@ -33,7 +33,7 @@ const SITE = 'https://3trevo.com.br';
 
 const ler = (p) => readFileSync(join(ROOT, p), 'utf8');
 const lerJson = (p) => JSON.parse(ler(p));
-const config = lerJson('i18n/config.json');
+const config = lerJson('i18n/paginas.json'); // (config.json é ignorado pelo .gitignore)
 const PAGINAS = config.paginas;            // páginas que existem nos três idiomas
 const IDIOMAS = Object.keys(config.idiomas); // ['en', 'es']
 const dic = Object.fromEntries(['pt', ...IDIOMAS].map((l) => [l, lerJson(`i18n/${l}.json`)]));
