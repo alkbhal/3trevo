@@ -58,7 +58,7 @@ const TITULOS = [
     slug: 'almanaque-tt', tipo: 'editora', titulo: 'Almanaque Três Trevo', autor: 'Editora Três Trevo',
     numero: '001/26', edicao: 'Edição semanal',
     // Pauta da semana. Texto editorial, escrito pela equipe; não é copiado de outra fonte.
-    manchete: 'Manchete da semana (pendente)', chamada: 'Chamada de apoio (pendente)',
+    manchete: 'Eleições Presidenciais: a nova Copa do Mundo, ou só a novela de folhetim?', chamada: '',
   },
 ];
 
