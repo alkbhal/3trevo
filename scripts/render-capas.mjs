@@ -63,7 +63,7 @@ const TITULOS = [
     chamada: 'Entre a torcida e o enredo, quem escreve o roteiro desta eleição?',
     // Ilustração por edição: caminho absoluto do arquivo em alta resolução, passado por variável de ambiente.
     ilustracao: process.env.ALMANAQUE_ILUSTRACAO ?? null,
-    iaIlustracao: 'Ilustração de capa gerada com auxílio de inteligência artificial, a partir da manchete da semana.',
+    iaIlustracao: 'Conteúdo de IA',
   },
 ];
 
@@ -127,6 +127,9 @@ ${aviso}
 function capaEditora(l) {
   const imagem = l.ilustracao ? `<img class="topo-img" src="file://${l.ilustracao}">` : '';
   const aviso = l.iaIlustracao && l.ilustracao ? `<div class="aviso-ia">${esc(l.iaIlustracao)}</div>` : '';
+  // A manchete com dois-pontos vira etiqueta (antes do ":") e título (depois).
+  const [etiqueta, titulo] = l.manchete.includes(':') ? l.manchete.split(/:(.+)/) : [null, l.manchete];
+  const kicker = etiqueta ? `<div class="kicker">${esc(etiqueta)}</div>` : '';
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
 html,body{margin:0;width:${LARGURA}px;height:${ALTURA}px;overflow:hidden;background:#1fd1c1;font-family:'Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif;color:#14101f}
 .topo{position:absolute;left:0;top:0;width:${LARGURA}px;height:1560px;background:#15171c;overflow:hidden}
@@ -134,7 +137,8 @@ html,body{margin:0;width:${LARGURA}px;height:${ALTURA}px;overflow:hidden;backgro
 .marca{position:absolute;left:90px;top:90px;background:#e6007e;color:#ffffff;font-weight:700;font-size:30px;letter-spacing:6px;padding:20px 30px;text-transform:uppercase}
 .corpo{position:absolute;left:0;top:1560px;width:${LARGURA}px;height:1000px;box-sizing:border-box;padding:60px 90px 50px;display:flex;flex-direction:column;justify-content:center}
 .masthead{font-size:32px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:#4c1d95}
-.manchete{font-size:100px;line-height:1.02;font-weight:800;letter-spacing:-2px;margin-top:34px}
+.kicker{align-self:flex-start;margin-top:34px;padding:14px 26px;background:#4c1d95;color:#ffffff;font-size:40px;font-weight:800;letter-spacing:4px;text-transform:uppercase;transform:rotate(-2deg);transform-origin:left center}
+.manchete{font-size:104px;line-height:1;font-weight:800;letter-spacing:-2px;margin-top:40px;color:#14101f;text-shadow:6px 6px 0 #e6007e,12px 12px 0 #4c1d95}
 .chamada{font-size:46px;line-height:1.35;color:#444;margin-top:34px}
 .rodape{margin-top:72px;display:flex;justify-content:space-between;align-items:center;border-top:3px solid #14101f;padding-top:26px;font-size:28px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
 .aviso-ia{position:absolute;left:90px;top:1470px;width:1420px;box-sizing:border-box;padding:16px 22px;background:rgba(20,16,31,.9);color:#ffffff;font-size:24px;line-height:1.3}</style></head><body>
@@ -143,7 +147,7 @@ html,body{margin:0;width:${LARGURA}px;height:${ALTURA}px;overflow:hidden;backgro
 ${aviso}
 <div class="corpo">
 <div class="masthead">${esc(l.titulo)} · Nº ${esc(l.numero)}</div>
-<div class="manchete">${esc(l.manchete)}</div>
+${kicker}<div class="manchete">${esc(titulo.trim())}</div>
 <div class="rodape"><span>${esc(l.edicao)}</span><span>${esc(l.autor)}</span></div>
 </div></body></html>`;
 }
