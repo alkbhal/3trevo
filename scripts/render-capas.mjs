@@ -58,7 +58,8 @@ const TITULOS = [
     slug: 'almanaque-tt', tipo: 'editora', titulo: 'Almanaque Três Trevo', autor: 'Editora Três Trevo',
     numero: '001/26', edicao: 'Edição semanal',
     // Pauta da semana. Texto editorial, escrito pela equipe; não é copiado de outra fonte.
-    manchete: 'Eleições Presidenciais: a nova Copa do Mundo, ou só a novela de folhetim?', chamada: '',
+    manchete: 'Eleições Presidenciais: a nova Copa do Mundo, ou só a novela de folhetim?',
+    chamada: 'Entre a torcida e o enredo, quem escreve o roteiro desta eleição?',
   },
 ];
 
@@ -124,6 +125,7 @@ function capaEditora(l) {
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>${base}
 body{background:#0f2d1a;font-family:Georgia,'Liberation Serif','DejaVu Serif',serif;color:#f7f2e6}
 .moldura{border:2px solid rgba(200,168,75,.45);padding:130px 120px 130px;justify-content:space-between;text-align:left}
+.arte{position:absolute;left:160px;top:900px;width:1280px;opacity:.07}
 .topo{width:100%}
 .selo{font-size:34px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b;text-align:center}
 .jornal{font-size:50px;letter-spacing:4px;color:#e6d59a;text-align:center;margin-top:50px}
@@ -134,6 +136,14 @@ body{background:#0f2d1a;font-family:Georgia,'Liberation Serif','DejaVu Serif',se
 .numero{font-size:72px;letter-spacing:4px;color:#f7f2e6;text-align:center}
 .edicao{font-size:44px;letter-spacing:4px;color:#e6d59a;margin-top:20px;text-align:center}
 .autor{font-size:44px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b;text-align:center;margin-top:70px}</style></head><body><div class="moldura">
+<svg class="arte" viewBox="0 0 1280 900" fill="none" stroke="#c8a84b" stroke-width="10" stroke-linejoin="round">
+<rect x="340" y="420" width="600" height="380" rx="18"/>
+<rect x="420" y="470" width="440" height="22" rx="11" fill="#c8a84b"/>
+<circle cx="640" cy="260" r="130" stroke="#e6d59a"/>
+<polygon points="640,200 697,241.5 675.3,308.5 604.7,308.5 582.9,241.5" stroke="#e6d59a" stroke-width="8"/>
+<path d="M640 390 V420" stroke-dasharray="6 14" stroke-linecap="round"/>
+<text x="640" y="880" text-anchor="middle" fill="#c8a84b" stroke="none" font-family="Georgia,'Liberation Serif',serif" font-style="italic" font-size="64">continua…</text>
+</svg>
 <div class="topo"><div class="selo">✦ Três Trevo</div><div class="jornal">${esc(l.titulo)}</div><div class="filete"></div></div>
 <div class="manchete">${esc(l.manchete)}</div>
 ${chamada}
