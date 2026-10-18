@@ -30,13 +30,13 @@ jobs:
           done
       - name: Abre cada EPUB candidato
         run: |
-          jq -r '.[] | "\(.id) \(.idioma)"' scripts/estante-candidatos.json | while read ID IDI; do
-            URL="https://www.gutenberg.org/ebooks/$ID.epub3.images"
+          jq -r '.[] | "\(.id) \(.idioma) \(.formato // "epub3.images")"' scripts/estante-candidatos.json | while read ID IDI FMT; do
+            URL="https://www.gutenberg.org/ebooks/$ID.$FMT"
             curl -sL -A "EditoraTresTrevo/1.0" -o /tmp/l.epub -w "%{http_code} %{size_download}" "$URL" > /tmp/h || true
             OPF=$(unzip -Z1 /tmp/l.epub 2>/dev/null | grep '\.opf$' | head -1)
             T=$(unzip -p /tmp/l.epub "$OPF" 2>/dev/null | grep -o '<dc:title[^>]*>[^<]*' | head -1 | sed 's/<[^>]*>//')
             A=$(unzip -p /tmp/l.epub "$OPF" 2>/dev/null | grep -o '<dc:creator[^>]*>[^<]*' | head -1 | sed 's/<[^>]*>//')
             G=$(unzip -p /tmp/l.epub "$OPF" 2>/dev/null | grep -o '<dc:language[^>]*>[^<]*' | head -1 | sed 's/<[^>]*>//')
             OK=$([ "$G" = "$IDI" ] && echo OK || echo "IDIOMA_DIFERENTE")
-            echo -e "$ID\t$(cat /tmp/h)\t$G\t$OK\t$A\t$T"
+            echo -e "$ID.$FMT\t$(cat /tmp/h)\t$G\t$OK\t$A\t$T"
           done
