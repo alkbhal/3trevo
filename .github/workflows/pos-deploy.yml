@@ -1,0 +1,56 @@
+name: Verificação pós-deploy
+
+# Roda depois de cada publicação do GitHub Pages: confere que as páginas principais
+# respondem e que todo JS/CSS local referenciado por elas existe (um arquivo faltando
+# deixa o leitor ou o player quebrados sem erro visível). Falhou → abre issue com o
+# comando de reversão.
+on:
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aguarda propagação do CDN
+        run: sleep 60
+      - name: Páginas e arquivos referenciados
+        id: smoke
+        run: |
+          set -u
+          BASE=https://3trevo.com.br
+          falhas=""
+          for pagina in / /area-cliente.html /minha-biblioteca.html /biblioteca-musica.html /catalogo.html /checkout.html; do
+            code=$(curl -s -o /tmp/p.html -w "%{http_code}" "$BASE$pagina")
+            [ "$code" = "200" ] || { falhas="$falhas\n$pagina → HTTP $code"; continue; }
+            for ref in $(grep -oE '(src|href)="/(js|css)/[^"]+"' /tmp/p.html | sed -E 's/^(src|href)="//; s/"$//' | sort -u); do
+              c=$(curl -s -o /dev/null -w "%{http_code}" "$BASE$ref")
+              [ "$c" = "200" ] || falhas="$falhas\n$pagina → $ref HTTP $c"
+            done
+          done
+          grep -q "media-src" <(curl -s "$BASE/area-cliente.html") || falhas="$falhas\narea-cliente.html sem media-src na CSP (música volta a ser bloqueada)"
+          if [ -n "$falhas" ]; then
+            printf "Falhas:$falhas\n"
+            { echo "falhas<<EOF"; printf "$falhas\n"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          echo "✓ produção saudável"
+      - name: Abre issue se a produção quebrou
+        if: failure()
+        uses: actions/github-script@v7
+        env:
+          FALHAS: ${{ steps.smoke.outputs.falhas }}
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              title: '[ALERTA] Verificação pós-deploy falhou',
+              labels: ['alerta', 'infra'],
+              body: `Commit no ar: ${context.payload.workflow_run?.head_sha || context.sha}\n\n\`\`\`\n${process.env.FALHAS}\n\`\`\`\n\nPara voltar à versão anterior: Actions → **Reverter produção** → Run workflow (alvo = a branch \`azul-*\` mais recente). Roteiro: docs/DEPLOY_AZUL_VERDE.md`,
+            });

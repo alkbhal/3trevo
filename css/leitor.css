@@ -1,0 +1,147 @@
+/* leitor.css — Leitor da Editora Três Trevo (usado por js/leitor.js)
+   Marca: verde #1e5c3a / #0f2d1a, ouro #c8a84b, creme #f7f2e6, Fraunces nos títulos. */
+.tl{
+  --tl-fundo:#fbf8f2;--tl-painel:#fffdf9;--tl-texto:#2b241a;--tl-suave:rgba(43,36,26,.58);
+  --tl-borda:rgba(43,36,26,.12);--tl-verde:#1e5c3a;--tl-verde-escuro:#0f2d1a;--tl-ouro:#c8a84b;
+  --tl-topo-h:56px;--tl-base-h:60px;
+  position:fixed;inset:0;z-index:1000;display:none;flex-direction:column;
+  background:var(--tl-fundo);color:var(--tl-texto);
+  font-family:'Instrument Sans','Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.tl.aberto{display:flex}
+.tl[data-tema="noite"]{
+  --tl-fundo:#0e1f15;--tl-painel:#0b1a11;--tl-texto:#ece3cf;--tl-suave:rgba(236,227,207,.62);
+  --tl-borda:rgba(236,227,207,.12);--tl-verde:#e8c96a;
+}
+html.tl-travado,html.tl-travado body{overflow:hidden}
+/* Com o player de música aberto, o leitor não fica por baixo dele. */
+body:has(#tt-player.ativo) .tl{bottom:64px}
+
+.tl button{font-family:inherit;cursor:pointer}
+.tl button:focus-visible,.tl a:focus-visible{outline:2px solid var(--tl-ouro);outline-offset:2px}
+
+/* Progresso de leitura: linha fina no topo */
+.tl-progresso{position:absolute;top:0;left:0;right:0;height:2px;z-index:3;background:transparent}
+.tl-progresso span{display:block;height:100%;width:0;background:var(--tl-ouro);transition:width .35s ease}
+
+/* Cabeçalho da marca */
+.tl-topo{
+  flex-shrink:0;height:var(--tl-topo-h);display:flex;align-items:center;gap:12px;
+  padding:0 8px 0 16px;background:var(--tl-verde-escuro);color:#f7f2e6;
+  padding-top:env(safe-area-inset-top);box-sizing:content-box;
+}
+.tl-marca{display:flex;align-items:center;gap:8px;flex-shrink:0;color:var(--tl-ouro)}
+.tl-trevo{display:inline-flex;width:22px;height:22px}
+.tl-trevo svg{width:100%;height:100%}
+.tl-marca-nome{font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:600;letter-spacing:.2px;color:#f7f2e6;white-space:nowrap}
+.tl-titulo{
+  flex:1;min-width:0;font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(247,242,230,.82);
+  padding-left:12px;border-left:1px solid rgba(200,168,75,.35);
+}
+.tl-acoes{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.tl-btn{
+  width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;
+  background:transparent;border:0;border-radius:8px;color:#f7f2e6;font-size:16px;font-weight:600;
+}
+.tl-btn:hover{background:rgba(247,242,230,.1)}
+.tl-btn svg{width:20px;height:20px}
+.tl-btn[hidden]{display:none}
+.tl-btn-ajustes{font-family:'Fraunces',Georgia,serif;font-size:17px}
+
+/* Painel de ajustes */
+.tl-ajustes{
+  position:absolute;top:calc(var(--tl-topo-h) + env(safe-area-inset-top) + 6px);right:10px;z-index:4;
+  background:var(--tl-painel);color:var(--tl-texto);border:1px solid var(--tl-borda);border-radius:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:240px;
+}
+.tl-ajustes[hidden]{display:none}
+.tl-ajuste-linha{display:flex;align-items:center;gap:8px;font-size:13px}
+.tl-ajuste-linha>span:first-child{width:46px;color:var(--tl-suave)}
+.tl-tamanho{min-width:44px;text-align:center;font-variant-numeric:tabular-nums;font-size:13px}
+.tl-chip{
+  min-width:44px;height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--tl-borda);
+  background:transparent;color:var(--tl-texto);font-size:14px;
+}
+.tl-chip[aria-pressed="true"]{background:var(--tl-verde-escuro);border-color:var(--tl-verde-escuro);color:#f7f2e6}
+.tl[data-tema="noite"] .tl-chip[aria-pressed="true"]{background:var(--tl-ouro);border-color:var(--tl-ouro);color:#0f2d1a}
+
+/* Texto */
+.tl-viewer{flex:1;min-height:0;position:relative;background:var(--tl-fundo);overflow:hidden}
+.tl-viewer .epub-container{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.tl-pdf{width:100%;height:100%;border:0}
+
+/* Rodapé: troca de capítulo + onde estou */
+.tl-base{
+  flex-shrink:0;height:var(--tl-base-h);display:flex;align-items:center;gap:8px;
+  padding:0 8px;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;
+  background:var(--tl-painel);border-top:1px solid var(--tl-borda);
+}
+.tl-base[hidden]{display:none}
+.tl-nav{
+  height:44px;min-width:44px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;
+  background:transparent;border:1px solid var(--tl-borda);border-radius:22px;color:var(--tl-texto);font-size:14px;
+}
+.tl-nav span[aria-hidden]{font-size:20px;line-height:1}
+.tl-nav:disabled{opacity:.35;cursor:default}
+.tl-prox{background:var(--tl-verde-escuro);border-color:var(--tl-verde-escuro);color:#f7f2e6}
+.tl[data-tema="noite"] .tl-prox{background:var(--tl-ouro);border-color:var(--tl-ouro);color:#0f2d1a}
+.tl-local{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;line-height:1.25;text-align:center}
+.tl-cap{font-size:12.5px;color:var(--tl-texto);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-pct{font-size:12px;color:var(--tl-suave);font-variant-numeric:tabular-nums}
+
+/* Estados */
+.tl-estado{
+  position:absolute;left:0;right:0;top:calc(var(--tl-topo-h) + env(safe-area-inset-top));bottom:0;z-index:2;
+  display:flex;align-items:center;justify-content:center;padding:24px;background:var(--tl-fundo);
+}
+.tl-estado[hidden]{display:none}
+.tl-estado-box{max-width:360px;text-align:center;font-size:15px;line-height:1.6;color:var(--tl-suave)}
+.tl-estado-titulo{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;color:var(--tl-texto);margin:0 0 8px}
+.tl-estado-box p{margin:0 0 10px}
+.tl-estado-ajuda{font-size:13px}
+.tl-estado-acoes{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0 12px}
+.tl-spinner{
+  width:32px;height:32px;margin:0 auto 14px;border-radius:50%;
+  border:3px solid var(--tl-borda);border-top-color:var(--tl-ouro);animation:tl-gira .8s linear infinite;
+}
+@keyframes tl-gira{to{transform:rotate(360deg)}}
+.tl-cta{
+  display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border-radius:23px;
+  background:var(--tl-verde-escuro);color:#f7f2e6;border:1px solid var(--tl-verde-escuro);
+  font-size:15px;font-weight:600;text-decoration:none;
+}
+.tl-cta-sec{background:transparent;color:var(--tl-texto);border-color:var(--tl-borda)}
+.tl[data-tema="noite"] .tl-cta:not(.tl-cta-sec){background:var(--tl-ouro);border-color:var(--tl-ouro);color:#0f2d1a}
+
+/* Página final */
+.tl-fim{
+  position:absolute;left:0;right:0;top:calc(var(--tl-topo-h) + env(safe-area-inset-top));bottom:0;z-index:2;
+  overflow-y:auto;background:var(--tl-fundo);display:flex;justify-content:center;padding:40px 20px 32px;
+}
+.tl-fim[hidden]{display:none}
+.tl-fim-box{max-width:420px;width:100%;text-align:center;margin:auto 0}
+.tl-fim-trevo{display:inline-flex;width:40px;height:40px;color:var(--tl-ouro);margin-bottom:12px}
+.tl-fim-trevo svg{width:100%;height:100%}
+.tl-fim-sobre{font-size:14px;color:var(--tl-suave);margin:0 0 4px}
+.tl-fim-titulo{font-family:'Fraunces',Georgia,serif;font-size:26px;line-height:1.2;font-weight:600;color:var(--tl-verde);margin:0 0 6px;overflow-wrap:break-word}
+.tl-fim-autor{font-size:15px;color:var(--tl-suave);margin:0 0 24px}
+.tl-fim-sugestao{margin:0 0 24px;text-align:left}
+.tl-fim-rotulo{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--tl-suave);margin:0 0 8px;text-align:center}
+.tl-fim-card{
+  display:flex;flex-direction:column;gap:4px;padding:16px 18px;border:1px solid var(--tl-borda);border-radius:12px;
+  text-decoration:none;color:var(--tl-texto);background:var(--tl-painel);
+}
+.tl-fim-card-titulo{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:600}
+.tl-fim-card-autor{font-size:13px;color:var(--tl-suave)}
+.tl-fim-card-link{font-size:14px;color:var(--tl-verde);font-weight:600;margin-top:4px}
+.tl-fim-acoes{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.tl-colofao{font-size:12.5px;line-height:1.6;color:var(--tl-suave);border-top:1px solid var(--tl-borda);padding-top:16px;margin:0}
+
+@media (max-width:560px){
+  .tl-marca-nome{display:none}
+  .tl-titulo{padding-left:10px;font-size:14.5px}
+}
+@media (max-width:340px){.tl-nav-txt{display:none}}
+@media (prefers-reduced-motion:reduce){.tl-progresso span{transition:none}.tl-spinner{animation-duration:2s}}
