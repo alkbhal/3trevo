@@ -8,6 +8,8 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { assinarForge } from '../forge-download';
+import { verificarToken } from './admin-catalog';
 
 interface DeliveryPackage {
   projectId: string;
@@ -87,4 +89,19 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
 
   console.log(`[forge-webhook] produto rascunho criado: ${slug} (projeto ${pkg.projectId})`);
   return Response.json({ ok: true, slug, projectId: pkg.projectId });
+}
+
+/**
+ * GET /api/admin/forge/links?projectId=X — links assinados (15 min) de HTML/EPUB/PDF
+ * pra revisão no admin. O forge não abre mais esses arquivos sem assinatura.
+ */
+export async function handleAdminForgeLinks(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) return Response.json({ ok: false, erro: 'unauthorized' }, { status: 401 });
+  const projectId = (new URL(request.url).searchParams.get('projectId') ?? '').toLowerCase();
+  if (!/^[0-9a-f-]{36}$/.test(projectId)) return Response.json({ ok: false, erro: 'projectId_invalido' }, { status: 400 });
+  const [html, epub, pdf] = await Promise.all(
+    (['html', 'epub', 'pdf'] as const).map((f) => assinarForge(env, projectId, f))
+  );
+  if (!html || !epub || !pdf) return Response.json({ ok: false, erro: 'forge_download_secret_ausente' }, { status: 503 });
+  return Response.json({ ok: true, html, epub, pdf });
 }

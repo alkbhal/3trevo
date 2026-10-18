@@ -10,14 +10,38 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+// tr3vo-forge: arquivos só abrem com link assinado (mesmo segredo do forge).
+const FORGE_URL    = (Deno.env.get("FORGE_PUBLIC_URL") ?? "https://tr3vo-forge.al-kbhal.workers.dev").replace(/\/+$/, "");
+const FORGE_SECRET = Deno.env.get("FORGE_DOWNLOAD_SECRET") ?? "";
+const FORGE_TTL_S  = 15 * 60;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// URL do forge → { projectId, formato }; mesmo formato de worker/src/forge-download.ts.
+function arquivoForge(url: string): { projectId: string; formato: string } | null {
+  if (!url.toLowerCase().startsWith(FORGE_URL.toLowerCase() + "/")) return null;
+  const m = url.slice(FORGE_URL.length).match(/^\/project\/([0-9a-f-]{36})\/(epub|pdf)$/i);
+  return m ? { projectId: m[1].toLowerCase(), formato: m[2].toLowerCase() } : null;
+}
+
+async function assinarForge(projectId: string, formato: string): Promise<string | null> {
+  if (!FORGE_SECRET) { console.error("FORGE_DOWNLOAD_SECRET ausente — link do forge não assinado"); return null; }
+  const exp = Math.floor(Date.now() / 1000) + FORGE_TTL_S;
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(FORGE_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${projectId}.${formato}.${exp}`));
+  const hex = [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  return `${FORGE_URL}/project/${projectId}/${formato}?exp=${exp}&sig=${hex}`;
+}
+
 // deno-lint-ignore no-explicit-any
 async function assinarUrl(sbAdmin: any, arquivo: string): Promise<string | null> {
+  const forge = arquivoForge(arquivo);
+  if (forge) return assinarForge(forge.projectId, forge.formato);
   if (arquivo.startsWith("http")) return arquivo;
   const { data, error } = await sbAdmin.storage.from("ebooks").createSignedUrl(arquivo, 259200);
   if (error || !data) return null;
@@ -120,6 +144,8 @@ serve(async (req: Request) => {
       const n = nome.toLowerCase();
       if (n.endsWith(".pdf")) return "pdf";
       if (n.endsWith(".epub")) return "epub";
+      const forge = arquivoForge(nome);
+      if (forge) return forge.formato as "pdf" | "epub";
       return null;
     };
 
@@ -128,7 +154,9 @@ serve(async (req: Request) => {
       const tipo = tipoDe(campo);
       if (!tipo || formatos[tipo]) continue; // já preenchido, não sobrescreve
       const url = await assinarUrl(sbAdmin, campo);
-      if (url) formatos[tipo] = { download_url: url, expira_em: expiresAt };
+      // Link do forge vale 15 min (gerado a cada pedido); Storage, 72h.
+      const expira = arquivoForge(campo) ? new Date(Date.now() + FORGE_TTL_S * 1000).toISOString() : expiresAt;
+      if (url) formatos[tipo] = { download_url: url, expira_em: expira };
     }
 
     if (Object.keys(formatos).length === 0) {

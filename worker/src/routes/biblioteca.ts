@@ -28,6 +28,7 @@ import { z } from 'zod';
 import type { Env } from '../types';
 import { verificarToken as verificarTokenAdmin } from './admin-catalog';
 import { sb } from '../sb';
+import { resolverUrlExterna } from '../forge-download';
 
 // ─── Validação Zod do acervo — achado da auditoria real (01/09): create/update
 // gravavam o body admin cru sem schema, permitindo titulo/sinopse com HTML que
@@ -367,9 +368,12 @@ export async function handleBibliotecaStream(request: Request, env: Env): Promis
 
   const { epub_url } = JSON.parse(raw) as { epub_url: string; email: string; slug: string };
 
-  // epub_url é URL externa (Gutenberg, etc.) → redirect direto (domínio público)
+  // epub_url é URL externa (Gutenberg, etc.) → redirect direto (domínio público).
+  // Do forge → redirect com link assinado (o forge recusa sem assinatura).
   if (epub_url.startsWith('http')) {
-    return Response.redirect(epub_url, 302);
+    const destino = await resolverUrlExterna(epub_url, env);
+    if (!destino) return new Response('Leitura temporariamente indisponível.', { status: 503 });
+    return Response.redirect(destino, 302);
   }
 
   // epub_url é caminho no R2 privado (ex: "dom-casmurro.epub")

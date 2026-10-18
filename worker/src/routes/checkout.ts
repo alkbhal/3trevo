@@ -13,6 +13,7 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { arquivoForge, resolverUrlExterna } from '../forge-download';
 import { verificarToken } from './admin-catalog';
 import {
   usuarioDoToken, reservarNema, cancelarReservaNema, confirmarResgateNema,
@@ -271,11 +272,13 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
 
   // Buscar arquivo do produto
   const prodResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/products?id=eq.${dl.product_id}&select=arquivo_url,titulo`,
+    `${env.SUPABASE_URL}/rest/v1/products?id=eq.${dl.product_id}&select=arquivo_url,epub_url,titulo`,
     { headers: supabaseHeaders(env) }
   );
   const [produto] = (await prodResp.json()) as any[];
-  if (!produto?.arquivo_url) {
+  // PDF em arquivo_url, EPUB em epub_url — produto só com EPUB também é entregue.
+  const arquivo: string | undefined = produto?.arquivo_url || produto?.epub_url;
+  if (!arquivo) {
     return new Response('Arquivo não configurado', { status: 404 });
   }
 
@@ -283,11 +286,14 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
   // get-download (edge function) já usa pro leitor/biblioteca. Rota antiga apontava pra
   // um bucket R2 que nunca chegou a ser configurado (achado real: TODO download por
   // e-mail quebrava com 500, "r2_not_configured" -- corrigido nesta sessão).
-  if (produto.arquivo_url.startsWith('http')) {
-    return Response.redirect(produto.arquivo_url, 302);
+  // URL do forge sai assinada (o forge recusa link sem assinatura).
+  if (arquivo.startsWith('http')) {
+    const destino = await resolverUrlExterna(arquivo, env);
+    if (!destino) return new Response('Download temporariamente indisponível. Contate sac@3trevo.com.br.', { status: 503 });
+    return Response.redirect(destino, 302);
   }
   const signResp = await fetch(
-    `${env.SUPABASE_URL}/storage/v1/object/sign/ebooks/${encodeURIComponent(produto.arquivo_url)}`,
+    `${env.SUPABASE_URL}/storage/v1/object/sign/ebooks/${encodeURIComponent(arquivo)}`,
     {
       method: 'POST',
       headers: { ...supabaseHeaders(env), 'Content-Type': 'application/json' },
@@ -296,7 +302,7 @@ export async function handleDownload(request: Request, env: Env): Promise<Respon
   );
   const signed = await signResp.json() as { signedURL?: string; message?: string };
   if (!signed.signedURL) {
-    console.error('[download] falha ao assinar arquivo:', produto.arquivo_url, signed.message);
+    console.error('[download] falha ao assinar arquivo:', arquivo, signed.message);
     return Response.json({ ok: false, erro: 'assinatura_falhou' }, { status: 500 });
   }
 
@@ -582,16 +588,20 @@ async function enviarEmailCompra(
   // link de download continua sendo o caminho garantido, nunca bloqueia a entrega.
   let attachment: { filename: string; content: string } | null = null;
   try {
-    const prodResp = await fetch(`${env.SUPABASE_URL}/rest/v1/products?slug=eq.${opts.productSlug}&select=arquivo_url`, { headers: supabaseHeaders(env) });
+    const prodResp = await fetch(`${env.SUPABASE_URL}/rest/v1/products?slug=eq.${opts.productSlug}&select=arquivo_url,epub_url`, { headers: supabaseHeaders(env) });
     const [produto] = (await prodResp.json()) as any[];
-    if (produto?.arquivo_url) {
+    const arquivo: string | undefined = produto?.arquivo_url || produto?.epub_url;
+    if (arquivo) {
       const fileResp = await fetch(downloadUrl, { redirect: 'follow' });
       if (fileResp.ok) {
         const bytes = new Uint8Array(await fileResp.arrayBuffer());
         if (bytes.byteLength > 0 && bytes.byteLength < 15 * 1024 * 1024) {
           let binary = '';
           for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-          attachment = { filename: produto.arquivo_url, content: btoa(binary) };
+          // URL do forge não serve de nome de arquivo: slug + formato.
+          const forge = arquivoForge(arquivo, env);
+          const filename = forge ? `${opts.productSlug}.${forge.formato}` : arquivo.split('/').pop() || arquivo;
+          attachment = { filename, content: btoa(binary) };
         }
       }
     }

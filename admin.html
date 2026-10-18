@@ -1481,9 +1481,13 @@ async function carregarForgeProjeto() {
 
     document.getElementById('forge-preview-area').style.display = '';
     document.getElementById('forge-cover-img').src = `${FORGE_URL}/project/${id}/cover`;
-    document.getElementById('forge-link-html').href = `${FORGE_URL}/project/${id}/html`;
-    document.getElementById('forge-link-epub').href = `${FORGE_URL}/project/${id}/epub`;
-    document.getElementById('forge-link-pdf').href = `${FORGE_URL}/project/${id}/pdf`;
+    // Arquivos do forge só abrem com link assinado (15 min), gerado pelo worker.
+    const rLinks = await api(`/api/admin/forge/links?projectId=${id}`);
+    const links = await rLinks.json();
+    if (!links.ok) toast('Links do forge indisponíveis: ' + (links.erro || rLinks.status), 'err');
+    document.getElementById('forge-link-html').href = links.html || '#';
+    document.getElementById('forge-link-epub').href = links.epub || '#';
+    document.getElementById('forge-link-pdf').href = links.pdf || '#';
     document.getElementById('forge-slug').value = `forge-${id.slice(0, 8)}`;
 
     carregarForgeMarketing(id);
