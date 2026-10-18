@@ -5,9 +5,9 @@
  * TTLeitor.abrir({
  *   titulo, autor,
  *   chave,                         // id estável pra lembrar a posição (localStorage)
- *   obterArquivo: async () => ({ epub?: url, pdf?: url, erro?: msg }),
+ *   obterArquivo: async () => ({ epub?: url | ArrayBuffer, pdf?: url, erro?: msg }),
  *   trilha?:   async () => idDaMusica | null,   // mostra o botão de trilha
- *   sugestao?: async () => ({ titulo, autor, href }) | null,  // cartão na página final
+ *   sugestao?: async () => ({ titulo, autor, href, rotulo?, acao? }) | null,  // cartão na página final
  *   aoProgredir?: (pct) => void,   // ex.: salvar progresso no servidor
  *   aoFechar?: () => void,
  * })
@@ -181,6 +181,7 @@
         margin:-28px -20px 1.4em !important; padding:44px 20px 26px !important; max-width:none !important;
         font-size:1.5em !important; position:relative;
       }
+.tt-abertura-solta { margin-top:1.2em !important; }
       .tt-abertura::before {
         content:''; display:block; width:26px; height:26px; margin-bottom:14px;
         background:url("${TREVO_DATA}") no-repeat center / contain;
@@ -206,7 +207,14 @@
 
     // Primeiro título do capítulo vira a faixa de abertura da editora.
     const primeiro = doc.body && doc.body.querySelector('h1, h2');
-    if (primeiro) primeiro.classList.add('tt-abertura');
+    if (primeiro) {
+      primeiro.classList.add('tt-abertura');
+      // Com texto antes do título (ex.: "Amostra gratuita"), a faixa não sobe até o topo.
+      const antes = doc.createRange();
+      antes.setStart(doc.body, 0);
+      antes.setEndBefore(primeiro);
+      if (antes.toString().trim()) primeiro.classList.add('tt-abertura-solta');
+    }
 
     // Valores e números não se partem no fim da linha ("R$ / 100" → "R$ 100").
     const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
@@ -324,9 +332,9 @@
         const s = await opcoes.sugestao();
         const box = el.fim.querySelector('.tl-fim-sugestao');
         if (s && box) {
-          box.innerHTML = `<p class="tl-fim-rotulo">Do mesmo autor</p>
+          box.innerHTML = `<p class="tl-fim-rotulo">${esc(s.rotulo || 'Do mesmo autor')}</p>
             <a class="tl-fim-card" href="${esc(s.href)}"><span class="tl-fim-card-titulo">${esc(s.titulo)}</span>
-            ${s.autor ? `<span class="tl-fim-card-autor">${esc(s.autor)}</span>` : ''}<span class="tl-fim-card-link">Conhecer o livro ›</span></a>`;
+            ${s.autor ? `<span class="tl-fim-card-autor">${esc(s.autor)}</span>` : ''}<span class="tl-fim-card-link">${esc(s.acao || 'Conhecer o livro')} ›</span></a>`;
           box.hidden = false;
         }
       } catch { /* sugestão é opcional */ }
@@ -396,7 +404,8 @@
     }, TEMPO_LIMITE_MS);
 
     try {
-      book = window.ePub(arq.epub, { openAs: 'epub' });
+      // URL → 'epub' (o epub.js baixa); bytes já baixados (ArrayBuffer) → 'binary'.
+      book = window.ePub(arq.epub, { openAs: arq.epub instanceof ArrayBuffer ? 'binary' : 'epub' });
       rendition = book.renderTo(el.viewer, { width: '100%', height: '100%', flow: 'scrolled-doc', allowScriptedContent: false });
       rendition.hooks.content.register(prepararConteudo);
       rendition.on('relocated', (loc) => {

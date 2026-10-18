@@ -40,3 +40,4 @@ O workflow **Health Check** (a cada 6h) e o `/api/health/status` confirmam a sa�
 | Data | Azul (antes) | Verde (depois) | O que mudou |
 |---|---|---|---|
 | 18/10/2026 | `azul-20261018` | PR `verde-20261018` | Leitor novo, música liberada na CSP, capas tipográficas, banner de clássicos condicional, Nema como pontos, policy dos produtos comprados |
+| 18/10/2026 | `azul-20261018b` | PR `verde-20261018-membros` | Área de membros grátis: pop-up e /gratis criam a conta, amostra em EPUB, 1 clássico por membro (tabela `leitura_livre` + função `livre-epub`), cartão do Nema |

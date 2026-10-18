@@ -25,6 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/leitor.css?v=d3600737">
+<link rel="stylesheet" href="/css/membro.css?v=81b2a6bc">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
@@ -766,7 +767,7 @@ nav{
 <div id="tela-login" class="tela ativa">
   <div class="login-box">
     <div class="login-logo">✦ Três Trevo</div>
-    <p class="login-sub">Acesse sua biblioteca pessoal</p>
+    <p class="login-sub">Acesse sua biblioteca pessoal. Ainda não tem conta? Use “Receber link por e-mail”: a área de membro é criada na hora, de graça.</p>
     <label class="campo-label" for="emailLogin">E-mail</label>
     <input type="email" id="emailLogin" class="campo-input" placeholder="seu@email.com"
       autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('senhaLogin').focus()">
@@ -881,7 +882,8 @@ nav{
 
 <script src="/js/supabase-client.js?v=4c1ab884"></script>
 <script src="/js/player.js?v=1228b01f"></script>
-<script src="/js/leitor.js?v=e627ba66"></script>
+<script src="/js/leitor.js?v=705149eb"></script>
+<script src="/js/membro.js?v=6be58d7f"></script>
 <script>
 // ============================================================
 // ÁREA DO CLIENTE — Editora Três Trevo
@@ -1061,7 +1063,7 @@ async function carregarStats() {
   animarNum('statEbooks',  ebooks);
   animarNum('statMusicas', musicas);
   carregarNema();
-  document.getElementById('statStatus').textContent = hasSub ? 'Ativa' : 'Sem plano';
+  document.getElementById('statStatus').textContent = hasSub ? 'Ativa' : (ebooks === 0 ? 'Membro grátis' : 'Sem plano');
 }
 
 // Nema: saldo vem do worker (as regras ficam no banco). Disponível = pode usar no checkout.
@@ -1120,6 +1122,12 @@ async function carregarBiblioteca() {
   produtosBiblioteca = ebooks.map(l => l.produto).filter(Boolean);
   const banner = document.getElementById('bannerClassicos');
   if (banner) banner.hidden = ebooks.length === 0;
+
+  // Conta sem compra = membro grátis: amostra, 1 clássico e o cartão do Nema (js/membro.js).
+  if (ebooks.length === 0 && window.TTMembro) {
+    TTMembro.renderizar(cont);
+    return;
+  }
 
   if (ebooks.length === 0) {
     cont.innerHTML = `<div class="vazio">

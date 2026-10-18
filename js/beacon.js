@@ -1,6 +1,6 @@
 /**
  * beacon.js — Growth Engine Fase 4
- * Tracking frontend + pop-up captura de leads
+ * Tracking frontend + pop-up de cadastro de membro grátis (amostra + clássico)
  * Dispara eventos para POST /api/track (Worker)
  */
 (function () {
@@ -113,56 +113,105 @@
     showLeadPopup();
   }
 
+  // ── Cadastro de membro grátis ─────────────────────────────────────────────
+  // Cria a conta pelo link de acesso do Supabase (sem senha): o e-mail leva direto à
+  // área do cliente, onde ficam a amostra, o clássico grátis e o cartão do Nema.
+  // A mala direta (sequência de e-mails do Worker) só entra com o consentimento marcado.
+  var SB_URL = 'https://xfkepekffdyrtcgagwqo.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2VwZWtmZmR5cnRjZ2Fnd3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkyMTMsImV4cCI6MjA5MDE1NTIxM30.UtCfSrLZlJanIUMlQKE_nEr9YKIvBhPIaIdQPcQfGTI';
+
+  function criarMembro(dados) {
+    var email = (dados.email || '').trim().toLowerCase();
+    var nome = (dados.nome || '').trim().slice(0, 120);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return Promise.resolve({ ok: false, erro: 'email_invalido' });
+    var destino = location.origin + '/area-cliente.html';
+    var conta = fetch(SB_URL + '/auth/v1/otp?redirect_to=' + encodeURIComponent(destino), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON },
+      body: JSON.stringify({
+        email: email,
+        create_user: true,
+        data: { nome: nome, origem: dados.origem || 'amostra', mala_direta: !!dados.malaDireta, consentimento_em: dados.malaDireta ? new Date().toISOString() : null }
+      })
+    }).then(function (r) {
+      if (r.ok) return { ok: true };
+      return { ok: false, erro: r.status === 429 ? 'muitas_tentativas' : 'falha' };
+    }).catch(function () { return { ok: false, erro: 'conexao' }; });
+
+    if (dados.malaDireta) {
+      fetch(API + '/api/leads/capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: nome, email: email, anon_id: getAnonId(), utm: getUtm() || {} })
+      }).catch(function () {});
+    }
+    return conta.then(function (res) {
+      if (res.ok) {
+        localStorage.setItem(LEAD_CAPTURED_KEY, '1');
+        track('membro_cadastro', { origem: dados.origem || 'amostra', mala_direta: !!dados.malaDireta });
+      }
+      return res;
+    });
+  }
+
+  function mensagemErro(erro) {
+    if (erro === 'email_invalido') return 'Confira o e-mail digitado.';
+    if (erro === 'muitas_tentativas') return 'Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.';
+    if (erro === 'conexao') return 'Sem conexão. Verifique a internet e tente de novo.';
+    return 'Não foi possível criar agora. Tente de novo em instantes.';
+  }
+
   function showLeadPopup() {
     var overlay = document.createElement('div');
     overlay.id = 'tt-lead-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'tt-lead-title');
     overlay.innerHTML = [
       '<div class="tt-lead-box">',
       '  <button class="tt-lead-close" aria-label="Fechar">&times;</button>',
-      '  <h3 class="tt-lead-title">Leia o 1º capítulo de graça</h3>',
-      '  <p class="tt-lead-sub">Ficção documental que antecipa manchetes reais. Receba o primeiro capítulo no seu e-mail.</p>',
-      '  <form id="tt-lead-form">',
-      '    <input type="text" name="nome" placeholder="Seu nome" required class="tt-lead-input">',
-      '    <input type="email" name="email" placeholder="Seu melhor e-mail" required class="tt-lead-input">',
-      '    <input type="tel" name="whatsapp" placeholder="WhatsApp (opcional)" class="tt-lead-input">',
-      '    <label class="tt-lead-check"><input type="checkbox" name="whatsapp_optin" value="1"> Receber novidades por WhatsApp</label>',
-      '    <button type="submit" class="tt-lead-btn">Quero ler o 1º capítulo →</button>',
-      '    <p class="tt-lead-msg" id="tt-lead-msg"></p>',
+      '  <p class="tt-lead-kicker">✦ Grátis · sem cartão</p>',
+      '  <h3 class="tt-lead-title" id="tt-lead-title">Crie grátis sua área de membro</h3>',
+      '  <p class="tt-lead-sub">Leia o 1º capítulo de <em>O Nascimento Silencioso da 3ª Guerra Mundial</em> e escolha um clássico da literatura brasileira para ler no leitor da editora.</p>',
+      '  <form id="tt-lead-form" novalidate>',
+      '    <input type="text" name="nome" placeholder="Seu nome" autocomplete="given-name" required class="tt-lead-input">',
+      '    <input type="email" name="email" placeholder="Seu melhor e-mail" autocomplete="email" required class="tt-lead-input">',
+      '    <label class="tt-lead-check"><input type="checkbox" name="mala_direta" value="1"> Quero receber lançamentos e novidades da editora por e-mail</label>',
+      '    <button type="submit" class="tt-lead-btn">Criar minha área grátis →</button>',
+      '    <p class="tt-lead-msg" id="tt-lead-msg" role="status"></p>',
       '  </form>',
-      '  <p class="tt-lead-fine">Sem spam. Cancele quando quiser.</p>',
+      '  <p class="tt-lead-fine">Sem senha: enviamos um link de acesso para o seu e-mail. Novidades só se você marcar a opção acima, e você cancela quando quiser.</p>',
       '</div>'
     ].join('\n');
 
     var style = document.createElement('style');
     style.textContent = [
-      '#tt-lead-overlay{position:fixed;inset:0;background:rgba(5,15,7,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:ttFadeIn .3s}',
+      '#tt-lead-overlay{position:fixed;inset:0;background:rgba(5,15,7,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;animation:ttFadeIn .3s}',
       '@keyframes ttFadeIn{from{opacity:0}to{opacity:1}}',
-      '.tt-lead-box{background:#fff;border-radius:8px;padding:36px 32px 28px;max-width:400px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)}',
-      '.tt-lead-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:22px;color:#8a9a84;cursor:pointer;line-height:1}',
+      '.tt-lead-box{background:#fffdf9;border-radius:10px;padding:32px 28px 24px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);border-top:4px solid #1e5c3a;max-height:calc(100vh - 32px);overflow-y:auto}',
+      '.tt-lead-close{position:absolute;top:8px;right:8px;width:44px;height:44px;background:none;border:none;font-size:24px;color:#8a9a84;cursor:pointer;line-height:1}',
       '.tt-lead-close:hover{color:#111}',
-      '.tt-lead-title{font-family:"Fraunces",Georgia,serif;font-size:22px;font-weight:300;color:#111a0e;margin-bottom:8px;line-height:1.25}',
-      '.tt-lead-sub{font-size:14px;color:#5a6a54;line-height:1.55;margin-bottom:20px}',
-      '.tt-lead-input{display:block;width:100%;padding:11px 14px;border:1px solid #e0dbd2;border-radius:4px;font-size:14px;font-family:"Instrument Sans",system-ui,sans-serif;margin-bottom:10px;outline:none;transition:border-color .2s}',
+      '.tt-lead-kicker{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a6f28;margin:0 0 8px;font-family:"Instrument Sans",system-ui,sans-serif}',
+      '.tt-lead-title{font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:600;color:#111a0e;margin:0 0 8px;line-height:1.2}',
+      '.tt-lead-sub{font-size:15px;color:#3d4a41;line-height:1.55;margin:0 0 18px;font-family:"Instrument Sans",system-ui,sans-serif}',
+      '.tt-lead-input{display:block;width:100%;box-sizing:border-box;padding:13px 14px;border:1px solid #d8d2c6;border-radius:6px;font-size:16px;font-family:"Instrument Sans",system-ui,sans-serif;margin-bottom:10px;outline:none;transition:border-color .2s;background:#fff}',
       '.tt-lead-input:focus{border-color:#2d7a50}',
-      '.tt-lead-check{display:flex;align-items:center;gap:8px;font-size:12px;color:#5a6a54;margin-bottom:14px;cursor:pointer}',
-      '.tt-lead-check input{accent-color:#2d7a50}',
-      '.tt-lead-btn{display:block;width:100%;padding:13px;background:#1e5c3a;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:600;font-family:"Instrument Sans",system-ui,sans-serif;cursor:pointer;transition:background .2s}',
+      '.tt-lead-check{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45;color:#3d4a41;margin:4px 0 16px;cursor:pointer;font-family:"Instrument Sans",system-ui,sans-serif}',
+      '.tt-lead-check input{accent-color:#1e5c3a;width:18px;height:18px;flex-shrink:0;margin-top:1px}',
+      '.tt-lead-btn{display:block;width:100%;min-height:50px;padding:13px;background:#1e5c3a;color:#fff;border:none;border-radius:6px;font-size:16px;font-weight:600;font-family:"Instrument Sans",system-ui,sans-serif;cursor:pointer;transition:background .2s}',
       '.tt-lead-btn:hover{background:#2d7a50}',
       '.tt-lead-btn:disabled{opacity:.6;cursor:wait}',
-      '.tt-lead-msg{font-size:13px;text-align:center;margin-top:10px;min-height:18px}',
-      '.tt-lead-fine{font-size:11px;color:#8a9a84;text-align:center;margin-top:12px}'
+      '.tt-lead-msg{font-size:14px;line-height:1.5;text-align:center;margin:10px 0 0;min-height:18px;font-family:"Instrument Sans",system-ui,sans-serif}',
+      '.tt-lead-fine{font-size:12px;line-height:1.5;color:#6b7a66;text-align:center;margin:12px 0 0;font-family:"Instrument Sans",system-ui,sans-serif}'
     ].join('\n');
 
     document.head.appendChild(style);
     document.body.appendChild(overlay);
 
-    overlay.querySelector('.tt-lead-close').addEventListener('click', function () {
-      overlay.remove();
-      track('lead_popup_closed');
-    });
-    overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) { overlay.remove(); track('lead_popup_closed'); }
-    });
+    function fechar() { overlay.remove(); track('lead_popup_closed'); }
+    overlay.querySelector('.tt-lead-close').addEventListener('click', fechar);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) fechar(); });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && document.body.contains(overlay)) { fechar(); document.removeEventListener('keydown', esc); } });
 
     track('lead_popup_shown');
 
@@ -172,47 +221,24 @@
       var btn = form.querySelector('.tt-lead-btn');
       var msg = document.getElementById('tt-lead-msg');
       btn.disabled = true;
-      btn.textContent = 'Enviando…';
+      btn.textContent = 'Criando…';
       msg.textContent = '';
       msg.style.color = '';
-
-      var data = {
-        nome: form.nome.value.trim(),
-        email: form.email.value.trim(),
-        whatsapp: form.whatsapp.value.trim() || null,
-        anon_id: getAnonId(),
-        utm: getUtm()
-      };
-
-      fetch(API + '/api/leads/capture', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-        .then(function (r) { return r.json(); })
+      criarMembro({ nome: form.nome.value, email: form.email.value, malaDireta: form.mala_direta.checked, origem: 'popup' })
         .then(function (res) {
           if (res.ok) {
-            localStorage.setItem(LEAD_CAPTURED_KEY, '1');
-            track('lead_captured', { email_hash: data.email.length });
-            msg.style.color = '#1e5c3a';
-            msg.textContent = '✔ Pronto! Verifique seu e-mail.';
-            btn.textContent = 'Enviado!';
-            setTimeout(function () { overlay.remove(); }, 2500);
+            form.innerHTML = '<p class="tt-lead-msg" style="color:#1e5c3a;font-size:15px">✦ Pronto! Enviamos o link de acesso para <strong>' +
+              form.email.value.replace(/[<>&"]/g, '') + '</strong>.<br>Abra o e-mail e sua área de membro já estará criada. Confira o spam se não chegar em 2 minutos.</p>';
           } else {
-            msg.style.color = '#c0392b';
-            msg.textContent = res.erro === 'email_invalido' ? 'E-mail inválido.' : 'Erro ao cadastrar. Tente novamente.';
+            msg.style.color = '#b23b2e';
+            msg.textContent = mensagemErro(res.erro);
             btn.disabled = false;
-            btn.textContent = 'Quero ler o 1º capítulo →';
+            btn.textContent = 'Criar minha área grátis →';
           }
-        })
-        .catch(function () {
-          msg.style.color = '#c0392b';
-          msg.textContent = 'Falha na conexão. Tente novamente.';
-          btn.disabled = false;
-          btn.textContent = 'Quero ler o 1º capítulo →';
         });
     });
   }
 
+  window.TTCadastro = { criarMembro: criarMembro, mensagemErro: mensagemErro };
   window.__ttTrack = track;
 })();

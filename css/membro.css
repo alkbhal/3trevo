@@ -1,0 +1,32 @@
+/* membro.css — Área de membros grátis (js/membro.js), dentro da área do cliente. */
+.mb{display:flex;flex-direction:column;gap:14px}
+.mb-boasvindas{padding:22px 24px;background:var(--painel,#fffdf9);border:1px solid var(--borda,rgba(38,32,22,.11));border-left:3px solid var(--ouro,#c8a84b)}
+.mb-rotulo{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ouro-escuro,#8a6f28);margin:0 0 6px}
+.mb-titulo{font-family:'Fraunces','Lora',Georgia,serif;font-weight:600;font-size:22px;line-height:1.25;color:var(--tinta,#262016);margin:0 0 6px}
+.mb-texto{font-size:15px;line-height:1.6;color:var(--t2,rgba(38,32,22,.7));margin:0}
+.mb-secao{font-family:'Fraunces','Lora',Georgia,serif;font-size:18px;font-weight:600;color:var(--tinta,#262016);margin:22px 0 2px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.mb-espaco{font-family:'Poppins',system-ui,sans-serif;font-size:11px;font-weight:500;letter-spacing:1.4px;text-transform:uppercase;color:var(--verde-claro,#2a6b42);background:rgba(42,107,66,.09);padding:3px 9px;border-radius:999px}
+.mb-card .ebook-footer{flex-wrap:wrap;gap:8px}
+.mb-progresso{height:4px;background:rgba(38,32,22,.1);border-radius:2px;overflow:hidden;margin:2px 0 4px}
+.mb-progresso span{display:block;height:100%;background:var(--ouro,#c8a84b)}
+.mb-progresso-txt{font-size:12px;color:var(--t3,rgba(38,32,22,.5));margin-bottom:10px}
+.mb-trocar{background:none;border:0;padding:6px 0;font:inherit;font-size:12.5px;color:var(--t2,rgba(38,32,22,.65));text-decoration:underline;cursor:pointer}
+.mb-nota{font-size:13.5px;line-height:1.55;color:var(--t3,rgba(38,32,22,.55));margin:6px 0 0}
+
+/* Cartão do Nema */
+.mb-nema{
+  margin-top:18px;display:flex;gap:18px;align-items:flex-start;padding:24px;
+  background:linear-gradient(135deg,#0f2d1a 0%,#1e5c3a 100%);color:#f7f2e6;border-radius:8px;
+}
+.mb-nema-selo{
+  flex-shrink:0;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;color:#0f2d1a;
+  background:radial-gradient(circle at 35% 30%,#f1dc8f,#c8a84b 60%,#8a6f28);box-shadow:0 0 0 3px rgba(200,168,75,.3);
+}
+.mb-nema-rotulo{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:#e8c96a;margin:0 0 6px}
+.mb-nema-titulo{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;line-height:1.25;margin:0 0 8px;color:#fff}
+.mb-nema-texto p{font-size:14.5px;line-height:1.6;color:rgba(247,242,230,.82);margin:0}
+.mb-nema-acoes{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;margin-top:16px}
+.mb-btn{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;background:#c8a84b;color:#0f2d1a;font-weight:600;font-size:14px;text-decoration:none;border-radius:3px}
+.mb-link{color:#e8c96a;font-size:14px;font-weight:500}
+@media (max-width:480px){.mb-nema{flex-direction:column;gap:12px;padding:20px}.mb-boasvindas{padding:18px}}

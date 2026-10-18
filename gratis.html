@@ -57,6 +57,8 @@
     .success p { color: var(--t2); line-height: 1.6; font-size: 14px; }
     .success .link-catalogo { display: inline-block; margin-top: 24px; padding: 12px 28px; background: transparent; border: 1px solid var(--verde-claro); border-radius: 6px; color: var(--verde-claro); text-decoration: none; font-size: 14px; transition: background .2s; }
     .success .link-catalogo:hover { background: rgba(64,145,108,0.1); }
+    .consent { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.45; color: var(--t2, #c9d1c4); cursor: pointer; text-transform: none; letter-spacing: 0; }
+    .consent input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; accent-color: var(--verde); }
     .erro-msg { color: #ef9a9a; font-size: 13px; padding: 10px 14px; background: rgba(239,154,154,0.1); border-radius: 6px; display: none; }
     .trust { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--bd); display: flex; flex-direction: column; gap: 10px; }
     .trust-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--t3); }
@@ -73,7 +75,7 @@
     <div id="form-area">
       <span class="badge">1º Capítulo Grátis</span>
       <h1>Leia o que está incomodando <em>gente poderosa.</em></h1>
-      <p class="subtitulo">Ficção documental que antecipa manchetes reais. O 1º capítulo vai para o seu e-mail agora. Sem compromisso.</p>
+      <p class="subtitulo">Ficção documental que antecipa manchetes reais. Crie grátis sua área de membro e leia o 1º capítulo no leitor da editora, além de um clássico da literatura brasileira. Sem cartão.</p>
       <form class="form" id="form-captura" onsubmit="capturarLead(event)">
         <div class="input-group">
           <label for="inp-nome">Seu nome</label>
@@ -83,63 +85,50 @@
           <label for="inp-email">Seu e-mail</label>
           <input type="email" id="inp-email" placeholder="voce@email.com" autocomplete="email" required>
         </div>
-        <div class="input-group">
-          <label for="inp-wpp">WhatsApp <span class="opt">(opcional)</span></label>
-          <input type="tel" id="inp-wpp" placeholder="(00) 00000-0000" autocomplete="tel">
-        </div>
+        <label class="consent"><input type="checkbox" id="inp-mala"> Quero receber lançamentos e novidades da editora por e-mail</label>
         <div class="erro-msg" id="erro-msg"></div>
-        <button type="submit" class="btn-cta" id="btn-captura">Quero ler o 1º capítulo →</button>
-        <p class="privacidade">Sem spam. Cancele a qualquer momento. <a href="/politica-privacidade.html">Política de privacidade.</a></p>
+        <button type="submit" class="btn-cta" id="btn-captura">Criar minha área grátis →</button>
+        <p class="privacidade">Sem senha: enviamos um link de acesso para o seu e-mail. Novidades só se você marcar a opção acima.</p>
       </form>
     </div>
 
     <div class="success" id="success-area">
-      <div class="success-icon">✉️</div>
-      <h2>E-mail enviado!</h2>
-      <p>O 1º capítulo de <strong>O Nascimento Silencioso da 3ª Guerra Mundial</strong> está a caminho da sua caixa.<br><br>Verifique o spam se não aparecer em alguns minutos.</p>
+      <div class="success-icon">✦</div>
+      <h2>Sua área está pronta</h2>
+      <p>Enviamos o link de acesso para o seu e-mail. Abra o link e o 1º capítulo de <strong>O Nascimento Silencioso da 3ª Guerra Mundial</strong> já estará na sua área de membro.<br><br>Confira o spam se não chegar em alguns minutos.</p>
       <a href="/catalogo.html" class="link-catalogo">Ver catálogo completo →</a>
     </div>
 
     <div class="trust">
       <div class="trust-item"><span class="trust-ic">📚</span><span><strong>Said Anes</strong> — autor independente de Montauri/RS. Ficção que antecipa o que os grandes veículos ainda não perceberam.</span></div>
-      <div class="trust-item"><span class="trust-ic">🔒</span><span>Seus dados são usados apenas para enviar o capítulo e novidades editoriais. Nunca repassamos a terceiros.</span></div>
+      <div class="trust-item"><span class="trust-ic">🔒</span><span>Seu e-mail é usado para o acesso à sua área. Novidades só com a sua autorização. Nunca repassamos a terceiros.</span></div>
     </div>
   </div>
 
-  <script src="js/beacon.js?v=56e64d7b" defer></script>
+  <script src="js/beacon.js?v=db6c8192" defer></script>
   <script>
-    var API = 'https://tres-trevo-api.al-kbhal.workers.dev';
+    // Cadastro de membro grátis: js/beacon.js (TTCadastro), o mesmo do pop-up do site.
     async function capturarLead(e) {
       e.preventDefault();
       var btn = document.getElementById('btn-captura');
       var erroEl = document.getElementById('erro-msg');
       erroEl.style.display = 'none';
-      btn.disabled = true; btn.textContent = 'Enviando…';
-      var nome = document.getElementById('inp-nome').value.trim();
-      var email = document.getElementById('inp-email').value.trim();
-      var wpp = document.getElementById('inp-wpp').value.trim();
-      var anon_id = localStorage.getItem('_tt_anon');
-      var utm = {};
-      var p = new URLSearchParams(location.search);
-      ['source','medium','campaign','content','term'].forEach(function(k){ var v=p.get('utm_'+k); if(v) utm[k]=v; });
-      try {
-        var body = { nome: nome, email: email, anon_id: anon_id, utm: utm };
-        if (wpp) body.whatsapp = wpp;
-        var resp = await fetch(API + '/api/leads/capture', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        var d = await resp.json();
-        if (d.ok) {
-          document.getElementById('form-area').style.display = 'none';
-          document.getElementById('success-area').style.display = 'block';
-          if (typeof fbq !== 'undefined') fbq('track', 'Lead');
-        } else {
-          erroEl.textContent = d.erro === 'email_invalido' ? 'E-mail inválido. Verifique e tente novamente.' : 'Algo deu errado. Tente novamente.';
-          erroEl.style.display = 'block';
-          btn.disabled = false; btn.textContent = 'Quero ler o 1º capítulo →';
-        }
-      } catch(err) {
-        erroEl.textContent = 'Sem conexão. Verifique sua internet e tente novamente.';
+      if (!window.TTCadastro) { erroEl.textContent = 'Carregando… tente de novo em um instante.'; erroEl.style.display = 'block'; return; }
+      btn.disabled = true; btn.textContent = 'Criando…';
+      var res = await TTCadastro.criarMembro({
+        nome: document.getElementById('inp-nome').value,
+        email: document.getElementById('inp-email').value,
+        malaDireta: document.getElementById('inp-mala').checked,
+        origem: 'gratis'
+      });
+      if (res.ok) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('success-area').style.display = 'block';
+        if (typeof fbq !== 'undefined') fbq('track', 'CompleteRegistration');
+      } else {
+        erroEl.textContent = TTCadastro.mensagemErro(res.erro);
         erroEl.style.display = 'block';
-        btn.disabled = false; btn.textContent = 'Quero ler o 1º capítulo →';
+        btn.disabled = false; btn.textContent = 'Criar minha área grátis →';
       }
     }
   </script>
