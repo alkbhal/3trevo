@@ -7,6 +7,7 @@
 // Cada uma gera também um verso com a ficha técnica (editora, fontes, licença e
 // aviso de IA). A capa da frente nunca recebe a identidade da editora.
 // Capas "editora": produto próprio da Três Trevo (Almanaque semanal), numerado.
+// A identidade fica no selo do trevo; o resto do layout segue uma linguagem moderna.
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -61,7 +62,6 @@ const TITULOS = [
     manchete: 'Eleições Presidenciais: a nova Copa do Mundo, ou só a novela de folhetim?',
     chamada: 'Entre a torcida e o enredo, quem escreve o roteiro desta eleição?',
     // Ilustração por edição: caminho absoluto do arquivo em alta resolução, passado por variável de ambiente.
-    // Sem ela, a capa usa só a arte em SVG de segundo plano.
     ilustracao: process.env.ALMANAQUE_ILUSTRACAO ?? null,
     iaIlustracao: 'Ilustração de capa gerada com auxílio de inteligência artificial, a partir da manchete da semana.',
   },
@@ -123,41 +123,30 @@ ${aviso}
 </div></body></html>`;
 }
 
-// Capa do periódico: a manchete da semana é o elemento principal.
+// Capa do periódico: imagem em cima, manchete em bloco claro embaixo.
 function capaEditora(l) {
-  const ilust = l.ilustracao ? `<img class="ilust" src="file://${l.ilustracao}"><div class="veu"></div>` : '';
+  const imagem = l.ilustracao ? `<img class="topo-img" src="file://${l.ilustracao}">` : '';
   const aviso = l.iaIlustracao && l.ilustracao ? `<div class="aviso-ia">${esc(l.iaIlustracao)}</div>` : '';
   const chamada = l.chamada ? `<div class="chamada">${esc(l.chamada)}</div>` : '';
-  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>${base}
-body{background:#0f2d1a;font-family:Georgia,'Liberation Serif','DejaVu Serif',serif;color:#f7f2e6}
-.moldura{border:2px solid rgba(200,168,75,.45);padding:130px 120px 130px;justify-content:space-between;text-align:left}
-.arte{position:absolute;left:160px;top:900px;width:1280px;opacity:.07}
-.ilust{position:absolute;left:0;top:0;width:${LARGURA}px;height:${ALTURA}px;object-fit:cover}
-.veu{position:absolute;left:0;top:0;width:${LARGURA}px;height:${ALTURA}px;background:linear-gradient(rgba(15,45,26,.55),rgba(15,45,26,.92))}
-.aviso-ia{font-size:30px;line-height:1.4;color:#e6d59a;text-align:center;margin-top:30px;width:100%}
-.topo{width:100%}
-.selo{font-size:34px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b;text-align:center}
-.jornal{font-size:50px;letter-spacing:4px;color:#e6d59a;text-align:center;margin-top:50px}
-.filete{width:100%;height:3px;background:#c8a84b;margin:40px 0 0}
-.manchete{font-size:150px;line-height:1.06;font-weight:600;width:100%}
-.chamada{font-size:56px;line-height:1.4;font-style:italic;color:#e6d59a;margin-top:60px;width:100%}
-.rodape{width:100%}
-.numero{font-size:72px;letter-spacing:4px;color:#f7f2e6;text-align:center}
-.edicao{font-size:44px;letter-spacing:4px;color:#e6d59a;margin-top:20px;text-align:center}
-.autor{font-size:44px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b;text-align:center;margin-top:70px}</style></head><body>${ilust}<div class="moldura">
-<svg class="arte" viewBox="0 0 1280 900" fill="none" stroke="#c8a84b" stroke-width="10" stroke-linejoin="round">
-<rect x="340" y="420" width="600" height="380" rx="18"/>
-<rect x="420" y="470" width="440" height="22" rx="11" fill="#c8a84b"/>
-<circle cx="640" cy="260" r="130" stroke="#e6d59a"/>
-<polygon points="640,200 697,241.5 675.3,308.5 604.7,308.5 582.9,241.5" stroke="#e6d59a" stroke-width="8"/>
-<path d="M640 390 V420" stroke-dasharray="6 14" stroke-linecap="round"/>
-<text x="640" y="880" text-anchor="middle" fill="#c8a84b" stroke="none" font-family="Georgia,'Liberation Serif',serif" font-style="italic" font-size="64">continua…</text>
-</svg>
-<div class="topo"><div class="selo">✦ Três Trevo</div><div class="jornal">${esc(l.titulo)}</div><div class="filete"></div></div>
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+html,body{margin:0;width:${LARGURA}px;height:${ALTURA}px;overflow:hidden;background:#f4f1ea;font-family:'Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif;color:#111}
+.topo{position:absolute;left:0;top:0;width:${LARGURA}px;height:1560px;background:#15171c;overflow:hidden}
+.topo-img{width:100%;height:100%;object-fit:cover;display:block}
+.marca{position:absolute;left:90px;top:90px;background:#0f2d1a;color:#f4f1ea;font-weight:700;font-size:30px;letter-spacing:6px;padding:20px 30px;text-transform:uppercase}
+.corpo{position:absolute;left:0;top:1560px;width:${LARGURA}px;height:1000px;box-sizing:border-box;padding:60px 90px 50px;display:flex;flex-direction:column}
+.masthead{font-size:32px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:#e0533d}
+.manchete{font-size:100px;line-height:1.02;font-weight:800;letter-spacing:-2px;margin-top:34px}
+.chamada{font-size:46px;line-height:1.35;color:#444;margin-top:34px}
+.rodape{margin-top:72px;display:flex;justify-content:space-between;align-items:center;border-top:3px solid #111;padding-top:26px;font-size:28px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.aviso-ia{position:absolute;left:90px;top:1470px;width:1420px;box-sizing:border-box;padding:16px 22px;background:rgba(21,23,28,.88);color:#f4f1ea;font-size:24px;line-height:1.3}</style></head><body>
+<div class="topo">${imagem}</div>
+<div class="marca">✦ Três Trevo</div>
+${aviso}
+<div class="corpo">
+<div class="masthead">${esc(l.titulo)} · Nº ${esc(l.numero)}</div>
 <div class="manchete">${esc(l.manchete)}</div>
 ${chamada}
-<div class="rodape"><div class="numero">Nº ${esc(l.numero)}</div><div class="edicao">${esc(l.edicao)}</div><div class="autor">${esc(l.autor)}</div></div>
-${aviso}
+<div class="rodape"><span>${esc(l.edicao)}</span><span>${esc(l.autor)}</span></div>
 </div></body></html>`;
 }
 
