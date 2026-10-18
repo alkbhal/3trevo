@@ -8,6 +8,7 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { refInterna } from '../forge-arquivo';
 
 interface DeliveryPackage {
   projectId: string;
@@ -54,11 +55,9 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
     return Response.json({ ok: true, ignorado: pkg.status });
   }
 
-  const forgeBaseUrl = env.FORGE_PUBLIC_URL ?? 'https://tr3vo-forge.al-kbhal.workers.dev';
+  // Referência interna, não URL pública: o download resolve no servidor com o segredo.
   const temEpub = pkg.arquivos.some((a) => a.startsWith(`epub/${pkg.projectId}/`));
-  const arquivoUrl = temEpub
-    ? `${forgeBaseUrl}/project/${pkg.projectId}/epub`
-    : `${forgeBaseUrl}/project/${pkg.projectId}/html`;
+  const arquivoUrl = refInterna(pkg.projectId, temEpub ? 'epub' : 'html');
 
   const titulo = pkg.summary.match(/^Obra "(.+?)"/)?.[1] ?? `Forge ${pkg.projectId.slice(0, 8)}`;
   const slug = `forge-${pkg.projectId.slice(0, 8)}`;

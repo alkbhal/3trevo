@@ -28,6 +28,7 @@ import { z } from 'zod';
 import type { Env } from '../types';
 import { verificarToken as verificarTokenAdmin } from './admin-catalog';
 import { sb } from '../sb';
+import { referenciaForge, entregarArquivoForge } from '../forge-arquivo';
 
 // ─── Validação Zod do acervo — achado da auditoria real (01/09): create/update
 // gravavam o body admin cru sem schema, permitindo titulo/sinopse com HTML que
@@ -366,6 +367,10 @@ export async function handleBibliotecaStream(request: Request, env: Env): Promis
   if (!raw) return new Response('Token expirado — solicite novo acesso.', { status: 401 });
 
   const { epub_url } = JSON.parse(raw) as { epub_url: string; email: string; slug: string };
+
+  // Livro do forge: entregue pelo servidor da loja, nunca por redirect ao forge.
+  const refForge = referenciaForge(epub_url, env);
+  if (refForge) return entregarArquivoForge(refForge, env, 'ebook');
 
   // epub_url é URL externa (Gutenberg, etc.) → redirect direto (domínio público)
   if (epub_url.startsWith('http')) {
