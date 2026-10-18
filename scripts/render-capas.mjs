@@ -57,6 +57,8 @@ const TITULOS = [
   {
     slug: 'almanaque-tt', tipo: 'editora', titulo: 'Almanaque Três Trevo', autor: 'Editora Três Trevo',
     numero: '001/26', edicao: 'Edição semanal',
+    // Pauta da semana. Texto editorial, escrito pela equipe; não é copiado de outra fonte.
+    manchete: 'Manchete da semana (pendente)', chamada: 'Chamada de apoio (pendente)',
   },
 ];
 
@@ -116,19 +118,26 @@ ${aviso}
 </div></body></html>`;
 }
 
+// Capa do periódico: a manchete da semana é o elemento principal.
 function capaEditora(l) {
+  const chamada = l.chamada ? `<div class="chamada">${esc(l.chamada)}</div>` : '';
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>${base}
 body{background:#0f2d1a;font-family:Georgia,'Liberation Serif','DejaVu Serif',serif;color:#f7f2e6}
-.moldura{border:2px solid rgba(200,168,75,.45);padding:150px 120px 130px}
-.selo{font-size:34px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b}
-.titulo{font-size:160px;line-height:1.05;font-weight:600}
-.filete{width:300px;height:4px;background:#c8a84b;margin:70px auto}
-.numero{font-size:96px;letter-spacing:4px;color:#f7f2e6}
-.edicao{font-size:52px;letter-spacing:4px;color:#e6d59a;margin-top:30px}
-.autor{font-size:48px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b}</style></head><body><div class="moldura">
-<div class="selo">✦ Três Trevo</div>
-<div><div class="titulo">${esc(l.titulo)}</div><div class="filete"></div><div class="numero">Nº ${esc(l.numero)}</div><div class="edicao">${esc(l.edicao)}</div></div>
-<div class="autor">${esc(l.autor)}</div>
+.moldura{border:2px solid rgba(200,168,75,.45);padding:130px 120px 130px;justify-content:space-between;text-align:left}
+.topo{width:100%}
+.selo{font-size:34px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b;text-align:center}
+.jornal{font-size:50px;letter-spacing:4px;color:#e6d59a;text-align:center;margin-top:50px}
+.filete{width:100%;height:3px;background:#c8a84b;margin:40px 0 0}
+.manchete{font-size:150px;line-height:1.06;font-weight:600;width:100%}
+.chamada{font-size:56px;line-height:1.4;font-style:italic;color:#e6d59a;margin-top:60px;width:100%}
+.rodape{width:100%}
+.numero{font-size:72px;letter-spacing:4px;color:#f7f2e6;text-align:center}
+.edicao{font-size:44px;letter-spacing:4px;color:#e6d59a;margin-top:20px;text-align:center}
+.autor{font-size:44px;letter-spacing:8px;text-transform:uppercase;color:#c8a84b;text-align:center;margin-top:70px}</style></head><body><div class="moldura">
+<div class="topo"><div class="selo">✦ Três Trevo</div><div class="jornal">${esc(l.titulo)}</div><div class="filete"></div></div>
+<div class="manchete">${esc(l.manchete)}</div>
+${chamada}
+<div class="rodape"><div class="numero">Nº ${esc(l.numero)}</div><div class="edicao">${esc(l.edicao)}</div><div class="autor">${esc(l.autor)}</div></div>
 </div></body></html>`;
 }
 
