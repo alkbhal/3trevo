@@ -137,8 +137,8 @@ html,body{margin:0;width:${LARGURA}px;height:${ALTURA}px;overflow:hidden;backgro
 .marca{position:absolute;left:90px;top:90px;background:#e6007e;color:#ffffff;font-weight:700;font-size:30px;letter-spacing:6px;padding:20px 30px;text-transform:uppercase}
 .corpo{position:absolute;left:0;top:1560px;width:${LARGURA}px;height:1000px;box-sizing:border-box;padding:60px 90px 50px;display:flex;flex-direction:column;justify-content:center}
 .masthead{font-size:32px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:#4c1d95}
-.kicker{align-self:flex-start;margin-top:34px;padding:14px 26px;background:#4c1d95;color:#ffffff;font-size:40px;font-weight:800;letter-spacing:4px;text-transform:uppercase;transform:rotate(-2deg);transform-origin:left center}
-.manchete{font-size:104px;line-height:1;font-weight:800;letter-spacing:-2px;margin-top:40px;color:#14101f;text-shadow:6px 6px 0 #e6007e,12px 12px 0 #4c1d95}
+.kicker{align-self:flex-start;margin-top:34px;padding:12px 30px;border-radius:999px;background:#ffffff;color:#e6007e;font-size:36px;font-weight:800;letter-spacing:3px;text-transform:uppercase;transform:rotate(-2deg);transform-origin:left center;box-shadow:0 6px 0 rgba(20,16,31,.18)}
+.manchete{font-size:104px;line-height:1;font-weight:800;letter-spacing:-2px;margin-top:40px;color:#14101f;text-shadow:3px 3px 0 rgba(76,29,149,.35)}
 .chamada{font-size:46px;line-height:1.35;color:#444;margin-top:34px}
 .rodape{margin-top:72px;display:flex;justify-content:space-between;align-items:center;border-top:3px solid #14101f;padding-top:26px;font-size:28px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
 .aviso-ia{position:absolute;left:90px;top:1470px;width:1420px;box-sizing:border-box;padding:16px 22px;background:rgba(20,16,31,.9);color:#ffffff;font-size:24px;line-height:1.3}</style></head><body>
