@@ -55,10 +55,13 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
   }
 
   const forgeBaseUrl = env.FORGE_PUBLIC_URL ?? 'https://tr3vo-forge.al-kbhal.workers.dev';
+  // Formatos de venda: EPUB e PDF. HTML fica fora da venda e nunca vira arquivo do produto.
   const temEpub = pkg.arquivos.some((a) => a.startsWith(`epub/${pkg.projectId}/`));
-  const arquivoUrl = temEpub
-    ? `${forgeBaseUrl}/project/${pkg.projectId}/epub`
-    : `${forgeBaseUrl}/project/${pkg.projectId}/html`;
+  const temPdf = pkg.arquivos.some((a) => a.startsWith(`pdf/${pkg.projectId}/`));
+  const epubUrl = temEpub ? `${forgeBaseUrl}/project/${pkg.projectId}/epub` : null;
+  const pdfUrl = temPdf ? `${forgeBaseUrl}/project/${pkg.projectId}/pdf` : null;
+  const semArquivo = !epubUrl && !pdfUrl;
+  if (semArquivo) console.warn(`[forge-webhook] sem EPUB nem PDF para ${pkg.projectId}: rascunho sem arquivo de venda`);
 
   const titulo = pkg.summary.match(/^Obra "(.+?)"/)?.[1] ?? `Forge ${pkg.projectId.slice(0, 8)}`;
   const slug = `forge-${pkg.projectId.slice(0, 8)}`;
@@ -75,7 +78,8 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
       descricao: pkg.summary,
       preco: 0,
       ativo: false,
-      arquivo_url: arquivoUrl,
+      epub_url: epubUrl,
+      arquivo_url: pdfUrl,
     }),
   });
 
@@ -86,5 +90,5 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
   }
 
   console.log(`[forge-webhook] produto rascunho criado: ${slug} (projeto ${pkg.projectId})`);
-  return Response.json({ ok: true, slug, projectId: pkg.projectId });
+  return Response.json({ ok: true, slug, projectId: pkg.projectId, semArquivo });
 }
