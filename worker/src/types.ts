@@ -18,6 +18,7 @@ export interface Env {
   FORGE_WEBHOOK_SECRET?: string;
   FORGE_PUBLIC_URL?: string;
   FORGE_DOWNLOAD_SECRET?: string; // mesmo valor do tr3vo-forge — assina links de epub/pdf/html
+  FORGE_API_SECRET?: string;      // mesmo valor do tr3vo-forge — admin envia manuscrito e nova edição
 
   // IA
   ANTHROPIC_KEY: string;

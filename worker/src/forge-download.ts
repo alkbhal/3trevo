@@ -69,10 +69,11 @@ export async function resolverUrlExterna(url: string, env: Env): Promise<string 
 const MAX_ARQUIVO_BYTES = 100 * 1024 * 1024;
 const CONTENT_TYPE: Record<'epub' | 'pdf', string> = { epub: 'application/epub+zip', pdf: 'application/pdf' };
 
-async function baixarDoForge(env: Env, projectId: string, formato: 'epub' | 'pdf'): Promise<ArrayBuffer | null> {
+async function baixarDoForge(env: Env, projectId: string, formato: 'epub' | 'pdf', lang?: string): Promise<ArrayBuffer | null> {
   const url = await assinarForge(env, projectId, formato);
   if (!url) return null;
-  const r = await fetch(url);
+  // lang fica fora da assinatura no forge: escolhe entre edições do mesmo livro.
+  const r = await fetch(lang ? `${url}&lang=${encodeURIComponent(lang)}` : url);
   if (!r.ok) {
     if (r.status !== 404) console.error(`[forge-download] ${formato} de ${projectId}: forge respondeu ${r.status}`);
     return null;
@@ -87,11 +88,11 @@ async function baixarDoForge(env: Env, projectId: string, formato: 'epub' | 'pdf
 
 /** Copia EPUB/PDF do forge pro bucket "ebooks". Devolve os caminhos gravados (o que falhar fica de fora). */
 export async function copiarParaStorage(
-  env: Env, projectId: string, slug: string, formatos: Array<'epub' | 'pdf'> = ['epub', 'pdf']
+  env: Env, projectId: string, slug: string, formatos: Array<'epub' | 'pdf'> = ['epub', 'pdf'], lang?: string
 ): Promise<{ epub?: string; pdf?: string }> {
   const out: { epub?: string; pdf?: string } = {};
   for (const formato of formatos) {
-    const bytes = await baixarDoForge(env, projectId, formato);
+    const bytes = await baixarDoForge(env, projectId, formato, lang);
     if (!bytes) continue;
     const caminho = `${slug}.${formato}`;
     const r = await fetch(`${env.SUPABASE_URL}/storage/v1/object/ebooks/${encodeURIComponent(caminho)}`, {
@@ -114,9 +115,9 @@ export async function copiarParaStorage(
 }
 
 /** Biblioteca TT lê EPUB do R2 privado (epubs/{slug}.epub, mesma chave do upload manual). */
-export async function copiarEpubParaBiblioteca(env: Env, projectId: string, slug: string): Promise<string | null> {
+export async function copiarEpubParaBiblioteca(env: Env, projectId: string, slug: string, lang?: string): Promise<string | null> {
   if (!env.BIBLIOTECA_R2) return null;
-  const bytes = await baixarDoForge(env, projectId, 'epub');
+  const bytes = await baixarDoForge(env, projectId, 'epub', lang);
   if (!bytes) return null;
   const chave = `epubs/${slug}.epub`;
   await env.BIBLIOTECA_R2.put(chave, bytes, { httpMetadata: { contentType: CONTENT_TYPE.epub } });

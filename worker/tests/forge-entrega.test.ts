@@ -27,6 +27,7 @@ describe('webhook do forge', () => {
       chamadas.push({ url, init });
       if (url.startsWith('https://tr3vo-forge')) return new Response(url.includes('/epub?') ? 'EPUB' : 'PDF');
       if (url.includes('/storage/v1/object/ebooks/')) return new Response('{}');
+      if (init?.method === 'PATCH') return new Response('[]'); // produto ainda não existe
       return new Response('[{}]', { status: 201 });
     }));
     const pkg = {
@@ -52,6 +53,7 @@ describe('webhook do forge', () => {
     vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
       chamadas.push({ url, init });
       if (url.startsWith('https://tr3vo-forge')) return new Response('x', { status: 401 });
+      if (init?.method === 'PATCH') return new Response('[]');
       return new Response('[{}]', { status: 201 });
     }));
     const pkg = { projectId: ID, status: 'complete', summary: 'Obra "A"', timestamp: '', arquivos: [`epub/${ID}/a.epub`] };
@@ -59,6 +61,25 @@ describe('webhook do forge', () => {
     expect(await r.json()).toMatchObject({ ok: true, semArquivo: true });
     const produto = JSON.parse(String(chamadas.find((c) => c.url.endsWith('/rest/v1/products'))!.init!.body));
     expect(produto).toMatchObject({ titulo: 'A', autor: null, epub_url: null, arquivo_url: null });
+  });
+});
+
+describe('webhook do forge — nova edição', () => {
+  it('produto já existe: atualiza arquivos, título e autor, sem tocar em preço/ativação nem duplicar', async () => {
+    const chamadas: Array<{ url: string; init?: RequestInit }> = [];
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+      chamadas.push({ url, init });
+      if (url.startsWith('https://tr3vo-forge')) return url.includes('/pdf?') ? new Response('x', { status: 404 }) : new Response('EPUB');
+      if (url.includes('/storage/v1/object/ebooks/')) return new Response('{}');
+      if (init?.method === 'PATCH') return new Response('[{"slug":"forge-11111111"}]');
+      throw new Error('não deveria criar produto');
+    }));
+    const pkg = { projectId: ID, status: 'complete', summary: '', timestamp: '', titulo: 'T', autor: 'Novo Autor', arquivos: [`epub/${ID}/t.epub`, `pdf/${ID}/t.pdf`] };
+    const r = await handleForgeDelivery(await assinado(JSON.stringify(pkg)), env);
+    expect(await r.json()).toMatchObject({ ok: true, atualizado: true });
+    const patch = JSON.parse(String(chamadas.find((c) => c.init?.method === 'PATCH')!.init!.body));
+    // PDF não copiado desta vez: arquivo_url anterior é mantido (chave ausente).
+    expect(patch).toEqual({ titulo: 'T', autor: 'Novo Autor', epub_url: 'forge-11111111.epub' });
   });
 });
 
