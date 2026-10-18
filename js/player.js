@@ -159,6 +159,10 @@
     // Eventos do audio
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('ended',      onEnded);
+    // Antes toda falha de áudio era engolida em silêncio (a faixa "não tocava" sem aviso).
+    audio.addEventListener('error', () => {
+      if (audio.src) notificarErro('Não foi possível tocar esta faixa agora.');
+    });
     audio.addEventListener('loadedmetadata', () => {
       document.getElementById('ttp-total').textContent = fmtTempo(audio.duration);
     });
@@ -230,6 +234,7 @@
           notificarLogin(t);
           return;
         }
+        notificarErro(data && data.error ? data.error : 'Faixa indisponível no momento.');
         return;
       }
 
@@ -237,10 +242,20 @@
       signedUrl     = data.url;
       urlExpiry     = Date.now() + 55 * 60 * 1000;
 
-      audio.play().then(() => setPlayIcon(true)).catch(() => {});
       document.getElementById('tt-player').classList.add('ativo');
+      audio.play().then(() => setPlayIcon(true)).catch((err) => {
+        // NotAllowedError = navegador exige um toque antes de tocar; não é falha da faixa.
+        if (err && err.name === 'NotAllowedError') {
+          document.getElementById('ttp-sub').textContent = 'Toque ▶ para ouvir';
+          setPlayIcon(false);
+        } else if (err && err.name !== 'AbortError') {
+          notificarErro('Não foi possível tocar esta faixa agora.');
+        }
+      });
 
-    } catch (e) { /* silencioso */ }
+    } catch (e) {
+      notificarErro('Sem conexão. Verifique a internet e tente de novo.');
+    }
   }
 
   function atualizarUI(t) {
@@ -337,6 +352,12 @@
         }
       }, 300);
     }
+  }
+
+  function notificarErro(msg) {
+    document.getElementById('tt-player').classList.add('ativo');
+    document.getElementById('ttp-sub').textContent = msg;
+    setPlayIcon(false);
   }
 
   function notificarLogin(t) {

@@ -1,0 +1,39 @@
+name: Reverter produção
+
+# Volta o site para uma versão marcada (tag azul-AAAAMMDD) sem reescrever histórico:
+# cria um commit novo no main com o conteúdo daquela versão. O GitHub Pages republica
+# em ~1 min e a verificação pós-deploy roda em seguida.
+on:
+  workflow_dispatch:
+    inputs:
+      alvo:
+        description: 'Tag ou commit da versão boa (ex.: azul-20261018)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  reverter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Restaura o conteúdo da versão alvo
+        env:
+          ALVO: ${{ inputs.alvo }}
+        run: |
+          set -euo pipefail
+          git rev-parse --verify "$ALVO^{commit}" >/dev/null
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Arquivos criados depois do alvo saem; os do alvo voltam. .github fica como está
+          # (para este workflow continuar existindo depois da reversão).
+          git diff --name-only --diff-filter=A "$ALVO" HEAD -- . ':(exclude).github' | xargs -r git rm -q
+          git checkout "$ALVO" -- . ':(exclude).github'
+          if git diff --cached --quiet; then echo "Nada a reverter: main já está igual a $ALVO"; exit 0; fi
+          git commit -q -m "Reverter produção para $ALVO"
+          git push origin main
+          echo "✓ main agora tem o conteúdo de $ALVO"
