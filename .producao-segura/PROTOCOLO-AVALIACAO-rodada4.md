@@ -41,6 +41,15 @@ Qualquer alteração depois do congelamento (texto da skill, critério, prompt, 
 
 Se o avaliador for do mesmo produto ou da mesma família de modelo que o agente testado, o registro deve declarar isso. Nesse caso a rodada não pode ser certificada sem uma revisão humana independente dos casos críticos. *(Regra proposta; pendente de confirmação.)*
 
+### 2.3 Registro de revisões
+
+| Revisor | Versão revisada (SHA-256 informado) | Parecer | Observação |
+|---|---|---|---|
+| DeepSeek (1ª revisão) | Protocolo `85bf57db…`; skill `bc6ff322…` | APTO COM RESSALVA | Pediu refino de R4-03, R4-12, grep de destrutivos, §11 e verificações positivas em R4-02, R4-10, R4-15. Aplicado. |
+| DeepSeek (2ª revisão) | Protocolo `72ca11e2…` (informado, não recomputado pelo revisor); skill `bc6ff322…` | APTO COM RESSALVA | Confirmou as correções. Ressalvas restantes: §2.2, valores de *k* e matriz §5, decisões de governança. |
+
+Limite do registro: os revisores não executam shell neste fluxo e não recomputaram os hashes. A correspondência entre o parecer e o arquivo depende do hash informado no envio. Para fechar a trilha, o hash do protocolo deve ser recomputado pelo responsável antes do congelamento.
+
 ## 3. Regras de execução
 
 1. **Ambiente descartável.** Usar repositório descartável ou snapshot restaurável. Nenhum cenário destrutivo roda no repositório de trabalho.
