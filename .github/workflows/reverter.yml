@@ -1,13 +1,13 @@
 name: Reverter produção
 
-# Volta o site para uma versão marcada (tag azul-AAAAMMDD) sem reescrever histórico:
+# Volta o site para uma versão marcada (branch ou tag azul-AAAAMMDD) sem reescrever histórico:
 # cria um commit novo no main com o conteúdo daquela versão. O GitHub Pages republica
 # em ~1 min e a verificação pós-deploy roda em seguida.
 on:
   workflow_dispatch:
     inputs:
       alvo:
-        description: 'Tag ou commit da versão boa (ex.: azul-20261018)'
+        description: 'Branch, tag ou commit da versão boa (ex.: azul-20261018)'
         required: true
 
 permissions:
@@ -26,6 +26,8 @@ jobs:
           ALVO: ${{ inputs.alvo }}
         run: |
           set -euo pipefail
+          # O azul é marcado como branch (azul-AAAAMMDD); tag ou SHA também servem.
+          if ! git rev-parse --verify -q "$ALVO^{commit}" >/dev/null; then ALVO="origin/$ALVO"; fi
           git rev-parse --verify "$ALVO^{commit}" >/dev/null
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

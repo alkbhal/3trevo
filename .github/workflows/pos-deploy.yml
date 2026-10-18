@@ -52,5 +52,5 @@ jobs:
               owner: context.repo.owner, repo: context.repo.repo,
               title: '[ALERTA] Verificação pós-deploy falhou',
               labels: ['alerta', 'infra'],
-              body: `Commit no ar: ${context.payload.workflow_run?.head_sha || context.sha}\n\n\`\`\`\n${process.env.FALHAS}\n\`\`\`\n\nPara voltar à versão anterior: Actions → **Reverter produção** → Run workflow (alvo = última tag \`azul-*\`). Roteiro: docs/DEPLOY_AZUL_VERDE.md`,
+              body: `Commit no ar: ${context.payload.workflow_run?.head_sha || context.sha}\n\n\`\`\`\n${process.env.FALHAS}\n\`\`\`\n\nPara voltar à versão anterior: Actions → **Reverter produção** → Run workflow (alvo = a branch \`azul-*\` mais recente). Roteiro: docs/DEPLOY_AZUL_VERDE.md`,
             });

@@ -5,14 +5,15 @@ aprovação do dono, e voltar para o azul é um clique.
 
 ## Site (GitHub Pages, branch `main`)
 
-1. **Marcar o azul**: antes de cada troca, crie a tag `azul-AAAAMMDD` no commit que está
-   no ar (`git tag azul-20261018 origin/main && git push origin azul-20261018`).
+1. **Marcar o azul**: antes de cada troca, crie a branch `azul-AAAAMMDD` a partir do
+   `main` que está no ar (`git push origin origin/main:refs/heads/azul-20261018`). Não
+   faça commits nela: é só a marca da versão boa.
 2. **Montar o verde**: branch `verde-AAAAMMDD` e PR para `main`. O CI (`stamp-check` +
    testes do worker) precisa passar. Anexe ao PR as capturas em tela de celular das
    telas alteradas.
 3. **Trocar**: fazer o merge do PR. O Pages republica em cerca de 1 minuto e o workflow
    **Verificação pós-deploy** confere as páginas e os JS/CSS. Se falhar, ele abre uma issue.
-4. **Voltar ao azul**: Actions → **Reverter produção** → Run workflow → `alvo` = a tag
+4. **Voltar ao azul**: Actions → **Reverter produção** → Run workflow → `alvo` = a branch
    azul. Isso cria um commit novo no `main` com o conteúdo do azul, sem reescrever o histórico.
 
 ## Banco (Supabase)
