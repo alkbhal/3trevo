@@ -127,17 +127,16 @@ ${aviso}
 function capaEditora(l) {
   const imagem = l.ilustracao ? `<img class="topo-img" src="file://${l.ilustracao}">` : '';
   const aviso = l.iaIlustracao && l.ilustracao ? `<div class="aviso-ia">${esc(l.iaIlustracao)}</div>` : '';
-  const chamada = l.chamada ? `<div class="chamada">${esc(l.chamada)}</div>` : '';
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
-html,body{margin:0;width:${LARGURA}px;height:${ALTURA}px;overflow:hidden;background:#f4f1ea;font-family:'Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif;color:#111}
+html,body{margin:0;width:${LARGURA}px;height:${ALTURA}px;overflow:hidden;background:#eceae4;font-family:'Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif;color:#1c1e21}
 .topo{position:absolute;left:0;top:0;width:${LARGURA}px;height:1560px;background:#15171c;overflow:hidden}
 .topo-img{width:100%;height:100%;object-fit:cover;display:block}
-.marca{position:absolute;left:90px;top:90px;background:#0f2d1a;color:#f4f1ea;font-weight:700;font-size:30px;letter-spacing:6px;padding:20px 30px;text-transform:uppercase}
-.corpo{position:absolute;left:0;top:1560px;width:${LARGURA}px;height:1000px;box-sizing:border-box;padding:60px 90px 50px;display:flex;flex-direction:column}
-.masthead{font-size:32px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:#e0533d}
+.marca{position:absolute;left:90px;top:90px;background:#1c1e21;color:#eceae4;font-weight:700;font-size:30px;letter-spacing:6px;padding:20px 30px;text-transform:uppercase}
+.corpo{position:absolute;left:0;top:1560px;width:${LARGURA}px;height:1000px;box-sizing:border-box;padding:60px 90px 50px;display:flex;flex-direction:column;justify-content:center}
+.masthead{font-size:32px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:#5b6168}
 .manchete{font-size:100px;line-height:1.02;font-weight:800;letter-spacing:-2px;margin-top:34px}
 .chamada{font-size:46px;line-height:1.35;color:#444;margin-top:34px}
-.rodape{margin-top:72px;display:flex;justify-content:space-between;align-items:center;border-top:3px solid #111;padding-top:26px;font-size:28px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.rodape{margin-top:72px;display:flex;justify-content:space-between;align-items:center;border-top:3px solid #1c1e21;padding-top:26px;font-size:28px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
 .aviso-ia{position:absolute;left:90px;top:1470px;width:1420px;box-sizing:border-box;padding:16px 22px;background:rgba(21,23,28,.88);color:#f4f1ea;font-size:24px;line-height:1.3}</style></head><body>
 <div class="topo">${imagem}</div>
 <div class="marca">✦ Três Trevo</div>
@@ -145,7 +144,6 @@ ${aviso}
 <div class="corpo">
 <div class="masthead">${esc(l.titulo)} · Nº ${esc(l.numero)}</div>
 <div class="manchete">${esc(l.manchete)}</div>
-${chamada}
 <div class="rodape"><span>${esc(l.edicao)}</span><span>${esc(l.autor)}</span></div>
 </div></body></html>`;
 }
