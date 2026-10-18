@@ -21,7 +21,9 @@ jobs:
           for L in en es; do
             echo "== $L"
             for P in 1 2; do
-              curl -s "https://gutendex.com/books/?languages=$L&sort=popular&page=$P" \
+              curl -sL --retry 3 "https://gutendex.com/books/?languages=$L&sort=popular&page=$P" -o /tmp/g.json || true
+              jq -e . /tmp/g.json >/dev/null 2>&1 || { echo "(gutendex sem resposta JSON: $(head -c 120 /tmp/g.json))"; continue; }
+              cat /tmp/g.json \
               | jq -r '.results[] | select(.authors[0].death_year != null and .authors[0].death_year <= 1945)
                        | "\(.id)\t\(.authors[0].name) (†\(.authors[0].death_year))\t\(.title|.[0:70])\t\(.languages|join(","))"'
             done
