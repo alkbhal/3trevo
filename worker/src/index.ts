@@ -44,7 +44,7 @@ import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
 import { handleAdminMarketingStats } from './routes/admin-marketing';
 import { handleAdminBI } from './routes/admin-bi';
-import { handleForgeDelivery, handleAdminForgeLinks } from './routes/forge-webhook';
+import { handleForgeDelivery, handleAdminForgeLinks, handleAdminForgeArquivos } from './routes/forge-webhook';
 import { handleDrawProgress } from './routes/admin-draw';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
@@ -294,6 +294,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
 
     if (path === '/api/admin/forge/links' && method === 'GET') {
       return handleAdminForgeLinks(request, env);
+    }
+    if (path === '/api/admin/forge/arquivos' && method === 'POST') {
+      return handleAdminForgeArquivos(request, env);
     }
 
     // Login admin (geração de sessão)

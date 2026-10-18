@@ -514,6 +514,7 @@
             <div class="card">
               <div class="card-body">
                 <div class="field"><label>Título</label><input type="text" id="forge-titulo" class="input"></div>
+                <div class="field"><label>Autor (vem do brief do forge)</label><input type="text" id="forge-autor" class="input" placeholder="Nome do autor (obrigatório)"></div>
                 <div class="field"><label>Slug (usado no catálogo/checkout)</label><input type="text" id="forge-slug" class="input"></div>
                 <div class="field"><label>Descrição</label><textarea id="forge-descricao" class="input" rows="4"></textarea></div>
                 <div class="field"><label>Gênero</label><input type="text" id="forge-genero" class="input"></div>
@@ -962,7 +963,7 @@
         </div>
         <div class="field">
           <label>Autor</label>
-          <input type="text" id="livro-autor" value="Said Anes">
+          <input type="text" id="livro-autor" placeholder="Nome do autor (obrigatório)" required>
         </div>
       </div>
       <div style="margin-bottom:16px;">
@@ -1116,6 +1117,7 @@ const FORGE_URL = 'https://tr3vo-forge.al-kbhal.workers.dev';
 let token = sessionStorage.getItem('tt_admin_token') || '';
 let forgeProjectId = null;
 let forgeMarketingFiles = [];
+let forgeLinks = {}; // links assinados (15 min) de html/epub/pdf, vindos do worker
 let statsCache = null;
 let catalogoCache = [];
 let mkCache = null;
@@ -1333,7 +1335,7 @@ function abrirModalLivro(slug) {
   document.getElementById('modal-livro-titulo').textContent = livro ? 'Editar — ' + (livro.titulo || livro.slug) : 'Novo título';
   document.getElementById('livro-slug-original').value = livro?.slug || '';
   document.getElementById('livro-slug').value = livro?.slug || '';
-  document.getElementById('livro-autor').value = livro?.autor || 'Said Anes';
+  document.getElementById('livro-autor').value = livro?.autor || '';
   document.getElementById('livro-titulo-pt').value = livro?.titulo || '';
   document.getElementById('livro-titulo-en').value = livro?.titulo_en || '';
   document.getElementById('livro-titulo-es').value = livro?.titulo_es || '';
@@ -1426,6 +1428,11 @@ async function salvarLivro() {
     ativo: document.getElementById('livro-ativo').checked,
     motivo_inativo: document.getElementById('livro-motivo-inativo').value.trim() || null,
   };
+  if (!payload.autor) {
+    toast('Informe o autor — ele aparece na loja e nos exemplares vendidos.', 'err');
+    btn.textContent = 'Salvar'; btn.disabled = false;
+    return;
+  }
   try {
     const r = slugOriginal
       ? await api(`/api/admin/catalogo/${slugOriginal}`, 'PUT', payload)
@@ -1485,9 +1492,13 @@ async function carregarForgeProjeto() {
     const rLinks = await api(`/api/admin/forge/links?projectId=${id}`);
     const links = await rLinks.json();
     if (!links.ok) toast('Links do forge indisponíveis: ' + (links.erro || rLinks.status), 'err');
+    forgeLinks = links.ok ? links : {};
     document.getElementById('forge-link-html').href = links.html || '#';
     document.getElementById('forge-link-epub').href = links.epub || '#';
     document.getElementById('forge-link-pdf').href = links.pdf || '#';
+    // Título e autor do brief do forge — o autor é o que está gravado no EPUB/PDF.
+    if (d.titulo) document.getElementById('forge-titulo').value = d.titulo;
+    document.getElementById('forge-autor').value = d.autor || '';
     document.getElementById('forge-slug').value = `forge-${id.slice(0, 8)}`;
 
     carregarForgeMarketing(id);
@@ -1529,16 +1540,22 @@ async function decidirForge(destino) {
   const descricao = document.getElementById('forge-descricao').value.trim();
   const genero = document.getElementById('forge-genero').value.trim();
   const preco = parseFloat(document.getElementById('forge-preco').value) || 0;
+  const autor = document.getElementById('forge-autor').value.trim();
 
   if (!titulo || !slug) { toast('Preencha título e slug.', 'err'); return; }
+  if (!autor) { toast('Informe o autor — ele aparece na loja e nos exemplares.', 'err'); return; }
 
   const capaUrl = `${FORGE_URL}/project/${forgeProjectId}/cover`;
 
   try {
     if (destino === 'biblioteca') {
+      // EPUB copiado pro R2 da biblioteca — o acervo nunca aponta pro forge.
+      const rArq = await api('/api/admin/forge/arquivos', 'POST', { projectId: forgeProjectId, slug, destino: 'biblioteca' });
+      const dArq = await rArq.json();
+      if (!dArq.ok) throw new Error('cópia do EPUB falhou: ' + (dArq.erro || rArq.status));
       const r = await api('/api/admin/biblioteca/acervo', 'POST', {
-        slug, titulo, autor: 'Said Anes', genero: genero || null,
-        sinopse: descricao || null, epub_url: `${FORGE_URL}/project/${forgeProjectId}/epub`,
+        slug, titulo, autor, genero: genero || null,
+        sinopse: descricao || null, epub_url: dArq.epub_url,
         capa_url: capaUrl, idioma: 'pt', ativo: true, featured: false,
       });
       const d = await r.json();
@@ -1550,12 +1567,17 @@ async function decidirForge(destino) {
 
     // exclusiva | hero — ambos entram no catálogo (página própria = /checkout.html?slug=X)
     const rCat = await api('/api/admin/catalogo', 'POST', {
-      slug, titulo, autor: 'Said Anes', genero: genero || 'reflexao', genero_pt: genero || 'reflexao',
+      slug, titulo, autor, genero: genero || 'reflexao', genero_pt: genero || 'reflexao',
       descricao: descricao || '', preco, utm_campaign: slug,
       bg_color: '#0d2415', capa_url: capaUrl, ordem: 99, ativo: true,
     });
     const dCat = await rCat.json();
     if (!dCat.ok) throw new Error(dCat.erro || 'erro ao criar no catálogo');
+
+    // EPUB/PDF copiados pro Storage do site e gravados no produto.
+    const rArq = await api('/api/admin/forge/arquivos', 'POST', { projectId: forgeProjectId, slug, destino: 'loja' });
+    const dArq = await rArq.json();
+    if (!dArq.ok) toast('Livro criado, mas a cópia dos arquivos falhou: ' + (dArq.erro || rArq.status) + '. Tente publicar de novo.', 'err');
 
     if (destino === 'hero') {
       const rHero = await api('/api/admin/hero-config');
@@ -1586,9 +1608,9 @@ async function gerarBibliotecaLocal() {
     const pastaHandle = await raizHandle.getDirectoryHandle(pastaNome, { create: true });
 
     const arquivos = [
-      { nome: `${pastaNome}.epub`, url: `${FORGE_URL}/project/${forgeProjectId}/epub` },
-      { nome: `${pastaNome}.pdf`, url: `${FORGE_URL}/project/${forgeProjectId}/pdf` },
-      { nome: `${pastaNome}.html`, url: `${FORGE_URL}/project/${forgeProjectId}/html` },
+      { nome: `${pastaNome}.epub`, url: forgeLinks.epub },
+      { nome: `${pastaNome}.pdf`, url: forgeLinks.pdf },
+      { nome: `${pastaNome}.html`, url: forgeLinks.html },
       { nome: 'capa.jpg', url: `${FORGE_URL}/project/${forgeProjectId}/cover` },
       ...forgeMarketingFiles.map(f => ({ nome: `marketing_${f.lang}_${f.name}`, url: f.url })),
     ];

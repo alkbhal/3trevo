@@ -1,14 +1,17 @@
 /**
  * forge-webhook.ts — Três Trevo Worker
  * Recebe o webhook HMAC-assinado do tr3vo-forge quando um livro completa
- * e cria o produto (rascunho, ativo=false) na tabela `products`.
+ * e cria o produto (rascunho, ativo=false) na tabela `products`, com EPUB/PDF
+ * copiados pro Storage do site (nunca apontando pro forge).
  *
  * POST /api/webhook/forge-delivery
+ * GET  /api/admin/forge/links            — links assinados pra revisão no admin
+ * POST /api/admin/forge/arquivos         — copia EPUB/PDF pra loja ou biblioteca
  */
 
 import type { Env } from '../types';
 import { sb } from '../sb';
-import { assinarForge } from '../forge-download';
+import { assinarForge, copiarParaStorage, copiarEpubParaBiblioteca } from '../forge-download';
 import { verificarToken } from './admin-catalog';
 
 interface DeliveryPackage {
@@ -17,6 +20,9 @@ interface DeliveryPackage {
   arquivos: string[];
   summary: string;
   timestamp: string;
+  titulo?: string;
+  autor?: string;
+  editora?: string;
 }
 
 // ponytail: comparação hex constant-time duplicada em checkout.ts — sem util
@@ -56,17 +62,22 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
     return Response.json({ ok: true, ignorado: pkg.status });
   }
 
-  const forgeBaseUrl = env.FORGE_PUBLIC_URL ?? 'https://tr3vo-forge.al-kbhal.workers.dev';
-  // Formatos de venda: EPUB e PDF. HTML fica fora da venda e nunca vira arquivo do produto.
-  const temEpub = pkg.arquivos.some((a) => a.startsWith(`epub/${pkg.projectId}/`));
-  const temPdf = pkg.arquivos.some((a) => a.startsWith(`pdf/${pkg.projectId}/`));
-  const epubUrl = temEpub ? `${forgeBaseUrl}/project/${pkg.projectId}/epub` : null;
-  const pdfUrl = temPdf ? `${forgeBaseUrl}/project/${pkg.projectId}/pdf` : null;
-  const semArquivo = !epubUrl && !pdfUrl;
-  if (semArquivo) console.warn(`[forge-webhook] sem EPUB nem PDF para ${pkg.projectId}: rascunho sem arquivo de venda`);
+  if (!/^[0-9a-f-]{36}$/i.test(pkg.projectId ?? '')) {
+    return Response.json({ ok: false, erro: 'projectId_invalido' }, { status: 400 });
+  }
+  const projectId = pkg.projectId.toLowerCase();
+  const slug = `forge-${projectId.slice(0, 8)}`;
 
-  const titulo = pkg.summary.match(/^Obra "(.+?)"/)?.[1] ?? `Forge ${pkg.projectId.slice(0, 8)}`;
-  const slug = `forge-${pkg.projectId.slice(0, 8)}`;
+  // Formatos de venda: EPUB e PDF, copiados pro Storage. HTML fica fora da venda.
+  const formatos = (['epub', 'pdf'] as const).filter((f) => pkg.arquivos.some((a) => a.startsWith(`${f}/${pkg.projectId}/`)));
+  const copiados = await copiarParaStorage(env, projectId, slug, [...formatos]);
+  const semArquivo = !copiados.epub && !copiados.pdf;
+  if (semArquivo) console.warn(`[forge-webhook] sem EPUB nem PDF copiados para ${projectId}: rascunho sem arquivo de venda`);
+
+  // Título e autor vêm do pacote (brief do forge); regex no summary só pra pacote antigo.
+  const titulo = pkg.titulo?.trim() || pkg.summary.match(/^Obra "(.+?)"/)?.[1] || `Forge ${projectId.slice(0, 8)}`;
+  const autor = pkg.autor?.trim() || null;
+  if (!autor) console.warn(`[forge-webhook] ${projectId} sem autor no brief — preencher no admin antes de ativar`);
 
   // Portão humano: cria como rascunho (ativo=false, preço placeholder).
   // Precificação real e ativação ficam pro admin, via /api/admin/catalogo já existente.
@@ -77,11 +88,12 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
       slug,
       tipo: 'ebook',
       titulo,
+      autor,
       descricao: pkg.summary,
       preco: 0,
       ativo: false,
-      epub_url: epubUrl,
-      arquivo_url: pdfUrl,
+      epub_url: copiados.epub ?? null,
+      arquivo_url: copiados.pdf ?? null,
     }),
   });
 
@@ -108,4 +120,37 @@ export async function handleAdminForgeLinks(request: Request, env: Env): Promise
   );
   if (!html || !epub || !pdf) return Response.json({ ok: false, erro: 'forge_download_secret_ausente' }, { status: 503 });
   return Response.json({ ok: true, html, epub, pdf });
+}
+
+/**
+ * POST /api/admin/forge/arquivos { projectId, slug, destino: 'loja' | 'biblioteca' }
+ * loja: copia EPUB/PDF pro Storage e grava em products (slug já criado pelo catálogo).
+ * biblioteca: copia o EPUB pro R2 da Biblioteca TT e devolve a chave pro acervo.
+ */
+export async function handleAdminForgeArquivos(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) return Response.json({ ok: false, erro: 'unauthorized' }, { status: 401 });
+  let body: { projectId?: unknown; slug?: unknown; destino?: unknown };
+  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  const projectId = typeof body.projectId === 'string' ? body.projectId.toLowerCase() : '';
+  const slug = typeof body.slug === 'string' ? body.slug : '';
+  if (!/^[0-9a-f-]{36}$/.test(projectId)) return Response.json({ ok: false, erro: 'projectId_invalido' }, { status: 400 });
+  if (!/^[a-z0-9][a-z0-9-]{0,78}[a-z0-9]$/.test(slug)) return Response.json({ ok: false, erro: 'slug_invalido' }, { status: 400 });
+
+  if (body.destino === 'biblioteca') {
+    const epub_url = await copiarEpubParaBiblioteca(env, projectId, slug);
+    if (!epub_url) return Response.json({ ok: false, erro: 'copia_falhou' }, { status: 502 });
+    return Response.json({ ok: true, epub_url });
+  }
+  if (body.destino !== 'loja') return Response.json({ ok: false, erro: 'destino_invalido' }, { status: 400 });
+
+  const copiados = await copiarParaStorage(env, projectId, slug);
+  if (!copiados.epub && !copiados.pdf) return Response.json({ ok: false, erro: 'copia_falhou' }, { status: 502 });
+  const r = await sb(env, `products?slug=eq.${encodeURIComponent(slug)}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' } as any,
+    body: JSON.stringify({ epub_url: copiados.epub ?? null, arquivo_url: copiados.pdf ?? null }),
+  });
+  const linhas = r.ok ? await r.json().catch(() => []) : [];
+  if (!Array.isArray(linhas) || !linhas.length) return Response.json({ ok: false, erro: 'produto_nao_encontrado' }, { status: 404 });
+  return Response.json({ ok: true, ...copiados });
 }

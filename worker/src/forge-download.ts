@@ -58,3 +58,67 @@ export async function resolverUrlExterna(url: string, env: Env): Promise<string 
   if (!assinada) console.error('[forge-download] FORGE_DOWNLOAD_SECRET ausente — link do forge não pode ser assinado');
   return assinada;
 }
+
+// ─── Cópia para o armazenamento do site ──────────────────────────────────────
+// O livro vendido não fica apontando pro forge: no webhook (e na publicação pelo
+// admin) o EPUB/PDF é copiado pro bucket "ebooks" do Supabase Storage, na mesma
+// convenção dos títulos já existentes ({slug}.pdf / {slug}.epub). Assim
+// /api/download e get-download servem como qualquer outro produto, e quem comprou
+// não é afetado se o projeto for reprocessado ou apagado no forge.
+
+const MAX_ARQUIVO_BYTES = 100 * 1024 * 1024;
+const CONTENT_TYPE: Record<'epub' | 'pdf', string> = { epub: 'application/epub+zip', pdf: 'application/pdf' };
+
+async function baixarDoForge(env: Env, projectId: string, formato: 'epub' | 'pdf'): Promise<ArrayBuffer | null> {
+  const url = await assinarForge(env, projectId, formato);
+  if (!url) return null;
+  const r = await fetch(url);
+  if (!r.ok) {
+    if (r.status !== 404) console.error(`[forge-download] ${formato} de ${projectId}: forge respondeu ${r.status}`);
+    return null;
+  }
+  const bytes = await r.arrayBuffer();
+  if (!bytes.byteLength || bytes.byteLength > MAX_ARQUIVO_BYTES) {
+    console.error(`[forge-download] ${formato} de ${projectId} com tamanho inválido: ${bytes.byteLength}`);
+    return null;
+  }
+  return bytes;
+}
+
+/** Copia EPUB/PDF do forge pro bucket "ebooks". Devolve os caminhos gravados (o que falhar fica de fora). */
+export async function copiarParaStorage(
+  env: Env, projectId: string, slug: string, formatos: Array<'epub' | 'pdf'> = ['epub', 'pdf']
+): Promise<{ epub?: string; pdf?: string }> {
+  const out: { epub?: string; pdf?: string } = {};
+  for (const formato of formatos) {
+    const bytes = await baixarDoForge(env, projectId, formato);
+    if (!bytes) continue;
+    const caminho = `${slug}.${formato}`;
+    const r = await fetch(`${env.SUPABASE_URL}/storage/v1/object/ebooks/${encodeURIComponent(caminho)}`, {
+      method: 'POST',
+      headers: {
+        apikey: env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+        'Content-Type': CONTENT_TYPE[formato],
+        'x-upsert': 'true', // republicar o mesmo slug substitui o arquivo
+      },
+      body: bytes,
+    });
+    if (!r.ok) {
+      console.error(`[forge-download] upload ${caminho} falhou:`, r.status, await r.text().catch(() => ''));
+      continue;
+    }
+    out[formato] = caminho;
+  }
+  return out;
+}
+
+/** Biblioteca TT lê EPUB do R2 privado (epubs/{slug}.epub, mesma chave do upload manual). */
+export async function copiarEpubParaBiblioteca(env: Env, projectId: string, slug: string): Promise<string | null> {
+  if (!env.BIBLIOTECA_R2) return null;
+  const bytes = await baixarDoForge(env, projectId, 'epub');
+  if (!bytes) return null;
+  const chave = `epubs/${slug}.epub`;
+  await env.BIBLIOTECA_R2.put(chave, bytes, { httpMetadata: { contentType: CONTENT_TYPE.epub } });
+  return chave;
+}
