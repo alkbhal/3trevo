@@ -17,7 +17,7 @@ UPDATE products SET slug = 'antes-do-app' WHERE slug = 'atico';
 INSERT INTO products (slug, titulo, preco, cotas, autor, ativo)
 VALUES
   ('habitaculos', 'Habitáculos do Fim', 76.74, 10, 'Said Anes', true),
-  ('ultima-coisa', 'A Última Coisa que Ela Disse', 76.74, 10, 'Anes Said', true),
+  ('ultima-coisa', 'A Última Coisa que Ela Disse', 76.74, 10, 'Said Anes', true),
   ('caminho-rubro-vol1', 'Caminho Rubro — Vol. 1: A Engenharia da Tirania', 46.04, 3, 'Said Anes', true),
   ('caminho-rubro-vol2', 'Caminho Rubro — Vol. 2: As 7 Leis', 46.04, 3, 'Said Anes', true),
   ('caminho-rubro-vol3', 'Caminho Rubro — Vol. 3: Tiranos São Construídos', 46.04, 3, 'Said Anes', true),

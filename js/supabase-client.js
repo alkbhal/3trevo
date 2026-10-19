@@ -25,7 +25,7 @@ const EDGE_BASE = `${SUPABASE_URL}/functions/v1`;
 const CATALOGO = {
   '3a-guerra':          { titulo: 'O Nascimento Silencioso da 3ª Guerra Mundial', autor: 'Said Anes', genero: 'Ficção Documental', cotas: 10, preco: 35.00 },
   habitaculos:          { titulo: 'Habitáculos do Fim',                           autor: 'Said Anes', genero: 'Ensaio',            cotas: 10, preco: 35.00 },
-  'ultima-coisa':       { titulo: 'A Última Coisa que Ela Disse',                 autor: 'Anes Said', genero: 'Ficção Literária',  cotas: 10, preco: 35.00 },
+  'ultima-coisa':       { titulo: 'A Última Coisa que Ela Disse',                 autor: 'Said Anes', genero: 'Ficção Literária',  cotas: 10, preco: 35.00 },
   'caminho-rubro-vol1': { titulo: 'Caminho Rubro — Vol. 1: A Engenharia da Tirania', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 29.90 },
   'caminho-rubro-vol2': { titulo: 'Caminho Rubro — Vol. 2: As 7 Leis',           autor: 'Said Anes', genero: 'Ensaio Político',   cotas: 3,  preco: 29.90 },
   'caminho-rubro-vol3': { titulo: 'Caminho Rubro — Vol. 3: Tiranos São Construídos', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 29.90 },
