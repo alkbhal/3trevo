@@ -35,7 +35,7 @@ async function derivarPinHash(pin: string, salt: string): Promise<string> {
     'raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']
   );
   const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: 200_000 },
+    { name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: 100_000 }, // Workers recusa mais de 100k (200k lançava NotSupportedError e derrubava login/definir-senha)
     key, 256
   );
   return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
