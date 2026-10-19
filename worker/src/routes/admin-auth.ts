@@ -111,6 +111,33 @@ export async function handleAdminLogin(request: Request, env: Env): Promise<Resp
   return json({ ok: true, token: rawToken, expira_em: sessao.expira_em });
 }
 
+// Grava a senha do admin a partir de um código de uso único (dash_usuarios.setup_hash, expira em 1h).
+export async function handleAdminDefinirSenha(request: Request, env: Env): Promise<Response> {
+  let body: any;
+  try { body = await request.json(); } catch { return json({ ok: false, erro: 'bad_request' }, 400); }
+  const { codigo, senha } = body ?? {};
+  if (typeof codigo !== 'string' || codigo.length < 16 || codigo.length > 128) return json({ ok: false, erro: 'codigo_invalido' }, 400);
+  if (typeof senha !== 'string' || senha.length < 12 || senha.length > 64 || senha !== senha.trim()) {
+    return json({ ok: false, erro: 'senha_invalida' }, 400);
+  }
+
+  const salt = crypto.randomUUID();
+  const hash = await derivarPinHash(senha, salt);
+  const agora = encodeURIComponent(new Date().toISOString());
+  const r = await sb(env, `dash_usuarios?setup_hash=eq.${await sha256(codigo)}&setup_expira=gt.${agora}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ pin_salt: salt, pin_hash_v2: hash, setup_hash: null, setup_expira: null }),
+  });
+  if (!r.ok) {
+    console.error('[auth] definir-senha falhou:', r.status, await r.text().catch(() => ''));
+    return json({ ok: false, erro: 'internal_error' }, 500);
+  }
+  const alterados = (await r.json()) as any[];
+  if (alterados.length === 0) return json({ ok: false, erro: 'codigo_invalido' }, 400);
+  return json({ ok: true });
+}
+
 export async function handleAdminStats(request: Request, env: Env): Promise<Response> {
   if (!(await verificarToken(request, env))) {
     return new Response('Unauthorized', { status: 401 });

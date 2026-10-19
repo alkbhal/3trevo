@@ -39,7 +39,7 @@ import {
 } from './routes/admin-hero';
 import { handleAiStudio } from './routes/admin-ai-studio';
 import { handleNemaSaldo } from './routes/nema';
-import { handleAdminLogin, handleAdminStats } from './routes/admin-auth';
+import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha } from './routes/admin-auth';
 import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
 import { handleAdminMarketingStats } from './routes/admin-marketing';
@@ -295,6 +295,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     // Login admin (geração de sessão)
     if (path === '/api/admin/login' && method === 'POST') {
       return handleAdminLogin(request, env);
+    }
+    if (path === '/api/admin/definir-senha' && method === 'POST') {
+      return handleAdminDefinirSenha(request, env);
     }
 
     // Stats (admin)

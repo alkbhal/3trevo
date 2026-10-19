@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Definir senha · Três Trevo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0a1f0e; color: #f8f5ef; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    form { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 40px 32px; width: min(360px, 90vw); }
+    h1 { font-size: 20px; margin: 0 0 20px; font-weight: 400; }
+    label { display: block; font-size: 13px; margin: 14px 0 6px; color: #a8c5a0; }
+    input { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #2d7a50; border-radius: 3px; background: #0f2d1a; color: #fff; font-size: 15px; }
+    button { width: 100%; margin-top: 22px; padding: 12px; background: #1e5c3a; color: #fff; border: 0; border-radius: 3px; font-size: 15px; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: default; }
+    #msg { margin-top: 16px; font-size: 14px; min-height: 20px; }
+    .erro { color: #ff8a7a; } .ok { color: #8fe0a8; }
+  </style>
+</head>
+<body>
+  <form id="f">
+    <h1>Definir senha do admin</h1>
+    <label for="codigo">Código de uso único</label>
+    <input id="codigo" type="text" autocomplete="off" required>
+    <label for="senha">Nova senha (12 a 64 caracteres)</label>
+    <input id="senha" type="password" autocomplete="new-password" minlength="12" maxlength="64" required>
+    <label for="conf">Repita a senha</label>
+    <input id="conf" type="password" autocomplete="new-password" required>
+    <button id="btn" type="submit">Gravar senha</button>
+    <div id="msg" role="status"></div>
+  </form>
+  <script>
+    const API = 'https://tres-trevo-api.al-kbhal.workers.dev';
+    const ERROS = {
+      codigo_invalido: 'Código inválido ou expirado.',
+      senha_invalida: 'Senha inválida: use 12 a 64 caracteres, sem espaço no início ou no fim.',
+      internal_error: 'Erro no servidor. Tente de novo em instantes.',
+    };
+    const f = document.getElementById('f'), msg = document.getElementById('msg'), btn = document.getElementById('btn');
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const senha = f.senha.value;
+      if (senha !== f.conf.value) { msg.className = 'erro'; msg.textContent = 'As senhas não conferem.'; return; }
+      btn.disabled = true; msg.className = ''; msg.textContent = 'Gravando…';
+      try {
+        const r = await fetch(`${API}/api/admin/definir-senha`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo: f.codigo.value.trim(), senha }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d.ok) { msg.className = 'ok'; msg.textContent = 'Senha gravada. Use-a no login do admin.'; f.reset(); }
+        else { msg.className = 'erro'; msg.textContent = ERROS[d.erro] || 'Não foi possível gravar.'; }
+      } catch { msg.className = 'erro'; msg.textContent = 'Sem conexão com o servidor.'; }
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>
