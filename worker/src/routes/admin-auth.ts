@@ -131,7 +131,7 @@ export async function handleAdminDefinirSenha(request: Request, env: Env): Promi
   });
   if (!r.ok) {
     console.error('[auth] definir-senha falhou:', r.status, await r.text().catch(() => ''));
-    return json({ ok: false, erro: 'internal_error' }, 500);
+    return json({ ok: false, erro: 'internal_error', sb_status: r.status }, 500);
   }
   const alterados = (await r.json()) as any[];
   if (alterados.length === 0) return json({ ok: false, erro: 'codigo_invalido' }, 400);
