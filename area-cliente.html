@@ -14,7 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.googletagmanager.com; connect-src 'self' *.supabase.co www.google-analytics.com region1.google-analytics.com www.google.com; img-src 'self' data: blob: *.supabase.co *.al-kbhal.workers.dev; font-src 'self' blob: fonts.gstatic.com; style-src 'self' 'unsafe-inline' blob: https://fonts.googleapis.com; frame-src 'self' *.supabase.co; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.googletagmanager.com; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com; img-src 'self' data: blob: *.supabase.co *.al-kbhal.workers.dev; font-src 'self' blob: fonts.gstatic.com; style-src 'self' 'unsafe-inline' blob: https://fonts.googleapis.com; frame-src 'self' *.supabase.co; object-src 'none';">
 <title>Minha Biblioteca — Editora Três Trevo</title>
 <meta name="description" content="Acesse sua biblioteca de ebooks, músicas e acompanhe o Programa Cultural da Editora Três Trevo.">
 <meta name="robots" content="noindex">
@@ -805,8 +805,8 @@ nav{
       <div class="stat-label">Músicas</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num" id="statCotas">—</div>
-      <div class="stat-label">Cotas no Programa</div>
+      <div class="stat-num" id="statNema">—</div>
+      <div class="stat-label" id="statNemaLabel">Nema (N$)</div>
     </div>
     <div class="stat-item">
       <div class="stat-num" id="statStatus">—</div>
@@ -818,7 +818,6 @@ nav{
   <div class="abas" role="tablist">
     <button class="aba ativa" onclick="trocarAba('biblioteca',this)" role="tab" aria-selected="true">Biblioteca</button>
     <button class="aba" onclick="trocarAba('musicas',this)" role="tab">Músicas</button>
-    <button class="aba" onclick="trocarAba('sorteios',this)" role="tab">Premiações</button>
     <button class="aba" onclick="trocarAba('extrato',this)" role="tab">Extrato</button>
     <button class="aba" onclick="trocarAba('assinatura',this)" role="tab">Assinatura</button>
     <button class="aba" onclick="trocarAba('planilhaviva',this)" role="tab">Planilha Viva</button>
@@ -1102,8 +1101,29 @@ async function carregarStats() {
 
   animarNum('statEbooks',  ebooks);
   animarNum('statMusicas', musicas);
-  animarNum('statCotas',   cotas);
+  carregarNema();
   document.getElementById('statStatus').textContent = hasSub ? 'Ativa' : 'Sem plano';
+}
+
+// Nema: saldo vem do worker (as regras ficam no banco). Disponível = pode usar no checkout.
+async function carregarNema() {
+  const el = document.getElementById('statNema');
+  const lbl = document.getElementById('statNemaLabel');
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/nema/saldo', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+    });
+    const d = await r.json();
+    if (!d.ok) { el.textContent = '—'; return; }
+    el.textContent = 'N$ ' + Number(d.disponivel).toFixed(2).replace('.', ',');
+    const partes = ['vale R$ ' + Number(d.disponivel_em_reais).toFixed(2).replace('.', ',') + ' na próxima compra'];
+    if (Number(d.pendente) > 0) partes.push('+ N$ ' + Number(d.pendente).toFixed(2).replace('.', ',') + ' liberam em até 7 dias');
+    lbl.textContent = 'Nema · ' + partes.join(' · ');
+  } catch (e) {
+    el.textContent = '—';
+  }
 }
 
 function animarNum(id, target) {

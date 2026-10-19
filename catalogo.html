@@ -22,7 +22,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Editora Três Trevo">
 <meta property="og:title" content="Catálogo — Editora Três Trevo">
-<meta property="og:description" content="Todos os títulos da editora. Adquira, leia e concorra a prêmios no Programa Cultural.">
+<meta property="og:description" content="Todos os títulos da editora. Adquira e leia com entrega imediata.">
 <meta property="og:url" content="https://www.3trevo.com.br/catalogo.html">
 <meta property="og:image" content="https://www.3trevo.com.br/og-image.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -243,20 +243,12 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
         <a href="/">Editora Três Trevo</a> / Catálogo
       </nav>
       <h1 class="pg-titulo reveal">Todos os <em>títulos</em></h1>
-      <p class="pg-sub reveal" style="transition-delay:.1s">Série 1 — Literatura · Programa Cultural · 2026</p>
+      <p class="pg-sub reveal" style="transition-delay:.1s">Série 1 — Literatura · 2026</p>
     </div>
     <div class="pg-stats reveal" style="transition-delay:.15s" aria-label="Estatísticas do catálogo">
       <div>
         <span class="pg-stat-num" id="totalObras">11</span>
         <div class="pg-stat-txt">Obras disponíveis</div>
-      </div>
-      <div>
-        <span class="pg-stat-num">6</span>
-        <div class="pg-stat-txt">Rodadas de premiação</div>
-      </div>
-      <div>
-        <span class="pg-stat-num" style="font-size:30px">R$9.000</span>
-        <div class="pg-stat-txt">Premiação total da série</div>
       </div>
     </div>
   </div>
@@ -323,10 +315,8 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
             '<h2 class="ebook-titulo">'+escapeHtml(l.titulo)+'</h2>'+
             '<p class="ebook-autor">'+escapeHtml(autor)+'</p>'+
             '<p class="ebook-desc">'+escapeHtml(l.descricao||'')+'</p>'+
-            '<div class="ebook-premio-box">✦ Participa do Programa Cultural · confirmação após D+7</div>'+
             '<div class="ebook-footer">'+
-              '<div><div class="ebook-preco" id="preco-'+encodeURIComponent(l.slug)+'">R$'+TTClient.formatMoney(l.preco)+'</div>'+
-              '<div class="ebook-cotas">'+l.cotas+' cota'+(l.cotas>1?'s':'')+' inclusa'+(l.cotas>1?'s':'')+'</div></div>'+
+              '<div><div class="ebook-preco" id="preco-'+encodeURIComponent(l.slug)+'">R$'+TTClient.formatMoney(l.preco)+'</div></div>'+
               '<a href="/checkout.html?slug='+encodeURIComponent(l.slug)+'" class="ebook-btn" onclick="event.stopPropagation()">Adquirir</a>'+
             '</div>';
           grid.appendChild(card);
@@ -337,47 +327,6 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
           requestAnimationFrame(function(){ card.classList.add('visivel'); });
         });
 
-        // Faixa é sobre a LINHA de produto (intervalo de preço), não um preço único --
-        // um título específico não define a faixa, o intervalo de preço define quantos
-        // títulos diferentes cabem nela. Cota já vem computada pelo servidor
-        // (cotasPorPreco em admin-catalog.ts), reaproveitada aqui como fonte única de
-        // verdade -- não recalculada a partir do preço de novo.
-        var FAIXAS = [
-          { tag:'Faixa Entrada', nome:'Ponto de partida', cotas:1, faixaTxt:'até R$20',
-            cotasTxt:'1 cota',
-            desc:'Acesso ao Programa Cultural com participação em todas as 6 rodadas da série. Ideal para quem quer começar e conhecer a editora.' },
-          { tag:'Faixa Intermediária', nome:'Custo-benefício', cotas:3, faixaTxt:'R$20 a R$30',
-            cotasTxt:'3 cotas',
-            desc:'3 cotas por título (cota base da faixa). Cada cota vale independentemente nas 6 rodadas — seu peso cresce conforme o prêmio aumenta.' },
-          { tag:'Faixa Premium', nome:'Máxima elegibilidade', cotas:10, faixaTxt:'acima de R$30',
-            cotasTxt:'10 cotas', destaque:true,
-            desc:'10 cotas por título (cota base da faixa) — a maior elegibilidade possível. Para leitores que levam a sério sua participação na série.' },
-        ];
-        var faixasGrid = document.getElementById('faixasGrid');
-        if (faixasGrid) {
-          faixasGrid.innerHTML = FAIXAS.map(function(f, i) {
-            var titulosFaixa = livros.filter(function(l) { return l.cotas === f.cotas; });
-            var listaHtml = titulosFaixa.length
-              ? titulosFaixa.map(function(l) { return '— ' + escapeHtml(l.titulo); }).join('<br>')
-              : 'Nenhum título ativo nesta faixa no momento.';
-            var precoMin = titulosFaixa.length ? Math.min.apply(null, titulosFaixa.map(function(l) { return Number(l.preco); })) : null;
-            var cta = titulosFaixa.length
-              ? '<a href="/checkout.html?slug=' + encodeURIComponent(titulosFaixa[0].slug) + '" class="faixa-btn">A partir de R$' + TTClient.formatMoney(precoMin) + '</a>'
-              : '<a href="/catalogo.html" class="faixa-btn" style="opacity:.5;pointer-events:none">Indisponível</a>';
-            return '<div class="faixa-card' + (f.destaque ? ' destaque' : '') + ' reveal" style="transition-delay:' + (i * 0.1) + 's">' +
-              '<div class="faixa-tag">' + f.tag + '</div>' +
-              '<div class="faixa-preco">' + f.faixaTxt + '</div>' +
-              '<div class="faixa-cotas">' + f.cotasTxt + '</div>' +
-              '<div class="faixa-nome">' + f.nome + '</div>' +
-              '<p class="faixa-desc">' + f.desc + '</p>' +
-              '<div class="faixa-obras">Títulos disponíveis:<br>' + listaHtml + '</div>' +
-              cta +
-            '</div>';
-          }).join('');
-          requestAnimationFrame(function() {
-            faixasGrid.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visivel'); });
-          });
-        }
       })
       .catch(function(){
         grid.innerHTML = '<p style="padding:40px;color:#999">Não foi possível carregar o catálogo agora. Tente novamente em instantes.</p>';
@@ -388,35 +337,6 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   </script>
 </section>
 
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- ESCOLHA SUA FAIXA -->
-<section class="faixas-wrap" aria-label="Comparativo de faixas e cotas">
-  <div class="sec-label">Programa Cultural</div>
-  <h2 class="sec-titulo reveal">Escolha sua <em style="color:var(--verde);font-style:italic">faixa</em></h2>
-  <p class="sec-sub reveal" style="transition-delay:.1s">Cada faixa inclui cotas diferentes para o Programa Cultural. Mais cotas, maior elegibilidade a cada rodada de premiação.</p>
-
-  <div class="faixas-grid" id="faixasGrid">
-    <p style="padding:20px;opacity:.6">Carregando faixas…</p>
-  </div>
-</section>
-
-<div class="divisor" aria-hidden="true"></div>
-
-<!-- PROGRAMA CTA -->
-<section class="prog-cta" aria-label="Entenda o Programa Cultural">
-  <div class="prog-cta-inner reveal">
-    <div>
-      <div class="sec-label" style="margin-bottom:12px">Como funciona</div>
-      <h2 class="prog-cta-titulo">O Programa Cultural</h2>
-      <p class="prog-cta-sub">Adquira, leia e escreva um depoimento genuíno sobre o que leu. Suas cotas são validadas automaticamente — sem sorteio manual, sem aleatoriedade humana. O algoritmo <strong>sha256-bigint-v1</strong> usa o hash de um bloco de Bitcoin como semente verificável. Auditável por qualquer pessoa, a qualquer momento.</p>
-    </div>
-    <div class="prog-cta-acoes">
-      <a href="/#programa" class="btn-primario">Ver como funciona →</a>
-      <a href="/auditoria-sorteio.html" class="btn-link">Auditoria pública</a>
-    </div>
-  </div>
-</section>
 </main>
 
 <div class="divisor" aria-hidden="true"></div>
@@ -448,7 +368,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-legal">© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada · Programa Cultural conforme legislação vigente</div>
+    <div class="footer-legal">© 2026 Editora Três Trevo · Todos os direitos reservados · Said Anes é marca registrada</div>
     <div class="footer-selos">
       <span class="footer-selo">CNPJ</span>
       <span class="footer-selo">SSL</span>

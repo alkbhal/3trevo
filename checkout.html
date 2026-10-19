@@ -152,13 +152,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
         <div class="produto-titulo" id="prodTitulo">—</div>
         <div class="produto-autor" id="prodAutor">—</div>
         <div class="produto-desc" id="prodDesc"></div>
-        <div class="produto-cotas-box">
-          <div class="produto-cotas-num" id="prodCotas">—</div>
-          <div class="produto-cotas-txt">
-            cotas no Programa Cultural<br>
-            <span style="color:rgba(26,26,22,.4);font-size:11px">Válidas após D+7 e validação do depoimento</span>
-          </div>
-        </div>
+        <!-- Programa Cultural pausado em 10/10/2026: o número segue preenchido pelo script, mas não aparece. -->
+        <div class="produto-cotas-box" style="display:none" aria-hidden="true"><div class="produto-cotas-num" id="prodCotas"></div></div>
         <div class="produto-preco-label">Valor</div>
         <div class="produto-preco-grande" id="prodPreco">—</div>
       </div>
@@ -185,6 +180,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
           Após o pagamento, o ebook é enviado para este e-mail automaticamente.
         </div>
       </div>
+
+      <!-- Nema: aparece só para cliente logado com saldo disponível -->
+      <label id="nemaBox" style="display:none;gap:10px;align-items:flex-start;padding:14px 16px;border:1px solid rgba(26,74,46,.25);background:rgba(26,74,46,.05);cursor:pointer;font-size:15px;line-height:1.5">
+        <input type="checkbox" id="usarNema" style="width:22px;height:22px;margin-top:2px;accent-color:#1a4a2e">
+        <span id="nemaTxt">Usar meu saldo Nema</span>
+      </label>
 
       <!-- Botão pagar via Mercado Pago (PIX + Cartão) -->
       <div>
@@ -314,10 +315,13 @@ async function iniciarPagamento() {
   mostrarOverlay('Preparando pagamento seguro…');
 
   try {
+    var headers = { 'Content-Type': 'application/json' };
+    var usarNema = !!(document.getElementById('usarNema') && document.getElementById('usarNema').checked && nemaToken);
+    if (usarNema) headers['Authorization'] = 'Bearer ' + nemaToken;
     var resp = await fetch(WORKER + '/api/checkout/preferencia', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: produtoSlug, email: email })
+      headers: headers,
+      body: JSON.stringify({ slug: produtoSlug, email: email, usar_nema: usarNema })
     });
     var data = await resp.json();
 
@@ -329,6 +333,8 @@ async function iniciarPagamento() {
         ? 'Sistema de pagamento em manutenção. Tente novamente em alguns minutos ou entre em contato: sac@3trevo.com.br'
         : data.erro === 'produto_nao_encontrado'
         ? 'Produto não encontrado. Volte ao catálogo e tente novamente.'
+        : data.erro === 'login_necessario'
+        ? 'Para usar seu saldo Nema, entre na sua área do cliente e volte a esta página.'
         : 'Erro ao processar. Tente novamente.', 'erro');
       return;
     }
@@ -340,6 +346,27 @@ async function iniciarPagamento() {
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pagar com PIX ou Cartão';
     mostrarAlerta('Erro de conexão. Verifique sua internet e tente novamente.', 'erro');
   }
+}
+
+// ── NEMA ──────────────────────────────────────────────────
+// Só para quem já está logado na área do cliente: mostra o saldo e o desconto possível.
+var nemaToken = null;
+async function carregarNemaCheckout() {
+  try {
+    if (!window.sb) return;
+    var r = await window.sb.auth.getSession();
+    var session = r && r.data && r.data.session;
+    if (!session) return;
+    var resp = await fetch(WORKER + '/api/nema/saldo', { headers: { 'Authorization': 'Bearer ' + session.access_token } });
+    var d = await resp.json();
+    if (!d.ok || Number(d.disponivel) <= 0) return;
+    nemaToken = session.access_token;
+    document.getElementById('nemaTxt').textContent =
+      'Usar meu saldo Nema: N$ ' + Number(d.disponivel).toFixed(2).replace('.', ',') +
+      ' (até R$ ' + Number(d.disponivel_em_reais).toFixed(2).replace('.', ',') + ' de desconto, limitado à metade do preço). ' +
+      'O pagamento fica no e-mail da sua conta: ' + session.user.email + '.';
+    document.getElementById('nemaBox').style.display = 'flex';
+  } catch (e) { /* sem saldo visível, o checkout segue normal */ }
 }
 
 // ── HELPERS ───────────────────────────────────────────────
@@ -357,6 +384,7 @@ function ocultarOverlay() {
 }
 
 init();
+carregarNemaCheckout();
 </script>
 <script src="js/beacon.js?v=31ab9ba7" defer></script>
 </body>
