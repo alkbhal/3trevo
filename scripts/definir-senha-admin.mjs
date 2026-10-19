@@ -16,6 +16,7 @@ const senha = await pedirOculto('Nova senha (minimo 12 caracteres): ');
 const conf = await pedirOculto('Repita a senha: ');
 if (senha !== conf) { console.error('As senhas nao conferem.'); process.exit(1); }
 if (senha.length < 12 || senha.length > 64) { console.error('Use de 12 a 64 caracteres.'); process.exit(1); }
+if (senha !== senha.trim()) { console.error('A senha nao pode comecar nem terminar com espaco (o admin.html faz trim antes de enviar).'); process.exit(1); }
 
 const salt = randomUUID();
 const hash = pbkdf2Sync(senha, salt, 200_000, 32, 'sha256').toString('hex');
