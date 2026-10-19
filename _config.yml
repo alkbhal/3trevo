@@ -6,6 +6,7 @@
 exclude:
   - worker
   - docs
+  - i18n
   - scripts
   - supabase
   - CLAUDE.md

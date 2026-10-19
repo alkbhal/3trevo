@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verifica se os hashes de cache-busting batem com o conteudo real
         run: node scripts/stamp.mjs --check
+      - name: Sites EN e ES em sincronia com o PT e sem português (scripts/i18n.mjs)
+        run: node scripts/i18n.mjs --check
 
   worker:
     runs-on: ubuntu-latest

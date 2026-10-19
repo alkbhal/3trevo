@@ -40,3 +40,16 @@ O workflow **Health Check** (a cada 6h) e o `/api/health/status` confirmam a sa�
 | Data | Azul (antes) | Verde (depois) | O que mudou |
 |---|---|---|---|
 | 18/10/2026 | `azul-20261018` | PR `verde-20261018` | Leitor novo, música liberada na CSP, capas tipográficas, banner de clássicos condicional, Nema como pontos, policy dos produtos comprados |
+| 18/10/2026 | `azul-20261018b` | PR `verde-20261018-membros` | Área de membros grátis: pop-up e /gratis criam a conta, amostra em EPUB, 1 clássico por membro (tabela `leitura_livre` + função `livre-epub`), cartão do Nema |
+| 18/10/2026 | `azul-20261018b` | PR `verde-20261018-idiomas` (inclui o de membros) | Três sites (PT, /en/, /es/) gerados do PT por `scripts/i18n.mjs`; estantes de clássicos por idioma (`estante_intl`); privacidade |
+
+## Idiomas (PT, EN, ES)
+
+O português é a fonte. Depois de editar uma página PT:
+
+1. `node scripts/i18n.mjs`: gera `/en/` e `/es/`. Se um texto PT mudou, o script lista as chaves que precisam de tradução nova.
+2. Atualize `i18n/en.json` e `i18n/es.json` e rode `node scripts/i18n.mjs --aceitar`.
+3. `node scripts/stamp.mjs` e commit.
+
+O CI (`i18n.mjs --check`) barra o deploy se faltar tradução, se o PT mudou depois da tradução ou se aparecer português em página EN/ES.
+
