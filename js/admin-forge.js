@@ -8,6 +8,15 @@ const FORGE_ESTADOS = {
   writing: ['Escrevendo', 'warn'], editing: ['Revisando', 'warn'], design: ['Design', 'warn'],
   marketing: ['Marketing', 'warn'], translation: ['Tradução', 'warn'], render: ['Gerando arquivos', 'warn'],
   delivery: ['Entrega', 'warn'], awaiting_character_images: ['Aguardando imagens', 'warn'],
+  rejected_format: ['Reprovada no formato', 'perigo'], rejected_quality: ['Reprovada no mercado', 'perigo'],
+};
+
+// Espelho da tabela do Forge (tr3vo-forge/lib/formats.ts): ao mudar lá, mudar aqui.
+const FORGE_FORMATOS = {
+  '': 'Sem formato: o Forge escreve um livro de 8 a 15 capítulos, como antes.',
+  ensaio: 'Ensaio · 2 mil a 15 mil palavras (alvo 6 mil) · 5 a 8 capítulos · voz autoral com tese central.',
+  novela: 'Novela · 17,5 mil a 40 mil palavras (alvo 28 mil) · 20 a 36 capítulos · ficção, não pesquisa na web.',
+  'artigo-academico': 'Artigo acadêmico · 6 mil a 10 mil palavras (alvo 8 mil) · 8 seções fixas · resumo, abstract e referências ABNT montadas das fontes reais.',
 };
 const FORGE_ERROS = {
   forge_nao_autorizado: 'O worker do 3Trevo não tem o segredo do Forge. Na pasta worker: npx wrangler secret put FORGE_API_SECRET.',
@@ -68,6 +77,14 @@ function forgeAbrir() {
   forgeAba('lista');
   forgeListar();
   forgeAgendar();
+  forgeFormatoMudou();
+}
+
+// Mostra o que o formato escolhido exige (faixa de palavras, capítulos, regras do portão).
+function forgeFormatoMudou() {
+  const f = forgeEl('forge-novo-formato').value;
+  forgeEl('forge-novo-formato-info').textContent =
+    (FORGE_FORMATOS[f] ?? FORGE_FORMATOS['']) + (f ? ' A obra só segue se atingir 85% do mínimo do formato.' : '');
 }
 
 async function forgeListar(silencioso = false) {
@@ -146,10 +163,16 @@ async function forgeDetalhes(id) {
   const totalUsd = cs.ok && cs.dados?.total?.total_usd != null ? Number(cs.dados.total.total_usd).toFixed(4) : '—';
   const custos = cs.ok ? (cs.dados.breakdown || []).map((b) =>
     `<tr><td>${escapeHtml(b.worker)}</td><td>${escapeHtml(b.model)}</td><td>${escapeHtml(b.calls)}</td><td>US$ ${Number(b.cost_usd).toFixed(4)}</td></tr>`).join('') : '';
+  // Relatório do editor para obras com formato: tamanho, diversidade lexical (MTLD, só métrica) e motivos.
+  const rel = p.relatorioFormato;
+  const motivos = !p.error_log && rel ? (rel.motivos || []).map((m) => `<div>• ${escapeHtml(m)}</div>`).join('') : '';
+  const relatorio = rel ? `<div style="font-size:13px;margin-bottom:14px;padding:10px 12px;border-radius:3px;background:${rel.aprovado ? '#e8f5e9' : '#ffebee'};">
+      <strong>Formato ${escapeHtml(rel.formato)}</strong> · ${Number(rel.palavras).toLocaleString('pt-BR')} palavras (mínimo exigido ${Number(rel.tamanho?.minimoExigido ?? 0).toLocaleString('pt-BR')}) · diversidade lexical (MTLD) ${escapeHtml(rel.lexico?.mtld ?? '—')} · ${rel.aprovado ? 'aprovada no formato' : 'reprovada no formato'}${rel.referencias ? ` · ${escapeHtml(rel.referencias)} referências` : ''}${motivos}</div>` : '';
   box.innerHTML = `
     <div class="card-hdr"><span class="card-titulo">${escapeHtml(p.tema || id)}</span>${forgeBadge(p.status)}</div>
     <div class="card-body">
       ${p.error_log ? `<div style="background:#ffebee;color:#c0392b;padding:10px 12px;border-radius:3px;margin-bottom:14px;font-size:13px;white-space:pre-wrap;">${escapeHtml(p.error_log)}</div>` : ''}
+      ${relatorio}
       <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Criado ${forgeData(p.created_at)} · atualizado ${forgeData(p.updated_at)} · custo total US$ ${totalUsd}</div>
       <div style="overflow-x:auto;"><table><thead><tr><th>Cap.</th><th>Título</th><th>Estado</th><th>Vetos</th></tr></thead><tbody>${caps || '<tr><td colspan="4">Sem capítulos ainda.</td></tr>'}</tbody></table></div>
       ${custos ? `<div style="overflow-x:auto;margin-top:14px;"><table><thead><tr><th>Etapa</th><th>Modelo</th><th>Chamadas</th><th>Custo</th></tr></thead><tbody>${custos}</tbody></table></div>` : ''}
@@ -171,22 +194,22 @@ function forgeLerArquivo(input) {
 
 async function forgeCriar() {
   const modo = document.querySelector('input[name="forge-modo"]:checked').value;
+  const formato = forgeEl('forge-novo-formato').value || undefined; // a meta de palavras vem do formato, no Forge
   let rota, corpo;
   if (modo === 'tema') {
     const tema = forgeEl('forge-novo-tema').value.trim();
     if (tema.length < 3) { toast('Descreva o tema do livro.', 'erro'); return; }
     rota = 'novo';
-    corpo = { tema, contexto: forgeEl('forge-novo-contexto').value.trim() || undefined };
+    corpo = { tema, contexto: forgeEl('forge-novo-contexto').value.trim() || undefined, formato };
   } else {
     const manuscrito = forgeEl('forge-novo-texto').value;
     if (manuscrito.trim().length < 200) { toast('O manuscrito precisa ter pelo menos 200 caracteres.', 'erro'); return; }
-    const meta = parseInt(forgeEl('forge-novo-meta').value, 10);
     rota = 'ingerir';
     corpo = {
       manuscrito,
       titulo: forgeEl('forge-novo-titulo').value.trim() || undefined,
       modo: forgeEl('forge-novo-modo').value,
-      metaPalavras: meta > 0 ? meta : undefined,
+      formato,
     };
   }
   const btn = forgeEl('forge-novo-enviar');
@@ -196,7 +219,8 @@ async function forgeCriar() {
     const res = await forgeApi(rota, 'POST', corpo);
     if (!res.ok) { toast(forgeMensagemErro(res), 'erro'); return; }
     toast(res.dados?.message || 'Projeto enviado ao Forge.');
-    ['forge-novo-tema', 'forge-novo-contexto', 'forge-novo-titulo', 'forge-novo-texto', 'forge-novo-meta'].forEach((i) => { forgeEl(i).value = ''; });
+    ['forge-novo-tema', 'forge-novo-contexto', 'forge-novo-titulo', 'forge-novo-texto', 'forge-novo-formato'].forEach((i) => { forgeEl(i).value = ''; });
+    forgeFormatoMudou();
     forgeAba('lista');
     forgeListar();
   } catch (e) {

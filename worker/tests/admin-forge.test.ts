@@ -48,6 +48,29 @@ describe('ponte admin → forge', () => {
     expect(f).toHaveBeenCalledTimes(1);
   });
 
+  it('manuscrito com formato: repassa o formato ao Forge', async () => {
+    const f = mockFetch(() => new Response(JSON.stringify({ projectId: ID }), { status: 201 }));
+    const r = await chamar(req('POST', 'ingerir', { manuscrito: 'palavra '.repeat(60), formato: 'novela' }));
+    expect(r.status).toBe(201);
+    const [url, init] = f.mock.calls[1] as [string, RequestInit];
+    expect(url).toBe('https://tr3vo-forge.al-kbhal.workers.dev/ingest');
+    expect(JSON.parse(init.body as string)).toMatchObject({ formato: 'novela' });
+  });
+
+  it('tema com formato: repassa o formato ao Forge', async () => {
+    const f = mockFetch(() => new Response(JSON.stringify({ projectId: ID }), { status: 201 }));
+    await chamar(req('POST', 'novo', { tema: 'Endividamento das famílias', formato: 'artigo-academico' }));
+    const [, init] = f.mock.calls[1] as [string, RequestInit];
+    expect(JSON.parse(init.body as string)).toMatchObject({ tema: 'Endividamento das famílias', formato: 'artigo-academico' });
+  });
+
+  it('formato desconhecido dá 400 antes de chamar o Forge', async () => {
+    const f = mockFetch(() => new Response('{}'));
+    const r = await chamar(req('POST', 'novo', { tema: 'Qualquer tema', formato: 'cordel' }));
+    expect(r.status).toBe(400);
+    expect(f).toHaveBeenCalledTimes(1); // só a checagem de sessão
+  });
+
   it('repassa o segredo ao Forge e devolve o JSON dele', async () => {
     const f = mockFetch(() => new Response(JSON.stringify([{ id: ID, tema: 't', status: 'complete' }])));
     const r = await chamar(req('GET', 'projetos'));

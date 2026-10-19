@@ -13,15 +13,20 @@ const PREFIXO = '/api/admin/forge/';
 const UUID = /^[0-9a-f-]{36}$/i;
 const MAX_BODY_BYTES = 5 * 1024 * 1024;
 
+// Espelho de FormatoSchema do tr3vo-forge (lib/formats.ts); formato novo entra lá e aqui.
+const formatoSchema = z.enum(['ensaio', 'novela', 'artigo-academico']);
+
 const ingerirSchema = z.object({
   manuscrito: z.string().min(200).max(4_000_000),
   titulo: z.string().trim().max(200).optional(),
   modo: z.enum(['completar', 'aprimorar', 'ambos']).optional(),
   metaPalavras: z.number().int().positive().max(1_000_000).optional(),
+  formato: formatoSchema.optional(),
 });
 const novoSchema = z.object({
   tema: z.string().trim().min(3).max(500),
   contexto: z.string().max(5000).optional(),
+  formato: formatoSchema.optional(),
 });
 const apagarSchema = z.object({ feedback: z.string().max(2000).optional() });
 
