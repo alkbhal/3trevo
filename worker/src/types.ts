@@ -17,6 +17,8 @@ export interface Env {
   WEBHOOK_HMAC_SECRET: string;
   FORGE_WEBHOOK_SECRET?: string;
   FORGE_PUBLIC_URL?: string;
+  FORGE_API_SECRET?: string; // segredo do worker intake do tr3vo-forge (ponte do admin)
+  FORGE_URL?: string;
 
   // IA
   ANTHROPIC_KEY: string;

@@ -40,6 +40,7 @@ import {
 import { handleAiStudio } from './routes/admin-ai-studio';
 import { handleNemaSaldo } from './routes/nema';
 import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha } from './routes/admin-auth';
+import { handleAdminForge } from './routes/admin-forge';
 import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
 import { handleAdminMarketingStats } from './routes/admin-marketing';
@@ -298,6 +299,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
     if (path === '/api/admin/definir-senha' && method === 'POST') {
       return handleAdminDefinirSenha(request, env);
+    }
+    if (path.startsWith('/api/admin/forge/')) {
+      return handleAdminForge(request, env, path);
     }
 
     // Stats (admin)

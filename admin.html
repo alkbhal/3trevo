@@ -386,7 +386,7 @@
         <span class="sb-ic">☰</span> Catálogo
       </button>
       <button class="sb-item" onclick="irPara('forge',this)">
-        <span class="sb-ic">📖</span> Revisar Forge
+        <span class="sb-ic">📖</span> Forge
       </button>
       <button class="sb-item" onclick="irPara('hero',this)">
         <span class="sb-ic">▶</span> Hero
@@ -488,14 +488,74 @@
       <div class="panel" id="panel-forge">
         <div class="section-hdr">
           <div>
-            <div class="section-titulo">Revisar produção do Forge</div>
-            <div class="section-sub">Carregue um projeto do tr3vo-forge pelo projectId, revise o material gerado e decida o destino.</div>
+            <div class="section-titulo">Forge</div>
+            <div class="section-sub">Crie livros, acompanhe a produção, corrija falhas e publique o que ficou pronto.</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button id="forge-tab-lista" class="btn btn-p" onclick="forgeAba('lista')">Projetos</button>
+            <button id="forge-tab-novo" class="btn-ghost" onclick="forgeAba('novo')">+ Novo projeto</button>
           </div>
         </div>
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-body" style="display:flex;gap:10px;align-items:center;">
-            <input type="text" id="forge-project-id" class="input" placeholder="projectId (UUID)" style="flex:1;">
-            <button class="btn btn-p" onclick="carregarForgeProjeto()">Carregar</button>
+
+        <div id="forge-aba-lista">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-hdr">
+              <span class="card-titulo">Projetos</span>
+              <span style="display:flex;gap:12px;align-items:center;font-size:12px;color:var(--t3);">
+                <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" id="forge-auto" checked onchange="forgeAgendar()"> atualizar sozinho</label>
+                <button class="btn-ghost" onclick="forgeListar()">Atualizar</button>
+              </span>
+            </div>
+            <div id="forge-lista-aviso" style="display:none;background:#fff8e1;color:#7a5a00;padding:10px 16px;font-size:13px;"></div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr><th>Tema</th><th>Estado</th><th>Criado</th><th>Ações</th></tr></thead>
+                <tbody id="forge-lista-body"><tr><td colspan="4">—</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="forge-detalhe" class="card" style="display:none;margin-bottom:16px;"></div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-body" style="display:flex;gap:10px;align-items:center;">
+              <input type="text" id="forge-project-id" class="input" placeholder="Abrir por projectId (UUID)" style="flex:1;">
+              <button class="btn btn-p" onclick="carregarForgeProjeto()">Carregar</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="forge-aba-novo" style="display:none;">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-hdr"><span class="card-titulo">Novo projeto</span></div>
+            <div class="card-body">
+              <div style="display:flex;gap:20px;margin-bottom:16px;font-size:13px;">
+                <label style="display:flex;gap:6px;align-items:center;"><input type="radio" name="forge-modo" value="tema" checked onchange="forgeModo('tema')"> A partir de um tema</label>
+                <label style="display:flex;gap:6px;align-items:center;"><input type="radio" name="forge-modo" value="manuscrito" onchange="forgeModo('manuscrito')"> Com manuscrito pronto</label>
+              </div>
+              <div id="forge-modo-tema">
+                <div class="field"><label>Tema do livro</label><input type="text" id="forge-novo-tema" class="input" maxlength="500" placeholder="Ex.: Educação financeira para quem está endividado"></div>
+                <div class="field" style="margin-top:12px;"><label>Contexto (opcional)</label><textarea id="forge-novo-contexto" class="input" rows="3" maxlength="5000" placeholder="Público, tom, referências…"></textarea></div>
+                <div class="field-sub" style="margin-top:8px;">O Forge pesquisa, escreve e revisa o livro inteiro; isso consome créditos de IA.</div>
+              </div>
+              <div id="forge-modo-manuscrito" style="display:none;">
+                <div class="field"><label>Título</label><input type="text" id="forge-novo-titulo" class="input" maxlength="200"></div>
+                <div class="field" style="margin-top:12px;"><label>O que fazer com o texto</label>
+                  <select id="forge-novo-modo" class="input">
+                    <option value="ambos">Completar e aprimorar</option>
+                    <option value="completar">Só completar</option>
+                    <option value="aprimorar">Só aprimorar</option>
+                  </select>
+                </div>
+                <div class="field" style="margin-top:12px;"><label>Meta de palavras (opcional)</label><input type="number" id="forge-novo-meta" class="input" min="1" step="1000"></div>
+                <div class="field" style="margin-top:12px;"><label>Manuscrito (mín. 200 caracteres)</label>
+                  <input type="file" accept=".txt,.md,text/plain,text/markdown" onchange="forgeLerArquivo(this)" style="margin-bottom:8px;font-size:12px;">
+                  <textarea id="forge-novo-texto" class="input" rows="12" placeholder="Cole o texto aqui ou carregue um arquivo .txt/.md"></textarea>
+                </div>
+              </div>
+              <div style="margin-top:18px;display:flex;gap:10px;">
+                <button id="forge-novo-enviar" class="btn btn-p" onclick="forgeCriar()">Enviar ao Forge</button>
+                <button class="btn-ghost" onclick="forgeAba('lista')">Cancelar</button>
+              </div>
+            </div>
           </div>
         </div>
         <div id="forge-status-area" class="card" style="margin-bottom:16px;display:none;">
@@ -1172,10 +1232,11 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', forge:'Revisar Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', forge:'Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
+  if (panel === 'forge') forgeAbrir();
   if (panel === 'hero') carregarHeroConfig();
   if (panel === 'depoimentos') carregarDepoimentos();
   if (panel === 'sorteio' && statsCache) renderSorteio(statsCache);
@@ -2433,5 +2494,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
   }
 }
 </script>
+<script src="js/admin-forge.js?v=2938fc92"></script>
 </body>
 </html>
