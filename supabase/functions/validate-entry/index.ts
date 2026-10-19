@@ -205,6 +205,10 @@ async function notificarRodadaProntaPraSortear(drawId: string): Promise<void> {
     console.warn("[EMAIL] RESEND_API_KEY não configurado — pulando aviso de rodada pronta.");
     return;
   }
+  // Destinatário fica na tabela avisos_config (ver scripts/avisos.sql), fora do código.
+  const { data: cfg } = await createClient(SUPABASE_URL, SERVICE_KEY)
+    .from("avisos_config").select("destinatario").limit(1).maybeSingle();
+  if (!cfg?.destinatario) return;
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -213,7 +217,7 @@ async function notificarRodadaProntaPraSortear(drawId: string): Promise<void> {
     },
     body: JSON.stringify({
       from:    `Editora Três Trevo <${FROM_EMAIL}>`,
-      to:      ["rogerio.kbhal@gmail.com"],
+      to:      [cfg.destinatario],
       subject: "[Três Trevo] ✦ Rodada pronta pra sortear",
       html: `<p>Uma rodada do Programa Cultural bateu a meta e todos os participantes já se qualificaram.</p>
 <p>Draw ID: <code>${drawId}</code></p>
