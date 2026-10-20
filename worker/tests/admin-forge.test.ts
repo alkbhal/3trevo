@@ -64,11 +64,27 @@ describe('ponte admin → forge', () => {
     expect(JSON.parse(init.body as string)).toMatchObject({ tema: 'Endividamento das famílias', formato: 'artigo-academico' });
   });
 
-  it('formato desconhecido dá 400 antes de chamar o Forge', async () => {
+  it('GET formatos: repassa ao Forge, que é a fonte única da tabela', async () => {
+    const lista = [{ id: 'novela', descricao: 'Novela · …' }];
+    const f = mockFetch(() => new Response(JSON.stringify(lista)));
+    const r = await chamar(req('GET', 'formatos'));
+    expect(r.status).toBe(200);
+    expect(await r.json()).toEqual(lista);
+    expect((f.mock.calls[1] as [string])[0]).toBe('https://tr3vo-forge.al-kbhal.workers.dev/formatos');
+  });
+
+  it('formato com caracteres estranhos dá 400 antes de chamar o Forge', async () => {
     const f = mockFetch(() => new Response('{}'));
-    const r = await chamar(req('POST', 'novo', { tema: 'Qualquer tema', formato: 'cordel' }));
+    const r = await chamar(req('POST', 'novo', { tema: 'Qualquer tema', formato: 'Cordel!!<x>' }));
     expect(r.status).toBe(400);
     expect(f).toHaveBeenCalledTimes(1); // só a checagem de sessão
+  });
+
+  it('formato bem formado mas desconhecido: quem decide é o Forge, e o 400 dele é repassado', async () => {
+    mockFetch(() => new Response(JSON.stringify({ error: 'formato inválido (use: ensaio, novela, artigo-academico)' }), { status: 400 }));
+    const r = await chamar(req('POST', 'novo', { tema: 'Qualquer tema', formato: 'cordel' }));
+    expect(r.status).toBe(400);
+    expect(JSON.stringify(await r.json())).toContain('formato inválido');
   });
 
   it('repassa o segredo ao Forge e devolve o JSON dele', async () => {

@@ -13,8 +13,8 @@ const PREFIXO = '/api/admin/forge/';
 const UUID = /^[0-9a-f-]{36}$/i;
 const MAX_BODY_BYTES = 5 * 1024 * 1024;
 
-// Espelho de FormatoSchema do tr3vo-forge (lib/formats.ts); formato novo entra lá e aqui.
-const formatoSchema = z.enum(['ensaio', 'novela', 'artigo-academico']);
+// A lista de formatos mora só no Forge (GET /formatos); aqui só se barra lixo e o Forge valida o resto.
+const formatoSchema = z.string().regex(/^[a-z0-9-]{1,40}$/);
 
 const ingerirSchema = z.object({
   manuscrito: z.string().min(200).max(4_000_000),
@@ -35,6 +35,7 @@ type Rota = { metodo: string; destino: (id: string) => string; id: boolean; corp
 // ponytail: lista fechada, uma linha por ação do Forge; rota nova do Forge só entra aqui de propósito
 const ROTAS: Record<string, Rota> = {
   'GET projetos': { metodo: 'GET', destino: () => '/projects?limit=50', id: false },
+  'GET formatos': { metodo: 'GET', destino: () => '/formatos', id: false },
   'GET status': { metodo: 'GET', destino: (id) => `/status/${id}`, id: true },
   'GET custos': { metodo: 'GET', destino: (id) => `/costs/${id}`, id: true },
   'POST ingerir': { metodo: 'POST', destino: () => '/ingest', id: false, corpo: ingerirSchema },

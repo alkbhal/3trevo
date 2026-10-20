@@ -11,13 +11,9 @@ const FORGE_ESTADOS = {
   rejected_format: ['Reprovada no formato', 'perigo'], rejected_quality: ['Reprovada no mercado', 'perigo'],
 };
 
-// Espelho da tabela do Forge (tr3vo-forge/lib/formats.ts): ao mudar lá, mudar aqui.
-const FORGE_FORMATOS = {
-  '': 'Sem formato: o Forge escreve um livro de 8 a 15 capítulos, como antes.',
-  ensaio: 'Ensaio · 2 mil a 15 mil palavras (alvo 6 mil) · 5 a 8 capítulos · voz autoral com tese central.',
-  novela: 'Novela · 17,5 mil a 40 mil palavras (alvo 28 mil) · 20 a 36 capítulos · ficção, não pesquisa na web.',
-  'artigo-academico': 'Artigo acadêmico · 6 mil a 10 mil palavras (alvo 8 mil) · 8 seções fixas · resumo, abstract e referências ABNT montadas das fontes reais.',
-};
+// A tabela de formatos mora só no Forge (GET /formatos); aqui ela é carregada, não copiada.
+const FORGE_SEM_FORMATO = 'Sem formato: o Forge escreve um livro de 8 a 15 capítulos, como antes.';
+let forgeFormatos = null; // null = ainda não carregou; [] = Forge sem a rota (versão antiga)
 const FORGE_ERROS = {
   forge_nao_autorizado: 'O worker do 3Trevo não tem o segredo do Forge. Na pasta worker: npx wrangler secret put FORGE_API_SECRET.',
   forge_indisponivel: 'O Forge não respondeu. Tente de novo em instantes.',
@@ -77,14 +73,35 @@ function forgeAbrir() {
   forgeAba('lista');
   forgeListar();
   forgeAgendar();
+  forgeCarregarFormatos();
+}
+
+// Monta o seletor a partir da tabela do Forge; sem ela (Forge antigo ou fora do ar), fica só "Padrão".
+async function forgeCarregarFormatos() {
+  if (forgeFormatos && forgeFormatos.length) return forgeFormatoMudou();
+  try {
+    const res = await forgeApi('formatos');
+    forgeFormatos = res.ok && Array.isArray(res.dados) ? res.dados : [];
+  } catch (e) { forgeFormatos = []; }
+  const sel = forgeEl('forge-novo-formato');
+  const atual = sel.value;
+  sel.replaceChildren(new Option('Padrão (livro de 8 a 15 capítulos)', ''), ...forgeFormatos.map((f) => new Option(f.rotulo, f.id)));
+  sel.value = forgeFormatos.some((f) => f.id === atual) ? atual : '';
   forgeFormatoMudou();
 }
 
 // Mostra o que o formato escolhido exige (faixa de palavras, capítulos, regras do portão).
 function forgeFormatoMudou() {
   const f = forgeEl('forge-novo-formato').value;
-  forgeEl('forge-novo-formato-info').textContent =
-    (FORGE_FORMATOS[f] ?? FORGE_FORMATOS['']) + (f ? ' A obra só segue se atingir 85% do mínimo do formato.' : '');
+  const info = forgeEl('forge-novo-formato-info');
+  if (!f) {
+    info.textContent = forgeFormatos && !forgeFormatos.length
+      ? `${FORGE_SEM_FORMATO} (Os formatos não carregaram: publique a versão nova do Forge.)`
+      : FORGE_SEM_FORMATO;
+    return;
+  }
+  const escolhido = (forgeFormatos || []).find((x) => x.id === f);
+  info.textContent = `${escolhido ? escolhido.descricao : f} A obra só segue se atingir 85% do mínimo do formato.`;
 }
 
 async function forgeListar(silencioso = false) {
