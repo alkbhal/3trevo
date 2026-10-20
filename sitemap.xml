@@ -49,6 +49,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://3trevo.com.br/obra/livre-das-dividas.html</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://3trevo.com.br/nema.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
