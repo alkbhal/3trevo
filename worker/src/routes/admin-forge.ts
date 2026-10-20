@@ -1,6 +1,6 @@
 /**
  * admin-forge.ts — ponte do admin para o worker do tr3vo-forge.
- * O segredo do Forge (FORGE_API_SECRET) fica só no worker; o navegador nunca o vê.
+ * A credencial do admin no Forge (FORGE_ADMIN_SECRET) fica só no worker; o navegador nunca a vê.
  * Só passa o que está na lista fechada abaixo, e só com sessão de admin válida.
  */
 
@@ -72,7 +72,7 @@ export async function handleAdminForge(request: Request, env: Env, path: string)
   }
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (env.FORGE_API_SECRET) headers['X-Forge-Secret'] = env.FORGE_API_SECRET;
+  if (env.FORGE_ADMIN_SECRET) headers['X-Forge-Secret'] = env.FORGE_ADMIN_SECRET;
 
   let r: Response;
   try {

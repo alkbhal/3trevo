@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { handleAdminForge } from '../src/routes/admin-forge';
 
 const ID = '123e4567-e89b-12d3-a456-426614174000';
-const env = { SUPABASE_URL: 'https://sb.test', SUPABASE_SERVICE_KEY: 'k', FORGE_API_SECRET: 'segredo-forge' } as any;
+const env = { SUPABASE_URL: 'https://sb.test', SUPABASE_SERVICE_KEY: 'k', FORGE_ADMIN_SECRET: 'segredo-forge' } as any;
 
 // Sessão de admin válida no Supabase; qualquer outra URL é o Forge e cai em `forge`.
 function mockFetch(forge: (url: string, init?: RequestInit) => Response) {

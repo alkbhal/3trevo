@@ -15,7 +15,7 @@ const FORGE_ESTADOS = {
 const FORGE_SEM_FORMATO = 'Sem formato: o Forge escreve um livro de 8 a 15 capítulos, como antes.';
 let forgeFormatos = null; // null = ainda não carregou; [] = Forge sem a rota (versão antiga)
 const FORGE_ERROS = {
-  forge_nao_autorizado: 'O worker do 3Trevo não tem o segredo do Forge. Na pasta worker: npx wrangler secret put FORGE_API_SECRET.',
+  forge_nao_autorizado: 'O Forge recusou a credencial do admin. Falta gravar FORGE_ADMIN_SECRET no worker do 3Trevo e no Forge (mesmo valor).',
   forge_indisponivel: 'O Forge não respondeu. Tente de novo em instantes.',
   forge_timeout: 'O Forge demorou demais para responder.',
   rota_forge_desconhecida: 'Ação desconhecida.',
