@@ -1288,7 +1288,7 @@ function abrirLeitor(productId, titulo) {
       const outros = (data || []).filter(p => !meus.has(p.slug) && (!prod.autor || p.autor === prod.autor));
       if (!outros.length) return null;
       const s = outros[Math.floor(Math.random() * outros.length)];
-      const paginas = { antifalencia: '/obra/antifalencia.html', justicamento: '/obra/justicamento.html', '3a-guerra': '/obra/terceiraguerra.html', atico: '/obra/atico.html', 'isa-isma-tintim': '/obra/isa-isma-tintim.html' };
+      const paginas = { antifalencia: '/obra/antifalencia.html', justicamento: '/obra/justicamento.html', '3a-guerra': '/obra/terceiraguerra.html', atico: '/obra/atico.html', 'isa-isma-tintim': '/obra/isa-isma-tintim.html', 'livre-das-dividas': '/obra/livre-das-dividas.html' };
       return { titulo: s.titulo, autor: s.autor, href: paginas[s.slug] || '/catalogo.html' };
     },
   });
