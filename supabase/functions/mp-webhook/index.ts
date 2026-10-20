@@ -354,6 +354,8 @@ async function notificarRodadaProntaPraSortear(drawId: string): Promise<void> {
     return;
   }
   try {
+    const { data: cfg } = await sb.from("avisos_config").select("destinatario").limit(1).maybeSingle();
+    if (!cfg?.destinatario) return;
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -362,7 +364,7 @@ async function notificarRodadaProntaPraSortear(drawId: string): Promise<void> {
       },
       body: JSON.stringify({
         from:    `Editora Três Trevo <${FROM_EMAIL}>`,
-        to:      ["rogerio.kbhal@gmail.com"],
+        to:      [cfg.destinatario],
         subject: "[Três Trevo] ✦ Rodada pronta pra sortear",
         html: `<p>Uma rodada do Programa Cultural bateu a meta e todos os participantes já se qualificaram.</p>
 <p>Draw ID: <code>${drawId}</code></p>

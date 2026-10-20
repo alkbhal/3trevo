@@ -5,9 +5,9 @@
  * TTLeitor.abrir({
  *   titulo, autor,
  *   chave,                         // id estável pra lembrar a posição (localStorage)
- *   obterArquivo: async () => ({ epub?: url, pdf?: url, erro?: msg }),
+ *   obterArquivo: async () => ({ epub?: url | ArrayBuffer, pdf?: url, erro?: msg }),
  *   trilha?:   async () => idDaMusica | null,   // mostra o botão de trilha
- *   sugestao?: async () => ({ titulo, autor, href }) | null,  // cartão na página final
+ *   sugestao?: async () => ({ titulo, autor, href, rotulo?, acao? }) | null,  // cartão na página final
  *   aoProgredir?: (pct) => void,   // ex.: salvar progresso no servidor
  *   aoFechar?: () => void,
  * })
@@ -52,6 +52,8 @@
   function salvarPosicao(chave, cfi) { try { localStorage.setItem('tt_leitor_pos_' + chave, cfi); } catch {} }
   let prefs = lerPrefs();
 
+  // Textos vêm do dicionário do idioma da página (scripts/i18n.mjs → window.T).
+  const T = (k, v) => (window.T ? window.T(k, v) : k);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // ── DOM ──────────────────────────────────────────────────────────────────────
@@ -65,37 +67,37 @@
     raiz.innerHTML = `
       <div class="tl-progresso" aria-hidden="true"><span></span></div>
       <header class="tl-topo">
-        <div class="tl-marca"><span class="tl-trevo">${TREVO_SVG}</span><span class="tl-marca-nome">Editora Três Trevo</span></div>
+        <div class="tl-marca"><span class="tl-trevo">${TREVO_SVG}</span><span class="tl-marca-nome">${T('js.marca')}</span></div>
         <div class="tl-titulo"></div>
         <div class="tl-acoes">
-          <button type="button" class="tl-btn tl-btn-trilha" hidden aria-label="Ouvir a trilha do livro" title="Ouvir a trilha do livro">
+          <button type="button" class="tl-btn tl-btn-trilha" hidden aria-label="${T('js.leitor.trilha')}" title="${T('js.leitor.trilha')}">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 17.5a2.5 2.5 0 1 1-2.5-2.5c.36 0 .7.08 1 .21V6.6l11-2.2v11.1a2.5 2.5 0 1 1-2.5-2.5c.36 0 .7.08 1 .21V7.04l-8 1.6z"/></svg>
           </button>
-          <button type="button" class="tl-btn tl-btn-ajustes" aria-label="Ajustes de leitura" aria-expanded="false" title="Tamanho do texto e modo noite">Aa</button>
-          <button type="button" class="tl-btn tl-btn-fechar" aria-label="Fechar o livro" title="Fechar">
+          <button type="button" class="tl-btn tl-btn-ajustes" aria-label="${T('js.leitor.ajustes')}" aria-expanded="false" title="${T('js.leitor.ajustes.dica')}">Aa</button>
+          <button type="button" class="tl-btn tl-btn-fechar" aria-label="${T('js.leitor.fechar.livro')}" title="${T('js.leitor.fechar')}">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
         </div>
       </header>
       <div class="tl-ajustes" hidden>
         <div class="tl-ajuste-linha">
-          <span>Texto</span>
-          <button type="button" class="tl-chip" data-acao="menor" aria-label="Diminuir texto">A−</button>
+          <span>${T('js.leitor.texto')}</span>
+          <button type="button" class="tl-chip" data-acao="menor" aria-label="${T('js.leitor.menor')}">A−</button>
           <span class="tl-tamanho"></span>
-          <button type="button" class="tl-chip" data-acao="maior" aria-label="Aumentar texto">A+</button>
+          <button type="button" class="tl-chip" data-acao="maior" aria-label="${T('js.leitor.maior')}">A+</button>
         </div>
         <div class="tl-ajuste-linha">
-          <span>Modo</span>
-          <button type="button" class="tl-chip" data-tema="dia">Dia</button>
-          <button type="button" class="tl-chip" data-tema="noite">Noite</button>
+          <span>${T('js.leitor.modo')}</span>
+          <button type="button" class="tl-chip" data-tema="dia">${T('js.leitor.dia')}</button>
+          <button type="button" class="tl-chip" data-tema="noite">${T('js.leitor.noite')}</button>
         </div>
       </div>
       <main class="tl-viewer"></main>
       <div class="tl-estado" role="status"></div>
       <footer class="tl-base">
-        <button type="button" class="tl-nav tl-ant" aria-label="Capítulo anterior"><span aria-hidden="true">‹</span><span class="tl-nav-txt">Anterior</span></button>
+        <button type="button" class="tl-nav tl-ant" aria-label="${T('js.leitor.cap.anterior')}"><span aria-hidden="true">‹</span><span class="tl-nav-txt">${T('js.leitor.anterior')}</span></button>
         <div class="tl-local"><span class="tl-cap"></span><span class="tl-pct">—</span></div>
-        <button type="button" class="tl-nav tl-prox" aria-label="Próximo capítulo"><span class="tl-nav-txt">Próximo</span><span aria-hidden="true">›</span></button>
+        <button type="button" class="tl-nav tl-prox" aria-label="${T('js.leitor.cap.proximo')}"><span class="tl-nav-txt">${T('js.leitor.proximo')}</span><span aria-hidden="true">›</span></button>
       </footer>
       <section class="tl-fim" hidden></section>`;
     document.body.appendChild(raiz);
@@ -181,6 +183,7 @@
         margin:-28px -20px 1.4em !important; padding:44px 20px 26px !important; max-width:none !important;
         font-size:1.5em !important; position:relative;
       }
+.tt-abertura-solta { margin-top:1.2em !important; }
       .tt-abertura::before {
         content:''; display:block; width:26px; height:26px; margin-bottom:14px;
         background:url("${TREVO_DATA}") no-repeat center / contain;
@@ -206,7 +209,14 @@
 
     // Primeiro título do capítulo vira a faixa de abertura da editora.
     const primeiro = doc.body && doc.body.querySelector('h1, h2');
-    if (primeiro) primeiro.classList.add('tt-abertura');
+    if (primeiro) {
+      primeiro.classList.add('tt-abertura');
+      // Com texto antes do título (ex.: "Amostra gratuita"), a faixa não sobe até o topo.
+      const antes = doc.createRange();
+      antes.setStart(doc.body, 0);
+      antes.setEndBefore(primeiro);
+      if (antes.toString().trim()) primeiro.classList.add('tt-abertura-solta');
+    }
 
     // Valores e números não se partem no fim da linha ("R$ / 100" → "R$ 100").
     const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
@@ -241,13 +251,13 @@
   function erro(msg, pdf) {
     clearTimeout(timerLimite);
     mostrarEstado(`<div class="tl-estado-box">
-      <p class="tl-estado-titulo">Não foi possível abrir o livro</p>
+      <p class="tl-estado-titulo">${T('js.leitor.erro.titulo')}</p>
       <p>${esc(msg)}</p>
       <div class="tl-estado-acoes">
-        <button type="button" class="tl-cta" data-acao="tentar">Tentar de novo</button>
-        ${pdf ? `<a class="tl-cta tl-cta-sec" href="${esc(pdf)}" target="_blank" rel="noopener">Abrir o PDF</a>` : ''}
+        <button type="button" class="tl-cta" data-acao="tentar">${T('js.leitor.tentar')}</button>
+        ${pdf ? `<a class="tl-cta tl-cta-sec" href="${esc(pdf)}" target="_blank" rel="noopener">${T('js.leitor.abrir.pdf')}</a>` : ''}
       </div>
-      <p class="tl-estado-ajuda">Se continuar, escreva para sac@3trevo.com.br</p>
+      <p class="tl-estado-ajuda">${T('js.leitor.erro.ajuda')}</p>
     </div>`);
     const t = el.estado.querySelector('[data-acao="tentar"]');
     if (t) t.onclick = () => abrir(opcoes);
@@ -292,7 +302,7 @@
     el.pct.textContent = Math.round(pct) + '%';
     el.cap.textContent = nomeCapitulo(ultimaLoc.start.href) || '';
     el.ant.disabled = indiceAtual() <= 0;
-    el.proxTxt.textContent = indiceAtual() >= ultimoIndice() ? 'Concluir' : 'Próximo';
+    el.proxTxt.textContent = indiceAtual() >= ultimoIndice() ? T('js.leitor.concluir') : T('js.leitor.proximo');
     if (opcoes.aoProgredir) opcoes.aoProgredir(pct);
   }
 
@@ -300,15 +310,15 @@
   async function mostrarFim() {
     el.fim.innerHTML = `<div class="tl-fim-box">
       <span class="tl-fim-trevo">${TREVO_SVG}</span>
-      <p class="tl-fim-sobre">Você chegou ao fim de</p>
+      <p class="tl-fim-sobre">${T('js.leitor.fim.sobre')}</p>
       <h2 class="tl-fim-titulo">${esc(opcoes.titulo)}</h2>
       ${opcoes.autor ? `<p class="tl-fim-autor">${esc(opcoes.autor)}</p>` : ''}
       <div class="tl-fim-sugestao" hidden></div>
       <div class="tl-fim-acoes">
-        <button type="button" class="tl-cta" data-acao="biblioteca">Voltar à biblioteca</button>
-        <button type="button" class="tl-cta tl-cta-sec" data-acao="inicio">Reler do início</button>
+        <button type="button" class="tl-cta" data-acao="biblioteca">${T('js.leitor.fim.voltar')}</button>
+        <button type="button" class="tl-cta tl-cta-sec" data-acao="inicio">${T('js.leitor.fim.reler')}</button>
       </div>
-      <p class="tl-colofao">Editora Três Trevo · edição digital<br>Obrigado por ler com a gente.</p>
+      <p class="tl-colofao">${T('js.leitor.colofao')}</p>
     </div>`;
     el.fim.hidden = false;
     el.barra.style.width = '100%';
@@ -324,9 +334,9 @@
         const s = await opcoes.sugestao();
         const box = el.fim.querySelector('.tl-fim-sugestao');
         if (s && box) {
-          box.innerHTML = `<p class="tl-fim-rotulo">Do mesmo autor</p>
+          box.innerHTML = `<p class="tl-fim-rotulo">${esc(s.rotulo || T('js.leitor.fim.mesmo.autor'))}</p>
             <a class="tl-fim-card" href="${esc(s.href)}"><span class="tl-fim-card-titulo">${esc(s.titulo)}</span>
-            ${s.autor ? `<span class="tl-fim-card-autor">${esc(s.autor)}</span>` : ''}<span class="tl-fim-card-link">Conhecer o livro ›</span></a>`;
+            ${s.autor ? `<span class="tl-fim-card-autor">${esc(s.autor)}</span>` : ''}<span class="tl-fim-card-link">${esc(s.acao || T('js.leitor.fim.conhecer'))} ›</span></a>`;
           box.hidden = false;
         }
       } catch { /* sugestão é opcional */ }
@@ -361,7 +371,7 @@
     el.btnTrilha.hidden = true;
     el.raiz.classList.add('aberto');
     document.documentElement.classList.add('tl-travado');
-    carregando('Abrindo o livro…');
+    carregando(T('js.leitor.abrindo'));
 
     if (op.trilha) {
       Promise.resolve(op.trilha()).then((id) => {
@@ -373,17 +383,17 @@
 
     let arq;
     try { arq = await op.obterArquivo(); }
-    catch { arq = { erro: 'Sem conexão com o servidor. Verifique a internet e tente de novo.' }; }
+    catch { arq = { erro: T('js.erro.conexao') }; }
     if (minhaSessao !== sessao) return;
-    if (!arq || arq.erro || (!arq.epub && !arq.pdf)) { erro((arq && arq.erro) || 'Nenhum formato disponível para leitura.'); return; }
+    if (!arq || arq.erro || (!arq.epub && !arq.pdf)) { erro((arq && arq.erro) || T('js.leitor.sem.formato')); return; }
 
     if (!arq.epub) {
       // PDF: celulares não exibem PDF embutido — abre no visualizador do aparelho.
       el.base.hidden = true;
       if (window.matchMedia('(pointer: coarse)').matches) {
         mostrarEstado(`<div class="tl-estado-box"><p class="tl-estado-titulo">${esc(op.titulo)}</p>
-          <p>Este título está em PDF. Ele abre no leitor de PDF do seu aparelho.</p>
-          <div class="tl-estado-acoes"><a class="tl-cta" href="${esc(arq.pdf)}" target="_blank" rel="noopener">Abrir o PDF</a></div></div>`);
+          <p>${T('js.leitor.pdf.celular')}</p>
+          <div class="tl-estado-acoes"><a class="tl-cta" href="${esc(arq.pdf)}" target="_blank" rel="noopener">${T('js.leitor.abrir.pdf')}</a></div></div>`);
       } else {
         mostrarEstado('');
         el.viewer.innerHTML = `<iframe class="tl-pdf" src="${esc(arq.pdf)}" title="${esc(op.titulo)}"></iframe>`;
@@ -392,11 +402,12 @@
     }
 
     timerLimite = setTimeout(() => {
-      if (minhaSessao === sessao) erro('O livro está demorando para carregar. A conexão pode estar lenta.', arq.pdf);
+      if (minhaSessao === sessao) erro(T('js.leitor.lento'), arq.pdf);
     }, TEMPO_LIMITE_MS);
 
     try {
-      book = window.ePub(arq.epub, { openAs: 'epub' });
+      // URL → 'epub' (o epub.js baixa); bytes já baixados (ArrayBuffer) → 'binary'.
+      book = window.ePub(arq.epub, { openAs: arq.epub instanceof ArrayBuffer ? 'binary' : 'epub' });
       rendition = book.renderTo(el.viewer, { width: '100%', height: '100%', flow: 'scrolled-doc', allowScriptedContent: false });
       rendition.hooks.content.register(prepararConteudo);
       rendition.on('relocated', (loc) => {
@@ -415,7 +426,7 @@
       // % exato: gera as locations em segundo plano, sem travar a abertura.
       book.locations.generate(1600).then(() => { if (minhaSessao === sessao) atualizarProgresso(); }).catch(() => {});
     } catch (e) {
-      if (minhaSessao === sessao) erro('O arquivo do livro não pôde ser lido.', arq.pdf);
+      if (minhaSessao === sessao) erro(T('js.leitor.ilegivel'), arq.pdf);
     }
   }
 

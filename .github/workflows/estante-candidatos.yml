@@ -1,0 +1,42 @@
+name: Estante — conferir obras de domínio público
+
+# Lista as obras mais lidas do Project Gutenberg em inglês e espanhol (com ano de morte do
+# autor) e confere cada EPUB candidato abrindo o arquivo: título, autor e idioma reais.
+# Roda quando a lista de candidatos muda ou manualmente.
+on:
+  push:
+    paths: ['scripts/estante-candidatos.json', '.github/workflows/estante-candidatos.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conferir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mais lidas no Gutenberg (autor morto até 1945)
+        run: |
+          for L in en es; do
+            echo "== $L"
+            for P in 1 2; do
+              curl -sL --retry 3 "https://gutendex.com/books/?languages=$L&sort=popular&page=$P" -o /tmp/g.json || true
+              jq -e . /tmp/g.json >/dev/null 2>&1 || { echo "(gutendex sem resposta JSON: $(head -c 120 /tmp/g.json))"; continue; }
+              cat /tmp/g.json \
+              | jq -r '.results[] | select(.authors[0].death_year != null and .authors[0].death_year <= 1945)
+                       | "\(.id)\t\(.authors[0].name) (†\(.authors[0].death_year))\t\(.title|.[0:70])\t\(.languages|join(","))"'
+            done
+          done
+      - name: Abre cada EPUB candidato
+        run: |
+          jq -r '.[] | "\(.id) \(.idioma) \(.formato // "epub3.images")"' scripts/estante-candidatos.json | while read ID IDI FMT; do
+            URL="https://www.gutenberg.org/ebooks/$ID.$FMT"
+            curl -sL -A "EditoraTresTrevo/1.0" -o /tmp/l.epub -w "%{http_code} %{size_download}" "$URL" > /tmp/h || true
+            OPF=$(unzip -Z1 /tmp/l.epub 2>/dev/null | grep '\.opf$' | head -1)
+            T=$(unzip -p /tmp/l.epub "$OPF" 2>/dev/null | grep -o '<dc:title[^>]*>[^<]*' | head -1 | sed 's/<[^>]*>//')
+            A=$(unzip -p /tmp/l.epub "$OPF" 2>/dev/null | grep -o '<dc:creator[^>]*>[^<]*' | head -1 | sed 's/<[^>]*>//')
+            G=$(unzip -p /tmp/l.epub "$OPF" 2>/dev/null | grep -o '<dc:language[^>]*>[^<]*' | head -1 | sed 's/<[^>]*>//')
+            OK=$([ "$G" = "$IDI" ] && echo OK || echo "IDIOMA_DIFERENTE")
+            echo -e "$ID.$FMT\t$(cat /tmp/h)\t$G\t$OK\t$A\t$T"
+          done

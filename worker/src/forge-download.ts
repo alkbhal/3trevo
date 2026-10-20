@@ -73,7 +73,10 @@ async function baixarDoForge(env: Env, projectId: string, formato: 'epub' | 'pdf
   const url = await assinarForge(env, projectId, formato);
   if (!url) return null;
   // lang fica fora da assinatura no forge: escolhe entre edições do mesmo livro.
-  const r = await fetch(lang ? `${url}&lang=${encodeURIComponent(lang)}` : url);
+  // Worker → forge pelo service binding: por workers.dev a Cloudflare recusa (erro
+  // 1042) chamada entre Workers da mesma conta. fetch global só sem binding (testes).
+  const chamar = env.FORGE ? env.FORGE.fetch.bind(env.FORGE) : fetch;
+  const r = await chamar(lang ? `${url}&lang=${encodeURIComponent(lang)}` : url);
   if (!r.ok) {
     if (r.status !== 404) console.error(`[forge-download] ${formato} de ${projectId}: forge respondeu ${r.status}`);
     return null;

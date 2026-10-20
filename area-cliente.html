@@ -15,8 +15,8 @@
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.googletagmanager.com; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com; img-src 'self' data: blob: *.supabase.co *.al-kbhal.workers.dev; font-src 'self' blob: fonts.gstatic.com; style-src 'self' 'unsafe-inline' blob: https://fonts.googleapis.com; frame-src 'self' *.supabase.co; media-src 'self' blob: *.supabase.co; object-src 'none';">
-<title>Minha Biblioteca — Editora Três Trevo</title>
-<meta name="description" content="Acesse sua biblioteca de ebooks, músicas e acompanhe o seu saldo Nema na Editora Três Trevo.">
+<title data-i18n="meta.ac.titulo">Minha Biblioteca — Editora Três Trevo</title>
+<meta name="description" data-i18n-attr="content:meta.ac.desc" content="Acesse sua biblioteca de ebooks, músicas e acompanhe o seu saldo Nema na Editora Três Trevo.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -25,6 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/leitor.css?v=d3600737">
+<link rel="stylesheet" href="/css/membro.css?v=80ea41de">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
@@ -72,6 +73,10 @@ nav{
 }
 .nav-marca::before{content:'✦';font-size:13px;opacity:.75}
 .nav-right{display:flex;align-items:center;gap:16px}
+.nav-idiomas{display:flex;gap:2px;margin-left:auto;margin-right:12px}
+.nav-idiomas a{font-size:12px;letter-spacing:.06em;padding:8px 7px;color:rgba(255,255,255,.55);text-decoration:none}
+.nav-idiomas a.ativo{color:#fff;border-bottom:1px solid var(--ouro)}
+.nav-idiomas .tt-idiomas-nome{display:none}
 .nav-user{font-size:12.5px;color:rgba(232,201,106,.5);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .btn-sair{
   font-size:11px;letter-spacing:1.2px;padding:7px 16px;text-transform:uppercase;
@@ -750,15 +755,22 @@ nav{
 }
 
 </style>
+<script id="tt-textos">window.TT_LANG="pt";window.TT_TEXTOS={"js.ac.baixar.epub":"Baixar arquivo EPUB","js.ac.baixar.pdf":"Baixar arquivo PDF","js.ac.email.invalido":"Digite um e-mail válido.","js.ac.entrando":"Entrando…","js.ac.entrar":"Entrar","js.ac.enviando":"Enviando…","js.ac.erro.carregar":"Erro ao carregar","js.ac.erro.leitura":"Erro ao abrir a leitura.","js.ac.erro.link":"Não foi possível enviar o link agora. Tente de novo em instantes.","js.ac.erro.login":"Não foi possível entrar agora. Tente de novo.","js.ac.ler":"Ler agora","js.ac.link":"Receber link por e-mail","js.ac.link.ok":"Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style=\"opacity:.6\">Pode levar até 2 minutos. Cheque o spam.</small>","js.ac.nema":"Pontos Nema","js.ac.nema.pendente":"Pontos Nema · + {n} liberam em até 7 dias","js.ac.plano.ativa":"Ativa","js.ac.plano.membro":"Membro grátis","js.ac.plano.sem":"Sem plano","js.ac.recarregue":"Recarregue a página.","js.ac.remover":"Remover da biblioteca","js.ac.sem.acesso":"Este título não está na sua conta.","js.ac.sem.titulo":"Título indisponível","js.ac.senha.errada":"E-mail ou senha incorretos.","js.ac.senha.vazia":"Digite sua senha ou use o link por e-mail.","js.cad.botao":"Criar minha área grátis →","js.cad.criando":"Criando…","js.cad.email":"Seu melhor e-mail","js.cad.erro.conexao":"Sem conexão. Verifique a internet e tente de novo.","js.cad.erro.email":"Confira o e-mail digitado.","js.cad.erro.geral":"Não foi possível criar agora. Tente de novo em instantes.","js.cad.erro.tentativas":"Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.","js.cad.fechar":"Fechar","js.cad.fino":"Sem senha: enviamos um link de acesso para o seu e-mail. Novidades só se você marcar a opção acima, e você cancela quando quiser.","js.cad.fino.intl":"Sem senha: enviamos um link de acesso para o seu e-mail.","js.cad.kicker":"Grátis · sem cartão","js.cad.mala":"Quero receber lançamentos e novidades da editora por e-mail","js.cad.nome":"Seu nome","js.cad.ok":"Pronto! Enviamos o link de acesso para {email}.<br>Abra o e-mail e sua área de membro já estará criada. Confira o spam se não chegar em 2 minutos.","js.cad.sub":"Leia o 1º capítulo de <em>O Nascimento Silencioso da 3ª Guerra Mundial</em> e escolha um clássico da literatura brasileira para ler no leitor da editora.","js.cad.titulo":"Crie grátis sua área de membro","js.carregando":"Carregando","js.erro.conexao":"Sem conexão com o servidor. Verifique a internet e tente de novo.","js.erro.sessao":"Sua sessão expirou. Entre de novo para continuar lendo.","js.estante.dica":"Comece por um dos favoritos dos leitores: {titulos}.","js.estante.filtro":"Filtrar por gênero","js.estante.obra1":"1 obra","js.estante.obras":"{n} obras","js.estante.outros":"Outros","js.estante.paginas":"{n} páginas","js.estante.seculo":"século {n}","js.estante.sobre":"Sobre o livro","js.estante.todos":"Todos","js.estante.vazia":"A estante está sendo organizada. Volte em breve.","js.faq":[{"q":"Como recebo meu ebook?","r":"Logo após a confirmação do pagamento, você recebe o PDF por e-mail (sac@3trevo.com.br) e tem acesso permanente ao EPUB na sua área do cliente, com leitor integrado."},{"q":"O que é o Nema?","r":"É o ponto de fidelidade da editora: a nossa moeda de descontos. Você ganha Nema ao comprar e usa o saldo em novas compras. As regras de emissão e uso, inclusive de campanhas e promoções futuras, estão nas Regras do Nema."},{"q":"Quando posso usar meu Nema?","r":"Assim que o saldo for liberado, ele aparece no seu espaço de cliente. O prazo de liberação de cada Nema está nas Regras do Nema."},{"q":"Como uso o Nema?","r":"Entre no seu espaço de cliente e vá ao pagamento da próxima compra. Marque \"Usar meu saldo Nema\" e ganhe desconto. Também há campanhas de uso: acompanhe por aqui e pelas nossas redes."},{"q":"Posso trocar Nema por dinheiro?","r":"Não. Nema só vale como desconto em compras na editora e não pode ser transferido para outra pessoa."},{"q":"Posso pedir reembolso?","r":"Sim. Pelo art. 49 do CDC, você tem 7 dias corridos após a compra para pedir reembolso integral. Escreva para sac@3trevo.com.br. O Nema daquela compra é cancelado."}],"js.gratis.carregando":"Carregando… tente de novo em um instante.","js.leitor.abrindo":"Abrindo o livro…","js.leitor.abrir.pdf":"Abrir o PDF","js.leitor.ajustes":"Ajustes de leitura","js.leitor.ajustes.dica":"Tamanho do texto e modo noite","js.leitor.anterior":"Anterior","js.leitor.cap.anterior":"Capítulo anterior","js.leitor.cap.proximo":"Próximo capítulo","js.leitor.colofao":"Editora Três Trevo · edição digital<br>Obrigado por ler com a gente.","js.leitor.concluir":"Concluir","js.leitor.dia":"Dia","js.leitor.erro.ajuda":"Se continuar, escreva para sac@3trevo.com.br","js.leitor.erro.titulo":"Não foi possível abrir o livro","js.leitor.fechar":"Fechar","js.leitor.fechar.livro":"Fechar o livro","js.leitor.fim.conhecer":"Conhecer o livro","js.leitor.fim.mesmo.autor":"Do mesmo autor","js.leitor.fim.reler":"Reler do início","js.leitor.fim.sobre":"Você chegou ao fim de","js.leitor.fim.voltar":"Voltar à biblioteca","js.leitor.ilegivel":"O arquivo do livro não pôde ser lido.","js.leitor.lento":"O livro está demorando para carregar. A conexão pode estar lenta.","js.leitor.maior":"Aumentar texto","js.leitor.menor":"Diminuir texto","js.leitor.modo":"Modo","js.leitor.noite":"Noite","js.leitor.pdf.celular":"Este título está em PDF. Ele abre no leitor de PDF do seu aparelho.","js.leitor.proximo":"Próximo","js.leitor.sem.formato":"Nenhum formato disponível para leitura.","js.leitor.tentar":"Tentar de novo","js.leitor.texto":"Texto","js.leitor.trilha":"Ouvir a trilha do livro","js.marca":"Editora Três Trevo","js.membro.amostra.completo":"Livro completo · a compra rende Nema","js.membro.amostra.gostou":"Gostou do capítulo?","js.membro.amostra.ler":"Ler o capítulo 1","js.membro.amostra.ler.completo":"Ler o livro completo","js.membro.amostra.secao":"Amostra grátis","js.membro.amostra.selo":"Amostra grátis","js.membro.classico.secao":"Clássico grátis","js.membro.comecar":"Começar a ler","js.membro.continuar":"Continuar","js.membro.erro.abrir":"Não foi possível abrir o clássico agora. Tente de novo em instantes.","js.membro.erro.escolher":"Não foi possível escolher agora. Tente de novo.","js.membro.erro.liberar":"Não foi possível liberar agora. Tente de novo.","js.membro.escolha":"Escolha um clássico para o seu espaço de leitura. Você lê um de cada vez e pode trocar quando terminar.","js.membro.escolher":"Escolher este","js.membro.escolhido":"\"{titulo}\" está no seu espaço de leitura.","js.membro.espaco":"1 espaço de leitura","js.membro.fim.nema":"Sua primeira compra rende Nema","js.membro.fim.nema.intl":"Quando chegarem, cada compra rende Nema","js.membro.fim.rotulo":"Da Editora Três Trevo","js.membro.fim.titulo":"Conheça os livros da casa","js.membro.fim.titulo.intl":"Nossas edições estão a caminho","js.membro.intro":"Escolha um clássico e leia no leitor da editora, com o progresso salvo.","js.membro.intro.pt":"Comece pela amostra e escolha um clássico da literatura brasileira. Tudo no leitor da editora, com o progresso salvo.","js.membro.lido":"{n}% lido","js.membro.nota":"Membros grátis leem um clássico por vez. Quem compra qualquer livro da editora ganha três espaços na Biblioteca TT.","js.membro.nota.intl":"Membros grátis leem um clássico por vez e podem trocar quando terminarem.","js.membro.rotulo":"Membro grátis","js.membro.seu.classico":"Seu clássico","js.membro.titulo":"Sua área de leitura na Três Trevo","js.membro.trocar":"Concluir e trocar","js.membro.trocar.confirma":"Concluir este clássico e liberar o espaço para outro?","js.nema.aria":"Nema, o ponto de fidelidade da editora","js.nema.catalogo":"Ver o catálogo","js.nema.como":"Como o Nema funciona","js.nema.rotulo":"Nema · ponto de fidelidade","js.nema.texto":"10% do valor de cada e-book volta para você em Nema, e o saldo vira desconto na próxima leitura (até metade do preço). Liberado 7 dias depois da compra.","js.nema.titulo":"Sua primeira compra já rende Nema"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
+<link rel="canonical" href="https://3trevo.com.br/area-cliente.html">
+<link rel="alternate" hreflang="pt-BR" href="https://3trevo.com.br/area-cliente.html">
+<link rel="alternate" hreflang="en" href="https://3trevo.com.br/en/area-cliente.html">
+<link rel="alternate" hreflang="es" href="https://3trevo.com.br/es/area-cliente.html">
+<link rel="alternate" hreflang="x-default" href="https://3trevo.com.br/area-cliente.html">
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <a href="/" class="nav-marca">Editora Três Trevo</a>
+  <a href="/" class="nav-marca" data-i18n="ac.marca">Editora Três Trevo</a>
+  <div data-tt-idiomas class="nav-idiomas" aria-label="Idioma" data-i18n-attr="aria-label:nav.idioma"><a href="/area-cliente.html" hreflang="pt-BR" lang="pt-BR" aria-current="true" class="ativo">PT<span class="tt-idiomas-nome"> · Português</span></a><a href="/en/area-cliente.html" hreflang="en" lang="en">EN<span class="tt-idiomas-nome"> · English</span></a><a href="/es/area-cliente.html" hreflang="es" lang="es">ES<span class="tt-idiomas-nome"> · Español</span></a></div>
   <div class="nav-right" id="navRight" style="display:none">
     <span class="nav-user" id="navEmail"></span>
-    <button class="btn-sair" onclick="sair()">Sair</button>
+    <button class="btn-sair" onclick="sair()" data-i18n="ac.sair">Sair</button>
   </div>
 </nav>
 
@@ -766,21 +778,21 @@ nav{
 <div id="tela-login" class="tela ativa">
   <div class="login-box">
     <div class="login-logo">✦ Três Trevo</div>
-    <p class="login-sub">Acesse sua biblioteca pessoal</p>
-    <label class="campo-label" for="emailLogin">E-mail</label>
-    <input type="email" id="emailLogin" class="campo-input" placeholder="seu@email.com"
+    <p class="login-sub" data-i18n="ac.login.sub">Acesse sua biblioteca pessoal. Ainda não tem conta? Use “Receber link por e-mail”: a área de membro é criada na hora, de graça.</p>
+    <label class="campo-label" for="emailLogin" data-i18n="ac.login.email">E-mail</label>
+    <input type="email" id="emailLogin" class="campo-input" data-i18n-attr="placeholder:ac.login.email.ph" placeholder="seu@email.com"
       autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('senhaLogin').focus()">
-    <label class="campo-label" for="senhaLogin">Senha</label>
+    <label class="campo-label" for="senhaLogin" data-i18n="ac.login.senha">Senha</label>
     <div class="campo-senha-wrap">
       <input type="password" id="senhaLogin" class="campo-input" placeholder="••••••••"
         autocomplete="current-password" onkeydown="if(event.key==='Enter')entrarComSenha()">
-      <button class="senha-toggle" type="button" onclick="toggleSenha()" title="Mostrar/ocultar senha">👁</button>
+      <button class="senha-toggle" type="button" onclick="toggleSenha()" data-i18n-attr="title:ac.login.ver.senha" title="Mostrar/ocultar senha">👁</button>
     </div>
-    <button class="btn-primario" id="btnSenha" onclick="entrarComSenha()">Entrar</button>
-    <div class="login-divider"><span>ou</span></div>
-    <button class="btn-secundario" id="btnMagic" onclick="enviarMagicLink()">Receber link por e-mail</button>
+    <button class="btn-primario" id="btnSenha" onclick="entrarComSenha()" data-i18n="ac.login.entrar">Entrar</button>
+    <div class="login-divider"><span data-i18n="ac.login.ou">ou</span></div>
+    <button class="btn-secundario" id="btnMagic" onclick="enviarMagicLink()" data-i18n="ac.login.link">Receber link por e-mail</button>
     <p class="login-msg" id="msgLogin"></p>
-    <div class="login-voltar"><a href="/">← Voltar ao site</a></div>
+    <div class="login-voltar"><a href="/" data-i18n="ac.login.voltar">← Voltar ao site</a></div>
   </div>
 </div>
 
@@ -789,32 +801,32 @@ nav{
 
   <!-- Header -->
   <div class="dash-header">
-    <div class="dash-saudacao">Minha conta</div>
-    <h1 class="dash-titulo">Minha <em>biblioteca</em></h1>
+    <div class="dash-saudacao" data-i18n="ac.conta">Minha conta</div>
+    <h1 class="dash-titulo" data-i18n-html="ac.titulo">Minha <em>biblioteca</em></h1>
   </div>
 
   <!-- Stats -->
   <div class="stats-row" id="statsRow">
-    <div class="stat-item">
+    <div class="stat-item" data-so-pt>
       <div class="stat-num" id="statEbooks">—</div>
       <div class="stat-label">Ebooks</div>
     </div>
-    <div class="stat-item">
+    <div class="stat-item" data-so-pt>
       <div class="stat-num" id="statMusicas">—</div>
       <div class="stat-label">Músicas</div>
     </div>
     <div class="stat-item">
       <div class="stat-num" id="statNema">—</div>
-      <div class="stat-label" id="statNemaLabel">Pontos Nema</div>
+      <div class="stat-label" id="statNemaLabel" data-i18n="ac.stat.nema">Pontos Nema</div>
     </div>
     <div class="stat-item">
       <div class="stat-num" id="statStatus">—</div>
-      <div class="stat-label">Assinatura</div>
+      <div class="stat-label" data-i18n="ac.stat.plano">Assinatura</div>
     </div>
   </div>
 
   <!-- Abas -->
-  <div class="abas" role="tablist">
+  <div class="abas" role="tablist" data-so-pt>
     <button class="aba ativa" onclick="trocarAba('biblioteca',this)" role="tab" aria-selected="true">Biblioteca</button>
     <button class="aba" onclick="trocarAba('musicas',this)" role="tab">Músicas</button>
     <button class="aba" onclick="trocarAba('extrato',this)" role="tab">Extrato</button>
@@ -824,13 +836,13 @@ nav{
 
   <!-- ── ABA: BIBLIOTECA ── -->
   <div id="aba-biblioteca" class="aba-conteudo ativa" role="tabpanel">
-    <div class="sec-titulo">Meus ebooks</div>
+    <div class="sec-titulo" data-i18n="ac.meus">Meus ebooks</div>
     <div id="listaEbooks">
-      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt" data-i18n="ac.carregando">Carregando</span></div>
     </div>
 
     <!-- Biblioteca Clássica TT — exibido por carregarBiblioteca() só quando há ebook na conta -->
-    <div id="bannerClassicos" class="banner-classicos" hidden style="margin-top:36px;padding:28px 32px;background:linear-gradient(135deg,#0f2d1a 0%,#1e5c3a 100%);border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+    <div id="bannerClassicos" class="banner-classicos" hidden data-so-pt style="margin-top:36px;padding:28px 32px;background:linear-gradient(135deg,#0f2d1a 0%,#1e5c3a 100%);border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
       <div>
         <p style="color:var(--ouro);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin:0 0 8px;">Incluído na sua compra</p>
         <h3 style="font-family:'Lora',serif;font-weight:400;font-size:20px;color:#fff;margin:0 0 10px;"><span style="color:var(--ouro)">✦</span> Biblioteca Clássica TT</h3>
@@ -841,7 +853,7 @@ nav{
   </div>
 
   <!-- ── ABA: MÚSICAS ── -->
-  <div id="aba-musicas" class="aba-conteudo" role="tabpanel">
+  <div id="aba-musicas" class="aba-conteudo" role="tabpanel" data-so-pt>
     <div class="sec-titulo">Minhas músicas</div>
     <div id="listaMusicas">
       <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
@@ -849,7 +861,7 @@ nav{
   </div>
 
   <!-- ── ABA: EXTRATO ── -->
-  <div id="aba-extrato" class="aba-conteudo" role="tabpanel">
+  <div id="aba-extrato" class="aba-conteudo" role="tabpanel" data-so-pt>
     <div class="sec-titulo">Histórico de pagamentos</div>
     <div id="listaExtrato">
       <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
@@ -857,7 +869,7 @@ nav{
   </div>
 
   <!-- ── ABA: ASSINATURA ── -->
-  <div id="aba-assinatura" class="aba-conteudo" role="tabpanel">
+  <div id="aba-assinatura" class="aba-conteudo" role="tabpanel" data-so-pt>
     <div class="sec-titulo">Minha assinatura</div>
     <div id="conteudoAssinatura">
       <div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>
@@ -865,7 +877,7 @@ nav{
   </div>
 
   <!-- ── ABA: PLANILHA VIVA ── -->
-  <div id="aba-planilhaviva" class="aba-conteudo" role="tabpanel">
+  <div id="aba-planilhaviva" class="aba-conteudo" role="tabpanel" data-so-pt>
     <div class="sec-titulo">Planilha Viva · SFDTT</div>
     <div id="conteudoPlanilhaViva"></div>
   </div>
@@ -879,9 +891,11 @@ nav{
 
 <!-- Leitor: js/leitor.js monta o próprio #tela-leitura ao abrir um livro -->
 
-<script src="/js/supabase-client.js?v=4c1ab884"></script>
-<script src="/js/player.js?v=1228b01f"></script>
-<script src="/js/leitor.js?v=e627ba66"></script>
+<script src="/js/supabase-client.js?v=33db0afb"></script>
+<script data-so-pt src="/js/player.js?v=1228b01f"></script>
+<script src="/js/leitor.js?v=56ae9591"></script>
+<script src="/js/estante.js?v=fc77c52c"></script>
+<script src="/js/membro.js?v=720de1fb"></script>
 <script>
 // ============================================================
 // ÁREA DO CLIENTE — Editora Três Trevo
@@ -933,7 +947,7 @@ function emailValido() {
   const email = document.getElementById('emailLogin').value.trim();
   const msg   = document.getElementById('msgLogin');
   if (!email || !email.includes('@')) {
-    msg.textContent = 'Digite um e-mail válido.';
+    msg.textContent = T('js.ac.email.invalido');
     msg.className = 'login-msg erro';
     return null;
   }
@@ -947,17 +961,17 @@ async function entrarComSenha() {
   const btn   = document.getElementById('btnSenha');
   const msg   = document.getElementById('msgLogin');
   if (!senha) {
-    msg.textContent = 'Digite sua senha ou use o link por e-mail.';
+    msg.textContent = T('js.ac.senha.vazia');
     msg.className = 'login-msg erro';
     return;
   }
   btn.disabled = true;
-  btn.textContent = 'Entrando…';
+  btn.textContent = T('js.ac.entrando');
   const { error } = await sb.auth.signInWithPassword({ email, password: senha });
   btn.disabled = false;
-  btn.textContent = 'Entrar';
+  btn.textContent = T('js.ac.entrar');
   if (error) {
-    msg.textContent = error.message.includes('Invalid login') ? 'E-mail ou senha incorretos.' : 'Erro: ' + error.message;
+    msg.textContent = error.message.includes('Invalid login') ? T('js.ac.senha.errada') : T('js.ac.erro.login');
     msg.className = 'login-msg erro';
   }
 }
@@ -968,18 +982,18 @@ async function enviarMagicLink() {
   const btn = document.getElementById('btnMagic');
   const msg = document.getElementById('msgLogin');
   btn.disabled = true;
-  btn.textContent = 'Enviando…';
+  btn.textContent = T('js.ac.enviando');
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.origin + '/area-cliente.html' }
+    options: { emailRedirectTo: window.location.origin + window.location.pathname, data: { idioma: window.TT_LANG || 'pt' } }
   });
   btn.disabled = false;
-  btn.textContent = 'Receber link por e-mail';
+  btn.textContent = T('js.ac.link');
   if (error) {
-    msg.textContent = 'Erro: ' + error.message;
+    msg.textContent = /rate|limit|429/i.test(error.message) ? T('js.cad.erro.tentativas') : T('js.ac.erro.link');
     msg.className = 'login-msg erro';
   } else {
-    msg.innerHTML = '✦ Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style="opacity:.6">Pode levar até 2 minutos. Cheque o spam.</small>';
+    msg.innerHTML = '✦ ' + T('js.ac.link.ok');
     msg.className = 'login-msg sucesso';
   }
 }
@@ -1061,7 +1075,7 @@ async function carregarStats() {
   animarNum('statEbooks',  ebooks);
   animarNum('statMusicas', musicas);
   carregarNema();
-  document.getElementById('statStatus').textContent = hasSub ? 'Ativa' : 'Sem plano';
+  document.getElementById('statStatus').textContent = hasSub ? T('js.ac.plano.ativa') : (ebooks === 0 ? T('js.ac.plano.membro') : T('js.ac.plano.sem'));
 }
 
 // Nema: saldo vem do worker (as regras ficam no banco). Disponível = pode usar no checkout.
@@ -1079,8 +1093,8 @@ async function carregarNema() {
     const pts = (v) => (Number(v) || 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
     el.textContent = pts(d.disponivel);
     lbl.textContent = Number(d.pendente) > 0
-      ? `Pontos Nema · + ${pts(d.pendente)} liberam em até 7 dias`
-      : 'Pontos Nema';
+      ? T('js.ac.nema.pendente', { n: pts(d.pendente) })
+      : T('js.ac.nema');
   } catch (e) {
     el.textContent = '—';
   }
@@ -1112,7 +1126,7 @@ async function carregarBiblioteca() {
     .order('liberado_em', { ascending: false });
 
   if (error) {
-    cont.innerHTML = vazioCont('⚠', 'Erro ao carregar', 'Recarregue a página.');
+    cont.innerHTML = vazioCont('⚠', T('js.ac.erro.carregar'), T('js.ac.recarregue'));
     return;
   }
 
@@ -1120,6 +1134,12 @@ async function carregarBiblioteca() {
   produtosBiblioteca = ebooks.map(l => l.produto).filter(Boolean);
   const banner = document.getElementById('bannerClassicos');
   if (banner) banner.hidden = ebooks.length === 0;
+
+  // Conta sem compra = membro grátis: amostra, 1 clássico e o cartão do Nema (js/membro.js).
+  if (ebooks.length === 0 && window.TTMembro) {
+    TTMembro.renderizar(cont);
+    return;
+  }
 
   if (ebooks.length === 0) {
     cont.innerHTML = `<div class="vazio">
@@ -1202,7 +1222,7 @@ function capaTipografica(titulo, autor, slug) {
 }
 
 function cardEbook(p, meta, i, libId) {
-  const titulo = p.titulo || meta.titulo || 'Título indisponível';
+  const titulo = p.titulo || meta.titulo || T('js.ac.sem.titulo');
   const autor  = p.autor  || meta.autor  || '';
   const genero = p.genero || meta.genero || '';
   const cotas  = p.cotas  || meta.cotas  || 0;
@@ -1227,12 +1247,12 @@ function cardEbook(p, meta, i, libId) {
           ${p.slug === 'atico' ? `<a href="ebook-atico-conteudo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(200,123,27,.12);border:1px solid rgba(200,123,27,.3);color:#7a5c1e;font-size:11px;font-weight:500;text-decoration:none;white-space:nowrap;border-radius:2px">⚡ Ler</a>` : ''}
           ${(temFormato(p, 'epub') || temFormato(p, 'pdf')) ? `<button class="btn-ler" onclick="abrirLeitor('${p.id}','${titulo.replace(/'/g, "\\'")}')">
             ${iconeFormato('epub')}
-            Ler agora
+            ${T('js.ac.ler')}
           </button>` : ''}
-          ${temFormato(p, 'pdf') ? `<button class="btn-dl-mini" id="dl-${p.id}-pdf" title="Baixar arquivo PDF" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','pdf')">${iconeFormato('pdf')}</button>` : ''}
-          ${temFormato(p, 'epub') ? `<button class="btn-dl-mini" id="dl-${p.id}-epub" title="Baixar arquivo EPUB" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','epub')">${iconeFormato('epub')}</button>` : ''}
+          ${temFormato(p, 'pdf') ? `<button class="btn-dl-mini" id="dl-${p.id}-pdf" title="${T('js.ac.baixar.pdf')}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','pdf')">${iconeFormato('pdf')}</button>` : ''}
+          ${temFormato(p, 'epub') ? `<button class="btn-dl-mini" id="dl-${p.id}-epub" title="${T('js.ac.baixar.epub')}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','epub')">${iconeFormato('epub')}</button>` : ''}
         </div>
-        ${libId ? `<button onclick="event.stopPropagation();ocultarDaBiblioteca('${libId}',this)" title="Remover da biblioteca" style="background:none;border:none;cursor:pointer;color:rgba(26,26,22,.25);font-size:14px;padding:2px 4px;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(200,80,80,.7)'" onmouseout="this.style.color='rgba(26,26,22,.25)'">✕</button>` : ''}
+        ${libId ? `<button onclick="event.stopPropagation();ocultarDaBiblioteca('${libId}',this)" title="${T('js.ac.remover')}" style="background:none;border:none;cursor:pointer;color:rgba(26,26,22,.25);font-size:14px;padding:2px 4px;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(200,80,80,.7)'" onmouseout="this.style.color='rgba(26,26,22,.25)'">✕</button>` : ''}
       </div>
     </div>
   </div>`;
@@ -1265,7 +1285,7 @@ async function baixar(productId, titulo, formato) {
       toast(`✦ Arquivo ${rotulo} de "${titulo}" baixado.`);
     }
   } catch {
-    toast('Erro de conexão. Tente novamente.', 'erro');
+    toast(T('js.erro.conexao'), 'erro');
   } finally {
     if (btn) {
       btn.classList.remove('carregando');
@@ -1286,14 +1306,14 @@ function abrirLeitor(productId, titulo) {
     chave: 'prod:' + productId,
     obterArquivo: async () => {
       const { data: { session } } = await sb.auth.getSession();
-      if (!session) return { erro: 'Sua sessão expirou. Entre de novo para continuar lendo.' };
+      if (!session) return { erro: T('js.erro.sessao') };
       const res = await fetch(`${EDGE_BASE}/get-download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
         body: JSON.stringify({ product_id: productId }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || data.error) return { erro: data.error || 'Erro ao abrir a leitura.' };
+      if (!res.ok || data.error) return { erro: res.status === 403 ? T('js.ac.sem.acesso') : T('js.ac.erro.leitura') };
       return { epub: data.formatos?.epub?.download_url, pdf: data.formatos?.pdf?.download_url };
     },
     trilha: async () => {
@@ -1641,7 +1661,7 @@ async function enviarValidacao(drawId, purchaseId) {
     abasCarregadas['sorteios'] = false;
     setTimeout(() => { abasCarregadas['sorteios'] = false; carregarSorteios(); }, 1200);
   } catch {
-    toast('Erro de conexão. Tente novamente.', 'erro');
+    toast(T('js.erro.conexao'), 'erro');
   }
 }
 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q64TDCCL85"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Q64TDCCL85');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="meta.gratis.titulo">Free member area — Três Trevo</title>
+  <meta name="description" data-i18n-attr="content:meta.gratis.desc" content="Create a free member area and read a public-domain classic in the Três Trevo reader.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/assets/favicon.ico">
+  <!-- Meta Pixel — substituir 296545814480082 pela ID real após criar conta Meta Ads -->
+  <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','296545814480082');fbq('track','PageView');</script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=296545814480082&ev=PageView&noscript=1"/></noscript>
+  <style>
+    :root {
+      --serif: 'Georgia', 'Times New Roman', serif;
+      --sans: system-ui, -apple-system, sans-serif;
+      --bg: #0a0a0a; --bg2: #111; --t1: #f5f0e8; --t2: #c8bfaa; --t3: #8a8070;
+      --verde: #2d6a4f; --verde-claro: #40916c; --laranja: #e07a2f; --bd: #2a2a2a;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--t1); font-family: var(--sans); min-height: 100vh; }
+    .container { max-width: 480px; margin: 0 auto; padding: 48px 24px 64px; }
+    .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 48px; }
+    .logo-mark { width: 32px; height: 32px; background: var(--verde); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; font-weight: 700; }
+    .idiomas{margin-left:auto;display:flex;gap:2px}.idiomas a{color:var(--t3);font-size:13px;padding:8px;text-decoration:none}.idiomas a.ativo{color:var(--t1)}.tt-idiomas-nome{display:none}
+    .logo-nome { font-family: var(--serif); font-size: 15px; letter-spacing: 0.08em; color: var(--t2); }
+    .badge { display: inline-block; padding: 4px 12px; background: rgba(224,122,47,0.15); border: 1px solid rgba(224,122,47,0.4); border-radius: 20px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--laranja); margin-bottom: 20px; }
+    h1 { font-family: var(--serif); font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 400; line-height: 1.25; color: var(--t1); margin-bottom: 12px; }
+    h1 em { font-style: italic; color: var(--laranja); }
+    .subtitulo { font-size: 1rem; line-height: 1.6; color: var(--t2); margin-bottom: 32px; }
+    .prova { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; font-size: 13px; color: var(--t3); }
+    .form { display: flex; flex-direction: column; gap: 12px; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3); }
+    input { background: var(--bg2); border: 1px solid var(--bd); border-radius: 8px; padding: 14px 16px; font-size: 15px; color: var(--t1); outline: none; transition: border-color .2s; width: 100%; }
+    input::placeholder { color: var(--t3); }
+    input:focus { border-color: var(--verde-claro); }
+    .opt { font-size: 12px; color: var(--t3); margin-top: -4px; }
+    .btn-cta { width: 100%; padding: 16px; background: var(--verde); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background .2s, transform .1s; margin-top: 4px; }
+    .btn-cta:hover { background: var(--verde-claro); }
+    .btn-cta:active { transform: scale(.98); }
+    .btn-cta:disabled { opacity: .6; cursor: not-allowed; }
+    .privacidade { font-size: 11px; color: var(--t3); text-align: center; margin-top: 12px; line-height: 1.5; }
+    .privacidade a { color: var(--t3); text-decoration: underline; }
+    .success { display: none; text-align: center; padding: 32px 0; }
+    .success-icon { font-size: 48px; margin-bottom: 16px; }
+    .success h2 { font-family: var(--serif); font-size: 1.5rem; font-weight: 400; margin-bottom: 12px; color: var(--t1); }
+    .success p { color: var(--t2); line-height: 1.6; font-size: 14px; }
+    .success .link-catalogo { display: inline-block; margin-top: 24px; padding: 12px 28px; background: transparent; border: 1px solid var(--verde-claro); border-radius: 6px; color: var(--verde-claro); text-decoration: none; font-size: 14px; transition: background .2s; }
+    .success .link-catalogo:hover { background: rgba(64,145,108,0.1); }
+    .consent { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.45; color: var(--t2, #c9d1c4); cursor: pointer; text-transform: none; letter-spacing: 0; }
+    .consent input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; accent-color: var(--verde); }
+    .erro-msg { color: #ef9a9a; font-size: 13px; padding: 10px 14px; background: rgba(239,154,154,0.1); border-radius: 6px; display: none; }
+    .trust { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--bd); display: flex; flex-direction: column; gap: 10px; }
+    .trust-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--t3); }
+    .trust-ic { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  </style>
+<script id="tt-textos">window.TT_LANG="en";window.TT_TEXTOS={"js.ac.baixar.epub":"Download the EPUB file","js.ac.baixar.pdf":"Download the PDF file","js.ac.email.invalido":"Please enter a valid email address.","js.ac.entrando":"Signing in…","js.ac.entrar":"Sign in","js.ac.enviando":"Sending…","js.ac.erro.carregar":"Couldn’t load","js.ac.erro.leitura":"Couldn’t open this book.","js.ac.erro.link":"We couldn’t send the link right now. Please try again in a moment.","js.ac.erro.login":"We couldn’t sign you in right now. Please try again.","js.ac.ler":"Read now","js.ac.link":"Email me a sign-in link","js.ac.link.ok":"Link sent! Check your email and click the link to sign in.<br><small style=\"opacity:.6\">It can take up to 2 minutes. Check your spam folder.</small>","js.ac.nema":"Nema points","js.ac.nema.pendente":"Nema points · + {n} released within 7 days","js.ac.plano.ativa":"Active","js.ac.plano.membro":"Free member","js.ac.plano.sem":"No plan","js.ac.recarregue":"Please reload the page.","js.ac.remover":"Remove from library","js.ac.sem.acesso":"This title isn’t in your account.","js.ac.sem.titulo":"Title unavailable","js.ac.senha.errada":"Wrong email or password.","js.ac.senha.vazia":"Enter your password, or get a sign-in link by email.","js.cad.botao":"Create my free member area →","js.cad.criando":"Creating…","js.cad.email":"Your best email","js.cad.erro.conexao":"No connection. Check your internet and try again.","js.cad.erro.email":"Please check the email address.","js.cad.erro.geral":"We couldn’t create it right now. Please try again in a moment.","js.cad.erro.tentativas":"Too many attempts in a row. Please wait a few minutes and try again.","js.cad.fechar":"Close","js.cad.fino":"No password: we email you a sign-in link.","js.cad.fino.intl":"No password: we email you a sign-in link. We never share your email.","js.cad.kicker":"Free · no card needed","js.cad.mala":"Send me new releases and news by email","js.cad.nome":"Your name","js.cad.ok":"Done! We sent the sign-in link to {email}.<br>Open the email and your member area will be ready. Check your spam folder if it doesn’t arrive within 2 minutes.","js.cad.sub":"Choose a public-domain classic of English literature and read it in our reader, with your place always saved.","js.cad.titulo":"Create your free member area","js.carregando":"Loading","js.erro.conexao":"Can’t reach the server. Check your internet and try again.","js.erro.sessao":"Your session has expired. Please sign in again to keep reading.","js.estante.dica":"Start with one of our readers’ favorites: {titulos}.","js.estante.filtro":"Filter by genre","js.estante.obra1":"1 book","js.estante.obras":"{n} books","js.estante.outros":"Other","js.estante.paginas":"{n} pages","js.estante.seculo":"{n} century","js.estante.sobre":"About the book","js.estante.todos":"All","js.estante.vazia":"We’re still arranging this shelf. Please come back soon.","js.faq":[{"q":"What is the free member area?","r":"It’s your personal space at Três Trevo. You create it with just your email — no password and no card — and use it to read a public-domain classic in our reader."},{"q":"Which books can I read?","r":"Great classics of English literature that are in the public domain. You choose one from the shelf in your member area."},{"q":"Why one classic at a time?","r":"Your free membership includes one reading space. When you finish a book, tap “Finish and switch” and choose the next one."},{"q":"Does it work on my phone?","r":"Yes. The reader adapts to any screen, with large type, night mode and your place saved wherever you stop."},{"q":"Are your own books available in English?","r":"Not yet. Our English editions are on their way, and they will appear in your member area as soon as they are published."},{"q":"What is Nema?","r":"Our loyalty program. Once our English editions arrive, 10% of every purchase comes back as Nema, which becomes a discount on your next book. The full rules are on the Nema page."}],"js.gratis.carregando":"Loading… please try again in a moment.","js.leitor.abrindo":"Opening the book…","js.leitor.abrir.pdf":"Open the PDF","js.leitor.ajustes":"Reading settings","js.leitor.ajustes.dica":"Text size and night mode","js.leitor.anterior":"Previous","js.leitor.cap.anterior":"Previous chapter","js.leitor.cap.proximo":"Next chapter","js.leitor.colofao":"Três Trevo · digital edition<br>Thank you for reading with us.","js.leitor.concluir":"Finish","js.leitor.dia":"Day","js.leitor.erro.ajuda":"If it keeps happening, write to sac@3trevo.com.br","js.leitor.erro.titulo":"We couldn’t open the book","js.leitor.fechar":"Close","js.leitor.fechar.livro":"Close the book","js.leitor.fim.conhecer":"Learn more","js.leitor.fim.mesmo.autor":"By the same author","js.leitor.fim.reler":"Read again from the start","js.leitor.fim.sobre":"You’ve reached the end of","js.leitor.fim.voltar":"Back to the library","js.leitor.ilegivel":"The book file couldn’t be read.","js.leitor.lento":"The book is taking a while to load. Your connection may be slow.","js.leitor.maior":"Larger text","js.leitor.menor":"Smaller text","js.leitor.modo":"Mode","js.leitor.noite":"Night","js.leitor.pdf.celular":"This title is a PDF. It opens in your device’s PDF viewer.","js.leitor.proximo":"Next","js.leitor.sem.formato":"No readable format is available.","js.leitor.tentar":"Try again","js.leitor.texto":"Text","js.leitor.trilha":"Listen to the book’s soundtrack","js.marca":"Três Trevo","js.membro.amostra.completo":"Full book · your purchase earns Nema","js.membro.amostra.gostou":"Enjoyed the chapter?","js.membro.amostra.ler":"Read chapter 1","js.membro.amostra.ler.completo":"Read the full book","js.membro.amostra.secao":"Free sample","js.membro.amostra.selo":"Free sample","js.membro.classico.secao":"Your free classic","js.membro.comecar":"Start reading","js.membro.continuar":"Continue","js.membro.erro.abrir":"We couldn’t open the classic right now. Please try again in a moment.","js.membro.erro.escolher":"We couldn’t save your choice. Please try again.","js.membro.erro.liberar":"We couldn’t free the space right now. Please try again.","js.membro.escolha":"Choose a classic for your reading space. You read one at a time and can switch when you finish.","js.membro.escolher":"Choose this one","js.membro.escolhido":"“{titulo}” is now in your reading space.","js.membro.espaco":"1 reading space","js.membro.fim.nema":"Your first purchase earns Nema","js.membro.fim.nema.intl":"When they arrive, every purchase earns Nema","js.membro.fim.rotulo":"From Três Trevo","js.membro.fim.titulo":"Discover our books","js.membro.fim.titulo.intl":"Our English editions are on their way","js.membro.intro":"Choose a classic and read it in our reader, with your place always saved.","js.membro.intro.pt":"Choose a classic and read it in our reader, with your place always saved.","js.membro.lido":"{n}% read","js.membro.nota":"Free members read one classic at a time.","js.membro.nota.intl":"Free members read one classic at a time and can switch when they finish.","js.membro.rotulo":"Free member","js.membro.seu.classico":"Your classic","js.membro.titulo":"Your reading room at Três Trevo","js.membro.trocar":"Finish and switch","js.membro.trocar.confirma":"Finish this classic and free the space for another one?","js.nema.aria":"Nema, the Três Trevo loyalty program","js.nema.catalogo":"See the catalog","js.nema.como":"How Nema works","js.nema.rotulo":"Nema · loyalty points","js.nema.texto":"Once our English editions arrive, 10% of every e-book you buy comes back to you as Nema, and your balance becomes a discount on your next book (up to half the price), released 7 days after the purchase.","js.nema.titulo":"Nema: your reading pays you back"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
+<link rel="canonical" href="https://3trevo.com.br/en/gratis.html">
+<link rel="alternate" hreflang="pt-BR" href="https://3trevo.com.br/gratis.html">
+<link rel="alternate" hreflang="en" href="https://3trevo.com.br/en/gratis.html">
+<link rel="alternate" hreflang="es" href="https://3trevo.com.br/es/gratis.html">
+<link rel="alternate" hreflang="x-default" href="https://3trevo.com.br/gratis.html">
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <div class="logo-mark">T</div>
+      <div class="logo-nome" data-i18n="gratis.marca">TRÊS TREVO</div>
+      <div data-tt-idiomas class="idiomas" aria-label="Language" data-i18n-attr="aria-label:nav.idioma"><a href="/gratis.html" hreflang="pt-BR" lang="pt-BR">PT<span class="tt-idiomas-nome"> · Português</span></a><a href="/en/gratis.html" hreflang="en" lang="en" aria-current="true" class="ativo">EN<span class="tt-idiomas-nome"> · English</span></a><a href="/es/gratis.html" hreflang="es" lang="es">ES<span class="tt-idiomas-nome"> · Español</span></a></div>
+    </div>
+
+    <div id="form-area">
+      <span class="badge" data-i18n="gratis.badge">Free membership</span>
+      
+      
+      <h1 data-i18n-html="gratis.titulo.intl">A classic, <em>on us.</em></h1>
+      <p class="subtitulo" data-i18n="gratis.sub.intl">Create your free member area and choose a public-domain classic to read in our reader. No card needed.</p>
+      <form class="form" id="form-captura" onsubmit="capturarLead(event)">
+        <div class="input-group">
+          <label for="inp-nome" data-i18n="gratis.nome">Your name</label>
+          <input type="text" id="inp-nome" data-i18n-attr="placeholder:gratis.nome.ph" placeholder="What should we call you?" autocomplete="given-name" required>
+        </div>
+        <div class="input-group">
+          <label for="inp-email" data-i18n="gratis.email">Your email</label>
+          <input type="email" id="inp-email" data-i18n-attr="placeholder:gratis.email.ph" placeholder="you@email.com" autocomplete="email" required>
+        </div>
+        
+        <div class="erro-msg" id="erro-msg"></div>
+        <button type="submit" class="btn-cta" id="btn-captura" data-i18n="gratis.botao">Create my free member area →</button>
+        <p class="privacidade" data-i18n-html="gratis.fino">No password: we email you a sign-in link. We never share your email. <a href="/en/privacidade.html">Privacy</a>.</p>
+      </form>
+    </div>
+
+    <div class="success" id="success-area">
+      <div class="success-icon">✦</div>
+      <h2 data-i18n="gratis.ok.titulo">Your member area is ready</h2>
+      
+      <p data-i18n-html="gratis.ok.texto.intl">We’ve emailed you a sign-in link. Open it and choose your classic from the shelf.<br><br>Check your spam folder if it doesn’t arrive within a few minutes.</p>
+      
+      <a href="/en/" class="link-catalogo" data-i18n="gratis.inicio">Discover Três Trevo →</a>
+    </div>
+
+    <div class="trust">
+      
+      <div class="trust-item"><span class="trust-ic">📚</span><span data-i18n="gratis.trust.intl">Public-domain classics in the Três Trevo reader: large type, night mode and your place always saved.</span></div>
+      <div class="trust-item"><span class="trust-ic">🔒</span><span data-i18n="gratis.trust.dados">Your email is used to sign you in to your member area. We never share it with anyone.</span></div>
+    </div>
+  </div>
+
+  <script src="/js/beacon.js?v=a4453a06" defer></script>
+  <script>
+    // Cadastro de membro grátis: js/beacon.js (TTCadastro), o mesmo do pop-up do site.
+    async function capturarLead(e) {
+      e.preventDefault();
+      var btn = document.getElementById('btn-captura');
+      var erroEl = document.getElementById('erro-msg');
+      erroEl.style.display = 'none';
+      if (!window.TTCadastro) { erroEl.textContent = window.T('js.gratis.carregando'); erroEl.style.display = 'block'; return; }
+      btn.disabled = true; btn.textContent = window.T('js.cad.criando');
+      var res = await TTCadastro.criarMembro({
+        nome: document.getElementById('inp-nome').value,
+        email: document.getElementById('inp-email').value,
+        malaDireta: !!(document.getElementById('inp-mala') && document.getElementById('inp-mala').checked),
+        origem: 'gratis'
+      });
+      if (res.ok) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('success-area').style.display = 'block';
+        if (typeof fbq !== 'undefined') fbq('track', 'CompleteRegistration');
+      } else {
+        erroEl.textContent = TTCadastro.mensagemErro(res.erro);
+        erroEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = window.T('js.cad.botao');
+      }
+    }
+  </script>
+</body>
+</html>

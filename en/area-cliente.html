@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q64TDCCL85"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Q64TDCCL85');
+  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.googletagmanager.com; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com; img-src 'self' data: blob: *.supabase.co *.al-kbhal.workers.dev; font-src 'self' blob: fonts.gstatic.com; style-src 'self' 'unsafe-inline' blob: https://fonts.googleapis.com; frame-src 'self' *.supabase.co; media-src 'self' blob: *.supabase.co; object-src 'none';">
+<title data-i18n="meta.ac.titulo">My library — Três Trevo</title>
+<meta name="description" data-i18n-attr="content:meta.ac.desc" content="Your free member area at Três Trevo: your classic, your reading progress and your Nema points.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0f2d1a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/leitor.css?v=d3600737">
+<link rel="stylesheet" href="/css/membro.css?v=80ea41de">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+<style>
+/* ══════════════════════════════════════════════════════════
+   RESET & TOKENS — biblioteca de leitor, referência Kindle Cloud Reader
+   (papel/creme, serifada nos títulos, cromo minimalista)
+══════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --verde:#0f2d1a;--verde-medio:#1a4a2e;--verde-claro:#2a6b42;
+  --ouro:#c8a84b;--ouro-claro:#e8c96a;--ouro-escuro:#8a6f28;
+  --creme:#f7f2e6;--painel:#fffdf9;--branco:#fffdf9;
+  --tinta:#262016;
+  --t1:rgba(38,32,22,.86);--t2:rgba(38,32,22,.58);--t3:rgba(38,32,22,.42);--t4:rgba(38,32,22,.28);
+  --borda:rgba(38,32,22,.11);--borda2:rgba(38,32,22,.07);
+  --ok:#3f8f5f;--erro:#c25a4e;
+  --player-h:76px;
+  --ease-out:cubic-bezier(0.22,1,0.36,1);
+  --sombra-card:0 1px 2px rgba(38,32,22,.06),0 8px 24px rgba(38,32,22,.08);
+  --sombra-card-hover:0 4px 10px rgba(38,32,22,.08),0 20px 44px rgba(38,32,22,.14);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',sans-serif;background:var(--creme);
+  color:var(--t1);min-height:100vh;overflow-x:hidden;
+}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--creme)}
+::-webkit-scrollbar-thumb{background:rgba(38,32,22,.18);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(38,32,22,.3)}
+
+/* ══ NAV ══ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  padding:0 48px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(15,45,26,0.98);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(200,168,75,.15);
+}
+.nav-marca{
+  font-family:'Lora',serif;font-size:19px;font-weight:500;
+  color:var(--ouro-claro);text-decoration:none;letter-spacing:.3px;
+  display:flex;align-items:center;gap:9px;
+}
+.nav-marca::before{content:'✦';font-size:13px;opacity:.75}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-idiomas{display:flex;gap:2px;margin-left:auto;margin-right:12px}
+.nav-idiomas a{font-size:12px;letter-spacing:.06em;padding:8px 7px;color:rgba(255,255,255,.55);text-decoration:none}
+.nav-idiomas a.ativo{color:#fff;border-bottom:1px solid var(--ouro)}
+.nav-idiomas .tt-idiomas-nome{display:none}
+.nav-user{font-size:12.5px;color:rgba(232,201,106,.5);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-sair{
+  font-size:11px;letter-spacing:1.2px;padding:7px 16px;text-transform:uppercase;
+  border:1px solid rgba(200,168,75,.3);color:var(--ouro-claro);background:transparent;
+  cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;
+}
+.btn-sair:hover{background:rgba(200,168,75,.1);border-color:var(--ouro)}
+
+/* ══ TELAS ══ */
+.tela{display:none;min-height:100vh}
+.tela.ativa{display:block}
+
+/* ══════════════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════════════ */
+#tela-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.login-box{
+  width:100%;max-width:420px;padding:48px 40px;
+  background:var(--painel);border:1px solid var(--borda);
+  box-shadow:var(--sombra-card);
+  position:relative;
+  animation:fadeUp .5s var(--ease-out) both;
+}
+.login-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent);
+}
+.login-logo{
+  font-family:'Lora',serif;font-size:27px;font-weight:400;
+  color:var(--verde-medio);margin-bottom:8px;text-align:center;
+}
+.login-sub{font-size:13px;color:var(--t3);text-align:center;margin-bottom:36px;line-height:1.6}
+.campo-label{
+  font-size:11px;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--t3);margin-bottom:8px;display:block;
+}
+.campo-input{
+  width:100%;padding:12px 16px;background:var(--creme);
+  border:1px solid var(--borda);color:var(--tinta);
+  font-family:'Poppins',sans-serif;font-size:14px;outline:none;
+  transition:border-color .2s,background .2s;margin-bottom:20px;border-radius:2px;
+}
+.campo-input:focus{border-color:var(--ouro);background:var(--painel)}
+.campo-input::placeholder{color:var(--t4)}
+.btn-primario{
+  width:100%;padding:14px;background:var(--verde-medio);color:var(--branco);
+  border:none;font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;
+  letter-spacing:.5px;cursor:pointer;transition:background .2s;margin-top:4px;
+}
+.btn-primario:hover{background:var(--verde)}
+.btn-primario:disabled{opacity:.5;cursor:not-allowed}
+.login-msg{
+  font-size:13px;color:var(--t3);text-align:center;
+  margin-top:20px;line-height:1.7;min-height:40px;
+}
+.login-msg.sucesso{color:var(--ok)}
+.login-msg.erro{color:var(--erro)}
+.login-voltar{margin-top:16px;text-align:center}
+.login-voltar a{font-size:12px;color:var(--t3);text-decoration:none;transition:color .2s}
+.login-voltar a:hover{color:var(--ouro-escuro)}
+.login-divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.login-divider span{font-size:11px;letter-spacing:1px;color:var(--t4);white-space:nowrap}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--borda)}
+.btn-secundario{width:100%;padding:12px;background:transparent;color:var(--ouro-escuro);border:1px solid rgba(200,168,75,.4);font-family:'Poppins',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.btn-secundario:hover{border-color:var(--ouro-escuro);background:rgba(200,168,75,.08)}
+.btn-secundario:disabled{opacity:.5;cursor:not-allowed}
+.campo-senha-wrap{position:relative;margin-bottom:20px}
+.campo-senha-wrap .campo-input{margin-bottom:0}
+.senha-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t4);padding:4px;line-height:1;font-size:14px;transition:color .2s}
+.senha-toggle:hover{color:var(--ouro-escuro)}
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════ */
+#tela-dashboard{padding-top:64px}
+
+.dash-header{padding:40px 48px 28px;border-bottom:1px solid var(--borda)}
+.dash-saudacao{
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ouro-escuro);margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.dash-saudacao::before{content:'✦';opacity:.7}
+.dash-titulo{font-family:'Lora',serif;font-size:32px;font-weight:400;line-height:1.15;color:var(--tinta)}
+.dash-titulo em{font-style:italic;color:var(--verde-medio)}
+
+/* Stats row */
+.stats-row{
+  display:flex;gap:0;border-bottom:1px solid var(--borda);
+  background:var(--painel);
+}
+.stat-item{flex:1;padding:20px 28px;border-right:1px solid var(--borda2)}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  font-family:'Lora',serif;font-size:27px;font-weight:600;
+  color:var(--verde-medio);line-height:1;
+}
+.stat-label{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--t3);margin-top:5px}
+
+/* ══ ABAS ══ */
+.abas{
+  display:flex;gap:0;border-bottom:1px solid var(--borda);
+  padding:0 48px;background:var(--painel);overflow-x:auto;
+}
+.abas::-webkit-scrollbar{height:0}
+.aba{
+  padding:15px 20px;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--t3);cursor:pointer;background:none;
+  border:none;border-bottom:2px solid transparent;
+  font-family:'Poppins',sans-serif;font-weight:500;transition:all .2s;margin-bottom:-1px;
+  white-space:nowrap;flex-shrink:0;
+}
+.aba:hover{color:var(--t1)}
+.aba.ativa{color:var(--verde-medio);border-bottom-color:var(--ouro)}
+
+/* ══ CONTEÚDO DAS ABAS ══ */
+.aba-conteudo{
+  display:none;
+  padding:40px 48px;
+  padding-bottom:calc(40px + var(--player-h) + 20px);
+  animation:fadeUp .3s var(--ease-out) both;
+}
+.aba-conteudo.ativa{display:block}
+
+.sec-titulo{
+  font-size:10px;letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--ouro-escuro);margin-bottom:24px;display:flex;align-items:center;gap:12px;
+  font-weight:600;
+}
+.sec-titulo::before{content:'';width:20px;height:1px;background:var(--ouro-escuro)}
+
+/* ══════════════════════════════════════════════════════════
+   SKELETON LOADER
+══════════════════════════════════════════════════════════ */
+@keyframes shimmer{
+  0%{background-position:-400px 0}
+  100%{background-position:400px 0}
+}
+.skeleton{
+  background:linear-gradient(90deg,rgba(38,32,22,.05) 25%,rgba(38,32,22,.1) 50%,rgba(38,32,22,.05) 75%);
+  background-size:800px 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:2px;
+}
+.sk-card{
+  background:var(--painel);border:1px solid var(--borda2);
+  padding:20px 24px;display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center;
+  margin-bottom:1px;
+}
+.sk-cover{width:56px;height:80px;border-radius:2px}
+.sk-line{height:12px;margin-bottom:8px;border-radius:2px}
+.sk-line.s{width:60%}
+.sk-line.m{width:80%}
+.sk-line.l{width:100%}
+.sk-btn{width:90px;height:32px;border-radius:2px}
+
+/* ══════════════════════════════════════════════════════════
+   BIBLIOTECA — grade estilo Kindle: capa em destaque, cromo mínimo
+══════════════════════════════════════════════════════════ */
+.biblioteca-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:28px 22px;
+}
+.ebook-card{
+  background:transparent;border:none;
+  cursor:pointer;transition:transform .25s var(--ease-out);
+  position:relative;
+}
+.ebook-card:hover{transform:translateY(-3px)}
+.ebook-capa{
+  aspect-ratio:2/3;
+  background:var(--verde-medio);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--sombra-card);
+  transition:box-shadow .25s var(--ease-out);
+}
+.ebook-card:hover .ebook-capa{box-shadow:var(--sombra-card-hover)}
+.ebook-capa-img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .4s var(--ease-out);
+}
+.ebook-card:hover .ebook-capa-img{transform:scale(1.04)}
+.ebook-capa-emoji{font-size:52px;opacity:.55;line-height:1;color:var(--ouro-claro)}
+.banner-classicos[hidden]{display:none!important}
+/* Capa tipográfica: um único template para títulos sem arte — identidade da editora sem
+   custo de design por livro. A cor de fundo varia por título entre três verdes da marca. */
+.capa-tipo{
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;
+  padding:30% 11% 11%;color:#f7f2e6;text-align:left;
+  background:linear-gradient(160deg,var(--capa-a,#1e5c3a) 0%,var(--capa-b,#0f2d1a) 100%);
+}
+.capa-tipo::before{content:'';position:absolute;inset:7px;border:1px solid rgba(200,168,75,.45);pointer-events:none}
+.capa-tipo-selo{font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ouro-claro)}
+.capa-tipo-titulo{
+  font-family:'Fraunces','Lora',Georgia,serif;font-weight:600;font-size:clamp(15px,1.5vw + 8px,21px);
+  line-height:1.15;overflow-wrap:break-word;hyphens:none;
+  display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;
+}
+.capa-tipo-filete{display:block;width:34px;height:2px;background:var(--ouro);margin:12px 0 10px}
+.capa-tipo-autor{font-size:11px;letter-spacing:.6px;color:rgba(247,242,230,.78)}
+.ebook-capa-grad{
+  position:absolute;bottom:0;left:0;right:0;height:46%;
+  background:linear-gradient(to top,rgba(15,45,26,.88),transparent);
+}
+.ebook-capa-genero{
+  position:absolute;top:10px;left:10px;
+  font-size:9px;letter-spacing:1.8px;text-transform:uppercase;
+  background:rgba(255,253,249,.92);color:var(--verde-medio);padding:4px 9px;font-weight:600;
+}
+.ebook-body{padding:14px 2px 0}
+.ebook-titulo{
+  font-family:'Lora',serif;font-size:14.5px;font-weight:500;color:var(--tinta);
+  line-height:1.35;margin-bottom:3px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.ebook-autor{font-size:11px;color:var(--t3);letter-spacing:.3px;margin-bottom:12px}
+.ebook-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.ebook-cotas{font-size:10px;color:var(--t4);letter-spacing:.4px}
+.btn-dl{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:7px 14px;background:var(--verde-medio);color:var(--branco);border:none;
+  cursor:pointer;font-family:'Poppins',sans-serif;font-weight:500;
+  transition:background .2s;text-decoration:none;display:inline-flex;
+  align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;
+}
+.btn-dl:hover{background:var(--verde)}
+.btn-dl:disabled,.btn-dl.carregando{opacity:.5;cursor:wait;pointer-events:none}
+.btn-dl svg{flex-shrink:0}
+.btn-ler{
+  font-size:10.5px;letter-spacing:1px;text-transform:uppercase;
+  padding:8px 16px;background:var(--verde-medio);color:var(--branco);border:none;
+  cursor:pointer;font-family:'Poppins',sans-serif;font-weight:600;
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;flex-shrink:0;
+  transition:background .2s;
+}
+.btn-ler:hover{background:var(--verde)}
+.btn-ler:disabled{opacity:.5;cursor:wait}
+.btn-dl-mini{background:none;border:none;color:var(--t4);cursor:pointer;padding:4px;display:inline-flex;align-items:center;transition:color .2s}
+.btn-dl-mini:hover{color:var(--verde-medio)}
+
+
+/* ══ CARROSSEL SECAO ══ */
+.secao-wrapper{margin-bottom:44px}
+.secao-header{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:18px;
+}
+.secao-nome{
+  font-family:'Lora',serif;font-size:19px;font-weight:500;
+  color:var(--tinta);
+}
+.secao-ver-todos{
+  font-size:11px;letter-spacing:1px;color:var(--t3);
+  text-decoration:none;cursor:pointer;transition:color .2s;background:none;border:none;
+}
+.secao-ver-todos:hover{color:var(--ouro-escuro)}
+.carrossel-wrap{position:relative}
+.carrossel{
+  display:flex;gap:22px;overflow-x:auto;padding-bottom:10px;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+}
+.carrossel::-webkit-scrollbar{height:3px}
+.carrossel::-webkit-scrollbar-track{background:var(--borda2)}
+.carrossel::-webkit-scrollbar-thumb{background:rgba(38,32,22,.2);border-radius:2px}
+.carrossel .ebook-card{
+  flex:0 0 180px;scroll-snap-align:start;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MÚSICAS — LISTA + PLAYER
+══════════════════════════════════════════════════════════ */
+.musicas-lista{
+  background:var(--painel);
+  border:1px solid var(--borda2);
+}
+.musica-row{
+  display:grid;grid-template-columns:44px 36px 1fr auto;
+  gap:0 16px;align-items:center;padding:14px 20px;
+  border-bottom:1px solid var(--borda2);
+  cursor:pointer;transition:background .15s;position:relative;
+}
+.musica-row:last-child{border-bottom:none}
+.musica-row:hover,.musica-row.tocando{background:rgba(200,168,75,.06)}
+.musica-row.tocando{border-left:2px solid var(--ouro-escuro)}
+.musica-num{
+  font-size:12px;color:var(--t3);text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.musica-row.tocando .musica-num{display:none}
+.musica-row.tocando .musica-equalizador{display:flex}
+.musica-equalizador{
+  display:none;align-items:flex-end;justify-content:center;gap:2px;height:16px;
+}
+.musica-equalizador span{
+  width:3px;border-radius:1px;background:var(--ouro-escuro);
+  animation:eq-bar .8s ease-in-out infinite alternate;
+}
+.musica-equalizador span:nth-child(2){animation-delay:.2s;height:60%}
+.musica-equalizador span:nth-child(3){animation-delay:.4s;height:80%}
+.musica-equalizador span:nth-child(1){height:100%}
+@keyframes eq-bar{from{opacity:.5;transform:scaleY(.5)}to{opacity:1;transform:scaleY(1)}}
+.musica-btn-play{
+  width:32px;height:32px;border-radius:50%;border:1px solid var(--borda);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .2s;background:none;cursor:pointer;
+}
+.musica-btn-play svg{width:12px;height:12px;fill:var(--t3);margin-left:2px}
+.musica-row:hover .musica-btn-play{border-color:var(--ouro-escuro)}
+.musica-row:hover .musica-btn-play svg{fill:var(--ouro-escuro)}
+.musica-row.tocando .musica-btn-play{background:var(--verde-medio);border-color:var(--verde-medio)}
+.musica-row.tocando .musica-btn-play svg{fill:#fff;margin-left:0}
+.musica-nome{font-size:14px;color:var(--t1);margin-bottom:2px;line-height:1.3}
+.musica-sub{font-size:11px;color:var(--t3);letter-spacing:.4px}
+.musica-dur{font-size:12px;color:var(--t3);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ══ PAUSED indicator ══ */
+.musica-row.pausado .musica-equalizador span{animation-play-state:paused}
+
+/* ══════════════════════════════════════════════════════════
+   PLAYER FIXO
+══════════════════════════════════════════════════════════ */
+.player-fixo{
+  position:fixed;bottom:0;left:0;right:0;z-index:800;
+  background:rgba(15,45,26,0.98);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(200,168,75,.15);
+  height:var(--player-h);
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;padding:0 24px;gap:16px;
+  transform:translateY(100%);
+  transition:transform .35s var(--ease-out);
+}
+.player-fixo.show{transform:translateY(0)}
+
+.player-info{
+  display:flex;align-items:center;gap:14px;min-width:0;
+}
+.player-thumb{
+  width:44px;height:44px;background:rgba(200,168,75,.12);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;border:1px solid rgba(200,168,75,.2);
+}
+.player-meta{min-width:0}
+.player-nome{
+  font-size:13px;color:rgba(255,253,249,.9);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:200px;
+}
+.player-artista{font-size:11px;color:rgba(232,201,106,.5);margin-top:2px}
+
+.player-centro{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  min-width:280px;
+}
+.player-controles{display:flex;align-items:center;gap:16px}
+.player-btn{
+  background:none;border:none;cursor:pointer;
+  color:rgba(255,253,249,.5);padding:4px;
+  transition:color .2s;display:flex;align-items:center;
+}
+.player-btn:hover{color:rgba(255,253,249,.95)}
+.player-btn.btn-play{
+  width:38px;height:38px;border-radius:50%;border:1.5px solid var(--ouro);
+  justify-content:center;color:var(--ouro-claro);transition:all .2s;
+}
+.player-btn.btn-play:hover{background:var(--ouro);color:var(--verde)}
+.player-barra{
+  display:flex;align-items:center;gap:10px;width:100%;
+}
+.player-tempo{
+  font-size:11px;color:rgba(255,253,249,.4);
+  font-variant-numeric:tabular-nums;min-width:34px;text-align:center;
+}
+.player-progress{
+  flex:1;height:4px;background:rgba(255,253,249,.15);
+  position:relative;cursor:pointer;border-radius:2px;
+  transition:height .1s;
+}
+.player-progress:hover{height:6px}
+.player-progress-fill{
+  height:100%;background:var(--ouro);border-radius:inherit;
+  pointer-events:none;transition:width .1s linear;
+}
+.player-progress::after{
+  content:'';position:absolute;right:calc(100% - var(--pct,0%) );
+  top:50%;transform:translate(50%,-50%);
+  width:12px;height:12px;border-radius:50%;background:var(--ouro);
+  opacity:0;transition:opacity .15s;
+}
+.player-progress:hover::after{opacity:1}
+
+.player-direita{
+  display:flex;align-items:center;justify-content:flex-end;gap:12px;
+}
+.player-vol-wrap{display:flex;align-items:center;gap:8px}
+.player-vol{
+  width:80px;height:4px;background:rgba(255,253,249,.15);
+  position:relative;cursor:pointer;border-radius:2px;
+}
+.player-vol:hover{height:6px;transition:height .1s}
+.player-vol-fill{
+  height:100%;background:rgba(255,253,249,.5);border-radius:inherit;
+  pointer-events:none;
+}
+.btn-fechar-player{
+  background:none;border:none;cursor:pointer;
+  color:rgba(255,253,249,.3);padding:4px;transition:color .2s;
+}
+.btn-fechar-player:hover{color:rgba(255,253,249,.75)}
+
+/* ══════════════════════════════════════════════════════════
+   SORTEIOS
+══════════════════════════════════════════════════════════ */
+.sorteio-card{
+  background:var(--painel);border:1px solid var(--borda);
+  padding:28px;position:relative;margin-bottom:20px;
+  box-shadow:var(--sombra-card);
+}
+.sorteio-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--ouro),transparent);
+}
+.sorteio-status{
+  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--ouro-escuro);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;font-weight:600;
+}
+.sorteio-status::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--ouro-escuro);flex-shrink:0;
+  animation:pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.sorteio-titulo{
+  font-family:'Lora',serif;font-size:22px;font-weight:400;margin-bottom:4px;color:var(--tinta);
+}
+.sorteio-premios{font-size:13px;color:var(--t2);margin-bottom:24px;line-height:1.6}
+.cotas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.cota-item{
+  padding:16px;background:var(--creme);border:1px solid var(--borda);
+  text-align:center;
+}
+.cota-num{
+  font-family:'Lora',serif;font-size:27px;font-weight:600;
+  color:var(--verde-medio);line-height:1;
+}
+.cota-label{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--t3);margin-top:5px}
+.entry-linha{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--borda2);font-size:13px;
+}
+.entry-linha:last-of-type{border-bottom:none}
+.entry-chave{color:var(--t3)}
+.entry-val{color:var(--t1)}
+.entry-val.ok{color:var(--ok)}
+.entry-val.pendente{color:var(--ouro-escuro)}
+.btn-validar{
+  padding:12px 24px;background:var(--verde-medio);color:var(--branco);border:none;
+  font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;letter-spacing:.5px;
+  cursor:pointer;transition:background .2s;margin-top:16px;
+}
+.btn-validar:hover{background:var(--verde)}
+.btn-validar:disabled{opacity:.4;cursor:not-allowed}
+.dep-form{display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--borda)}
+.dep-form.show{display:block;animation:fadeUp .25s var(--ease-out)}
+.dep-textarea{
+  width:100%;padding:12px 14px;background:var(--creme);
+  border:1px solid var(--borda);color:var(--tinta);
+  font-family:'Poppins',sans-serif;font-size:14px;outline:none;
+  resize:vertical;min-height:100px;line-height:1.7;
+  transition:border-color .2s;margin-bottom:12px;
+}
+.dep-textarea:focus{border-color:var(--ouro);background:var(--painel)}
+.redes-check{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.rede-btn{
+  padding:7px 14px;border:1px solid var(--borda);background:transparent;
+  color:var(--t3);font-family:'Poppins',sans-serif;font-size:11px;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;user-select:none;
+}
+.rede-btn.on{border-color:var(--ouro-escuro);color:var(--ouro-escuro);background:rgba(200,168,75,.08)}
+.contador-palavras{font-size:11px;color:var(--t3);margin-bottom:12px}
+
+/* Histórico de vencedores */
+.vencedores-lista{margin-top:24px}
+.vencedor-row{
+  display:flex;align-items:center;gap:16px;padding:14px 0;
+  border-bottom:1px solid var(--borda2);
+}
+.vencedor-pos{
+  width:28px;height:28px;border:1px solid var(--ouro-escuro);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Lora',serif;font-size:14px;color:var(--ouro-escuro);flex-shrink:0;
+}
+.vencedor-info{flex:1;min-width:0}
+.vencedor-nome{font-size:14px;color:var(--t1)}
+.vencedor-data{font-size:11px;color:var(--t3)}
+.vencedor-premio{font-size:12px;color:var(--ouro-escuro);text-align:right;flex-shrink:0}
+
+/* ══════════════════════════════════════════════════════════
+   EXTRATO
+══════════════════════════════════════════════════════════ */
+.extrato-tabela{border:1px solid var(--borda2);background:var(--painel)}
+.extrato-linha{
+  display:grid;grid-template-columns:1fr auto auto;gap:20px;align-items:center;
+  padding:16px 20px;border-bottom:1px solid var(--borda2);
+  transition:background .15s;
+}
+.extrato-linha:last-child{border-bottom:none}
+.extrato-linha:hover{background:rgba(200,168,75,.04)}
+.extrato-produto{font-size:14px;color:var(--t1);margin-bottom:3px}
+.extrato-data{font-size:11px;color:var(--t3);letter-spacing:.4px}
+.extrato-metodo{
+  font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  padding:4px 10px;border:1px solid var(--borda);color:var(--t3);
+}
+.extrato-valor{
+  font-family:'Lora',serif;font-size:18px;font-weight:600;
+  color:var(--ouro-escuro);text-align:right;
+}
+.extrato-detalhe{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.badge-status{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border:1px solid}
+.badge-status.approved{border-color:rgba(63,143,95,.4);color:var(--ok)}
+.badge-status.pending{border-color:rgba(200,168,75,.5);color:var(--ouro-escuro)}
+.badge-status.rejected{border-color:rgba(194,90,78,.4);color:var(--erro)}
+.badge-status.refunded,.badge-status.cancelled{border-color:var(--borda);color:var(--t3)}
+.extrato-resumo{
+  margin-top:20px;padding:16px 20px;
+  border:1px solid var(--borda2);background:var(--painel);
+  display:flex;gap:32px;flex-wrap:wrap;
+}
+.resumo-item{}
+.resumo-label{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--t3)}
+.resumo-val{
+  font-family:'Lora',serif;font-size:22px;color:var(--verde-medio);margin-top:4px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ASSINATURA
+══════════════════════════════════════════════════════════ */
+.plano-card{
+  background:var(--painel);border:1px solid var(--borda);
+  padding:32px;position:relative;box-shadow:var(--sombra-card);
+}
+.plano-card::before{
+  content:'';display:block;width:40px;height:2px;background:var(--ouro);margin-bottom:24px;
+}
+.plano-nome{
+  font-family:'Lora',serif;font-size:26px;font-weight:400;color:var(--tinta);
+  margin-bottom:4px;
+}
+.plano-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;letter-spacing:1.8px;text-transform:uppercase;
+  padding:4px 12px;border:1px solid;margin-bottom:24px;
+}
+.plano-badge.ativo{border-color:rgba(63,143,95,.4);color:var(--ok)}
+.plano-badge.pausado{border-color:rgba(200,168,75,.5);color:var(--ouro-escuro)}
+.plano-badge.cancelado{border-color:var(--borda);color:var(--t3)}
+.plano-badge.sem-plano{border-color:var(--borda);color:var(--t3)}
+.plano-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.plano-detalhes{margin-top:20px;border-top:1px solid var(--borda)}
+.plano-beneficios{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;
+}
+.beneficio-item{
+  padding:14px;background:var(--creme);border:1px solid var(--borda2);
+  font-size:13px;color:var(--t2);line-height:1.5;
+}
+.beneficio-item strong{color:var(--t1);display:block;margin-bottom:4px;font-size:12px;letter-spacing:.5px}
+.plano-acao{
+  display:inline-flex;align-items:center;gap:8px;margin-top:8px;
+  padding:12px 24px;background:var(--verde-medio);color:var(--branco);
+  text-decoration:none;font-size:12px;font-weight:500;letter-spacing:.5px;
+  transition:background .2s;
+}
+.plano-acao:hover{background:var(--verde)}
+
+/* ══════════════════════════════════════════════════════════
+   UTILITÁRIOS
+══════════════════════════════════════════════════════════ */
+.vazio{padding:64px 28px;text-align:center}
+.vazio-icone{
+  width:60px;height:60px;border:1px solid var(--borda);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:26px;opacity:.5;color:var(--t3);
+}
+.vazio-titulo{
+  font-family:'Lora',serif;font-size:19px;font-weight:400;
+  color:var(--t2);margin-bottom:8px;
+}
+.vazio-texto{font-size:13px;color:var(--t3);line-height:1.7}
+.vazio-link{
+  display:inline-block;margin-top:20px;padding:10px 24px;
+  background:var(--verde-medio);color:var(--branco);text-decoration:none;
+  font-size:12px;font-weight:500;transition:background .2s;letter-spacing:.5px;
+}
+.vazio-link:hover{background:var(--verde)}
+.loading{
+  display:flex;align-items:center;justify-content:center;
+  padding:60px;flex-direction:column;gap:16px;
+}
+.loading-spinner{
+  width:26px;height:26px;border:2px solid rgba(200,168,75,.25);
+  border-top-color:var(--ouro-escuro);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:11px;color:var(--t3);letter-spacing:2px;text-transform:uppercase}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:calc(var(--player-h) + 16px);right:24px;
+  padding:13px 22px;background:var(--verde);
+  border:1px solid var(--ouro);color:rgba(255,253,249,.92);font-size:13px;
+  z-index:2000;border-radius:2px;max-width:340px;
+  box-shadow:0 12px 32px rgba(15,45,26,.25);
+  transform:translateY(20px);opacity:0;transition:all .35s var(--ease-out);
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.erro{border-color:rgba(194,90,78,.7);background:#3a1f1a;color:#f0b8ae}
+
+/* ══════════════════════════════════════════════════════════
+   ANIMAÇÕES
+══════════════════════════════════════════════════════════ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.fade-in{animation:fadeUp .4s var(--ease-out) both}
+.fade-in:nth-child(1){animation-delay:.03s}
+.fade-in:nth-child(2){animation-delay:.07s}
+.fade-in:nth-child(3){animation-delay:.11s}
+.fade-in:nth-child(4){animation-delay:.15s}
+.fade-in:nth-child(5){animation-delay:.19s}
+.fade-in:nth-child(6){animation-delay:.23s}
+.fade-in:nth-child(7){animation-delay:.27s}
+.fade-in:nth-child(8){animation-delay:.31s}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+@media(max-width:960px){
+  nav{padding:0 20px}
+  .dash-header,.abas,.aba-conteudo{padding-left:20px;padding-right:20px}
+  .stats-row{flex-wrap:wrap}
+  .stat-item{min-width:50%}
+  .biblioteca-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:20px 14px}
+  .player-fixo{padding:0 16px;grid-template-columns:1fr auto}
+  .player-info{min-width:0}
+  .player-centro{min-width:0;flex:1}
+  .player-direita{display:none}
+  .cotas-grid{grid-template-columns:1fr 1fr}
+  .plano-beneficios{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .abas{padding:0 12px}
+  .aba{font-size:10px;padding:12px 14px;letter-spacing:1.5px}
+  .aba-conteudo{padding:24px 16px}
+  .dash-header{padding:24px 16px}
+  .stats-row .stat-item{min-width:100%}
+  .cotas-grid{grid-template-columns:1fr 1fr}
+  .biblioteca-grid{grid-template-columns:repeat(2,1fr);gap:20px 10px}
+  .player-nome{max-width:140px}
+  .musica-row{grid-template-columns:36px 30px 1fr auto;gap:0 10px;padding:12px 14px}
+  .extrato-linha{grid-template-columns:1fr auto}
+  .extrato-valor{grid-column:1/-1;text-align:left}
+}
+@media(max-width:380px){
+  .biblioteca-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .dash-titulo{font-size:24px}
+}
+
+</style>
+<script id="tt-textos">window.TT_LANG="en";window.TT_TEXTOS={"js.ac.baixar.epub":"Download the EPUB file","js.ac.baixar.pdf":"Download the PDF file","js.ac.email.invalido":"Please enter a valid email address.","js.ac.entrando":"Signing in…","js.ac.entrar":"Sign in","js.ac.enviando":"Sending…","js.ac.erro.carregar":"Couldn’t load","js.ac.erro.leitura":"Couldn’t open this book.","js.ac.erro.link":"We couldn’t send the link right now. Please try again in a moment.","js.ac.erro.login":"We couldn’t sign you in right now. Please try again.","js.ac.ler":"Read now","js.ac.link":"Email me a sign-in link","js.ac.link.ok":"Link sent! Check your email and click the link to sign in.<br><small style=\"opacity:.6\">It can take up to 2 minutes. Check your spam folder.</small>","js.ac.nema":"Nema points","js.ac.nema.pendente":"Nema points · + {n} released within 7 days","js.ac.plano.ativa":"Active","js.ac.plano.membro":"Free member","js.ac.plano.sem":"No plan","js.ac.recarregue":"Please reload the page.","js.ac.remover":"Remove from library","js.ac.sem.acesso":"This title isn’t in your account.","js.ac.sem.titulo":"Title unavailable","js.ac.senha.errada":"Wrong email or password.","js.ac.senha.vazia":"Enter your password, or get a sign-in link by email.","js.cad.botao":"Create my free member area →","js.cad.criando":"Creating…","js.cad.email":"Your best email","js.cad.erro.conexao":"No connection. Check your internet and try again.","js.cad.erro.email":"Please check the email address.","js.cad.erro.geral":"We couldn’t create it right now. Please try again in a moment.","js.cad.erro.tentativas":"Too many attempts in a row. Please wait a few minutes and try again.","js.cad.fechar":"Close","js.cad.fino":"No password: we email you a sign-in link.","js.cad.fino.intl":"No password: we email you a sign-in link. We never share your email.","js.cad.kicker":"Free · no card needed","js.cad.mala":"Send me new releases and news by email","js.cad.nome":"Your name","js.cad.ok":"Done! We sent the sign-in link to {email}.<br>Open the email and your member area will be ready. Check your spam folder if it doesn’t arrive within 2 minutes.","js.cad.sub":"Choose a public-domain classic of English literature and read it in our reader, with your place always saved.","js.cad.titulo":"Create your free member area","js.carregando":"Loading","js.erro.conexao":"Can’t reach the server. Check your internet and try again.","js.erro.sessao":"Your session has expired. Please sign in again to keep reading.","js.estante.dica":"Start with one of our readers’ favorites: {titulos}.","js.estante.filtro":"Filter by genre","js.estante.obra1":"1 book","js.estante.obras":"{n} books","js.estante.outros":"Other","js.estante.paginas":"{n} pages","js.estante.seculo":"{n} century","js.estante.sobre":"About the book","js.estante.todos":"All","js.estante.vazia":"We’re still arranging this shelf. Please come back soon.","js.faq":[{"q":"What is the free member area?","r":"It’s your personal space at Três Trevo. You create it with just your email — no password and no card — and use it to read a public-domain classic in our reader."},{"q":"Which books can I read?","r":"Great classics of English literature that are in the public domain. You choose one from the shelf in your member area."},{"q":"Why one classic at a time?","r":"Your free membership includes one reading space. When you finish a book, tap “Finish and switch” and choose the next one."},{"q":"Does it work on my phone?","r":"Yes. The reader adapts to any screen, with large type, night mode and your place saved wherever you stop."},{"q":"Are your own books available in English?","r":"Not yet. Our English editions are on their way, and they will appear in your member area as soon as they are published."},{"q":"What is Nema?","r":"Our loyalty program. Once our English editions arrive, 10% of every purchase comes back as Nema, which becomes a discount on your next book. The full rules are on the Nema page."}],"js.gratis.carregando":"Loading… please try again in a moment.","js.leitor.abrindo":"Opening the book…","js.leitor.abrir.pdf":"Open the PDF","js.leitor.ajustes":"Reading settings","js.leitor.ajustes.dica":"Text size and night mode","js.leitor.anterior":"Previous","js.leitor.cap.anterior":"Previous chapter","js.leitor.cap.proximo":"Next chapter","js.leitor.colofao":"Três Trevo · digital edition<br>Thank you for reading with us.","js.leitor.concluir":"Finish","js.leitor.dia":"Day","js.leitor.erro.ajuda":"If it keeps happening, write to sac@3trevo.com.br","js.leitor.erro.titulo":"We couldn’t open the book","js.leitor.fechar":"Close","js.leitor.fechar.livro":"Close the book","js.leitor.fim.conhecer":"Learn more","js.leitor.fim.mesmo.autor":"By the same author","js.leitor.fim.reler":"Read again from the start","js.leitor.fim.sobre":"You’ve reached the end of","js.leitor.fim.voltar":"Back to the library","js.leitor.ilegivel":"The book file couldn’t be read.","js.leitor.lento":"The book is taking a while to load. Your connection may be slow.","js.leitor.maior":"Larger text","js.leitor.menor":"Smaller text","js.leitor.modo":"Mode","js.leitor.noite":"Night","js.leitor.pdf.celular":"This title is a PDF. It opens in your device’s PDF viewer.","js.leitor.proximo":"Next","js.leitor.sem.formato":"No readable format is available.","js.leitor.tentar":"Try again","js.leitor.texto":"Text","js.leitor.trilha":"Listen to the book’s soundtrack","js.marca":"Três Trevo","js.membro.amostra.completo":"Full book · your purchase earns Nema","js.membro.amostra.gostou":"Enjoyed the chapter?","js.membro.amostra.ler":"Read chapter 1","js.membro.amostra.ler.completo":"Read the full book","js.membro.amostra.secao":"Free sample","js.membro.amostra.selo":"Free sample","js.membro.classico.secao":"Your free classic","js.membro.comecar":"Start reading","js.membro.continuar":"Continue","js.membro.erro.abrir":"We couldn’t open the classic right now. Please try again in a moment.","js.membro.erro.escolher":"We couldn’t save your choice. Please try again.","js.membro.erro.liberar":"We couldn’t free the space right now. Please try again.","js.membro.escolha":"Choose a classic for your reading space. You read one at a time and can switch when you finish.","js.membro.escolher":"Choose this one","js.membro.escolhido":"“{titulo}” is now in your reading space.","js.membro.espaco":"1 reading space","js.membro.fim.nema":"Your first purchase earns Nema","js.membro.fim.nema.intl":"When they arrive, every purchase earns Nema","js.membro.fim.rotulo":"From Três Trevo","js.membro.fim.titulo":"Discover our books","js.membro.fim.titulo.intl":"Our English editions are on their way","js.membro.intro":"Choose a classic and read it in our reader, with your place always saved.","js.membro.intro.pt":"Choose a classic and read it in our reader, with your place always saved.","js.membro.lido":"{n}% read","js.membro.nota":"Free members read one classic at a time.","js.membro.nota.intl":"Free members read one classic at a time and can switch when they finish.","js.membro.rotulo":"Free member","js.membro.seu.classico":"Your classic","js.membro.titulo":"Your reading room at Três Trevo","js.membro.trocar":"Finish and switch","js.membro.trocar.confirma":"Finish this classic and free the space for another one?","js.nema.aria":"Nema, the Três Trevo loyalty program","js.nema.catalogo":"See the catalog","js.nema.como":"How Nema works","js.nema.rotulo":"Nema · loyalty points","js.nema.texto":"Once our English editions arrive, 10% of every e-book you buy comes back to you as Nema, and your balance becomes a discount on your next book (up to half the price), released 7 days after the purchase.","js.nema.titulo":"Nema: your reading pays you back"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
+<link rel="canonical" href="https://3trevo.com.br/en/area-cliente.html">
+<link rel="alternate" hreflang="pt-BR" href="https://3trevo.com.br/area-cliente.html">
+<link rel="alternate" hreflang="en" href="https://3trevo.com.br/en/area-cliente.html">
+<link rel="alternate" hreflang="es" href="https://3trevo.com.br/es/area-cliente.html">
+<link rel="alternate" hreflang="x-default" href="https://3trevo.com.br/area-cliente.html">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/en/" class="nav-marca" data-i18n="ac.marca">Três Trevo Publishing</a>
+  <div data-tt-idiomas class="nav-idiomas" aria-label="Language" data-i18n-attr="aria-label:nav.idioma"><a href="/area-cliente.html" hreflang="pt-BR" lang="pt-BR">PT<span class="tt-idiomas-nome"> · Português</span></a><a href="/en/area-cliente.html" hreflang="en" lang="en" aria-current="true" class="ativo">EN<span class="tt-idiomas-nome"> · English</span></a><a href="/es/area-cliente.html" hreflang="es" lang="es">ES<span class="tt-idiomas-nome"> · Español</span></a></div>
+  <div class="nav-right" id="navRight" style="display:none">
+    <span class="nav-user" id="navEmail"></span>
+    <button class="btn-sair" onclick="sair()" data-i18n="ac.sair">Sign out</button>
+  </div>
+</nav>
+
+<!-- ══ TELA: LOGIN ══ -->
+<div id="tela-login" class="tela ativa">
+  <div class="login-box">
+    <div class="login-logo">✦ Três Trevo</div>
+    <p class="login-sub" data-i18n="ac.login.sub">Open your personal library. New here? Choose “Email me a sign-in link” and your free member area is created on the spot.</p>
+    <label class="campo-label" for="emailLogin" data-i18n="ac.login.email">Email</label>
+    <input type="email" id="emailLogin" class="campo-input" data-i18n-attr="placeholder:ac.login.email.ph" placeholder="you@email.com"
+      autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('senhaLogin').focus()">
+    <label class="campo-label" for="senhaLogin" data-i18n="ac.login.senha">Password</label>
+    <div class="campo-senha-wrap">
+      <input type="password" id="senhaLogin" class="campo-input" placeholder="••••••••"
+        autocomplete="current-password" onkeydown="if(event.key==='Enter')entrarComSenha()">
+      <button class="senha-toggle" type="button" onclick="toggleSenha()" data-i18n-attr="title:ac.login.ver.senha" title="Show or hide password">👁</button>
+    </div>
+    <button class="btn-primario" id="btnSenha" onclick="entrarComSenha()" data-i18n="ac.login.entrar">Sign in</button>
+    <div class="login-divider"><span data-i18n="ac.login.ou">or</span></div>
+    <button class="btn-secundario" id="btnMagic" onclick="enviarMagicLink()" data-i18n="ac.login.link">Email me a sign-in link</button>
+    <p class="login-msg" id="msgLogin"></p>
+    <div class="login-voltar"><a href="/en/" data-i18n="ac.login.voltar">← Back to the website</a></div>
+  </div>
+</div>
+
+<!-- ══ TELA: DASHBOARD ══ -->
+<div id="tela-dashboard" class="tela" style="display:none">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="dash-saudacao" data-i18n="ac.conta">My account</div>
+    <h1 class="dash-titulo" data-i18n-html="ac.titulo">My <em>library</em></h1>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    
+    
+    <div class="stat-item">
+      <div class="stat-num" id="statNema">—</div>
+      <div class="stat-label" id="statNemaLabel" data-i18n="ac.stat.nema">Nema points</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statStatus">—</div>
+      <div class="stat-label" data-i18n="ac.stat.plano">Plan</div>
+    </div>
+  </div>
+
+  <!-- Abas -->
+  
+
+  <!-- ── ABA: BIBLIOTECA ── -->
+  <div id="aba-biblioteca" class="aba-conteudo ativa" role="tabpanel">
+    <div class="sec-titulo" data-i18n="ac.meus">My books</div>
+    <div id="listaEbooks">
+      <div class="loading"><div class="loading-spinner"></div><span class="loading-txt" data-i18n="ac.carregando">Loading</span></div>
+    </div>
+
+    <!-- Biblioteca Clássica TT — exibido por carregarBiblioteca() só quando há ebook na conta -->
+    
+  </div>
+
+  <!-- ── ABA: MÚSICAS ── -->
+  
+
+  <!-- ── ABA: EXTRATO ── -->
+  
+
+  <!-- ── ABA: ASSINATURA ── -->
+  
+
+  <!-- ── ABA: PLANILHA VIVA ── -->
+  
+
+</div><!-- /tela-dashboard -->
+
+<!-- Player de música: js/player.js injeta seu próprio widget fixo (#tt-player) -->
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert"></div>
+
+<!-- Leitor: js/leitor.js monta o próprio #tela-leitura ao abrir um livro -->
+
+<script src="/js/supabase-client.js?v=33db0afb"></script>
+
+<script src="/js/leitor.js?v=56ae9591"></script>
+<script src="/js/estante.js?v=fc77c52c"></script>
+<script src="/js/membro.js?v=720de1fb"></script>
+<script>
+// ============================================================
+// ÁREA DO CLIENTE — Editora Três Trevo
+// v4.0 — Production-ready
+// ============================================================
+
+let usuarioAtual   = null;
+let abasCarregadas = {};
+let toastTimer     = null;
+
+// ── INIT ──────────────────────────────────────────────────
+async function init() {
+  // Supabase PKCE: trocar token_hash do magic link pela sessão
+  const params = new URLSearchParams(window.location.search);
+  const tokenHash = params.get('token_hash');
+  const tokenType = params.get('type');
+  if (tokenHash) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    const { data, error } = await sb.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: tokenType === 'recovery' ? 'recovery' : 'email'
+    });
+    if (!error && data.session) {
+      usuarioAtual = data.user;
+      mostrarDashboard();
+      return;
+    }
+  }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    usuarioAtual = session.user;
+    mostrarDashboard();
+  }
+
+  sb.auth.onAuthStateChange((_e, session) => {
+    if (session && !usuarioAtual) {
+      usuarioAtual = session.user;
+      mostrarDashboard();
+    } else if (!session && usuarioAtual) {
+      usuarioAtual = null;
+      location.reload();
+    }
+  });
+}
+
+// ── LOGIN ─────────────────────────────────────────────────
+function emailValido() {
+  const email = document.getElementById('emailLogin').value.trim();
+  const msg   = document.getElementById('msgLogin');
+  if (!email || !email.includes('@')) {
+    msg.textContent = T('js.ac.email.invalido');
+    msg.className = 'login-msg erro';
+    return null;
+  }
+  return email;
+}
+
+async function entrarComSenha() {
+  const email = emailValido();
+  if (!email) return;
+  const senha = document.getElementById('senhaLogin').value;
+  const btn   = document.getElementById('btnSenha');
+  const msg   = document.getElementById('msgLogin');
+  if (!senha) {
+    msg.textContent = T('js.ac.senha.vazia');
+    msg.className = 'login-msg erro';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = T('js.ac.entrando');
+  const { error } = await sb.auth.signInWithPassword({ email, password: senha });
+  btn.disabled = false;
+  btn.textContent = T('js.ac.entrar');
+  if (error) {
+    msg.textContent = error.message.includes('Invalid login') ? T('js.ac.senha.errada') : T('js.ac.erro.login');
+    msg.className = 'login-msg erro';
+  }
+}
+
+async function enviarMagicLink() {
+  const email = emailValido();
+  if (!email) return;
+  const btn = document.getElementById('btnMagic');
+  const msg = document.getElementById('msgLogin');
+  btn.disabled = true;
+  btn.textContent = T('js.ac.enviando');
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.origin + window.location.pathname, data: { idioma: window.TT_LANG || 'pt' } }
+  });
+  btn.disabled = false;
+  btn.textContent = T('js.ac.link');
+  if (error) {
+    msg.textContent = /rate|limit|429/i.test(error.message) ? T('js.cad.erro.tentativas') : T('js.ac.erro.link');
+    msg.className = 'login-msg erro';
+  } else {
+    msg.innerHTML = '✦ ' + T('js.ac.link.ok');
+    msg.className = 'login-msg sucesso';
+  }
+}
+
+function toggleSenha() {
+  const campo = document.getElementById('senhaLogin');
+  campo.type = campo.type === 'password' ? 'text' : 'password';
+}
+
+async function sair() {
+  if (window.TTPlayer) TTPlayer.fechar();
+  await sb.auth.signOut();
+  usuarioAtual = null;
+  abasCarregadas = {};
+  document.getElementById('tela-dashboard').style.display = 'none';
+  document.getElementById('tela-login').className = 'tela ativa';
+  document.getElementById('tela-login').style.display = '';
+  document.getElementById('navRight').style.display = 'none';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function mostrarDashboard() {
+  document.getElementById('tela-login').style.display = 'none';
+  document.getElementById('tela-dashboard').style.display = 'block';
+  document.getElementById('navRight').style.display = 'flex';
+  document.getElementById('navEmail').textContent = usuarioAtual.email;
+  carregarBiblioteca();
+  carregarStats();
+}
+
+// ── ABAS ──────────────────────────────────────────────────
+function trocarAba(id, btn) {
+  document.querySelectorAll('.aba').forEach(b => {
+    b.classList.remove('ativa');
+    b.setAttribute('aria-selected', 'false');
+  });
+  document.querySelectorAll('.aba-conteudo').forEach(c => c.classList.remove('ativa'));
+  btn.classList.add('ativa');
+  btn.setAttribute('aria-selected', 'true');
+  const painel = document.getElementById('aba-' + id);
+  painel.classList.add('ativa');
+
+  if (!abasCarregadas[id]) {
+    abasCarregadas[id] = true;
+    if (id === 'musicas')    carregarMusicas();
+    if (id === 'sorteios')   carregarSorteios();
+    if (id === 'extrato')    carregarExtrato();
+    if (id === 'assinatura') carregarAssinatura();
+  }
+  if (id === 'planilhaviva') carregarPlanilhaViva();
+}
+
+// ── STATS ─────────────────────────────────────────────────
+async function carregarStats() {
+  const [libRes, cotasRes, subRes, musicasRes] = await Promise.all([
+    sb.from('user_library')
+      .select('id, product_id')
+      .eq('user_id', usuarioAtual.id),
+    sb.from('draw_entries')
+      .select('cotas_base, cotas_bonus')
+      .eq('user_id', usuarioAtual.id),
+    sb.from('subscriptions')
+      .select('status')
+      .eq('user_id', usuarioAtual.id)
+      .eq('status', 'active')
+      .limit(1),
+    sb.from('musicas')
+      .select('id, produto_id, gratuita')
+      .eq('ativo', true),
+  ]);
+
+  const lib     = libRes.data  || [];
+  const ebooks  = lib.length;
+  const libProductIds = new Set(lib.map(l => l.product_id));
+  const musicas = (musicasRes.data || []).filter(m => m.gratuita || (m.produto_id && libProductIds.has(m.produto_id))).length;
+  const cotas   = (cotasRes.data || []).reduce((s, e) => s + (e.cotas_base || 0) + (e.cotas_bonus || 0), 0);
+  const hasSub  = (subRes.data  || []).length > 0;
+
+  animarNum('statEbooks',  ebooks);
+  animarNum('statMusicas', musicas);
+  carregarNema();
+  document.getElementById('statStatus').textContent = hasSub ? T('js.ac.plano.ativa') : (ebooks === 0 ? T('js.ac.plano.membro') : T('js.ac.plano.sem'));
+}
+
+// Nema: saldo vem do worker (as regras ficam no banco). Disponível = pode usar no checkout.
+async function carregarNema() {
+  const el = document.getElementById('statNema');
+  const lbl = document.getElementById('statNemaLabel');
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/nema/saldo', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+    });
+    const d = await r.json();
+    if (!d.ok) { el.textContent = '—'; return; }
+    const pts = (v) => (Number(v) || 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+    el.textContent = pts(d.disponivel);
+    lbl.textContent = Number(d.pendente) > 0
+      ? T('js.ac.nema.pendente', { n: pts(d.pendente) })
+      : T('js.ac.nema');
+  } catch (e) {
+    el.textContent = '—';
+  }
+}
+
+function animarNum(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let cur = 0;
+  const step = Math.max(1, Math.ceil(target / 20));
+  const t = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur;
+    if (cur >= target) clearInterval(t);
+  }, 40);
+}
+
+// ══════════════════════════════════════════════════════════
+// BIBLIOTECA (EBOOKS)
+// ══════════════════════════════════════════════════════════
+async function carregarBiblioteca() {
+  const cont = document.getElementById('listaEbooks');
+  cont.innerHTML = skeletonCards(4);
+
+  const { data: lib, error } = await sb
+    .from('user_library')
+    .select('id, liberado_em, produto:product_id(id, slug, tipo, titulo, autor, genero, cotas, capa_url, arquivo_url, epub_url)')
+    .eq('user_id', usuarioAtual.id)
+    .order('liberado_em', { ascending: false });
+
+  if (error) {
+    cont.innerHTML = vazioCont('⚠', T('js.ac.erro.carregar'), T('js.ac.recarregue'));
+    return;
+  }
+
+  const ebooks = lib || [];
+  produtosBiblioteca = ebooks.map(l => l.produto).filter(Boolean);
+  const banner = document.getElementById('bannerClassicos');
+  if (banner) banner.hidden = ebooks.length === 0;
+
+  // Conta sem compra = membro grátis: amostra, 1 clássico e o cartão do Nema (js/membro.js).
+  if (ebooks.length === 0 && window.TTMembro) {
+    TTMembro.renderizar(cont);
+    return;
+  }
+
+  if (ebooks.length === 0) {
+    cont.innerHTML = `<div class="vazio">
+      <div class="vazio-icone">📚</div>
+      <div class="vazio-titulo">Biblioteca vazia</div>
+      <p class="vazio-texto">Você ainda não tem ebooks.<br>Adquira um título e ele aparecerá aqui.</p>
+      <a href="/#catalogo" class="vazio-link">Ver catálogo →</a>
+    </div>`;
+    return;
+  }
+
+  // Agrupar por gênero para carrossel
+  const porGenero = {};
+  ebooks.forEach(l => {
+    const p   = l.produto || {};
+    const meta = CATALOGO[p.slug] || {};
+    const gen  = p.genero || meta.genero || 'Ebooks';
+    if (!porGenero[gen]) porGenero[gen] = [];
+    porGenero[gen].push({ l, p, meta });
+  });
+
+  const generos = Object.keys(porGenero);
+
+  // Se só um gênero ou poucos itens, usar grid direto
+  if (ebooks.length <= 6) {
+    cont.innerHTML = `<div class="biblioteca-grid">${ebooks.map((l, i) => {
+      const p = l.produto || {};
+      const meta = CATALOGO[p.slug] || {};
+      return cardEbook(p, meta, i, l.id);
+    }).join('')}</div>`;
+    return;
+  }
+
+  // Com carrossel por gênero
+  cont.innerHTML = generos.map(gen => {
+    const items = porGenero[gen];
+    return `<div class="secao-wrapper">
+      <div class="secao-header">
+        <div class="secao-nome">${gen}</div>
+      </div>
+      ${items.length > 4
+        ? `<div class="carrossel-wrap"><div class="carrossel">${items.map(({ l, p, meta }, i) => cardEbook(p, meta, i, l.id)).join('')}</div></div>`
+        : `<div class="biblioteca-grid">${items.map(({ l, p, meta }, i) => cardEbook(p, meta, i, l.id)).join('')}</div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+// A extensão real decide o formato, não a coluna — arquivo_url historicamente guarda
+// o "arquivo principal" e nem sempre é PDF (vários títulos têm só EPUB nesse campo).
+function temFormato(p, ext) {
+  const termina = (v) => (v || '').toLowerCase().endsWith('.' + ext);
+  return termina(p.arquivo_url) || termina(p.epub_url);
+}
+
+// Ícones distintos por formato — página com dobra (PDF, layout fixo) vs livro
+// aberto (EPUB, texto fluido). Antes os dois botões usavam o mesmo glifo genérico.
+function iconeFormato(formato) {
+  if (formato === 'epub') {
+    return '<svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M8 3.2c-1.1-.9-2.7-1.3-4.5-1.3a.5.5 0 00-.5.5v9.4c0 .28.22.5.5.5 1.5 0 3.1.35 4.13 1.13a.6.6 0 00.74 0C9.4 12.65 11 12.3 12.5 12.3a.5.5 0 00.5-.5V2.4a.5.5 0 00-.5-.5c-1.8 0-3.4.4-4.5 1.3z"/><path d="M8 3.2v9.9" fill="none" stroke="#f0ebe0" stroke-width=".9"/></svg>';
+  }
+  return '<svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor"><path d="M3.5 1A1.5 1.5 0 002 2.5v11A1.5 1.5 0 003.5 15h9a1.5 1.5 0 001.5-1.5V5.41a1.5 1.5 0 00-.44-1.06L10.15 1.44A1.5 1.5 0 009.09 1H3.5z"/><path d="M9.5 1.15V4a1 1 0 001 1h2.85" fill="none" stroke="#f0ebe0" stroke-width="1"/></svg>';
+}
+
+const PALETA_CAPA = [['#1e5c3a', '#0f2d1a'], ['#2a6b42', '#13361f'], ['#3d4f2a', '#1b2614']];
+function escHtml(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function capaTipografica(titulo, autor, slug) {
+  let h = 0;
+  for (const ch of String(slug || titulo)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const [a, b] = PALETA_CAPA[h % PALETA_CAPA.length];
+  return `<div class="capa-tipo" style="--capa-a:${a};--capa-b:${b}">
+    <span><span class="capa-tipo-titulo">${escHtml(titulo)}</span><span class="capa-tipo-filete"></span>
+    <span class="capa-tipo-autor">${escHtml(autor)}</span></span>
+    <span class="capa-tipo-selo">✦ Três Trevo</span>
+  </div>`;
+}
+
+function cardEbook(p, meta, i, libId) {
+  const titulo = p.titulo || meta.titulo || T('js.ac.sem.titulo');
+  const autor  = p.autor  || meta.autor  || '';
+  const genero = p.genero || meta.genero || '';
+  const cotas  = p.cotas  || meta.cotas  || 0;
+  const imgSrc = p.capa_url || '';
+
+  return `<div class="ebook-card fade-in" style="animation-delay:${i * 0.05}s">
+    <div class="ebook-capa">
+      ${imgSrc
+        ? `<img class="ebook-capa-img" src="${imgSrc}" alt="${titulo}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : ''
+      }
+      <div class="capa-tipo-wrap" style="${imgSrc ? 'display:none' : ''}">${capaTipografica(titulo, autor, p.slug)}</div>
+      ${imgSrc ? '<div class="ebook-capa-grad"></div>' : ''}
+      ${p.slug === 'atico' ? `<span class="ebook-capa-genero" style="background:rgba(200,123,27,.85);color:#fff">⚡ Beta</span>` : (genero ? `<span class="ebook-capa-genero">${genero}</span>` : '')}
+    </div>
+    <div class="ebook-body">
+      <div class="ebook-titulo">${escHtml(titulo)}</div>
+      <div class="ebook-autor">${escHtml(autor)}</div>
+      <div class="ebook-footer">
+
+        <div style="display:flex;gap:6px;align-items:center">
+          ${p.slug === 'atico' ? `<a href="ebook-atico-conteudo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(200,123,27,.12);border:1px solid rgba(200,123,27,.3);color:#7a5c1e;font-size:11px;font-weight:500;text-decoration:none;white-space:nowrap;border-radius:2px">⚡ Ler</a>` : ''}
+          ${(temFormato(p, 'epub') || temFormato(p, 'pdf')) ? `<button class="btn-ler" onclick="abrirLeitor('${p.id}','${titulo.replace(/'/g, "\\'")}')">
+            ${iconeFormato('epub')}
+            ${T('js.ac.ler')}
+          </button>` : ''}
+          ${temFormato(p, 'pdf') ? `<button class="btn-dl-mini" id="dl-${p.id}-pdf" title="${T('js.ac.baixar.pdf')}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','pdf')">${iconeFormato('pdf')}</button>` : ''}
+          ${temFormato(p, 'epub') ? `<button class="btn-dl-mini" id="dl-${p.id}-epub" title="${T('js.ac.baixar.epub')}" onclick="baixar('${p.id}','${titulo.replace(/'/g, "\\'")}','epub')">${iconeFormato('epub')}</button>` : ''}
+        </div>
+        ${libId ? `<button onclick="event.stopPropagation();ocultarDaBiblioteca('${libId}',this)" title="${T('js.ac.remover')}" style="background:none;border:none;cursor:pointer;color:rgba(26,26,22,.25);font-size:14px;padding:2px 4px;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(200,80,80,.7)'" onmouseout="this.style.color='rgba(26,26,22,.25)'">✕</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+async function baixar(productId, titulo, formato) {
+  const btn = document.getElementById(`dl-${productId}-${formato}`);
+  const rotulo = formato.toUpperCase();
+  if (btn) { btn.classList.add('carregando'); btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/><path d="M12 2v4a6 6 0 010 12v4a10 10 0 000-20z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".8s" repeatCount="indefinite"/></path></svg>'; }
+
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(`${EDGE_BASE}/get-download`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ product_id: productId }),
+    });
+    const data = await res.json();
+    const item = data?.formatos?.[formato];
+
+    if (!res.ok || data.error) {
+      toast(data.error || 'Erro ao gerar link de download.', 'erro');
+    } else if (!item) {
+      toast(`Formato ${rotulo} não disponível para este título.`, 'erro');
+    } else {
+      window.open(item.download_url, '_blank');
+      toast(`✦ Arquivo ${rotulo} de "${titulo}" baixado (link válido por 72h).`);
+    }
+  } catch {
+    toast(T('js.erro.conexao'), 'erro');
+  } finally {
+    if (btn) {
+      btn.classList.remove('carregando');
+      btn.innerHTML = iconeFormato(formato);
+    }
+  }
+}
+
+// Leitor — js/leitor.js (mesmo leitor da Biblioteca TT). EPUB preferido ao PDF:
+// o texto reflui e ganha o estilo de leitura da editora em qualquer tela.
+let produtosBiblioteca = [];
+
+function abrirLeitor(productId, titulo) {
+  const prod = produtosBiblioteca.find(p => p.id === productId) || {};
+  TTLeitor.abrir({
+    titulo,
+    autor: prod.autor || '',
+    chave: 'prod:' + productId,
+    obterArquivo: async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return { erro: T('js.erro.sessao') };
+      const res = await fetch(`${EDGE_BASE}/get-download`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+        body: JSON.stringify({ product_id: productId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error) return { erro: res.status === 403 ? T('js.ac.sem.acesso') : T('js.ac.erro.leitura') };
+      return { epub: data.formatos?.epub?.download_url, pdf: data.formatos?.pdf?.download_url };
+    },
+    trilha: async () => {
+      const { data } = await sb.from('musicas').select('id').eq('produto_id', productId).eq('ativo', true).limit(1);
+      return data && data[0] ? data[0].id : null;
+    },
+    sugestao: async () => {
+      const { data } = await sb.from('products').select('slug, titulo, autor')
+        .eq('ativo', true).eq('tipo', 'ebook').limit(30);
+      const meus = new Set(produtosBiblioteca.map(p => p.slug));
+      const outros = (data || []).filter(p => !meus.has(p.slug) && (!prod.autor || p.autor === prod.autor));
+      if (!outros.length) return null;
+      const s = outros[Math.floor(Math.random() * outros.length)];
+      const paginas = { antifalencia: '/obra/antifalencia.html', justicamento: '/obra/justicamento.html', '3a-guerra': '/obra/terceiraguerra.html', atico: '/obra/atico.html' };
+      return { titulo: s.titulo, autor: s.autor, href: paginas[s.slug] || '/catalogo.html' };
+    },
+  });
+}
+
+function fecharLeitor() { TTLeitor.fechar(); }
+
+// ══════════════════════════════════════════════════════════
+// MÚSICAS
+// ══════════════════════════════════════════════════════════
+async function carregarMusicas() {
+  const cont = document.getElementById('listaMusicas');
+  cont.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>`;
+
+  const { data: todasMusicas } = await sb.from('musicas').select('*').eq('ativo', true).order('ordem');
+  const { data: lib } = await sb.from('user_library').select('product_id').eq('user_id', usuarioAtual.id);
+  const userLibrary = new Set((lib || []).map(l => l.product_id));
+
+  const musicas = (todasMusicas || []).filter(m => m.gratuita || (m.produto_id && userLibrary.has(m.produto_id)));
+
+  if (window.TTPlayer) TTPlayer.loadPlaylist(musicas);
+
+  if (musicas.length === 0) {
+    cont.innerHTML = `<div class="vazio">
+      <div class="vazio-icone">🎵</div>
+      <div class="vazio-titulo">Nenhuma música ainda</div>
+      <p class="vazio-texto">Músicas gratuitas ou desbloqueadas ao comprar o ebook relacionado<br>aparecem aqui.</p>
+    </div>`;
+    return;
+  }
+
+  cont.innerHTML = `<div class="musicas-lista">${musicas.map((m) => {
+    const semAudio = !m.arquivo_url;
+    return `<div class="musica-row" id="mrow-${m.id}"
+      onclick="${semAudio ? '' : `TTPlayer.play('${m.id}')`}"
+      style="${semAudio ? 'opacity:.4;cursor:default' : ''}">
+      <div class="musica-equalizador" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <button class="musica-btn-play" aria-label="${semAudio ? 'Indisponível' : 'Tocar ' + m.titulo}" ${semAudio ? 'disabled' : ''}>
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </button>
+      <div>
+        <div class="musica-nome">${m.titulo || 'Faixa'}</div>
+        <div class="musica-sub">${m.artista || 'Três Trevo'}${semAudio ? ' · indisponível' : ''}</div>
+      </div>
+      <div class="musica-dur">${m.duracao ? fmtTempo(m.duracao) : '—'}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function fmtTempo(seg) {
+  if (!seg || isNaN(seg)) return '0:00';
+  const m = Math.floor(seg / 60);
+  const s = Math.floor(seg % 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+// ══════════════════════════════════════════════════════════
+// SORTEIOS
+// ══════════════════════════════════════════════════════════
+async function carregarSorteios() {
+  const cont = document.getElementById('listaSorteios');
+  if (!cont) return; // aba de premiações fora do ar desde 10/10/2026
+
+  const [drawsRes, purchasesRes] = await Promise.all([
+    sb.from('draws')
+      .select('*')
+      .in('status', ['open', 'aguardando_qualificacao'])
+      .order('criado_em', { ascending: false })
+      .limit(5),
+    sb.from('purchases')
+      .select('id, product_id, cotas, criado_em, produto:product_id(titulo)')
+      .eq('user_id', usuarioAtual.id)
+      .eq('status', 'active'),
+  ]);
+
+  const draws     = drawsRes.data    || [];
+  const purchases = purchasesRes.data || [];
+
+  // ── Meus números na rodada ativa ──────────────────────────
+  const rodadaAtiva = draws[0];
+  if (rodadaAtiva) {
+    const { data: meusNums } = await sb
+      .from('draw_numbers')
+      .select('numero')
+      .eq('draw_id', rodadaAtiva.id)
+      .eq('user_id', usuarioAtual.id)
+      .order('numero');
+
+    const wrap = document.getElementById('meus-numeros-wrap');
+    if (meusNums && meusNums.length > 0) {
+      wrap.style.display = 'block';
+      document.getElementById('meus-numeros-lista').textContent =
+        meusNums.map(n => n.numero.toLocaleString('pt-BR')).join(' · ');
+
+      // Barra de meta
+      const metaAtual = Number(rodadaAtiva.meta_atual) || 0;
+      const metaTotal = Number(rodadaAtiva.meta_valor) || 0;
+      const pct       = metaTotal > 0 ? Math.min(100, (metaAtual / metaTotal) * 100) : 0;
+      const isMoeda   = rodadaAtiva.meta_tipo !== 'quantidade';
+      const fmt       = v => isMoeda
+        ? v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
+        : v.toLocaleString('pt-BR') + ' exemplares';
+
+      document.getElementById('meta-progresso-bar').style.width = pct.toFixed(1) + '%';
+      document.getElementById('meta-progresso-txt').textContent = `${fmt(metaAtual)} / ${fmt(metaTotal)} (${pct.toFixed(0)}%)`;
+
+      const faltam = Math.max(0, metaTotal - metaAtual);
+      if (faltam <= 0) {
+        document.getElementById('meta-faltam').textContent = 'Meta atingida — aguardando premiação';
+      } else {
+        document.getElementById('meta-faltam').textContent = `Faltam ${fmt(faltam)} para a premiação`;
+      }
+    } else {
+      wrap.style.display = 'none';
+    }
+  }
+
+  // Sorteios fechados recentes para histórico de vencedores
+  const { data: fechados } = await sb
+    .from('draws')
+    .select('id, titulo')
+    .eq('status', 'drawn')
+    .order('criado_em', { ascending: false })
+    .limit(3);
+
+  let html = '';
+
+  if (draws.length === 0) {
+    html += `<div class="vazio">
+      <div class="vazio-icone">🎯</div>
+      <div class="vazio-titulo">Nenhuma premiação aberta</div>
+      <p class="vazio-texto">Nenhuma premiação em andamento no momento.<br>Fique de olho — novas premiações são anunciadas pelo e-mail.</p>
+    </div>`;
+  } else {
+    const partes = await Promise.all(draws.map(async (draw) => {
+      const { data: entries } = await sb
+        .from('draw_entries')
+        .select('id, cotas_base, cotas_bonus, dep_validado, qualificado, purchase_id')
+        .eq('draw_id', draw.id)
+        .eq('user_id', usuarioAtual.id);
+
+      const totBase  = (entries || []).reduce((s, e) => s + (e.cotas_base  || 0), 0);
+      const totBonus = (entries || []).reduce((s, e) => s + (e.cotas_bonus || 0), 0);
+      const qualif   = (entries || []).filter(e => e.qualificado).length;
+
+      const purchasesComEntry   = new Set((entries || []).map(e => e.purchase_id));
+      const purchasesPendentes  = purchases.filter(p => !purchasesComEntry.has(p.id));
+
+      return `<div class="sorteio-card">
+        <div class="sorteio-status">Premiação aberta</div>
+        <div class="sorteio-titulo">${draw.titulo || 'Premiação'}</div>
+        ${(draw.premio_1 || draw.premio_2) ? `<div class="sorteio-premios">
+          ${draw.premio_1 ? `1° — <strong>${draw.premio_1}</strong>` : ''}
+          ${draw.premio_2 ? `&nbsp;·&nbsp; 2° — ${draw.premio_2}` : ''}
+        </div>` : ''}
+
+        <div class="cotas-grid">
+          <div class="cota-item">
+            <div class="cota-num">${totBase}</div>
+            <div class="cota-label">Cotas base</div>
+          </div>
+          <div class="cota-item">
+            <div class="cota-num">${totBonus}</div>
+            <div class="cota-label">Cotas bônus</div>
+          </div>
+          <div class="cota-item">
+            <div class="cota-num">${totBase + totBonus}</div>
+            <div class="cota-label">Total</div>
+          </div>
+        </div>
+
+        ${qualif > 0 ? `<div class="entry-linha">
+          <span class="entry-chave">Participações qualificadas</span>
+          <span class="entry-val ok">✓ ${qualif} confirmada${qualif !== 1 ? 's' : ''}</span>
+        </div>` : ''}
+
+        ${purchasesPendentes.map(p => {
+          const dias       = Math.floor((Date.now() - new Date(p.criado_em).getTime()) / 86400000);
+          const podeValid  = dias >= 7;
+          const faltam     = 7 - dias;
+          return `<div style="margin-top:16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--borda2)">
+            <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:10px">
+              ${p.produto?.titulo || 'Produto'} · ${p.cotas || 0} cota${(p.cotas || 0) !== 1 ? 's' : ''}
+            </div>
+            ${!podeValid ? `<div style="font-size:12px;color:var(--ouro);margin-bottom:10px">
+              Disponível para validação em ${faltam} dia${faltam !== 1 ? 's' : ''}
+            </div>` : ''}
+            <button class="btn-validar" onclick="abrirFormDep('${draw.id}','${p.id}','${(p.produto?.titulo || '').replace(/'/g, "\\'")}')" ${!podeValid ? 'disabled' : ''}>
+              ${podeValid ? 'Validar participação →' : 'Aguardando período de leitura'}
+            </button>
+            <div class="dep-form" id="dep-${p.id}">
+              <label style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:8px">
+                Depoimento (mín. 20 palavras)
+              </label>
+              <textarea class="dep-textarea" id="txt-${p.id}"
+                placeholder="O que você aprendeu ou sentiu lendo este livro? Mínimo 20 palavras."
+                oninput="contarPalavras('${p.id}')"></textarea>
+              <div class="contador-palavras" id="cnt-${p.id}">0 palavras</div>
+              <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">
+                Redes sociais que segue (multiplica cotas)
+              </div>
+              <div class="redes-check" id="redes-${p.id}">
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','whatsapp')">WhatsApp</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','instagram')">Instagram</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','facebook')">Facebook</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','tiktok')">TikTok</button>
+                <button class="rede-btn" onclick="toggleRede(this,'${p.id}','youtube')">YouTube</button>
+              </div>
+              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participação ✦</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }));
+    html += partes.join('');
+  }
+
+  // Histórico de vencedores
+  if ((fechados || []).length > 0) {
+    html += `<div style="margin-top:32px">
+      <div class="sec-titulo">Histórico de vencedores</div>
+      <div class="vencedores-lista" id="vencedoresList">
+        <div class="loading-txt" style="padding:20px 0;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:2px">Carregando…</div>
+      </div>
+    </div>`;
+  }
+
+  cont.innerHTML = html;
+
+  // Carregar vencedores dos sorteios fechados
+  if ((fechados || []).length > 0) {
+    const vencIds = fechados.map(d => d.id);
+    const { data: winners } = await sb
+      .from('draw_winners')
+      .select('posicao, nome_publico, draw_id, user_id, draws:draw_id(titulo, premio_1, premio_2)')
+      .in('draw_id', vencIds)
+      .order('posicao');
+
+    const listEl = document.getElementById('vencedoresList');
+    if (listEl) {
+      if (!winners || winners.length === 0) {
+        listEl.innerHTML = '<div class="vazio-texto" style="padding:12px 0;font-size:13px">Nenhum vencedor registrado ainda.</div>';
+      } else {
+        // Verificar se o usuário atual venceu algum desses
+        const myWins = (winners || []).filter(w => w.user_id === usuarioAtual.id);
+
+        // Destaque especial se venceu
+        let destaque = '';
+        if (myWins.length > 0) {
+          const pos = myWins[0].posicao === 1 ? '🥇 1º Lugar' : '🥈 2º Lugar';
+          destaque = `<div style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.4);padding:20px;margin-bottom:20px;position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">${pos}</div>
+            <div style="font-family:'Lora',serif;font-size:22px;margin-bottom:4px">Você foi selecionado(a)!</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Parabéns! Verifique seu e-mail para instruções de resgate do prêmio.</div>
+          </div>`;
+        }
+
+        listEl.innerHTML = destaque + winners.map(w => `
+          <div class="vencedor-row">
+            <div class="vencedor-pos">${w.posicao}°</div>
+            <div class="vencedor-info">
+              <div class="vencedor-nome">${w.nome_publico || 'Beneficiário'}</div>
+              <div class="vencedor-data">${w.draws?.titulo || ''}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div class="vencedor-premio">${w.posicao === 1 ? (w.draws?.premio_1 || '—') : (w.draws?.premio_2 || '—')}</div>
+              <a href="/auditoria-sorteio.html?draw_id=${w.draw_id}" target="_blank"
+                 style="font-size:10px;color:rgba(200,168,75,.6);text-decoration:none;letter-spacing:.5px">
+                🔒 ver auditoria
+              </a>
+            </div>
+          </div>`).join('');
+      }
+    }
+  }
+}
+
+function abrirFormDep(drawId, purchaseId, titulo) {
+  const form = document.getElementById('dep-' + purchaseId);
+  if (form) form.classList.toggle('show');
+}
+
+function contarPalavras(pid) {
+  const txt = (document.getElementById('txt-' + pid)?.value || '').trim();
+  const n   = txt ? txt.split(/\s+/).filter(Boolean).length : 0;
+  const el  = document.getElementById('cnt-' + pid);
+  if (el) el.textContent = n + ' palavra' + (n !== 1 ? 's' : '') + (n >= 20 ? ' ✓' : ' (mín. 20)');
+}
+
+const redesSelecionadas = {};
+function toggleRede(btn, pid, rede) {
+  const key = pid + '_' + rede;
+  redesSelecionadas[key] = !redesSelecionadas[key];
+  btn.classList.toggle('on', redesSelecionadas[key]);
+}
+
+async function enviarValidacao(drawId, purchaseId) {
+  const dep   = (document.getElementById('txt-' + purchaseId)?.value || '').trim();
+  const words = dep ? dep.split(/\s+/).filter(Boolean).length : 0;
+  if (words < 20) {
+    toast('O depoimento precisa ter pelo menos 20 palavras.', 'erro');
+    return;
+  }
+
+  const redes = Object.entries(redesSelecionadas)
+    .filter(([k, v]) => k.startsWith(purchaseId + '_') && v)
+    .map(([k]) => k.replace(purchaseId + '_', ''));
+
+  const { data: { session } } = await sb.auth.getSession();
+  toast('Enviando validação…');
+
+  try {
+    const res = await fetch(`${EDGE_BASE}/validate-entry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ draw_id: drawId, purchase_id: purchaseId, depoimento: dep, redes_seguidas: redes }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      toast(data.error || 'Erro ao validar participação.', 'erro');
+      return;
+    }
+    toast(`✦ Participação confirmada! ${data.cotas_total} cotas (${data.multiplicador}×)`);
+    abasCarregadas['sorteios'] = false;
+    setTimeout(() => { abasCarregadas['sorteios'] = false; carregarSorteios(); }, 1200);
+  } catch {
+    toast(T('js.erro.conexao'), 'erro');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// EXTRATO
+// ══════════════════════════════════════════════════════════
+async function carregarExtrato() {
+  const cont = document.getElementById('listaExtrato');
+
+  // Lazy cleanup — marcar pending >72h como expired (sem precisar de pg_cron)
+  const limite72h = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
+  await sb.from('payments')
+    .update({ status: 'cancelled' })
+    .eq('user_id', usuarioAtual.id)
+    .eq('status', 'pending')
+    .lt('criado_em', limite72h);
+
+  const { data: payments, error } = await sb
+    .from('payments')
+    .select('id, valor, status, metodo, criado_em, produto:product_id(titulo, slug)')
+    .eq('user_id', usuarioAtual.id)
+    .not('status', 'in', '("expired","cancelled")')
+    .order('criado_em', { ascending: false });
+
+  if (error || !payments || payments.length === 0) {
+    cont.innerHTML = `<div class="vazio">
+      <div class="vazio-icone">📄</div>
+      <div class="vazio-titulo">Nenhum pagamento</div>
+      <p class="vazio-texto">Seu histórico de pagamentos aparecerá aqui.</p>
+    </div>`;
+    return;
+  }
+
+  const statusLabel = { approved: 'Aprovado', pending: 'Pendente', rejected: 'Recusado', refunded: 'Reembolsado', cancelled: 'Cancelado', expired: 'Expirado' };
+  const metodoLabel = { pix: 'PIX', credit_card: 'Cartão', debit_card: 'Débito', ticket: 'Boleto', boleto: 'Boleto' };
+
+  // Totais
+  const totalPago = payments
+    .filter(p => p.status === 'approved')
+    .reduce((s, p) => s + (Number(p.valor) || 0), 0);
+
+  cont.innerHTML = `
+    <div class="extrato-tabela">
+      ${payments.map(p => {
+        const dt  = new Date(p.criado_em);
+        const dia = dt.toLocaleDateString('pt-BR');
+        const hr  = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const acoesPending = p.status === 'pending' ? `
+          <div style="display:flex;gap:6px;margin-top:4px">
+            ${p.produto?.slug ? `<a href="/checkout.html?slug=${p.produto.slug}" style="font-size:11px;color:var(--ouro);letter-spacing:1px;text-decoration:none;text-transform:uppercase;border:1px solid rgba(200,168,75,.4);padding:3px 8px;white-space:nowrap">Retomar →</a>` : ''}
+            <button onclick="cancelarPayment('${p.id}',this)" style="font-size:11px;color:rgba(200,80,80,.8);letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(200,80,80,.3);padding:3px 8px;background:none;cursor:pointer;white-space:nowrap">Cancelar</button>
+          </div>` : '';
+        const retomar = '';
+        return `<div class="extrato-linha">
+          <div>
+            <div class="extrato-produto">${p.produto?.titulo || 'Produto'}</div>
+            <div class="extrato-data">${dia} às ${hr}</div>
+          </div>
+          <div class="extrato-detalhe">
+            <span class="badge-status ${p.status || ''}">${statusLabel[p.status] || p.status || '—'}</span>
+            ${p.metodo ? `<span class="extrato-metodo">${metodoLabel[p.metodo] || p.metodo}</span>` : ''}
+            ${acoesPending}
+          </div>
+          <div class="extrato-valor">${p.valor ? 'R$\u00a0' + Number(p.valor).toFixed(2).replace('.', ',') : '—'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${totalPago > 0 ? `<div class="extrato-resumo">
+      <div class="resumo-item">
+        <div class="resumo-label">Total investido</div>
+        <div class="resumo-val">R$\u00a0${totalPago.toFixed(2).replace('.', ',')}</div>
+      </div>
+      <div class="resumo-item">
+        <div class="resumo-label">Transações aprovadas</div>
+        <div class="resumo-val">${payments.filter(p => p.status === 'approved').length}</div>
+      </div>
+    </div>` : ''}`;
+}
+
+async function cancelarPayment(paymentId, btn) {
+  if (!confirm('Cancelar esta compra pendente? A ação não pode ser desfeita.')) return;
+  btn.textContent = '…';
+  btn.disabled = true;
+  const { error } = await sb.from('payments')
+    .update({ status: 'cancelled' })
+    .eq('id', paymentId)
+    .eq('user_id', usuarioAtual.id)
+    .eq('status', 'pending');
+  if (error) { btn.textContent = 'Erro'; return; }
+  toast('Compra cancelada.', 'info');
+  carregarExtrato();
+}
+
+async function ocultarDaBiblioteca(libId, btn) {
+  btn.textContent = '…';
+  btn.disabled = true;
+  const { error } = await sb.from('user_library')
+    .update({ oculto: true })
+    .eq('id', libId)
+    .eq('user_id', usuarioAtual.id);
+  if (error) { btn.textContent = 'Erro'; return; }
+  toast('Removido da biblioteca.', 'info');
+  carregarBiblioteca();
+}
+
+// ══════════════════════════════════════════════════════════
+// ASSINATURA
+// ══════════════════════════════════════════════════════════
+async function carregarAssinatura() {
+  const cont = document.getElementById('conteudoAssinatura');
+
+  const { data: subs } = await sb
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', usuarioAtual.id)
+    .order('criado_em', { ascending: false })
+    .limit(1);
+
+  const sub = subs?.[0];
+
+  if (!sub) {
+    cont.innerHTML = `<div class="plano-card">
+      <div class="plano-nome">Sem assinatura ativa</div>
+      <span class="plano-badge sem-plano">Gratuito</span>
+      <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:24px">
+        Com a assinatura você acessa músicas autorais, lançamentos antecipados
+        e conteúdo exclusivo dos títulos.
+      </p>
+      <div class="plano-beneficios">
+        <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso ilimitado às faixas da editora</div>
+        <div class="beneficio-item"><strong>Lançamentos antecipados</strong>Acesso antes do público geral</div>
+        <div class="beneficio-item"><strong>Conteúdo exclusivo</strong>Material complementar dos títulos</div>
+      </div>
+      <a href="https://wa.me/5554999467085?text=Quero+saber+mais+sobre+a+assinatura+da+Editora+Tr%C3%AAs+Trevo"
+         target="_blank" rel="noopener" class="plano-acao">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.555 4.116 1.527 5.843L.057 23.885l6.253-1.639A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.948 0-3.763-.527-5.326-1.441l-.38-.226-3.964 1.04 1.053-3.877-.247-.399A9.941 9.941 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+        </svg>
+        Quero saber mais
+      </a>
+    </div>`;
+    return;
+  }
+
+  const venc       = sub.vencimento ? new Date(sub.vencimento).toLocaleDateString('pt-BR') : '—';
+  const inicio     = sub.criado_em  ? new Date(sub.criado_em).toLocaleDateString('pt-BR')  : '—';
+  const statusMap  = { active: 'Ativa', paused: 'Pausada', canceled: 'Cancelada' };
+  const badgeClass = { active: 'ativo', paused: 'pausado', canceled: 'cancelado' }[sub.status] || 'sem-plano';
+  const isAtiva    = sub.status === 'active';
+
+  cont.innerHTML = `<div class="plano-card">
+    <div class="plano-nome">Assinatura ${sub.plano || 'Padrão'}</div>
+    <span class="plano-badge ${badgeClass}">${statusMap[sub.status] || sub.status}</span>
+
+    <div class="plano-detalhes">
+      <div class="entry-linha">
+        <span class="entry-chave">Início</span>
+        <span class="entry-val">${inicio}</span>
+      </div>
+      <div class="entry-linha">
+        <span class="entry-chave">Vencimento</span>
+        <span class="entry-val ${isAtiva ? '' : 'pendente'}">${venc}</span>
+      </div>
+      ${sub.plano ? `<div class="entry-linha">
+        <span class="entry-chave">Plano</span>
+        <span class="entry-val">${sub.plano}</span>
+      </div>` : ''}
+    </div>
+
+    ${isAtiva ? `<div class="plano-beneficios" style="margin-top:20px">
+      <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso liberado</div>
+    </div>` : ''}
+
+    <div style="margin-top:20px;font-size:12px;color:rgba(255,255,255,.3);line-height:1.7">
+      Para cancelar, alterar plano ou qualquer dúvida:<br>
+      <a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>
+    </div>
+  </div>`;
+}
+
+// ── PLANILHA VIVA ─────────────────────────────────────────
+function carregarPlanilhaViva() {
+  const cont = document.getElementById('conteudoPlanilhaViva');
+  const KEY = 'tt_sfdtt_token';
+  const token = localStorage.getItem(KEY);
+
+  if (token) {
+    const vis = token.slice(0,8) + '…' + token.slice(-4);
+    cont.innerHTML = `
+      <div class="plano-card">
+        <div class="plano-nome">Planilha Viva</div>
+        <span class="plano-badge ativo">Código configurado</span>
+        <p style="font-size:14px;color:rgba(26,26,22,.6);line-height:1.8;margin:16px 0 24px">
+          Sistema Financeiro Doméstico — diagnóstico financeiro pessoal com inteligência adaptativa.
+        </p>
+        <a href="https://finintel.com.br/?u=${encodeURIComponent(token)}"
+           target="_blank" rel="noopener noreferrer" class="plano-acao"
+           style="text-decoration:none;display:inline-flex;margin-bottom:20px">
+          Acessar Planilha Viva →
+        </a>
+        <div style="margin-top:20px;font-size:12px;color:rgba(26,26,22,.35);line-height:1.8;border-top:1px solid var(--borda);padding-top:16px">
+          Código: <code style="font-family:monospace;background:rgba(26,74,46,.06);padding:2px 6px">${vis}</code><br>
+          <button onclick="localStorage.removeItem('tt_sfdtt_token');carregarPlanilhaViva()"
+            style="background:none;border:none;cursor:pointer;color:rgba(200,168,75,.7);font-family:'Poppins',sans-serif;font-size:12px;padding:0;margin-top:6px;text-decoration:underline">
+            Alterar código de acesso
+          </button>
+        </div>
+      </div>`;
+  } else {
+    cont.innerHTML = `
+      <div class="plano-card">
+        <div class="plano-nome">Planilha Viva</div>
+        <p style="font-size:14px;color:rgba(26,26,22,.6);line-height:1.8;margin-bottom:24px">
+          Sistema Financeiro Doméstico — controle financeiro pessoal com diagnóstico adaptativo.<br>
+          Cole abaixo o código de acesso UUID que você recebeu.
+        </p>
+        <label class="campo-label" for="sfdttTokenInput">Código de acesso</label>
+        <input id="sfdttTokenInput" class="campo-input" type="text"
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          onkeydown="if(event.key==='Enter')salvarTokenSFDTT()">
+        <button onclick="salvarTokenSFDTT()" class="plano-acao"
+          style="border:none;cursor:pointer;font-family:'Poppins',sans-serif">
+          Salvar e acessar →
+        </button>
+        <div style="margin-top:20px;font-size:12px;color:rgba(26,26,22,.35);line-height:1.8">
+          Não tem um código? Fale com a editora:<br>
+          <a href="mailto:sac@3trevo.com.br" style="color:var(--ouro);text-decoration:none">sac@3trevo.com.br</a>
+        </div>
+      </div>`;
+  }
+}
+
+function salvarTokenSFDTT() {
+  const input = document.getElementById('sfdttTokenInput');
+  if (!input) return;
+  const token = input.value.trim();
+  if (!token || token.length < 32) {
+    toast('Código inválido. Cole o UUID completo recebido por e-mail.', 'erro');
+    return;
+  }
+  localStorage.setItem('tt_sfdtt_token', token);
+  window.open('https://finintel.com.br/?u=' + encodeURIComponent(token), '_blank');
+  carregarPlanilhaViva();
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS DE UI
+// ══════════════════════════════════════════════════════════
+function skeletonCards(n) {
+  return Array.from({ length: n }, () => `<div class="sk-card">
+    <div class="skeleton sk-cover"></div>
+    <div>
+      <div class="skeleton sk-line m"></div>
+      <div class="skeleton sk-line s"></div>
+      <div class="skeleton sk-line l" style="margin-top:16px"></div>
+    </div>
+    <div><div class="skeleton sk-btn"></div></div>
+  </div>`).join('');
+}
+
+function vazioCont(icon, titulo, texto) {
+  return `<div class="vazio">
+    <div class="vazio-icone">${icon}</div>
+    <div class="vazio-titulo">${titulo}</div>
+    <p class="vazio-texto">${texto}</p>
+  </div>`;
+}
+
+function toast(msg, tipo) {
+  clearTimeout(toastTimer);
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (tipo === 'erro' ? ' erro' : '');
+  // Força reflow p/ reiniciar a transição
+  void t.offsetWidth;
+  t.classList.add('show');
+  toastTimer = setTimeout(() => t.classList.remove('show'), tipo === 'erro' ? 5000 : 4000);
+}
+
+// ── Inicializar ──
+init();
+</script>
+</body>
+</html>

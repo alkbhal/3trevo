@@ -89,3 +89,16 @@ describe('autoria no catálogo', () => {
     expect(catalogoInputSchema.safeParse({ slug: 'x-y', titulo: 'X', autor: 'Maria Souza' }).success).toBe(true);
   });
 });
+
+describe('cópia do forge pelo service binding', () => {
+  it('com env.FORGE, baixa por ele (workers.dev entre Workers da conta dá 1042)', async () => {
+    const pelaUrl = vi.fn(async (url: string) => (url.includes('/storage/') ? new Response('{}') : new Response('não', { status: 500 })));
+    vi.stubGlobal('fetch', pelaUrl);
+    const binding = { fetch: vi.fn(async () => new Response('EPUB')) } as unknown as Fetcher;
+    const { copiarParaStorage } = await import('../src/forge-download');
+    const out = await copiarParaStorage({ ...env, FORGE: binding }, ID, 'forge-11111111', ['epub']);
+    expect(out).toEqual({ epub: 'forge-11111111.epub' });
+    expect((binding.fetch as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
+    expect(pelaUrl.mock.calls.every(([u]) => !String(u).startsWith('https://tr3vo-forge'))).toBe(true);
+  });
+});

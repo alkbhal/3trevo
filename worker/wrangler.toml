@@ -25,6 +25,12 @@ id = "34f4ad1650394b77a51ae527a0437a24"
 binding = "BIBLIOTECA_R2"
 bucket_name = "tt-biblioteca"
 
+# Service binding para o Forge: a ponte do admin (/api/admin/forge/*) chama o worker tr3vo-forge por aqui.
+# Por workers.dev a Cloudflare recusa (erro 1042) chamada entre Workers da mesma conta.
+[[services]]
+binding = "FORGE"
+service = "tr3vo-forge"
+
 # Crons:
 # - Toda hora: health monitor (checa componentes, detecta ataques, alerta via email)
 # Sorteio puro RNG: disparado manualmente via POST /api/admin/sorteio (sem data fixa)
