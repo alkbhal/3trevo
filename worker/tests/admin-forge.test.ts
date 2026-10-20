@@ -97,6 +97,18 @@ describe('ponte admin → forge', () => {
     expect((init.headers as Record<string, string>)['X-Forge-Secret']).toBe('segredo-forge');
   });
 
+  it('com service binding FORGE, fala com o Forge por ele (workers.dev entre Workers da mesma conta dá erro 1042)', async () => {
+    const forgeBinding = { fetch: vi.fn(async () => new Response(JSON.stringify([{ id: 'novela' }]))) };
+    const f = mockFetch(() => new Response('NAO-DEVERIA-CHAMAR', { status: 500 }));
+    const r = await handleAdminForge(req('GET', 'formatos'), { ...env, FORGE: forgeBinding } as any, '/api/admin/forge/formatos');
+    expect(r.status).toBe(200);
+    expect(await r.json()).toEqual([{ id: 'novela' }]);
+    expect(forgeBinding.fetch).toHaveBeenCalledOnce();
+    expect(f).toHaveBeenCalledTimes(1); // só a checagem de sessão no Supabase
+    const init = (forgeBinding.fetch.mock.calls[0] as unknown as [string, RequestInit])[1];
+    expect((init.headers as Record<string, string>)['X-Forge-Secret']).toBe('segredo-forge');
+  });
+
   it('401 do Forge vira erro claro, sem vazar o segredo', async () => {
     mockFetch(() => new Response('{"ok":false}', { status: 401 }));
     const r = await chamar(req('GET', `status/${ID}`));

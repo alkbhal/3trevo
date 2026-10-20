@@ -74,9 +74,12 @@ export async function handleAdminForge(request: Request, env: Env, path: string)
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (env.FORGE_ADMIN_SECRET) headers['X-Forge-Secret'] = env.FORGE_ADMIN_SECRET;
 
+  // Worker chamando Worker da mesma conta por workers.dev dá erro 1042 da Cloudflare: o caminho
+  // certo é o service binding FORGE (o fetch global fica só como alternativa, p.ex. em testes).
+  const chamarForge = env.FORGE ? env.FORGE.fetch.bind(env.FORGE) : fetch;
   let r: Response;
   try {
-    r = await fetch(`${env.FORGE_URL ?? FORGE_URL_PADRAO}${rota.destino(id)}`, {
+    r = await chamarForge(`${env.FORGE_URL ?? FORGE_URL_PADRAO}${rota.destino(id)}`, {
       method: rota.metodo,
       headers,
       body: corpo,
