@@ -203,7 +203,18 @@ function textosJs(html, lang) {
   const corpo = `window.TT_LANG=${JSON.stringify(lang)};window.TT_TEXTOS=${JSON.stringify(js)};` +
     `window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;` +
     `return v?s.replace(/\\{(\\w+)\\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};`;
-  return html.replace(/<script id="tt-textos">[\s\S]*?<\/script>/, `<script id="tt-textos">${corpo}</script>`);
+  html = html.replace(/<script id="tt-textos">[\s\S]*?<\/script>/, `<script id="tt-textos">${corpo}</script>`);
+  return ldFaq(html, lang);
+}
+// <script type="application/ld+json" id="ld-faq"></script> → FAQPage com as perguntas de "js.faq" do idioma
+// (o FAQ da página é montado por JavaScript; esta marcação é o que buscadores e IAs leem sem rodar JS).
+function ldFaq(html, lang) {
+  const faq = dic[lang]['js.faq'];
+  if (!Array.isArray(faq)) return html;
+  const ld = { '@context': 'https://schema.org', '@type': 'FAQPage', inLanguage: config.idiomas[lang]?.html_lang || 'pt-BR',
+    mainEntity: faq.map(({ q, r }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: r } })) };
+  return html.replace(/<script type="application\/ld\+json" id="ld-faq">[\s\S]*?<\/script>/,
+    `<script type="application/ld+json" id="ld-faq">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`);
 }
 
 // ── Português que escapou para EN/ES ─────────────────────────────────────────

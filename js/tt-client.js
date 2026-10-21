@@ -1,7 +1,7 @@
 /**
  * tt-client.js — Cliente único de catálogo público (Fonte Única)
  * Inclua com: <script src="/js/tt-client.js" onerror="console.error('tt-client falhou ao carregar')"></script>
- * API global: window.TTClient.getCatalogo(slug?), .formatMoney(preco), .renderCatalogo(container, onSuccess)
+ * API global: window.TTClient.getCatalogo(slug?), .getDepoimentos(), .formatMoney(preco), .renderCatalogo(container, onSuccess)
  *
  * Substitui o padrão anterior (cada página lendo Supabase direto com a chave anônima
  * embutida) por uma única chamada ao worker, que já usa a service key no servidor.
@@ -58,5 +58,13 @@
     attempt();
   }
 
-  window.TTClient = { getCatalogo, formatMoney, renderCatalogo };
+  // Depoimentos aprovados na moderação (reais, de quem comprou). Lista vazia quando não há nenhum.
+  async function getDepoimentos() {
+    const r = await fetch(`${API_BASE}/api/public/depoimentos`);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+  window.TTClient = { getCatalogo, getDepoimentos, formatMoney, renderCatalogo };
 })();
