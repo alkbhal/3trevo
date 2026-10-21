@@ -24,6 +24,7 @@ interface DeliveryPackage {
   titulo?: string;
   autor?: string;
   editora?: string;
+  sinopse?: string;
 }
 
 // ponytail: comparação hex constant-time duplicada em checkout.ts — sem util
@@ -107,7 +108,8 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
       tipo: 'ebook',
       titulo,
       autor,
-      descricao: pkg.summary,
+      // Sinopse do Forge vira a descrição da loja; o summary técnico só para pacote antigo.
+      descricao: pkg.sinopse?.trim() || pkg.summary,
       preco: 0,
       ativo: false,
       epub_url: copiados.epub ?? null,

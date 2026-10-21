@@ -32,7 +32,7 @@ describe('webhook do forge', () => {
     }));
     const pkg = {
       projectId: ID, status: 'complete', summary: 'Obra "Velho" — 8 capítulos', timestamp: new Date().toISOString(),
-      titulo: 'Título Novo', autor: 'Maria Souza',
+      titulo: 'Título Novo', autor: 'Maria Souza', sinopse: 'Uma sinopse para a loja.',
       arquivos: [`epub/${ID}/titulo.epub`, `pdf/${ID}/titulo.pdf`, `html/${ID}/index.html`],
     };
     const r = await handleForgeDelivery(await assinado(JSON.stringify(pkg)), env);
@@ -43,7 +43,7 @@ describe('webhook do forge', () => {
     expect(chamadas.map((c) => c.url)).toContain('https://sb.test/storage/v1/object/ebooks/forge-11111111.epub');
     const produto = JSON.parse(String(chamadas.find((c) => c.url.endsWith('/rest/v1/products'))!.init!.body));
     expect(produto).toMatchObject({
-      slug: 'forge-11111111', titulo: 'Título Novo', autor: 'Maria Souza',
+      slug: 'forge-11111111', titulo: 'Título Novo', autor: 'Maria Souza', descricao: 'Uma sinopse para a loja.',
       epub_url: 'forge-11111111.epub', arquivo_url: 'forge-11111111.pdf', ativo: false,
     });
   });
