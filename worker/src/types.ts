@@ -17,6 +17,7 @@ export interface Env {
   WEBHOOK_HMAC_SECRET: string;
   FORGE_WEBHOOK_SECRET?: string;
   FORGE_PUBLIC_URL?: string;
+  FORGE_DOWNLOAD_SECRET?: string; // mesmo valor do tr3vo-forge — assina links de epub/pdf/html
   FORGE_ADMIN_SECRET?: string; // credencial do admin no worker intake do tr3vo-forge (ponte do admin)
   FORGE_URL?: string;
   FORGE?: Fetcher; // service binding para o worker tr3vo-forge (ver wrangler.toml)

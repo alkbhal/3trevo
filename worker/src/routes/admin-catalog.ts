@@ -29,7 +29,7 @@ export const catalogoInputSchema = z.object({
   genero_pt: z.string().max(100).nullable().optional(),
   genero_en: z.string().max(100).nullable().optional(),
   genero_es: z.string().max(100).nullable().optional(),
-  autor: z.string().max(200).nullable().optional(),
+  autor: z.string().trim().min(1, 'autor não pode ser vazio').max(200).optional(),
   preco: z.number().min(0).max(10000).optional(),
   utm_campaign: z.string().max(100).nullable().optional(),
   bg_color: z.string().max(20).nullable().optional(),
@@ -96,7 +96,7 @@ async function mirrorParaProducts(env: Env, slug: string, campos: Record<string,
     await sb(env, 'products', {
       method: 'POST',
       headers: { Prefer: 'resolution=merge-duplicates,return=minimal' } as any,
-      body: JSON.stringify({ slug, cotas: 0, autor: 'Said Anes', ...permitido }),
+      body: JSON.stringify({ slug, cotas: 0, ...permitido }),
     });
   } catch (err) {
     console.error('[admin-catalogo] mirror pra products falhou:', slug, err);
@@ -132,6 +132,8 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
   if (!parsed.success) return erroValidacao(parsed.error.issues);
   const body = parsed.data;
   if (!body.slug || !body.titulo) return Response.json({ ok: false, erro: 'slug_e_titulo_obrigatorios' }, { status: 400 });
+  // Autoria é sempre informada — sem padrão: o nome vai pra loja e pros exemplares.
+  if (!body.autor) return Response.json({ ok: false, erro: 'autor_obrigatorio' }, { status: 400 });
 
   const preco = body.preco ?? 0;
   const cotas = cotasPorPreco(preco); // sempre derivado do preço -- body.cotas é ignorado de propósito
@@ -151,7 +153,7 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
       genero_pt: body.genero_pt ?? body.genero ?? null,
       genero_en: body.genero_en ?? null,
       genero_es: body.genero_es ?? null,
-      autor: body.autor ?? 'Said Anes',
+      autor: body.autor,
       preco,
       cotas,
       utm_campaign: body.utm_campaign ?? body.slug,
@@ -171,7 +173,7 @@ export async function handleAdminCatalogoCreate(request: Request, env: Env): Pro
   await mirrorParaProducts(env, body.slug, {
     slug: body.slug,
     titulo: body.titulo,
-    autor: body.autor ?? 'Said Anes',
+    autor: body.autor,
     preco,
     cotas,
     ativo: body.ativo !== false,

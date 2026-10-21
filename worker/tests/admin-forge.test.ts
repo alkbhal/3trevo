@@ -50,11 +50,34 @@ describe('ponte admin → forge', () => {
 
   it('manuscrito com formato: repassa o formato ao Forge', async () => {
     const f = mockFetch(() => new Response(JSON.stringify({ projectId: ID }), { status: 201 }));
-    const r = await chamar(req('POST', 'ingerir', { manuscrito: 'palavra '.repeat(60), formato: 'novela' }));
+    const r = await chamar(req('POST', 'ingerir', { manuscrito: 'palavra '.repeat(60), formato: 'novela', autor: 'Maria Souza' }));
     expect(r.status).toBe(201);
     const [url, init] = f.mock.calls[1] as [string, RequestInit];
     expect(url).toBe('https://tr3vo-forge.al-kbhal.workers.dev/ingest');
     expect(JSON.parse(init.body as string)).toMatchObject({ formato: 'novela' });
+  });
+
+  it('manuscrito sem autor: 400, nada chega ao Forge', async () => {
+    const f = mockFetch(() => new Response('{}', { status: 201 }));
+    const r = await chamar(req('POST', 'ingerir', { manuscrito: 'palavra '.repeat(60) }));
+    expect(r.status).toBe(400);
+    expect(f.mock.calls.length).toBe(1); // só a checagem da sessão de admin
+  });
+
+  it('manuscrito em modo preservar: repassa modo e autor', async () => {
+    const f = mockFetch(() => new Response(JSON.stringify({ projectId: ID }), { status: 201 }));
+    const r = await chamar(req('POST', 'ingerir', { manuscrito: 'palavra '.repeat(60), modo: 'preservar', autor: 'Maria Souza' }));
+    expect(r.status).toBe(201);
+    const [, init] = f.mock.calls[1] as [string, RequestInit];
+    expect(JSON.parse(init.body as string)).toMatchObject({ modo: 'preservar', autor: 'Maria Souza' });
+  });
+
+  it('nova edição: vai para /project/{id}/edicao; idioma fora da lista é barrado', async () => {
+    const f = mockFetch(() => new Response(JSON.stringify({ ok: true }), { status: 202 }));
+    const r = await chamar(req('POST', `edicao/${ID}`, { autor: 'Maria Souza', capa: 'manter', idiomas: ['en-US'] }));
+    expect(r.status).toBe(202);
+    expect(f.mock.calls[1]![0]).toBe(`https://tr3vo-forge.al-kbhal.workers.dev/project/${ID}/edicao`);
+    expect((await chamar(req('POST', `edicao/${ID}`, { idiomas: ['fr-FR'] }))).status).toBe(400);
   });
 
   it('tema com formato: repassa o formato ao Forge', async () => {
