@@ -15,6 +15,8 @@ jobs:
         run: node scripts/stamp.mjs --check
       - name: Sites EN e ES em sincronia com o PT e sem português (scripts/i18n.mjs)
         run: node scripts/i18n.mjs --check
+      - name: Site — títulos, descrições, og:image, alt, privacidade, marcações, sitemap e consentimento (LGPD)
+        run: node scripts/site-check.mjs
 
   worker:
     runs-on: ubuntu-latest
