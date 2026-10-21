@@ -1,6 +1,10 @@
 {
  "js.ac.baixar.epub": "Baixar arquivo EPUB",
  "js.ac.baixar.pdf": "Baixar arquivo PDF",
+ "js.ac.compra.fechar": "Fechar",
+ "js.ac.compra.livro": "Seu livro",
+ "js.ac.compra.texto": "<strong>{titulo}</strong> já está liberado: ele aparece na sua biblioteca abaixo em instantes, e o PDF também chega por e-mail. Se não aparecer em alguns minutos, recarregue a página ou escreva para sac@3trevo.com.br (respondemos em até 48 horas).",
+ "js.ac.compra.titulo": "Obrigado! Seu pagamento foi aprovado.",
  "js.ac.email.invalido": "Digite um e-mail válido.",
  "js.ac.entrando": "Entrando…",
  "js.ac.entrar": "Entrar",
