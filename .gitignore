@@ -71,3 +71,8 @@ setup-*.ps1
 
 # grafo do /understand (local)
 .ua/
+
+# ── Central de Agentes TT: o código Python é versionado; o estado local não ──
+!scripts/central-tt/**/*.py
+scripts/central-tt/runtime/
+__pycache__/

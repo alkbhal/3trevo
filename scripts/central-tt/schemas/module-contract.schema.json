@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TT Module Contract",
+  "type": "object",
+  "required": [
+    "module_id",
+    "version",
+    "dependencies",
+    "autonomy_level",
+    "llm_policy",
+    "data_policy"
+  ],
+  "properties": {
+    "module_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "purpose",
+          "data_sent",
+          "cost_limit_brl"
+        ]
+      }
+    },
+    "autonomy_level": {
+      "enum": [
+        "read_only",
+        "prepare_action",
+        "execute_with_approval",
+        "execute_with_notification"
+      ]
+    },
+    "llm_policy": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "provider",
+        "model",
+        "model_version",
+        "prompt_version",
+        "data_sent",
+        "provider_retention",
+        "max_cost_brl",
+        "fallback"
+      ]
+    },
+    "data_policy": {
+      "type": "object",
+      "required": [
+        "classification",
+        "personal_data_allowed",
+        "retention_days"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
