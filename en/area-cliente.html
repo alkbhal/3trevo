@@ -1156,7 +1156,9 @@ async function carregarBiblioteca() {
 // A extensão real decide o formato, não a coluna — arquivo_url historicamente guarda
 // o "arquivo principal" e nem sempre é PDF (vários títulos têm só EPUB nesse campo).
 function temFormato(p, ext) {
-  const termina = (v) => (v || '').toLowerCase().endsWith('.' + ext);
+  // ".epub" (Storage) ou "/epub" (URL do forge: /project/{id}/epub).
+  const forge = new RegExp('/project/[0-9a-f-]{36}/' + ext + '$');
+  const termina = (v) => { const s = (v || '').toLowerCase(); return s.endsWith('.' + ext) || forge.test(s); };
   return termina(p.arquivo_url) || termina(p.epub_url);
 }
 
@@ -1279,7 +1281,7 @@ async function baixar(productId, titulo, formato) {
       toast(`Formato ${rotulo} não disponível para este título.`, 'erro');
     } else {
       window.open(item.download_url, '_blank');
-      toast(`✦ Arquivo ${rotulo} de "${titulo}" baixado (link válido por 72h).`);
+      toast(`✦ Arquivo ${rotulo} de "${titulo}" baixado.`);
     }
   } catch {
     toast(T('js.erro.conexao'), 'erro');

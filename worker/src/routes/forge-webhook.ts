@@ -1,13 +1,19 @@
 /**
  * forge-webhook.ts — Três Trevo Worker
  * Recebe o webhook HMAC-assinado do tr3vo-forge quando um livro completa
- * e cria o produto (rascunho, ativo=false) na tabela `products`.
+ * e cria o produto (rascunho, ativo=false) na tabela `products`, com EPUB/PDF
+ * copiados pro Storage do site (nunca apontando pro forge).
  *
  * POST /api/webhook/forge-delivery
+ * GET  /api/admin/forge/links            — links assinados pra revisão no admin
+ * POST /api/admin/forge/arquivos         — copia EPUB/PDF pra loja ou biblioteca
+ * (manuscrito e nova edição passam pela ponte genérica em admin-forge.ts)
  */
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { assinarForge, copiarParaStorage, copiarEpubParaBiblioteca } from '../forge-download';
+import { verificarToken } from './admin-catalog';
 
 interface DeliveryPackage {
   projectId: string;
@@ -15,6 +21,10 @@ interface DeliveryPackage {
   arquivos: string[];
   summary: string;
   timestamp: string;
+  titulo?: string;
+  autor?: string;
+  editora?: string;
+  sinopse?: string;
 }
 
 // ponytail: comparação hex constant-time duplicada em checkout.ts — sem util
@@ -54,14 +64,39 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
     return Response.json({ ok: true, ignorado: pkg.status });
   }
 
-  const forgeBaseUrl = env.FORGE_PUBLIC_URL ?? 'https://tr3vo-forge.al-kbhal.workers.dev';
-  const temEpub = pkg.arquivos.some((a) => a.startsWith(`epub/${pkg.projectId}/`));
-  const arquivoUrl = temEpub
-    ? `${forgeBaseUrl}/project/${pkg.projectId}/epub`
-    : `${forgeBaseUrl}/project/${pkg.projectId}/html`;
+  if (!/^[0-9a-f-]{36}$/i.test(pkg.projectId ?? '')) {
+    return Response.json({ ok: false, erro: 'projectId_invalido' }, { status: 400 });
+  }
+  const projectId = pkg.projectId.toLowerCase();
+  const slug = `forge-${projectId.slice(0, 8)}`;
 
-  const titulo = pkg.summary.match(/^Obra "(.+?)"/)?.[1] ?? `Forge ${pkg.projectId.slice(0, 8)}`;
-  const slug = `forge-${pkg.projectId.slice(0, 8)}`;
+  // Formatos de venda: EPUB e PDF, copiados pro Storage. HTML fica fora da venda.
+  const formatos = (['epub', 'pdf'] as const).filter((f) => pkg.arquivos.some((a) => a.startsWith(`${f}/${pkg.projectId}/`)));
+  const copiados = await copiarParaStorage(env, projectId, slug, [...formatos]);
+  const semArquivo = !copiados.epub && !copiados.pdf;
+  if (semArquivo) console.warn(`[forge-webhook] sem EPUB nem PDF copiados para ${projectId}: rascunho sem arquivo de venda`);
+
+  // Título e autor vêm do pacote (brief do forge); regex no summary só pra pacote antigo.
+  const titulo = pkg.titulo?.trim() || pkg.summary.match(/^Obra "(.+?)"/)?.[1] || `Forge ${projectId.slice(0, 8)}`;
+  const autor = pkg.autor?.trim() || null;
+  if (!autor) console.warn(`[forge-webhook] ${projectId} sem autor no brief — preencher no admin antes de ativar`);
+
+  // Nova edição do mesmo projeto (POST /project/:id/edicao no forge) reenvia o
+  // webhook: atualiza o produto existente sem mexer em preço/ativação. Arquivo
+  // que não foi copiado desta vez mantém o anterior.
+  const atualizacao: Record<string, unknown> = { titulo, autor };
+  if (copiados.epub) atualizacao.epub_url = copiados.epub;
+  if (copiados.pdf) atualizacao.arquivo_url = copiados.pdf;
+  const rPatch = await sb(env, `products?slug=eq.${slug}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' } as any,
+    body: JSON.stringify(atualizacao),
+  });
+  const existentes = rPatch.ok ? await rPatch.json().catch(() => []) : [];
+  if (Array.isArray(existentes) && existentes.length > 0) {
+    console.log(`[forge-webhook] produto ${slug} atualizado (nova edição do projeto ${projectId})`);
+    return Response.json({ ok: true, slug, projectId, atualizado: true, semArquivo });
+  }
 
   // Portão humano: cria como rascunho (ativo=false, preço placeholder).
   // Precificação real e ativação ficam pro admin, via /api/admin/catalogo já existente.
@@ -72,10 +107,13 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
       slug,
       tipo: 'ebook',
       titulo,
-      descricao: pkg.summary,
+      autor,
+      // Sinopse do Forge vira a descrição da loja; o summary técnico só para pacote antigo.
+      descricao: pkg.sinopse?.trim() || pkg.summary,
       preco: 0,
       ativo: false,
-      arquivo_url: arquivoUrl,
+      epub_url: copiados.epub ?? null,
+      arquivo_url: copiados.pdf ?? null,
     }),
   });
 
@@ -86,5 +124,58 @@ export async function handleForgeDelivery(request: Request, env: Env): Promise<R
   }
 
   console.log(`[forge-webhook] produto rascunho criado: ${slug} (projeto ${pkg.projectId})`);
-  return Response.json({ ok: true, slug, projectId: pkg.projectId });
+  return Response.json({ ok: true, slug, projectId: pkg.projectId, semArquivo });
+}
+
+/**
+ * GET /api/admin/forge/links?projectId=X — links assinados (15 min) de HTML/EPUB/PDF
+ * pra revisão no admin. O forge não abre mais esses arquivos sem assinatura.
+ */
+export async function handleAdminForgeLinks(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) return Response.json({ ok: false, erro: 'unauthorized' }, { status: 401 });
+  const projectId = (new URL(request.url).searchParams.get('projectId') ?? '').toLowerCase();
+  if (!/^[0-9a-f-]{36}$/.test(projectId)) return Response.json({ ok: false, erro: 'projectId_invalido' }, { status: 400 });
+  const [html, epub, pdf] = await Promise.all(
+    (['html', 'epub', 'pdf'] as const).map((f) => assinarForge(env, projectId, f))
+  );
+  if (!html || !epub || !pdf) return Response.json({ ok: false, erro: 'forge_download_secret_ausente' }, { status: 503 });
+  return Response.json({ ok: true, html, epub, pdf });
+}
+
+/**
+ * POST /api/admin/forge/arquivos { projectId, slug, destino: 'loja' | 'biblioteca' }
+ * loja: copia EPUB/PDF pro Storage e grava em products (slug já criado pelo catálogo).
+ * biblioteca: copia o EPUB pro R2 da Biblioteca TT e devolve a chave pro acervo.
+ */
+export async function handleAdminForgeArquivos(request: Request, env: Env): Promise<Response> {
+  if (!(await verificarToken(request, env))) return Response.json({ ok: false, erro: 'unauthorized' }, { status: 401 });
+  let body: { projectId?: unknown; slug?: unknown; destino?: unknown; lang?: unknown };
+  try { body = await request.json(); } catch { return Response.json({ ok: false, erro: 'json_invalido' }, { status: 400 }); }
+  const projectId = typeof body.projectId === 'string' ? body.projectId.toLowerCase() : '';
+  const slug = typeof body.slug === 'string' ? body.slug : '';
+  if (!/^[0-9a-f-]{36}$/.test(projectId)) return Response.json({ ok: false, erro: 'projectId_invalido' }, { status: 400 });
+  if (!/^[a-z0-9][a-z0-9-]{0,78}[a-z0-9]$/.test(slug)) return Response.json({ ok: false, erro: 'slug_invalido' }, { status: 400 });
+  // Idioma da edição a copiar (traduções do forge ficam em epub/{id}/{lang}/). Sem lang: original.
+  const lang = body.lang === undefined || body.lang === 'pt-BR' ? undefined : body.lang;
+  if (lang !== undefined && (typeof lang !== 'string' || !/^[a-z]{2}-[A-Z]{2}$/.test(lang))) {
+    return Response.json({ ok: false, erro: 'lang_invalido' }, { status: 400 });
+  }
+
+  if (body.destino === 'biblioteca') {
+    const epub_url = await copiarEpubParaBiblioteca(env, projectId, slug, lang);
+    if (!epub_url) return Response.json({ ok: false, erro: 'copia_falhou' }, { status: 502 });
+    return Response.json({ ok: true, epub_url });
+  }
+  if (body.destino !== 'loja') return Response.json({ ok: false, erro: 'destino_invalido' }, { status: 400 });
+
+  const copiados = await copiarParaStorage(env, projectId, slug, ['epub', 'pdf'], lang);
+  if (!copiados.epub && !copiados.pdf) return Response.json({ ok: false, erro: 'copia_falhou' }, { status: 502 });
+  const r = await sb(env, `products?slug=eq.${encodeURIComponent(slug)}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' } as any,
+    body: JSON.stringify({ epub_url: copiados.epub ?? null, arquivo_url: copiados.pdf ?? null }),
+  });
+  const linhas = r.ok ? await r.json().catch(() => []) : [];
+  if (!Array.isArray(linhas) || !linhas.length) return Response.json({ ok: false, erro: 'produto_nao_encontrado' }, { status: 404 });
+  return Response.json({ ok: true, ...copiados });
 }

@@ -212,21 +212,24 @@ function forgeLerArquivo(input) {
 async function forgeCriar() {
   const modo = document.querySelector('input[name="forge-modo"]:checked').value;
   const formato = forgeEl('forge-novo-formato').value || undefined; // a meta de palavras vem do formato, no Forge
+  const autor = forgeEl('forge-novo-autor').value.trim() || undefined; // vai pro brief, pra capa e pros arquivos
   let rota, corpo;
   if (modo === 'tema') {
     const tema = forgeEl('forge-novo-tema').value.trim();
     if (tema.length < 3) { toast('Descreva o tema do livro.', 'erro'); return; }
     rota = 'novo';
-    corpo = { tema, contexto: forgeEl('forge-novo-contexto').value.trim() || undefined, formato };
+    corpo = { tema, contexto: forgeEl('forge-novo-contexto').value.trim() || undefined, formato, autor };
   } else {
     const manuscrito = forgeEl('forge-novo-texto').value;
     if (manuscrito.trim().length < 200) { toast('O manuscrito precisa ter pelo menos 200 caracteres.', 'erro'); return; }
+    if (!autor) { toast('Informe o autor do manuscrito.', 'erro'); return; }
     rota = 'ingerir';
     corpo = {
       manuscrito,
       titulo: forgeEl('forge-novo-titulo').value.trim() || undefined,
       modo: forgeEl('forge-novo-modo').value,
       formato,
+      autor,
     };
   }
   const btn = forgeEl('forge-novo-enviar');
@@ -236,7 +239,7 @@ async function forgeCriar() {
     const res = await forgeApi(rota, 'POST', corpo);
     if (!res.ok) { toast(forgeMensagemErro(res), 'erro'); return; }
     toast(res.dados?.message || 'Projeto enviado ao Forge.');
-    ['forge-novo-tema', 'forge-novo-contexto', 'forge-novo-titulo', 'forge-novo-texto', 'forge-novo-formato'].forEach((i) => { forgeEl(i).value = ''; });
+    ['forge-novo-tema', 'forge-novo-contexto', 'forge-novo-titulo', 'forge-novo-texto', 'forge-novo-formato', 'forge-novo-autor'].forEach((i) => { forgeEl(i).value = ''; });
     forgeFormatoMudou();
     forgeAba('lista');
     forgeListar();

@@ -19,7 +19,9 @@ const formatoSchema = z.string().regex(/^[a-z0-9-]{1,40}$/);
 const ingerirSchema = z.object({
   manuscrito: z.string().min(200).max(4_000_000),
   titulo: z.string().trim().max(200).optional(),
-  modo: z.enum(['completar', 'aprimorar', 'ambos']).optional(),
+  // Manuscrito de autor: autor obrigatório (vai pro brief, capa e arquivos); "preservar" não reescreve o texto.
+  autor: z.string().trim().min(1).max(200),
+  modo: z.enum(['preservar', 'completar', 'aprimorar', 'ambos']).optional(),
   metaPalavras: z.number().int().positive().max(1_000_000).optional(),
   formato: formatoSchema.optional(),
 });
@@ -27,6 +29,15 @@ const novoSchema = z.object({
   tema: z.string().trim().min(3).max(500),
   contexto: z.string().max(5000).optional(),
   formato: formatoSchema.optional(),
+  autor: z.string().trim().min(1).max(200).optional(),
+});
+// Nova edição sem reescrever o texto: autor, capa (manter/gerar/enviar JPEG), idiomas extras.
+// Capa em base64 cabe no MAX_BODY_BYTES (~3,5 MB de JPEG); o Forge valida o conteúdo.
+const edicaoSchema = z.object({
+  autor: z.string().trim().min(1).max(200).optional(),
+  capa: z.enum(['manter', 'gerar', 'enviar']).optional(),
+  capaJpegBase64: z.string().max(MAX_BODY_BYTES).optional(),
+  idiomas: z.array(z.enum(['en-US', 'es-ES', 'de-DE'])).max(3).optional(),
 });
 const apagarSchema = z.object({ feedback: z.string().max(2000).optional() });
 
@@ -42,6 +53,7 @@ const ROTAS: Record<string, Rota> = {
   'POST novo': { metodo: 'POST', destino: () => '/', id: false, corpo: novoSchema },
   'POST retry': { metodo: 'POST', destino: (id) => `/retry/${id}`, id: true },
   'POST rerender': { metodo: 'POST', destino: (id) => `/rerender/${id}`, id: true },
+  'POST edicao': { metodo: 'POST', destino: (id) => `/project/${id}/edicao`, id: true, corpo: edicaoSchema },
   'DELETE projetos': { metodo: 'DELETE', destino: (id) => `/projects/${id}`, id: true, corpo: apagarSchema },
 };
 

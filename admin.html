@@ -524,6 +524,10 @@
                 <label style="display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;font-size:13px;"><input type="radio" name="forge-modo" value="manuscrito" onchange="forgeModo('manuscrito')" style="width:auto;margin:0;"> Com manuscrito pronto</label>
               </div>
               <div class="field" style="margin-bottom:16px;">
+                <label>Autor</label>
+                <input type="text" id="forge-novo-autor" class="input" maxlength="200" placeholder="Nome que vai na capa e nos arquivos (obrigatório com manuscrito)">
+              </div>
+              <div class="field" style="margin-bottom:16px;">
                 <label>Formato da obra</label>
                 <select id="forge-novo-formato" class="input" onchange="forgeFormatoMudou()">
                   <option value="">Padrão (livro de 8 a 15 capítulos)</option>
@@ -539,11 +543,13 @@
                 <div class="field"><label>Título</label><input type="text" id="forge-novo-titulo" class="input" maxlength="200"></div>
                 <div class="field" style="margin-top:12px;"><label>O que fazer com o texto</label>
                   <select id="forge-novo-modo" class="input">
+                    <option value="preservar" selected>Preservar o texto do autor (só formatar e gerar os arquivos)</option>
                     <option value="ambos">Completar e aprimorar</option>
                     <option value="completar">Só completar</option>
                     <option value="aprimorar">Só aprimorar</option>
                   </select>
                 </div>
+                <div class="field-sub" style="margin-top:8px;">Texto .txt ou .md em UTF-8 (no Word: Salvar como → Texto sem formatação). Capítulos marcados com "Capítulo 1…" ou "# Título", de 5 a 15.</div>
                 <div class="field" style="margin-top:12px;"><label>Manuscrito (mín. 200 caracteres)</label>
                   <input type="file" accept=".txt,.md,text/plain,text/markdown" onchange="forgeLerArquivo(this)" style="margin-bottom:8px;font-size:12px;">
                   <textarea id="forge-novo-texto" class="input" rows="12" placeholder="Cole o texto aqui ou carregue um arquivo .txt/.md"></textarea>
@@ -572,6 +578,7 @@
             <div class="card">
               <div class="card-body">
                 <div class="field"><label>Título</label><input type="text" id="forge-titulo" class="input"></div>
+                <div class="field"><label>Autor (vem do brief do forge)</label><input type="text" id="forge-autor" class="input" placeholder="Nome do autor (obrigatório)"></div>
                 <div class="field"><label>Slug (usado no catálogo/checkout)</label><input type="text" id="forge-slug" class="input"></div>
                 <div class="field"><label>Descrição</label><textarea id="forge-descricao" class="input" rows="4"></textarea></div>
                 <div class="field"><label>Gênero</label><input type="text" id="forge-genero" class="input"></div>
@@ -580,16 +587,49 @@
             </div>
           </div>
           <div class="card" style="margin-bottom:16px;">
+            <div class="card-hdr"><span class="card-titulo">Nova edição (sem reescrever o texto)</span></div>
+            <div class="card-body">
+              <div class="section-sub" style="margin-bottom:10px;">Usa o autor do campo acima. Refaz EPUB, PDF e capa no forge; quando terminar, o produto é atualizado e você usa "Atualizar arquivos na loja" se publicou com outro slug.</div>
+              <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+                <label>Capa
+                  <select id="ed-capa" class="input" style="width:auto;" onchange="document.getElementById('ed-capa-arquivo').style.display = this.value === 'enviar' ? '' : 'none'">
+                    <option value="manter" selected>Manter a atual</option>
+                    <option value="gerar">Gerar nova</option>
+                    <option value="enviar">Enviar arte (JPEG)</option>
+                  </select>
+                </label>
+                <input type="file" id="ed-capa-arquivo" accept="image/jpeg" style="display:none;">
+              </div>
+              <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+                <span>Traduzir para:</span>
+                <label><input type="checkbox" class="ed-idioma" value="en-US"> Inglês</label>
+                <label><input type="checkbox" class="ed-idioma" value="es-ES"> Espanhol</label>
+                <label><input type="checkbox" class="ed-idioma" value="de-DE"> Alemão</label>
+              </div>
+              <button class="btn btn-s" onclick="novaEdicaoForge()">Gerar nova edição</button>
+              <div id="ed-status" style="font-size:12px;color:var(--t3);margin-top:8px;"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
             <div class="card-hdr"><span class="card-titulo">Material de marketing</span></div>
             <div class="card-body" id="forge-marketing-list">—</div>
           </div>
           <div class="card">
             <div class="card-hdr"><span class="card-titulo">Decisão de publicação</span></div>
-            <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;">
+            <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+              <label>Idioma da edição
+                <select id="forge-lang" class="input" style="width:auto;">
+                  <option value="pt-BR" selected>Português (original)</option>
+                  <option value="en-US">Inglês</option>
+                  <option value="es-ES">Espanhol</option>
+                  <option value="de-DE">Alemão</option>
+                </select>
+              </label>
               <button class="btn btn-p" onclick="decidirForge('exclusiva')">Página exclusiva</button>
               <button class="btn btn-p" onclick="decidirForge('hero')">Destaque no hero</button>
               <button class="btn btn-s" onclick="decidirForge('biblioteca')">Só biblioteca</button>
               <button class="btn-ghost" onclick="decidirForge('rejeitar')">Não publicar</button>
+              <button class="btn btn-s" onclick="atualizarArquivosLoja()">Atualizar arquivos na loja</button>
               <button class="btn btn-s" style="margin-left:auto;" onclick="gerarBibliotecaLocal()">⭳ Gerar biblioteca local</button>
             </div>
             <div class="card-body" id="forge-decisao-status" style="padding-top:0;font-size:12px;color:var(--t3);"></div>
@@ -1020,7 +1060,7 @@
         </div>
         <div class="field">
           <label>Autor</label>
-          <input type="text" id="livro-autor" value="Said Anes">
+          <input type="text" id="livro-autor" placeholder="Nome do autor (obrigatório)" required>
         </div>
       </div>
       <div style="margin-bottom:16px;">
@@ -1174,6 +1214,7 @@ const FORGE_URL = 'https://tr3vo-forge.al-kbhal.workers.dev';
 let token = sessionStorage.getItem('tt_admin_token') || '';
 let forgeProjectId = null;
 let forgeMarketingFiles = [];
+let forgeLinks = {}; // links assinados (15 min) de html/epub/pdf, vindos do worker
 let statsCache = null;
 let catalogoCache = [];
 let mkCache = null;
@@ -1392,7 +1433,7 @@ function abrirModalLivro(slug) {
   document.getElementById('modal-livro-titulo').textContent = livro ? 'Editar — ' + (livro.titulo || livro.slug) : 'Novo título';
   document.getElementById('livro-slug-original').value = livro?.slug || '';
   document.getElementById('livro-slug').value = livro?.slug || '';
-  document.getElementById('livro-autor').value = livro?.autor || 'Said Anes';
+  document.getElementById('livro-autor').value = livro?.autor || '';
   document.getElementById('livro-titulo-pt').value = livro?.titulo || '';
   document.getElementById('livro-titulo-en').value = livro?.titulo_en || '';
   document.getElementById('livro-titulo-es').value = livro?.titulo_es || '';
@@ -1485,6 +1526,11 @@ async function salvarLivro() {
     ativo: document.getElementById('livro-ativo').checked,
     motivo_inativo: document.getElementById('livro-motivo-inativo').value.trim() || null,
   };
+  if (!payload.autor) {
+    toast('Informe o autor — ele aparece na loja e nos exemplares vendidos.', 'err');
+    btn.textContent = 'Salvar'; btn.disabled = false;
+    return;
+  }
   try {
     const r = slugOriginal
       ? await api(`/api/admin/catalogo/${slugOriginal}`, 'PUT', payload)
@@ -1540,9 +1586,17 @@ async function carregarForgeProjeto() {
 
     document.getElementById('forge-preview-area').style.display = '';
     document.getElementById('forge-cover-img').src = `${FORGE_URL}/project/${id}/cover`;
-    document.getElementById('forge-link-html').href = `${FORGE_URL}/project/${id}/html`;
-    document.getElementById('forge-link-epub').href = `${FORGE_URL}/project/${id}/epub`;
-    document.getElementById('forge-link-pdf').href = `${FORGE_URL}/project/${id}/pdf`;
+    // Arquivos do forge só abrem com link assinado (15 min), gerado pelo worker.
+    const rLinks = await api(`/api/admin/forge/links?projectId=${id}`);
+    const links = await rLinks.json();
+    if (!links.ok) toast('Links do forge indisponíveis: ' + (links.erro || rLinks.status), 'err');
+    forgeLinks = links.ok ? links : {};
+    document.getElementById('forge-link-html').href = links.html || '#';
+    document.getElementById('forge-link-epub').href = links.epub || '#';
+    document.getElementById('forge-link-pdf').href = links.pdf || '#';
+    // Título e autor do brief do forge — o autor é o que está gravado no EPUB/PDF.
+    if (d.titulo) document.getElementById('forge-titulo').value = d.titulo;
+    document.getElementById('forge-autor').value = d.autor || '';
     document.getElementById('forge-slug').value = `forge-${id.slice(0, 8)}`;
 
     carregarForgeMarketing(id);
@@ -1584,16 +1638,22 @@ async function decidirForge(destino) {
   const descricao = document.getElementById('forge-descricao').value.trim();
   const genero = document.getElementById('forge-genero').value.trim();
   const preco = parseFloat(document.getElementById('forge-preco').value) || 0;
+  const autor = document.getElementById('forge-autor').value.trim();
 
   if (!titulo || !slug) { toast('Preencha título e slug.', 'err'); return; }
+  if (!autor) { toast('Informe o autor — ele aparece na loja e nos exemplares.', 'err'); return; }
 
   const capaUrl = `${FORGE_URL}/project/${forgeProjectId}/cover`;
 
   try {
     if (destino === 'biblioteca') {
+      // EPUB copiado pro R2 da biblioteca — o acervo nunca aponta pro forge.
+      const rArq = await api('/api/admin/forge/arquivos', 'POST', { projectId: forgeProjectId, slug, destino: 'biblioteca', lang: document.getElementById('forge-lang').value });
+      const dArq = await rArq.json();
+      if (!dArq.ok) throw new Error('cópia do EPUB falhou: ' + (dArq.erro || rArq.status));
       const r = await api('/api/admin/biblioteca/acervo', 'POST', {
-        slug, titulo, autor: 'Said Anes', genero: genero || null,
-        sinopse: descricao || null, epub_url: `${FORGE_URL}/project/${forgeProjectId}/epub`,
+        slug, titulo, autor, genero: genero || null,
+        sinopse: descricao || null, epub_url: dArq.epub_url,
         capa_url: capaUrl, idioma: 'pt', ativo: true, featured: false,
       });
       const d = await r.json();
@@ -1605,12 +1665,17 @@ async function decidirForge(destino) {
 
     // exclusiva | hero — ambos entram no catálogo (página própria = /checkout.html?slug=X)
     const rCat = await api('/api/admin/catalogo', 'POST', {
-      slug, titulo, autor: 'Said Anes', genero: genero || 'reflexao', genero_pt: genero || 'reflexao',
+      slug, titulo, autor, genero: genero || 'reflexao', genero_pt: genero || 'reflexao',
       descricao: descricao || '', preco, utm_campaign: slug,
       bg_color: '#0d2415', capa_url: capaUrl, ordem: 99, ativo: true,
     });
     const dCat = await rCat.json();
     if (!dCat.ok) throw new Error(dCat.erro || 'erro ao criar no catálogo');
+
+    // EPUB/PDF copiados pro Storage do site e gravados no produto.
+    const rArq = await api('/api/admin/forge/arquivos', 'POST', { projectId: forgeProjectId, slug, destino: 'loja', lang: document.getElementById('forge-lang').value });
+    const dArq = await rArq.json();
+    if (!dArq.ok) toast('Livro criado, mas a cópia dos arquivos falhou: ' + (dArq.erro || rArq.status) + '. Tente publicar de novo.', 'err');
 
     if (destino === 'hero') {
       const rHero = await api('/api/admin/hero-config');
@@ -1624,6 +1689,52 @@ async function decidirForge(destino) {
       statusEl.textContent = 'Publicado no catálogo (página própria via checkout).';
       toast('Publicado no catálogo.', 'ok');
     }
+  } catch(e) { toast('Erro: ' + e.message, 'err'); }
+}
+
+function lerComoBase64(arquivo) {
+  return new Promise((ok, falha) => {
+    const fr = new FileReader();
+    fr.onload = () => ok(String(fr.result).split(',')[1] || '');
+    fr.onerror = () => falha(fr.error);
+    fr.readAsDataURL(arquivo);
+  });
+}
+
+async function novaEdicaoForge() {
+  if (!forgeProjectId) return;
+  const statusEl = document.getElementById('ed-status');
+  const autor = document.getElementById('forge-autor').value.trim();
+  const capa = document.getElementById('ed-capa').value;
+  const idiomas = [...document.querySelectorAll('.ed-idioma:checked')].map(c => c.value);
+  if (!autor) { toast('Informe o autor.', 'err'); return; }
+  const corpo = { autor, capa, idiomas };
+  if (capa === 'enviar') {
+    const img = document.getElementById('ed-capa-arquivo').files[0];
+    if (!img) { toast('Escolha a imagem da capa (JPEG).', 'err'); return; }
+    corpo.capaJpegBase64 = await lerComoBase64(img);
+  }
+  statusEl.textContent = 'Enviando…';
+  try {
+    // Ponte genérica do admin (admin-forge.ts): /api/admin/forge/edicao/{projectId}.
+    const r = await api(`/api/admin/forge/edicao/${forgeProjectId}`, 'POST', corpo);
+    const d = await r.json();
+    if (!r.ok || !d.ok) throw new Error(d.detalhe || d.erro || d.error || r.status);
+    statusEl.textContent = `Nova edição em produção (idiomas: ${(d.idiomas || []).join(', ')}). Recarregue o projeto para acompanhar.`;
+    toast('Nova edição iniciada no forge.', 'ok');
+  } catch(e) { statusEl.textContent = ''; toast('Erro: ' + e.message, 'err'); }
+}
+
+// Recopia EPUB/PDF do forge pro produto do slug (após nova edição ou falha na cópia).
+async function atualizarArquivosLoja() {
+  if (!forgeProjectId) return;
+  const slug = slugify(document.getElementById('forge-slug').value.trim());
+  if (!slug) { toast('Preencha o slug do produto.', 'err'); return; }
+  try {
+    const r = await api('/api/admin/forge/arquivos', 'POST', { projectId: forgeProjectId, slug, destino: 'loja', lang: document.getElementById('forge-lang').value });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.erro || r.status);
+    toast(`Arquivos atualizados: ${[d.epub, d.pdf].filter(Boolean).join(', ')}`, 'ok');
   } catch(e) { toast('Erro: ' + e.message, 'err'); }
 }
 
@@ -1641,9 +1752,9 @@ async function gerarBibliotecaLocal() {
     const pastaHandle = await raizHandle.getDirectoryHandle(pastaNome, { create: true });
 
     const arquivos = [
-      { nome: `${pastaNome}.epub`, url: `${FORGE_URL}/project/${forgeProjectId}/epub` },
-      { nome: `${pastaNome}.pdf`, url: `${FORGE_URL}/project/${forgeProjectId}/pdf` },
-      { nome: `${pastaNome}.html`, url: `${FORGE_URL}/project/${forgeProjectId}/html` },
+      { nome: `${pastaNome}.epub`, url: forgeLinks.epub },
+      { nome: `${pastaNome}.pdf`, url: forgeLinks.pdf },
+      { nome: `${pastaNome}.html`, url: forgeLinks.html },
       { nome: 'capa.jpg', url: `${FORGE_URL}/project/${forgeProjectId}/cover` },
       ...forgeMarketingFiles.map(f => ({ nome: `marketing_${f.lang}_${f.name}`, url: f.url })),
     ];
@@ -2492,6 +2603,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
   }
 }
 </script>
-<script src="js/admin-forge.js?v=d8101863"></script>
+<script src="js/admin-forge.js?v=5130e8d8"></script>
 </body>
 </html>
