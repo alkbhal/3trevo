@@ -64,6 +64,8 @@ import {
   registrarFalhaHMAC,
 } from './routes/health';
 import { handleHealthMonitor } from './cron/health-monitor';
+import { handleNFeEmissao } from './cron/nfe-emissao';
+import { handleNFeConectar, handleBlingCallback, handleNFeStatus, handleNFeProcessar } from './routes/admin-nfe';
 import {
   handleBibliotecaAcervo,
   handleBibliotecaAcesso,
@@ -155,6 +157,7 @@ export default {
       ctx.waitUntil(handleEmailEngine(env));
       ctx.waitUntil(handleBudgetController(env));
       ctx.waitUntil(handleCartRecovery(env));
+      ctx.waitUntil(handleNFeEmissao(env).then((r) => console.log('[nfe] cron:', JSON.stringify(r))));
     }
   },
 };
@@ -309,6 +312,20 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
     if (path.startsWith('/api/admin/forge/')) {
       return handleAdminForge(request, env, path);
+    }
+
+    // ── NF-e pelo Bling (admin + retorno do OAuth) ─────────────────────────
+    if (path === '/api/admin/nfe/conectar' && method === 'POST') {
+      return handleNFeConectar(request, env);
+    }
+    if (path === '/api/bling/callback' && method === 'GET') {
+      return handleBlingCallback(request, env);
+    }
+    if (path === '/api/admin/nfe/status' && method === 'GET') {
+      return handleNFeStatus(request, env);
+    }
+    if (path === '/api/admin/nfe/processar' && method === 'POST') {
+      return handleNFeProcessar(request, env);
     }
 
     // Stats (admin)
