@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="referrer-policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net www.googletagmanager.com connect.facebook.net; connect-src 'self' *.supabase.co tres-trevo-api.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com www.facebook.com; img-src 'self' data: blob: *.supabase.co tres-trevo-api.al-kbhal.workers.dev www.facebook.com; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net www.googletagmanager.com connect.facebook.net; connect-src 'self' *.supabase.co brasilapi.com.br tres-trevo-api.al-kbhal.workers.dev www.google-analytics.com region1.google-analytics.com www.google.com www.facebook.com; img-src 'self' data: blob: *.supabase.co tres-trevo-api.al-kbhal.workers.dev www.facebook.com; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none';">
 <title>Finalizar Compra — Editora Três Trevo</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -79,6 +79,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 .msg-auth{font-size:12px;color:rgba(26,26,22,.45);line-height:1.6;min-height:36px;margin-top:4px}
 .msg-auth.sucesso{color:var(--verde-medio)}
 .msg-auth.erro{color:#c0392b}
+.campo-linha{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.campo-linha.estreita{grid-template-columns:2fr 1fr}
+.campo-input{box-sizing:border-box}
+.msg-auth a{color:var(--verde-medio)}
+.campo-aviso{font-size:12px;line-height:1.5;min-height:18px;margin:-6px 0 8px;color:rgba(26,26,22,.5)}
+.campo-aviso.erro{color:#c0392b}
+.campo-aviso.ok{color:var(--verde-medio)}
+.campo-input.invalido{border-color:#c0392b}
 
 .usuario-logado{display:flex;align-items:center;justify-content:space-between;
   padding:12px 14px;background:rgba(26,74,46,.05);border:1px solid rgba(26,74,46,.12)}
@@ -171,6 +179,50 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
         </div>
       </div>
 
+      <!-- Dados para a nota fiscal (CPF/CNPJ e endereço) -->
+      <div class="login-card" id="nfCard">
+        <div class="card-titulo">Dados para a nota fiscal</div>
+        <label class="campo-label" for="docInput">CPF ou CNPJ</label>
+        <input type="text" id="docInput" class="campo-input" inputmode="text" maxlength="18"
+               placeholder="000.000.000-00" autocomplete="off" aria-describedby="docAviso"
+               oninput="aoDigitarDocumento()" onblur="aoSairDocumento()">
+        <div class="campo-aviso" id="docAviso" aria-live="polite"></div>
+        <div class="campo-linha estreita">
+          <div>
+            <label class="campo-label" for="cepInput">CEP</label>
+            <input type="text" id="cepInput" class="campo-input" inputmode="numeric" maxlength="9"
+                   placeholder="00000-000" autocomplete="postal-code" aria-describedby="cepAviso"
+                   oninput="aoDigitarCep()">
+          </div>
+          <div>
+            <label class="campo-label" for="ufInput">UF</label>
+            <input type="text" id="ufInput" class="campo-input" maxlength="2" placeholder="RS"
+                   autocomplete="address-level1" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'');validarFormulario()">
+          </div>
+        </div>
+        <div class="campo-aviso" id="cepAviso" aria-live="polite"></div>
+        <label class="campo-label" for="ruaInput">Rua</label>
+        <input type="text" id="ruaInput" class="campo-input" maxlength="120" autocomplete="address-line1" oninput="validarFormulario()">
+        <div class="campo-linha">
+          <div>
+            <label class="campo-label" for="numeroInput">Número</label>
+            <input type="text" id="numeroInput" class="campo-input" maxlength="10" placeholder="ou S/N" oninput="validarFormulario()">
+          </div>
+          <div>
+            <label class="campo-label" for="complInput">Complemento</label>
+            <input type="text" id="complInput" class="campo-input" maxlength="60" autocomplete="address-line2" placeholder="opcional">
+          </div>
+        </div>
+        <label class="campo-label" for="bairroInput">Bairro</label>
+        <input type="text" id="bairroInput" class="campo-input" maxlength="60" oninput="validarFormulario()">
+        <label class="campo-label" for="cidadeInput">Cidade</label>
+        <input type="text" id="cidadeInput" class="campo-input" maxlength="60" autocomplete="address-level2" oninput="validarFormulario()">
+        <div class="msg-auth">
+          Usados só para emitir a nota fiscal da compra (obrigação legal) e guardados pelo prazo da lei fiscal.
+          <a href="/privacidade.html" target="_blank" rel="noopener">Privacidade</a>
+        </div>
+      </div>
+
       <!-- Nema: aparece só para cliente logado com saldo disponível -->
       <label id="nemaBox" style="display:none;gap:10px;align-items:flex-start;padding:14px 16px;border:1px solid rgba(26,74,46,.25);background:rgba(26,74,46,.05);cursor:pointer;font-size:15px;line-height:1.5">
         <input type="checkbox" id="usarNema" style="width:22px;height:22px;margin-top:2px;accent-color:#1a4a2e">
@@ -208,6 +260,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 </div>
 
 <script src="/js/supabase-client.js?v=33db0afb"></script>
+<script src="/js/brasil-campos.js?v=f42d53f7"></script>
+<script src="/js/checkout-nf.js?v=b054d01c"></script>
 <script src="/js/tt-client.js?v=27f42f5f" onerror="console.error('tt-client falhou ao carregar')"></script>
 <script>
 const WORKER = 'https://tres-trevo-api.al-kbhal.workers.dev';
@@ -289,7 +343,7 @@ function renderProduto(p) {
 function validarFormulario() {
   const email = document.getElementById('emailInput').value.trim();
   const nome  = document.getElementById('nomeInput').value.trim();
-  const ok    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && nome.length >= 2;
+  const ok    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && nome.length >= 2 && dadosNF() !== null;
   document.getElementById('btnPagar').disabled = !ok || produtoIndisponivel;
 }
 
@@ -298,7 +352,8 @@ async function iniciarPagamento() {
   var email = document.getElementById('emailInput').value.trim();
   var nome  = document.getElementById('nomeInput').value.trim();
   var btn   = document.getElementById('btnPagar');
-  if (!email || !nome || !produtoSlug) return;
+  var nf    = dadosNF();
+  if (!email || !nome || !nf || !produtoSlug) return;
 
   btn.disabled = true;
   btn.innerHTML = '⏳ Processando…';
@@ -311,7 +366,7 @@ async function iniciarPagamento() {
     var resp = await fetch(WORKER + '/api/checkout/preferencia', {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({ slug: produtoSlug, email: email, usar_nema: usarNema })
+      body: JSON.stringify({ slug: produtoSlug, email: email, nome: nome, nf: nf, usar_nema: usarNema })
     });
     var data = await resp.json();
 
@@ -323,6 +378,8 @@ async function iniciarPagamento() {
         ? 'Sistema de pagamento em manutenção. Tente novamente em alguns minutos ou entre em contato: sac@3trevo.com.br'
         : data.erro === 'produto_nao_encontrado'
         ? 'Produto não encontrado. Volte ao catálogo e tente novamente.'
+        : data.erro === 'dados_fiscais_invalidos'
+        ? 'Confira o CPF/CNPJ e o endereço para a nota fiscal.'
         : data.erro === 'login_necessario'
         ? 'Para usar seu saldo Nema, entre na sua área do cliente e volte a esta página.'
         : 'Erro ao processar. Tente novamente.', 'erro');

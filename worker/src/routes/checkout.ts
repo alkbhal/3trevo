@@ -19,6 +19,7 @@ import {
   usuarioDoToken, reservarNema, cancelarReservaNema, confirmarResgateNema,
   creditarCompraNema, estornarCompraNema, reservaDoMetadata, valorNemaReais,
 } from './nema';
+import { validarDadosNF, payerMP, salvarDadosFiscais } from '../fiscal';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -45,6 +46,12 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   if (typeof slug !== 'string' || !/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug) || slug.length > 80) {
     return Response.json({ ok: false, erro: 'slug inválido' }, { status: 400 });
   }
+  // Nota fiscal: CPF/CNPJ e endereço obrigatórios (validados de novo aqui).
+  const nf = validarDadosNF(body?.nf);
+  if (!nf) {
+    return Response.json({ ok: false, erro: 'dados_fiscais_invalidos' }, { status: 400 });
+  }
+  const nome = typeof body?.nome === 'string' ? body.nome.trim().slice(0, 150) : '';
 
   // Buscar produto no Supabase (catalogo é a fonte de verdade com 11 slugs)
   const prodResp = await fetch(
@@ -89,9 +96,12 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
       unit_price: Math.round((preco - desconto) * 100) / 100,
       currency_id: 'BRL',
     }],
-    payer: { email },
+    payer: { email, ...payerMP(nf, nome) },
     external_reference: slug,
-    ...(reservaRef ? { metadata: { nema_reserva: reservaRef, nema_quantidade: nemaUsado } } : {}),
+    metadata: {
+      nf,
+      ...(reservaRef ? { nema_reserva: reservaRef, nema_quantidade: nemaUsado } : {}),
+    },
     notification_url: `${WORKER_URL}/api/webhook/pagamento`,
     back_urls: {
       success: `${SITE_URL}/area-cliente.html?status=success&slug=${slug}`,
@@ -208,6 +218,12 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
     await registrarAuditoria(env, 'webhook_erro', { mpPaymentId, erro: rpc.erro });
     return new Response('rpc_error', { status: 200 });
   }
+
+  // Nota fiscal: grava CPF/CNPJ e endereço informados no checkout (idempotente).
+  await salvarDadosFiscais(env, {
+    mpPaymentId: String(mpPaymentId), purchaseId: rpc.purchase_id ?? null,
+    email: emailPagador, nome: nomePagador, valor, metadata: mpPayment.metadata,
+  }).catch((e) => console.error('[webhook] salvarDadosFiscais falhou:', e));
 
   // Nema: confirma o saldo usado nesta compra e credita o Nema que ela gera.
   // As duas funções são idempotentes, então rodam também quando o MP reenvia o aviso.
