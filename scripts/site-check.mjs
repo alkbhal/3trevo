@@ -11,7 +11,7 @@
 //   - JSON-LD válido (JSON que abre sem erro)
 //   - Analytics e pixel só pelo js/consentimento.js (LGPD: nada carrega antes do "aceito")
 //   - páginas de venda (home, catálogo, checkout, grátis, obras) sem jargão jurídico ou técnico
-//     no texto: nada de "CDC", "art. 49", "Lei nº", "§", "SSL" ou "N$ 1"
+//     no texto: nada de "CDC", "art. 49", "Lei nº", "§" ou "SSL"
 // E, por página:
 //   - home (PT/EN/ES): Organization e FAQPage
 //   - páginas de obra: Book e BreadcrumbList
@@ -43,7 +43,7 @@ const meta = (html, chave) => {
 };
 
 const VENDA = /^((en\/|es\/)?index|catalogo|checkout|gratis)\.html$|^obra\//;
-const JARGAO = /\bCDC\b|\bart\.\s*\d|\bLei n[º°.]|§|\bSSL\b|N\$\s*\d/i;
+const JARGAO = /\bCDC\b|\bart\.\s*\d|\bLei n[º°.]|§|\bSSL\b/i;
 
 const sitemap = existsSync(join(ROOT, 'sitemap.xml')) ? readFileSync(join(ROOT, 'sitemap.xml'), 'utf8') : '';
 const titulos = new Map();
