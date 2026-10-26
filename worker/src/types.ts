@@ -28,7 +28,15 @@ export interface Env {
   // Pagamentos — Mercado Pago
   MP_ACCESS_TOKEN?: string;  // APP_USR-... (wrangler secret put MP_ACCESS_TOKEN)
 
-  // R2 (downloads de PDFs)
+  // NF-e pelo Bling (ver src/bling.ts e src/cron/nfe-emissao.ts)
+  BLING_CLIENT_ID?: string;      // secret: app da Central de Extensões do Bling
+  BLING_CLIENT_SECRET?: string;  // secret
+  BLING_NATUREZA_ID?: string;    // id da natureza de operação de venda (cadastrada no Bling pelo contador)
+  BLING_LOJA_ID?: string;        // opcional: loja do Bling a que as notas pertencem
+  NFE_NCM?: string;              // padrão 4901.99.00 (livros)
+  NFE_ENABLED?: string;          // "true" liga a emissão; qualquer outro valor só enfileira
+
+    // R2 (downloads de PDFs)
   R2_PUBLIC_BUCKET_ID?: string;
 
   // R2 privado — EPUBs da Biblioteca TT

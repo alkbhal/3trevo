@@ -404,6 +404,9 @@
       <button class="sb-item" onclick="irPara('sorteio',this)">
         <span class="sb-ic">◉</span> Sorteio
       </button>
+      <button class="sb-item" onclick="irPara('nfe',this)">
+        <span class="sb-ic">▤</span> Notas fiscais
+      </button>
       <button class="sb-item" onclick="irPara('monitor',this)" id="sb-monitor">
         <span class="sb-ic">◎</span> Monitor
         <span class="sb-badge" id="badge-monitor" style="display:none;background:#e74c3c">!</span>
@@ -988,6 +991,27 @@
       </div>
 
       <!-- ── MONITOR ──────────────────────────────────────────────────── -->
+      <!-- ── NOTAS FISCAIS (Bling) ─────────────────────────────────────── -->
+      <div class="panel" id="panel-nfe">
+        <div class="section-hdr">
+          <div>
+            <div class="section-titulo">Notas fiscais</div>
+            <div class="section-sub">Emissão de NF-e pelo Bling. Cada pagamento aprovado entra na fila; o Worker emite a cada hora.</div>
+          </div>
+          <button class="btn btn-s" onclick="carregarNFe()">↻ Atualizar</button>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hdr"><span class="card-titulo">Configuração</span>
+            <button class="btn btn-p btn-sm" id="nfe-conectar" onclick="conectarBling()">Conectar Bling</button></div>
+          <div class="card-body" id="nfe-config" style="padding:16px 20px;">Carregando…</div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-titulo">Fila de emissão</span>
+            <button class="btn btn-s btn-sm" id="nfe-processar" onclick="processarNFe()">Emitir agora</button></div>
+          <div class="card-body" id="nfe-fila" style="padding:16px 20px;">—</div>
+        </div>
+      </div>
+
       <div class="panel" id="panel-monitor">
         <div class="section-hdr">
           <div>
@@ -1271,7 +1295,7 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', forge:'Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', forge:'Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', nfe:'Notas fiscais', monitor:'Monitor do Sistema' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
@@ -1282,6 +1306,7 @@ function irPara(panel, btn) {
   if (panel === 'biblioteca') carregarBiblioteca();
   if (panel === 'marketing') carregarMarketing();
   if (panel === 'monitor') carregarMonitor();
+  if (panel === 'nfe') carregarNFe();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -2604,5 +2629,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
 }
 </script>
 <script src="js/admin-forge.js?v=5130e8d8"></script>
+<script src="js/admin-nfe.js?v=498f6875"></script>
 </body>
 </html>
