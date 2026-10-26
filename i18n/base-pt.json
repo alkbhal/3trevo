@@ -314,7 +314,7 @@
  "nema.titulo": "<em>Sua compra</em> volta como desconto",
  "priv.base": "Execução do contrato (conta, compras e leitura), cumprimento de obrigações legais (registros fiscais), consentimento (e-mails de novidades e cookies de medição) e legítimo interesse (segurança do site).",
  "priv.base.t": "Base legal",
- "priv.coleta": "Nome e e-mail quando você cria sua área de membro ou compra; CPF ou CNPJ e endereço na compra, para emitir a nota fiscal; dados da compra (produto, valor e situação do pagamento), processados pelo meio de pagamento; o progresso de leitura e as obras que você escolhe; e dados de navegação (páginas visitadas e origem da visita), por cookies de medição.",
+ "priv.coleta": "Nome e e-mail quando você cria sua área de membro ou compra; CPF ou CNPJ e endereço na compra, para emitir a nota fiscal (fora do Brasil: país, endereço e, se você quiser, passaporte ou número fiscal); dados da compra (produto, valor e situação do pagamento), processados pelo meio de pagamento; o progresso de leitura e as obras que você escolhe; e dados de navegação (páginas visitadas e origem da visita), por cookies de medição.",
  "priv.coleta.t": "O que coletamos",
  "priv.compartilha": "Só com os serviços necessários para o site funcionar: hospedagem e banco de dados (Supabase, Cloudflare e GitHub), pagamento (Mercado Pago), consulta de CEP e CNPJ para preencher o endereço da nota fiscal (BrasilAPI, que recebe só o CEP ou o CNPJ digitado, nunca o CPF), envio de e-mails e medição de audiência (Google Analytics e Meta). Não vendemos os seus dados.",
  "priv.compartilha.t": "Com quem compartilhamos",

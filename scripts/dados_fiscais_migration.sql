@@ -18,16 +18,25 @@ create table if not exists public.dados_fiscais (
   email           text not null,
   nome            text not null,
   valor           numeric(10,2) not null,
-  tipo_documento  text not null check (tipo_documento in ('CPF', 'CNPJ')),
-  documento       text not null check (documento ~ '^[0-9A-Z]{11,14}$'),
-  cep             text not null check (cep ~ '^[0-9]{8}$'),
+  -- EXTERIOR = comprador fora do Brasil (NF de exportação: UF "EX", município "EXTERIOR")
+  tipo_documento  text not null check (tipo_documento in ('CPF', 'CNPJ', 'EXTERIOR')),
+  pais            char(2) not null default 'BR',   -- ISO 3166-1 alfa-2
+  documento       text check (documento ~ '^[0-9A-Z]{1,20}$'),  -- no exterior: passaporte/nº fiscal, opcional
+  cep             text,                             -- no exterior: código postal livre, opcional
   logradouro      text not null,
-  numero          text not null,
+  numero          text,
   complemento     text,
-  bairro          text not null,
+  bairro          text,
   cidade          text not null,
   uf              char(2) not null,
   codigo_ibge     text check (codigo_ibge is null or codigo_ibge ~ '^[0-9]{7}$'),
+  -- coalesce: em CHECK, NULL conta como aprovado; aqui campo vazio tem de reprovar
+  constraint dados_fiscais_brasil_completo check (
+    tipo_documento = 'EXTERIOR'
+    or coalesce(pais = 'BR' and documento ~ '^[0-9A-Z]{11,14}$' and cep ~ '^[0-9]{8}$'
+        and numero is not null and bairro is not null, false)
+  ),
+  constraint dados_fiscais_exterior check (tipo_documento <> 'EXTERIOR' or (pais <> 'BR' and uf = 'EX')),
   nf_numero       text,          -- preenchido quando a nota for emitida
   nf_emitida_em   timestamptz,
   criado_em       timestamptz not null default now()

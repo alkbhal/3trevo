@@ -87,6 +87,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 .campo-aviso.erro{color:#c0392b}
 .campo-aviso.ok{color:var(--verde-medio)}
 .campo-input.invalido{border-color:#c0392b}
+.campo-check{display:flex;gap:10px;align-items:center;font-size:13px;color:rgba(26,26,22,.7);margin-bottom:14px;cursor:pointer;min-height:44px}
+.campo-check input{width:20px;height:20px;accent-color:#1a4a2e}
 
 .usuario-logado{display:flex;align-items:center;justify-content:space-between;
   padding:12px 14px;background:rgba(26,74,46,.05);border:1px solid rgba(26,74,46,.12)}
@@ -182,6 +184,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
       <!-- Dados para a nota fiscal (CPF/CNPJ e endereço) -->
       <div class="login-card" id="nfCard">
         <div class="card-titulo">Dados para a nota fiscal</div>
+        <label class="campo-check"><input type="checkbox" id="exteriorCheck" onchange="alternarExterior()">
+          <span>Moro fora do Brasil <span lang="en">(I live outside Brazil)</span></span></label>
+        <div id="nfExterior" hidden>
+          <label class="campo-label" for="paisSelect">País <span lang="en">(country)</span></label>
+          <select id="paisSelect" class="campo-input" autocomplete="country" onchange="validarFormulario()"></select>
+          <label class="campo-label" for="exRuaInput">Endereço <span lang="en">(address)</span></label>
+          <input type="text" id="exRuaInput" class="campo-input" maxlength="120" autocomplete="address-line1" oninput="validarFormulario()">
+          <div class="campo-linha">
+            <div>
+              <label class="campo-label" for="exCidadeInput">Cidade <span lang="en">(city)</span></label>
+              <input type="text" id="exCidadeInput" class="campo-input" maxlength="60" autocomplete="address-level2" oninput="validarFormulario()">
+            </div>
+            <div>
+              <label class="campo-label" for="exPostalInput">Cód. postal</label>
+              <input type="text" id="exPostalInput" class="campo-input" maxlength="12" autocomplete="postal-code" placeholder="ZIP · opcional">
+            </div>
+          </div>
+          <label class="campo-label" for="exDocInput">Passaporte ou nº fiscal <span lang="en">(tax ID)</span></label>
+          <input type="text" id="exDocInput" class="campo-input" maxlength="24" autocomplete="off" placeholder="opcional / optional">
+        </div>
+        <div id="nfBrasil">
         <label class="campo-label" for="docInput">CPF ou CNPJ</label>
         <input type="text" id="docInput" class="campo-input" inputmode="text" maxlength="18"
                placeholder="000.000.000-00" autocomplete="off" aria-describedby="docAviso"
@@ -217,6 +240,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
         <input type="text" id="bairroInput" class="campo-input" maxlength="60" oninput="validarFormulario()">
         <label class="campo-label" for="cidadeInput">Cidade</label>
         <input type="text" id="cidadeInput" class="campo-input" maxlength="60" autocomplete="address-level2" oninput="validarFormulario()">
+        </div>
         <div class="msg-auth">
           Usados só para emitir a nota fiscal da compra (obrigação legal) e guardados pelo prazo da lei fiscal.
           <a href="/privacidade.html" target="_blank" rel="noopener">Privacidade</a>
@@ -261,7 +285,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
 
 <script src="/js/supabase-client.js?v=33db0afb"></script>
 <script src="/js/brasil-campos.js?v=f42d53f7"></script>
-<script src="/js/checkout-nf.js?v=b054d01c"></script>
+<script src="/js/checkout-nf.js?v=08668677"></script>
 <script src="/js/tt-client.js?v=27f42f5f" onerror="console.error('tt-client falhou ao carregar')"></script>
 <script>
 const WORKER = 'https://tres-trevo-api.al-kbhal.workers.dev';

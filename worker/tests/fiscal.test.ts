@@ -58,6 +58,28 @@ describe('validarDadosNF', () => {
   });
 });
 
+describe('validarDadosNF no exterior', () => {
+  const fora = { exterior: true, pais: 'pt', logradouro: 'Rua Augusta 10', cidade: 'Lisboa', cep: '1100-053', documento: 'ab 123.456' };
+
+  it('aceita sem CPF/CEP brasileiro: país, endereço e cidade bastam', () => {
+    expect(validarDadosNF(fora)).toMatchObject({
+      tipo: 'EXTERIOR', pais: 'PT', uf: 'EX', documento: 'AB123456', cep: '1100-053', cidade: 'Lisboa',
+    });
+    expect(validarDadosNF({ ...fora, documento: '', cep: '' })).toMatchObject({ documento: '', cep: '' });
+  });
+
+  it('recusa país inválido, Brasil pelo caminho do exterior ou endereço vazio', () => {
+    expect(validarDadosNF({ ...fora, pais: 'XYZ' })).toBeNull();
+    expect(validarDadosNF({ ...fora, pais: 'BR' })).toBeNull();
+    expect(validarDadosNF({ ...fora, logradouro: ' ' })).toBeNull();
+    expect(validarDadosNF({ ...fora, cidade: '' })).toBeNull();
+  });
+
+  it('não manda identificação nem endereço ao Mercado Pago', () => {
+    expect(payerMP(validarDadosNF(fora)!, 'John')).toEqual({ name: 'John' });
+  });
+});
+
 describe('payerMP', () => {
   it('manda identificação ao MP só para documento numérico', () => {
     const cpf = validarDadosNF({ documento: '52998224725', ...endereco })!;

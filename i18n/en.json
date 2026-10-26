@@ -286,7 +286,7 @@
  "nema.titulo": "<em>Your purchase</em> comes back as a discount",
  "priv.base": "Performance of our agreement with you (account, purchases and reading), compliance with legal obligations (tax records), your consent (news emails and measurement cookies) and legitimate interest (site security).",
  "priv.base.t": "Legal basis",
- "priv.coleta": "Your name and email when you create your member area or make a purchase; your Brazilian tax ID (CPF or CNPJ) and address when you buy, to issue the invoice; purchase details (product, amount and payment status), handled by the payment provider; your reading progress and the books you choose; and browsing data (pages visited and where the visit came from), through measurement cookies.",
+ "priv.coleta": "Your name and email when you create your member area or make a purchase; your Brazilian tax ID (CPF or CNPJ) and address when you buy, to issue the invoice (outside Brazil: your country, address and, if you choose, your passport or tax ID); purchase details (product, amount and payment status), handled by the payment provider; your reading progress and the books you choose; and browsing data (pages visited and where the visit came from), through measurement cookies.",
  "priv.coleta.t": "What we collect",
  "priv.compartilha": "Only with the services the site needs to work: hosting and database (Supabase, Cloudflare and GitHub), payments (Mercado Pago), postal code and company ID lookup to fill in the invoice address (BrasilAPI, which receives only the postal code or CNPJ you type, never your CPF), email delivery and audience measurement (Google Analytics and Meta). We do not sell your data.",
  "priv.compartilha.t": "Who we share it with",

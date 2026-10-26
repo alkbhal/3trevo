@@ -10,7 +10,9 @@ import type { Env } from './types';
 import { sb } from './sb';
 
 export interface DadosNF {
-  tipo: 'CPF' | 'CNPJ';
+  // EXTERIOR: comprador fora do Brasil (NF de exportação: sem CPF/CEP; UF "EX", município "EXTERIOR")
+  tipo: 'CPF' | 'CNPJ' | 'EXTERIOR';
+  pais: string; // ISO 3166-1 alfa-2 ('BR' no Brasil)
   documento: string;
   cep: string;
   logradouro: string;
@@ -59,6 +61,7 @@ function texto(v: unknown, max: number): string {
 export function validarDadosNF(raw: unknown): DadosNF | null {
   if (!raw || typeof raw !== 'object') return null;
   const r = raw as Record<string, unknown>;
+  if (r.exterior === true || r.tipo === 'EXTERIOR') return validarExterior(r);
   // Se o metadata do MP devolver número em vez de texto, recupera os zeros à esquerda.
   const doc0 = String(r.documento ?? '').toUpperCase().replace(/[^0-9A-Z]/g, '');
   const documento = typeof r.documento === 'number' ? doc0.padStart(r.tipo === 'CNPJ' ? 14 : 11, '0') : doc0;
@@ -70,7 +73,7 @@ export function validarDadosNF(raw: unknown): DadosNF | null {
   const uf = String(r.uf ?? '').trim().toUpperCase();
   const ibge = String(r.ibge ?? '').replace(/\D/g, '');
   const nf: DadosNF = {
-    tipo, documento, cep, uf,
+    tipo, pais: 'BR', documento, cep, uf,
     logradouro: texto(r.logradouro, 120),
     numero: texto(r.numero, 10),
     complemento: texto(r.complemento, 60),
@@ -82,12 +85,35 @@ export function validarDadosNF(raw: unknown): DadosNF | null {
   return nf;
 }
 
+/**
+ * Comprador no exterior: país, endereço e cidade obrigatórios; código postal e
+ * documento do país dele (passaporte ou número fiscal) opcionais.
+ */
+function validarExterior(r: Record<string, unknown>): DadosNF | null {
+  const pais = String(r.pais ?? '').trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(pais) || pais === 'BR') return null;
+  const nf: DadosNF = {
+    tipo: 'EXTERIOR', pais,
+    documento: String(r.documento ?? '').toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 20),
+    cep: texto(r.cep, 12),
+    logradouro: texto(r.logradouro, 120),
+    numero: texto(r.numero, 10),
+    complemento: texto(r.complemento, 60),
+    bairro: texto(r.bairro, 60),
+    cidade: texto(r.cidade, 60),
+    uf: 'EX',
+    ibge: '',
+  };
+  if (!nf.logradouro || !nf.cidade) return null;
+  return nf;
+}
+
 /** Campos `payer` da preferência MP (o MP já abre o pagamento com CPF/endereço preenchidos). */
 export function payerMP(nf: DadosNF, nome: string): Record<string, unknown> {
-  const payer: Record<string, unknown> = {
-    address: { zip_code: nf.cep, street_name: nf.logradouro, street_number: nf.numero },
-  };
+  const payer: Record<string, unknown> = {};
   if (nome) payer.name = nome;
+  if (nf.tipo === 'EXTERIOR') return payer; // o MP só entende identificação e CEP brasileiros
+  payer.address = { zip_code: nf.cep, street_name: nf.logradouro, street_number: nf.numero };
   // CNPJ alfanumérico ainda pode não ser aceito pelo MP: nesse caso só a NF usa o documento.
   if (/^\d+$/.test(nf.documento)) payer.identification = { type: nf.tipo, number: nf.documento };
   return payer;
@@ -114,12 +140,13 @@ export async function salvarDadosFiscais(env: Env, opts: {
       nome: texto(opts.nome, 150),
       valor: opts.valor,
       tipo_documento: nf.tipo,
-      documento: nf.documento,
-      cep: nf.cep,
+      pais: nf.pais,
+      documento: nf.documento || null,
+      cep: nf.cep || null,
       logradouro: nf.logradouro,
-      numero: nf.numero,
+      numero: nf.numero || null,
       complemento: nf.complemento || null,
-      bairro: nf.bairro,
+      bairro: nf.bairro || null,
       cidade: nf.cidade,
       uf: nf.uf,
       codigo_ibge: nf.ibge || null,

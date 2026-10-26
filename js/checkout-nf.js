@@ -20,8 +20,55 @@ function tipoDocumento() {
   if (d.length === 14 && BrasilCampos.cnpjValido(d)) return 'CNPJ';
   return null;
 }
+// ── Comprador no exterior: NF de exportação (sem CPF/CEP; país + endereço) ──
+var PAISES = ('AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BS BT BV BW BY BZ ' +
+  'CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR ' +
+  'GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP ' +
+  'KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT ' +
+  'MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW ' +
+  'SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG ' +
+  'UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW').split(' ');
+function montarPaises() {
+  var sel = campo('paisSelect');
+  var nomes = null;
+  try { nomes = new Intl.DisplayNames(['pt-BR'], { type: 'region' }); } catch (e) {}
+  var lista = PAISES.map(function (c) { return [c, nomes ? nomes.of(c) : c]; })
+    .sort(function (a, b) { return a[1].localeCompare(b[1], 'pt-BR'); });
+  sel.innerHTML = '<option value="">Selecione / Select…</option>';
+  lista.forEach(function (p) {
+    var o = document.createElement('option');
+    o.value = p[0]; o.textContent = p[1];
+    sel.appendChild(o);
+  });
+}
+function noExterior() { return campo('exteriorCheck').checked; }
+function alternarExterior() {
+  var fora = noExterior();
+  campo('nfExterior').hidden = !fora;
+  campo('nfBrasil').hidden = fora;
+  validarFormulario();
+}
+function dadosExterior() {
+  var nf = {
+    exterior: true,
+    pais: campo('paisSelect').value,
+    logradouro: campo('exRuaInput').value.trim(),
+    cidade: campo('exCidadeInput').value.trim(),
+    cep: campo('exPostalInput').value.trim(),
+    documento: campo('exDocInput').value.trim(),
+  };
+  if (!/^[A-Z]{2}$/.test(nf.pais) || !nf.logradouro || !nf.cidade) return null;
+  return nf;
+}
+document.addEventListener('DOMContentLoaded', function iniciarExterior() {
+  montarPaises();
+  // quem chega dos sites em inglês ou espanhol já começa com "moro fora do Brasil"
+  if (/\/(en|es)\//.test(document.referrer)) { campo('exteriorCheck').checked = true; alternarExterior(); }
+});
+
 function dadosNF() {
   if (!window.BrasilCampos) return null;
+  if (noExterior()) return dadosExterior();
   var tipo = tipoDocumento();
   if (!tipo || (tipo === 'CNPJ' && cnpjBloqueado)) return null;
   var nf = {
