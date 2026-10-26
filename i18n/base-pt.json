@@ -43,7 +43,7 @@
  "ft.regulamento": "Regras do Nema",
  "ft.sobre": "Sobre",
  "ft.tag": "Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.",
- "gar.texto": "Não gostou? Reembolso integral sem perguntas em até 7 dias corridos (CDC art. 49). Contato: sac@3trevo.com.br (respondemos em até 48 horas) · Ao pedir reembolso, o Nema daquela compra é cancelado.",
+ "gar.texto": "Leia por 7 dias. Se não for o que você esperava, devolvemos 100% do valor, sem perguntas. É só escrever para sac@3trevo.com.br, respondemos em até 48 horas.",
  "gar.titulo": "Garantia de 7 dias",
  "gratis.badge": "1º Capítulo Grátis",
  "gratis.botao": "Criar minha área grátis →",
@@ -153,7 +153,7 @@
   },
   {
    "q": "Posso pedir reembolso?",
-   "r": "Sim. Pelo art. 49 do CDC, você tem 7 dias corridos após a compra para pedir reembolso integral. Escreva para sac@3trevo.com.br. O Nema daquela compra é cancelado."
+   "r": "Sim. Você tem 7 dias para ler sem risco: se não gostar, devolvemos 100% do valor. É só escrever para sac@3trevo.com.br. O Nema daquela compra é cancelado."
   }
  ],
  "js.gratis.carregando": "Carregando… tente de novo em um instante.",
@@ -293,7 +293,7 @@
  "nema.r.ganha.t": "Como você ganha",
  "nema.r.intl": "Nossas edições neste idioma estão a caminho. Quando chegarem, cada compra já rende Nema com estas regras.",
  "nema.r.intro": "Nema é o ponto de fidelidade da Editora Três Trevo. Cada e-book que você compra rende Nema, e o seu saldo paga parte da próxima leitura.",
- "nema.r.libera": "Sete dias depois da compra, quando termina o prazo de arrependimento do Código de Defesa do Consumidor. Até lá, o saldo aparece como pendente na sua área do cliente.",
+ "nema.r.libera": "Sete dias depois da compra, o mesmo prazo da sua garantia. Até lá, o saldo aparece como pendente na sua área do cliente.",
  "nema.r.libera.t": "Quando o saldo libera",
  "nema.r.nao.t": "O que o Nema não é",
  "nema.r.nao1": "Não é dinheiro: não pode ser sacado.",
@@ -344,8 +344,8 @@
  "sobre.p3": "Com o Nema, parte de cada compra volta para você como desconto na próxima leitura.",
  "sobre.titulo.em": "Editora",
  "sobre.titulo.rest": "Três Trevo",
- "trust.cdc": "(CDC art. 49)",
+ "trust.cdc": "para ler sem risco",
  "trust.entrega": "Entrega imediata por e-mail",
- "trust.garantia": "Garantia de 7 dias",
+ "trust.garantia": "7 dias de garantia",
  "wa.link": "https://wa.me/5554999467085?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20ebooks%20da%20Editora%20Três%20Trevo."
 }

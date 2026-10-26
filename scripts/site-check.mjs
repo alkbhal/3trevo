@@ -10,6 +10,8 @@
 //   - link para a política de privacidade
 //   - JSON-LD válido (JSON que abre sem erro)
 //   - Analytics e pixel só pelo js/consentimento.js (LGPD: nada carrega antes do "aceito")
+//   - páginas de venda (home, catálogo, checkout, grátis, obras) sem jargão jurídico ou técnico
+//     no texto: nada de "CDC", "art. 49", "Lei nº", "§", "SSL" ou "N$ 1"
 // E, por página:
 //   - home (PT/EN/ES): Organization e FAQPage
 //   - páginas de obra: Book e BreadcrumbList
@@ -40,6 +42,9 @@ const meta = (html, chave) => {
   return null;
 };
 
+const VENDA = /^((en\/|es\/)?index|catalogo|checkout|gratis)\.html$|^obra\//;
+const JARGAO = /\bCDC\b|\bart\.\s*\d|\bLei n[º°.]|§|\bSSL\b|N\$\s*\d/i;
+
 const sitemap = existsSync(join(ROOT, 'sitemap.xml')) ? readFileSync(join(ROOT, 'sitemap.xml'), 'utf8') : '';
 const titulos = new Map();
 
@@ -54,6 +59,13 @@ for (const arquivo of paginas()) {
   for (const bloco of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
     if (!bloco[1].trim()) continue;
     try { JSON.parse(bloco[1]); } catch (e) { erro(pagina, `JSON-LD inválido (${e.message})`); }
+  }
+
+  // Página de venda fala do livro: lei, artigo e sigla técnica ficam nos Termos e nas regras.
+  if (VENDA.test(pagina)) {
+    const corpo = html.replace(/<head\b[\s\S]*?<\/head>|<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ');
+    const jargao = corpo.match(JARGAO);
+    if (jargao) erro(pagina, `jargão jurídico ou técnico no texto da página de venda ("${jargao[0]}"); escreva como benefício ao leitor e deixe a lei para os Termos`);
   }
 
   const robots = meta(head, 'robots') || '';
