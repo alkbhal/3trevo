@@ -71,6 +71,12 @@ describe('GET /api/nema/saldo', () => {
   });
 });
 
+// Dados da nota fiscal, obrigatórios em todo pedido (ver src/fiscal.ts)
+const NF = {
+  documento: '529.982.247-25', cep: '95660-000', logradouro: 'Rua Principal', numero: '100',
+  complemento: '', bairro: 'Centro', cidade: 'Montauri', uf: 'RS', ibge: '4312476',
+};
+
 describe('POST /api/checkout/preferencia com Nema', () => {
   function responderBase(url: string) {
     if (url.includes('/rest/v1/catalogo')) return [{ slug: 'antifalencia', titulo: 'Guia', preco: 46.04, cotas: 3 }];
@@ -85,7 +91,7 @@ describe('POST /api/checkout/preferencia com Nema', () => {
     const req = new Request('https://w/api/checkout/preferencia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
-      body: JSON.stringify({ slug: 'antifalencia', email: 'outro@x.com', usar_nema: true }),
+      body: JSON.stringify({ slug: 'antifalencia', email: 'outro@x.com', usar_nema: true, nf: NF }),
     });
     const body: any = await (await handleCriarPreferencia(req, env)).json();
     expect(body).toMatchObject({ ok: true, desconto: 5, nema_usado: 10 });
@@ -93,28 +99,55 @@ describe('POST /api/checkout/preferencia com Nema', () => {
     const pref = JSON.parse(String(mp.init!.body));
     expect(pref.items[0].unit_price).toBe(41.04);
     expect(pref.payer.email).toBe('dono@x.com');
-    expect(pref.metadata).toEqual({ nema_reserva: REF, nema_quantidade: 10 });
+    expect(pref.metadata).toMatchObject({ nema_reserva: REF, nema_quantidade: 10 });
   });
 
   it('sem login não usa Nema', async () => {
     mockFetch(responderBase);
     const req = new Request('https://w/api/checkout/preferencia', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com', usar_nema: true }),
+      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com', usar_nema: true, nf: NF }),
     });
     expect((await handleCriarPreferencia(req, env)).status).toBe(401);
+  });
+
+  it('sem dados da nota fiscal, recusa antes de falar com o Mercado Pago', async () => {
+    const chamadas = mockFetch(responderBase);
+    const req = new Request('https://w/api/checkout/preferencia', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com', nf: { ...NF, documento: '529.982.247-24' } }),
+    });
+    const res = await handleCriarPreferencia(req, env);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ erro: 'dados_fiscais_invalidos' });
+    expect(chamadas.some((c) => c.url.includes('/checkout/preferences'))).toBe(false);
+  });
+
+  it('manda CPF e endereço ao Mercado Pago e guarda a NF no metadata', async () => {
+    const chamadas = mockFetch(responderBase);
+    const req = new Request('https://w/api/checkout/preferencia', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com', nome: 'Ana Leitora', nf: NF }),
+    });
+    await handleCriarPreferencia(req, env);
+    const pref = JSON.parse(String(chamadas.find((c) => c.url.includes('/checkout/preferences'))!.init!.body));
+    expect(pref.payer).toMatchObject({
+      email: 'x@x.com', name: 'Ana Leitora', identification: { type: 'CPF', number: '52998224725' },
+      address: { zip_code: '95660000', street_number: '100' },
+    });
+    expect(pref.metadata.nf).toMatchObject({ tipo: 'CPF', documento: '52998224725', uf: 'RS' });
   });
 
   it('sem pedir Nema, o preço segue cheio e nada é reservado', async () => {
     const chamadas = mockFetch(responderBase);
     const req = new Request('https://w/api/checkout/preferencia', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com' }),
+      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com', nf: NF }),
     });
     await handleCriarPreferencia(req, env);
     const pref = JSON.parse(String(chamadas.find((c) => c.url.includes('/checkout/preferences'))!.init!.body));
     expect(pref.items[0].unit_price).toBe(46.04);
-    expect(pref.metadata).toBeUndefined();
+    expect(pref.metadata).not.toHaveProperty('nema_reserva');
     expect(chamadas.some((c) => c.url.includes('nema_reservar'))).toBe(false);
   });
 
@@ -124,7 +157,7 @@ describe('POST /api/checkout/preferencia com Nema', () => {
     const req = new Request('https://w/api/checkout/preferencia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
-      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com', usar_nema: true }),
+      body: JSON.stringify({ slug: 'antifalencia', email: 'x@x.com', usar_nema: true, nf: NF }),
     });
     expect((await handleCriarPreferencia(req, env)).status).toBe(502);
     expect(chamadas.some((c) => c.url.includes('nema_cancelar_reserva'))).toBe(true);
@@ -143,7 +176,7 @@ describe('webhook de pagamento aprovado', () => {
     const chamadas = mockFetch((url) => {
       if (url.includes('/v1/payments/mp1')) return {
         status: 'approved', external_reference: 'antifalencia', transaction_amount: 41.04,
-        payment_type_id: 'pix', payer: { email: 'dono@x.com', first_name: 'Dono' }, metadata: { nema_reserva: REF },
+        payment_type_id: 'pix', payer: { email: 'dono@x.com', first_name: 'Dono' }, metadata: { nema_reserva: REF, nf: { ...NF, documento: '52998224725', cep: '95660000' } },
       };
       if (url.includes('/auth/v1/admin/users')) return { id: 'u1' };
       if (url.includes('rpc/registrar_compra_mp')) return { ok: true, novo: true, purchase_id: PURCHASE, cotas_base: 3 };
@@ -163,6 +196,10 @@ describe('webhook de pagamento aprovado', () => {
     expect(JSON.parse(String(confirma.init!.body))).toMatchObject({ p_ref: REF, p_mp_payment: 'mp1', p_purchase: PURCHASE });
     const credito = chamadas.find((c) => c.url.includes('nema_creditar_compra'))!;
     expect(JSON.parse(String(credito.init!.body))).toMatchObject({ p_user: 'u1', p_purchase: PURCHASE, p_valor_pago: 41.04 });
+    const fiscal = chamadas.find((c) => c.url.includes('/rest/v1/dados_fiscais'))!;
+    expect(JSON.parse(String(fiscal.init!.body))).toMatchObject({
+      mp_payment_id: 'mp1', purchase_id: PURCHASE, tipo_documento: 'CPF', documento: '52998224725', cep: '95660000', uf: 'RS',
+    });
     expect(chamadas.some((c) => c.url.includes('draw_numbers') || c.url.includes('draw_entries') || c.url.includes('/draws?'))).toBe(false);
   });
 });
