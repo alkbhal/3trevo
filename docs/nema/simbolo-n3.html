@@ -1,0 +1,42 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4efe5;font-family:Poppins,sans-serif;color:#1a1a16}
+.grade{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.col{padding:36px 28px;text-align:center;border-right:1px solid rgba(26,74,46,.12)}
+.col:last-child{border-right:0}
+h3{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#7a5c1e;margin:0 0 18px}
+.grande{font-family:'Playfair Display',serif;font-weight:700;font-size:120px;line-height:1;color:#1e3528;margin:10px 0 24px}
+.escuro{background:#24392d;border-radius:10px;padding:22px;margin:0 0 14px;color:#f6f1e6;font-family:'Playfair Display',serif;font-size:34px;font-weight:600}
+.claro{font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:#1e3528;margin-bottom:8px}
+.peq{font-size:14px;color:#3d3c35}
+p.nota{font-size:13px;color:#6b6860;line-height:1.5;margin:14px 0 0}
+/* o símbolo: "N" + "3" cortado; o leitor de tela lê "N$" */
+.n3{display:inline-flex;align-items:baseline;white-space:nowrap;font-variant-numeric:lining-nums}.grande,.escuro,.claro,.peq{font-variant-numeric:lining-nums}
+.n3 .tres{position:relative;display:inline-block;line-height:.72;padding:0 .02em}
+.v1 .tres::after{content:'';position:absolute;left:50%;top:-.16em;bottom:-.16em;width:.07em;margin-left:-.0375em;background:currentColor}
+.v2 .tres::before,.v2 .tres::after{content:'';position:absolute;top:-.14em;bottom:-.14em;width:.05em;background:currentColor}
+.v2 .tres::before{left:40%}.v2 .tres::after{left:58%}
+.v3 .tres::before,.v3 .tres::after{content:'';position:absolute;left:50%;width:.075em;margin-left:-.0375em;background:currentColor;height:.16em}
+.v3 .tres::before{top:-.17em}.v3 .tres::after{bottom:-.17em}
+.dourado .tres::after,.dourado .tres::before{background:#d6b762}
+</style></head><body><div class="grade">
+<div class="col"><h3>A · traço único</h3>
+ <div class="grande"><span class="n3 v1" aria-label="N$">N<span class="tres">3</span></span></div>
+ <div class="escuro">Rende <span class="n3 v1 dourado" aria-label="N$">N<span class="tres">3</span></span> 3,07</div>
+ <div class="claro">Saldo: <span class="n3 v1" aria-label="N$">N<span class="tres">3</span></span> 12,40</div>
+ <div class="peq">Você tem <span class="n3 v1" aria-label="N$">N<span class="tres">3</span></span> 4,98 para usar</div>
+ <p class="nota">Igual ao cifrão: um traço que atravessa o 3 de ponta a ponta. Lê-se “N$” na hora.</p></div>
+<div class="col"><h3>B · traço duplo</h3>
+ <div class="grande"><span class="n3 v2" aria-label="N$">N<span class="tres">3</span></span></div>
+ <div class="escuro">Rende <span class="n3 v2 dourado" aria-label="N$">N<span class="tres">3</span></span> 3,07</div>
+ <div class="claro">Saldo: <span class="n3 v2" aria-label="N$">N<span class="tres">3</span></span> 12,40</div>
+ <div class="peq">Você tem <span class="n3 v2" aria-label="N$">N<span class="tres">3</span></span> 4,98 para usar</div>
+ <p class="nota">Dois traços, como o cifrão antigo. Mais carregado, e em tamanho pequeno pode embolar.</p></div>
+<div class="col"><h3>C · só as pontas</h3>
+ <div class="grande"><span class="n3 v3" aria-label="N$">N<span class="tres">3</span></span></div>
+ <div class="escuro">Rende <span class="n3 v3 dourado" aria-label="N$">N<span class="tres">3</span></span> 3,07</div>
+ <div class="claro">Saldo: <span class="n3 v3" aria-label="N$">N<span class="tres">3</span></span> 12,40</div>
+ <div class="peq">Você tem <span class="n3 v3" aria-label="N$">N<span class="tres">3</span></span> 4,98 para usar</div>
+ <p class="nota">O traço só aparece acima e abaixo do 3. É o mais limpo, e o 3 continua legível.</p></div>
+</div></body></html>
