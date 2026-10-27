@@ -178,6 +178,26 @@ const cruza = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < 
     }
   }
 
+  // 9b. Âncoras levam ao destino; nada pesado tocando sozinho
+  {
+    const p = await abrir(b, PAGINA, [390, 844]);
+    const quebradas = await p.evaluate(() => [...document.querySelectorAll('a[href*="#"]')]
+      .map(a => new URL(a.getAttribute('href'), location.href))
+      .filter(u => u.pathname === location.pathname && u.hash.length > 1 && !document.getElementById(decodeURIComponent(u.hash.slice(1))))
+      .map(u => u.hash));
+    res('toda âncora #id leva a um elemento que existe', quebradas.length === 0, quebradas.length ? `sem destino: ${[...new Set(quebradas)].join(', ')}` : 'âncoras da própria página conferidas');
+    await p.waitForTimeout(1500);
+    const peso = await p.evaluate(() => {
+      const recursos = performance.getEntriesByType('resource').map(r => ({ nome: r.name.split('?')[0].split('/').pop(), kb: Math.round((r.transferSize || r.encodedBodySize || 0) / 1024), tipo: r.initiatorType }));
+      const videos = [...document.querySelectorAll('video')].filter(v => v.autoplay || !v.paused).map(v => (v.currentSrc || v.src || '').split('/').pop());
+      return { recursos, videos, total: recursos.reduce((t, r) => t + r.kb, 0) };
+    });
+    const grandes = peso.recursos.filter(r => r.kb > 1536 || (r.tipo === 'video' && r.kb > 1024));
+    res('nenhum arquivo acima de 1,5 MB nem vídeo pesado tocando sozinho', grandes.length === 0 && peso.videos.every(v => !peso.recursos.find(r => r.nome === v && r.kb > 1024)),
+      `${peso.recursos.length} arquivos, ${peso.total} KB no total${grandes.length ? '; grandes: ' + grandes.map(r => r.nome + ' ' + r.kb + ' KB').join(', ') : ''}${peso.videos.length ? '; vídeo automático: ' + peso.videos.join(', ') : ''}`);
+    await p.close();
+  }
+
   // 10. Computador: oferta acima da dobra
   {
     const p = await abrir(b, PAGINA, [1280, 800]);

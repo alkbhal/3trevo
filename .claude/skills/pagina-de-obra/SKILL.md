@@ -28,6 +28,29 @@ description: "Usar para criar, refazer ou publicar a página de uma obra no site
 - **PT:** a página para no PR e espera o aval do dono.
 - **EN/ES:** publica sozinha se a nota for ≥ 8 **e** a prova inteira passar; qualquer conferência falhando → para e espera o dono.
 
+## Página ruim (resposta do dono, 26/10/2026)
+Página ruim não é a feia: é a que atrapalha o objetivo dela. É ruim quando:
+- o visitante não entende rápido o que está sendo oferecido;
+- a promessa não bate com o produto ou com a entrega;
+- a ação principal é difícil de achar ou de executar;
+- há informação contraditória, preço inconsistente ou condição escondida;
+- elementos visuais competem e atrapalham a leitura;
+- o conteúdo é ilegível ou inacessível para parte do público;
+- demora para carregar ou trava (ex.: vídeo pesado tocando sozinho);
+- botão, link (ex.: âncora que não leva ao destino), formulário ou componente não funciona;
+- aviso, banner ou janela cobre conteúdo importante;
+- mede, coleta ou transmite dados sem respeitar a privacidade;
+- o código muda sem controle de escopo, sem teste ou sem como verificar o resultado.
+
+**Regra de qualidade:** código alterado ou captura bonita não é "pronto". Só está validada a página cujos critérios de aceitação foram verificados e cujas falhas relevantes foram corrigidas ou registradas.
+
+## Antes de alterar
+1. Identificar o objetivo da página e a ação principal.
+2. Ler a implementação atual antes de propor mudança.
+3. Registrar os problemas vistos, separando fato de hipótese.
+4. Escrever os critérios de aceitação verificáveis.
+5. Ficar no escopo autorizado, sem mudança colateral.
+
 ## Passos
 1. Conferir a nota de mercado do idioma contra o corte. Sem nota visível → declarar "não conferível" e parar no PR.
 2. Trocar o slug `forge-xxxxxxxx` por um slug legível (sem acento, com hífen) no admin.
@@ -53,6 +76,8 @@ Rodar e mostrar uma linha por conferência (passou / falhou / não conferido, co
    - barra fixa escondida com o aviso de cookies aberto e enquanto o botão da primeira tela está à vista;
    - sem rolagem horizontal em 7 larguras;
    - botão de compra abre `/checkout.html?slug=<slug>`;
+   - toda âncora `#id` da página leva a um elemento que existe;
+   - nenhum vídeo toca sozinho com mais de 1 MB e nenhum arquivo da página passa de 1,5 MB;
    - preço da tela = preço do JSON-LD = preço do admin;
    - acessibilidade WCAG AA: 0 violações.
 3. Cada número da ficha aparece no texto da página e no livro entregue.

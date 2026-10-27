@@ -1,7 +1,7 @@
 # Regulamento Geral do Nema — versão 1 (RASCUNHO)
 
-> Rascunho para revisão jurídica. Não publicar. Os trechos marcados **[DECISÃO PENDENTE]** trazem uma proposta e esperam a decisão do dono.
-> Base: o modelo de adesão definido pelo dono em 27/10/2026 e as regras que o sistema aplica hoje (`supabase/nema.sql`).
+> Rascunho para revisão jurídica. Não publicar. As decisões do dono de 26/10/2026 estão incorporadas; falta a redação jurídica definitiva.
+> Base: o modelo de adesão e as decisões consolidadas do dono e as regras que o sistema aplica hoje (`supabase/nema.sql`).
 
 **Promotora:** Editora Três Trevo, CNPJ 18.928.966/0001-59, Montauri/RS, Brasil.
 **Atendimento:** sac@3trevo.com.br. Respondemos em até 48 horas.
@@ -11,11 +11,13 @@
 
 ## 1. O que é o Nema
 
-1.1. O Nema (símbolo **N$**) é a moeda do programa de relacionamento da Editora Três Trevo. Ela registra a participação do leitor nas compras e nas ações da editora.
+1.1. O Nema (símbolo **N$**) é a unidade de valor e de participação do ecossistema Três Trevo. Ele registra a participação do leitor nas compras e nas campanhas da editora.
+
+1.1.1. O Nema não é sinônimo de desconto. **Campanha** é a ação que define como o Nema é gerado, distribuído ou usado. **Benefício** é a vantagem que uma campanha efetivamente oferece, e pode incluir desconto quando a campanha o prever.
 
 1.2. O Nema tem uma finalidade: ser usado nas modalidades e campanhas da própria Editora Três Trevo, conforme este Regulamento e o regulamento de cada campanha.
 
-1.3. O Nema **não é dinheiro**. Ele não pode ser sacado, convertido em reais, transferido para outra pessoa nem vendido. Não rende juros nem correção.
+1.3. O Nema **não é dinheiro**, não é moeda oficial nem de curso legal e não é um ativo resgatável em dinheiro. Ele não pode ser sacado, transferido para outra pessoa nem vendido, e não rende juros nem correção. O símbolo N$ é só a identidade visual do programa.
 
 1.4. Participar é gratuito e voluntário. Quem não aderir continua comprando normalmente no site.
 
@@ -29,7 +31,9 @@
 
 ## 3. Como o leitor recebe Nema
 
-3.1. **Compra de e-book:** cada compra aprovada gera Nema na proporção de 10% do valor efetivamente pago, convertido pelo valor de referência do item 5.1. Exemplo: numa compra de R$ 24,90, os 10% são R$ 2,49, que geram N$ 4,98.
+3.1. A quantidade de Nema de uma compra ou ação nunca é presumida: cada campanha informa a sua regra de cálculo antes da participação.
+
+3.1.1. **Campanha permanente "Compra de e-book":** cada compra aprovada gera Nema na proporção de 10% do valor efetivamente pago, convertido pelo valor de referência do item 5.1. Exemplo: numa compra de R$ 24,90, os 10% são R$ 2,49, que geram N$ 4,98.
 
 3.2. Quando parte da compra foi paga com Nema, o cálculo considera só o valor pago em dinheiro (Pix ou cartão).
 
@@ -39,13 +43,13 @@
 
 ## 4. Saldo e histórico
 
-4.1. O leitor consulta na área do cliente:
+4.1. O leitor consulta na área do cliente, mesmo sem ter aceitado a versão mais recente deste Regulamento:
 - o saldo disponível;
 - o saldo pendente, ainda na carência;
 - o saldo reservado, durante um pagamento em aberto;
 - o histórico de cada movimento, com data, origem (compra ou campanha) e situação.
 
-4.2. Se o leitor discordar de algum movimento, pode contestá-lo pelo atendimento em até [DECISÃO PENDENTE — proposta: 90 dias] da data do movimento.
+4.2. Se o leitor discordar de algum movimento, pode contestá-lo pelo atendimento em até 90 dias corridos, contados da data em que o lançamento apareceu no extrato. Esse prazo operacional não afasta os direitos previstos em lei, inclusive quando houver erro que não possa ser legitimamente excluído por prazo interno.
 
 ## 5. Modalidades de uso
 
@@ -82,13 +86,15 @@
 
 ## 7. Validade, expiração e cancelamento
 
-7.1. **Validade.** [DECISÃO PENDENTE — proposta: o Nema disponível vale por 12 meses a partir da data em que ficou disponível. A editora avisa por e-mail 30 dias antes de qualquer saldo expirar. Hoje o sistema não expira o Nema.]
+7.1. **Validade.** O saldo não expira automaticamente enquanto o programa estiver ativo.
+
+7.1.1. Uma campanha pode dar prazo próprio para usar os Nemas promocionais que ela conceder, desde que o prazo seja informado antes da participação. Esse prazo nunca se aplica, retroativamente, a Nemas concedidos sem prazo de expiração.
 
 7.2. **Devolução da compra:** se o leitor pedir a devolução dentro da garantia, o Nema gerado por aquela compra é cancelado, e o Nema usado nela volta ao saldo.
 
 7.3. **Cancelamento por irregularidade:** a editora pode cancelar o Nema obtido por fraude, erro do sistema, uso de várias contas pela mesma pessoa ou violação deste Regulamento. O leitor é avisado com o motivo e pode contestar pelo atendimento.
 
-7.4. **Encerramento da conta:** quem exclui a conta perde o saldo, depois de um aviso com prazo para usá-lo. [DECISÃO PENDENTE — proposta: 30 dias.]
+7.4. **Exclusão da conta:** excluir a conta não confisca o saldo automaticamente. O sistema registra o saldo e a data do pedido, e o participante tem 90 dias para pedir a regularização ou a destinação do saldo, conforme as condições de encerramento divulgadas. [JURÍDICO: validar o tratamento de saldos residuais e eventuais obrigações legais.]
 
 ## 8. Direitos e responsabilidades
 
@@ -111,13 +117,15 @@
 
 ## 9. Alterações e encerramento do programa
 
-9.1. Mudanças neste Regulamento geram uma nova versão, publicada no site e avisada por e-mail com pelo menos [DECISÃO PENDENTE — proposta: 30 dias] de antecedência.
+9.1. Mudanças neste Regulamento geram uma nova versão, publicada no site. Alterações materiais desfavoráveis ao participante são avisadas por e-mail com pelo menos 30 dias de antecedência. Mudanças exigidas por lei ou por necessidade urgente de segurança podem ter tratamento excepcional, com comunicação adequada.
 
-9.2. Ao usar o Nema depois de publicada a nova versão, o leitor aceita a versão nova, que é pedida uma vez. Quem não aceitar mantém o saldo já disponível para uso nas condições da versão anterior até [DECISÃO PENDENTE — proposta: o fim do prazo de validade do item 7.1].
+9.2. **Transição de versão.** O saldo existente é preservado. Antes da próxima operação com Nema, o participante recebe o regulamento atualizado. O aceite é explícito e registrado com a versão, a data e hora e a identificação do participante. Consultar saldo e histórico continua possível sem aceitar. Para usar, movimentar ou gerar novos Nemas, é preciso concluir o aceite.
 
-9.3. Se o programa for encerrado, a editora avisa com pelo menos [DECISÃO PENDENTE — proposta: 60 dias] de antecedência e mantém a modalidade padrão ativa nesse prazo, para que o saldo possa ser usado.
+9.2.1. A recusa não autoriza o confisco do saldo. O saldo de quem não aceitar fica registrado, e o atendimento informa como esclarecer ou resolver a situação. [JURÍDICO: definir o tratamento definitivo desses saldos.]
 
-9.4. Mudanças não prejudicam o Nema já concedido nem campanhas em andamento.
+9.3. Se o programa for encerrado, a editora avisa com pelo menos 90 dias de antecedência e divulga as regras para usar ou liquidar os saldos elegíveis. [JURÍDICO: disciplinar as exceções — lei, fraude, impossibilidade operacional — e o tratamento dos saldos.]
+
+9.4. Nenhuma mudança reduz retroativamente o saldo já adquirido nem retira benefícios já concedidos, e mudanças não prejudicam campanhas em andamento.
 
 ## 10. Disposições finais
 
@@ -131,7 +139,7 @@
 
 ### Notas para o jurídico (não fazem parte do texto público)
 
-- **"Moeda" e natureza jurídica.** O texto chama o Nema de "moeda do programa" e diz, no item 1.3, que ele não é dinheiro. Vale avaliar se a palavra "moeda" exige outro termo ("unidade", "ponto") para afastar qualquer leitura de meio de pagamento ou de arranjo de pagamento.
+- **Natureza jurídica.** O texto usa "unidade de valor e de participação" e diz, no item 1.3, que o Nema não é dinheiro nem moeda oficial. Confirmar se isso afasta qualquer leitura de meio de pagamento ou arranjo de pagamento.
 - **Campanhas com sorteio ou concurso.** Se alguma campanha tiver sorteio, vale-brinde ou concurso com prêmio, ela pode depender de autorização da SPA/Ministério da Fazenda (Lei 5.768/1971). O texto de campanhas precisa prever isso.
-- **Expiração (7.1).** Prazo e aviso precisam ser razoáveis para não serem considerados abusivos (CDC, art. 51).
-- **Saldo existente.** Quem ganhou Nema antes desta versão precisa ter o saldo preservado. A proposta é o aceite da v1 no próximo uso.
+- **Prazos internos** (contestação de 90 dias, exclusão de conta, encerramento): conferir se são razoáveis (CDC, art. 51) e redigir as exceções.
+- **Saldos de quem recusa ou exclui a conta** (7.4 e 9.2.1): definir o destino definitivo.

@@ -30,27 +30,35 @@ Símbolo: N com o 3 cortado só nas pontas (opção C), referência em `simbolo-
 | Liga/desliga do uso do saldo | não existe | parâmetro `resgate_ativo` lido por `nema_reservar` |
 | Backup com restauração testada | não conferível daqui | confirmar no painel do Supabase |
 
-## Ordem (cada fase = um PR que para no aval do dono)
-1. **Banco:** versões, aceites, campanhas, liga/desliga, tipo `credito_campanha`. Migração aditiva; saldos existentes intactos.
-2. **Worker:** registrar aceite; saldo informa `precisa_aceite`; uso do saldo recusado sem aceite.
-3. **Site:** página do Regulamento Geral; `nema.html` reescrita (moeda, sem "desconto"); aceite e histórico na área do cliente; checkout; home; EN/ES; símbolo C.
-4. **Admin:** cadastro e publicação de campanhas.
+## Decisões do dono (26/10/2026)
+- **Regra central:** o Nema não é sinônimo de desconto. É unidade de valor e de participação do ecossistema; o uso depende das regras gerais aceitas e das condições de cada campanha. Adesão uma vez; campanhas variam conforme regras informadas antes.
+- **Regulamento v1:** saldo não expira enquanto o programa estiver ativo (campanha pode ter prazo próprio para Nema promocional, informado antes e nunca retroativo); contestação em 90 dias corridos da disponibilização no extrato, preservados os direitos legais; aviso de 30 dias para alteração material desfavorável; 90 dias após exclusão da conta para regularizar ou destinar o saldo, sem confisco automático; aviso de 90 dias para encerramento, com regras de uso ou liquidação. Incorporado em `regulamento-geral-v1-rascunho.md`; falta a redação jurídica definitiva.
+- **Saldos existentes:** preservados. Aceite explícito da v1 (versão, data e hora, participante) antes da próxima operação. Consulta de saldo e histórico livre sem aceite; usar, movimentar ou gerar Nema exige aceite. Recusa não confisca. Nada retroativo.
+- **Comunicação:** três conceitos — **Nema** (unidade de valor), **Campanha** (ação que define geração e uso), **Benefício** (vantagem da campanha, pode incluir desconto quando previsto). Eliminar "Nema = desconto" na home, em `nema.html`, em EN/ES (títulos, descrições, botões, FAQ, metadados, mensagens de erro, telas de aceite, campanhas). EN/ES preservam o conceito, sem traduzir "desconto" para manter textos antigos.
+  - Home — título: "Nema: valor que circula dentro do ecossistema Três Trevo." Descrição: "Participe de campanhas, acumule Nemas conforme as regras de cada ação e utilize seus créditos nas oportunidades disponíveis. Cada campanha informa como participar, como os Nemas são calculados e quais condições se aplicam ao seu uso." Chamada: "Conheça o Nema e suas campanhas."
+  - `nema.html`: "O Nema é a unidade de valor utilizada no ecossistema Três Trevo. Sua geração e utilização seguem as regras gerais do programa e as condições específicas de cada campanha. Antes de participar, consulte os critérios de concessão, os limites, os benefícios disponíveis e as condições de utilização. A quantidade de Nemas associada a uma compra ou ação não deve ser presumida: cada campanha precisa apresentar sua regra de cálculo."
+- **Símbolo (opção C, encerrado):** entregar versão principal, monocromática, variantes para fundo claro e escuro, tamanho mínimo legível e arquivo vetorial; usar na área do cliente, admin, extratos e campanhas. Não sugerir moeda oficial nem ativo resgatável em dinheiro.
+- **Medidor próprio (`js/beacon.js`):** respeita a escolha de cookies. Antes do aceite, só o estritamente necessário; recusa → página funcional e sem medição analítica; escolha registrada e respeitada; separar métricas agregadas que dispensem consentimento das que usam identificador. Validar com LGPD/ANPD. Hoje o beacon grava `_tt_anon` e envia eventos sem esperar o aceite: precisa mudar antes de ir para as páginas de obra.
+- **Teste do verde:** clean × suave nas páginas de obra, com o resto constante. Critérios: contraste, legibilidade no celular, hierarquia, facilidade de achar a ação principal, peso do verde, desempenho e estabilidade. Decide pelo resultado.
+- **Fluxo de engenharia:** decisão → regra → requisito → esquema de dados → implementação → teste → evidência. Nenhuma alteração de saldo ou mudança irreversível sem validação e trilha de auditoria.
 
-## Decisões pendentes do dono
-1. Validade do Nema (proposta: 12 meses, aviso 30 dias antes).
-2. Prazo para contestar movimento (proposta: 90 dias).
-3. Aviso prévio de mudança no regulamento (proposta: 30 dias).
-4. Prazo para usar o saldo ao excluir a conta (proposta: 30 dias) e aviso de encerramento do programa (proposta: 60 dias).
-5. Quem já tem saldo: mantém o saldo e aceita a v1 no próximo uso; até aceitar, vê mas não usa (proposta).
-6. Manter N$ 1 = R$ 0,50 e o teto de metade do preço como modalidade padrão?
-7. Revisão jurídica: uso da palavra "moeda"; campanhas com sorteio/prêmio (Lei 5.768/1971); expiração (CDC art. 51).
+## Fases aprovadas (cada fase = um PR que para no aval do dono)
+1. **Fundação:** revisar o modelo de dados; versões do regulamento; aceite (versão, data e hora, participante); preservar o histórico; liga/desliga do uso do saldo; `nema_reservar` e o crédito de compra recusam sem aceite da versão vigente; consulta livre. Migração aditiva, saldos intactos, tudo auditável.
+2. **Motor de campanhas:** ficha com os 10 campos; regras de geração, uso, limites, validade e combinações; a compra de e-book vira a campanha permanente; crédito único por atividade.
+3. **Interfaces:** aceite e extrato na área do cliente; admin para regulamento e campanhas; home, `nema.html`, checkout e EN/ES reescritos; símbolo C.
+4. **Validação:** fluxos completos — aceite, recusa, saldo preexistente, alteração de campanha, contestação, encerramento e falhas operacionais — com evidência.
 
-## Outras frentes abertas (fora do Nema)
-| Frente | Situação | Depende de |
+## Pendências
+| Frente | Situação | Próximo passo |
 |---|---|---|
-| Home, `nema.html` e EN/ES ainda dizem "desconto" | identificado | fase 3 acima |
-| Isa, Antifalência e Justiça(mento) no visual clean | só o texto foi atualizado | aplicar a skill `pagina-de-obra` |
-| Medição nas páginas de obra (beacon) e teste A/B do verde | planejado | decisão: o `js/beacon.js` grava um id anônimo e envia eventos sem esperar o aceite de cookies, mas o aviso diz que a medição só liga com o aceite — alinhar o texto ou o comportamento |
-| Esteira forge → site | página de obra ainda feita à mão; slug `forge-xxxxxxxx`; nota de mercado invisível; sem biblioteca de manuscritos etiquetados nem painel de consulta no admin | projeto do forge |
+| Redação jurídica do Regulamento v1 | decisões incorporadas; 3 marcas [JURÍDICO] | jurídico |
+| Fases 1 a 4 do Nema | aprovadas; não iniciadas | fase 1 |
+| Home, `nema.html` e EN/ES ainda dizem "desconto" | textos-base definidos | fase 3 |
+| Símbolo C (arquivos vetoriais e variantes) | aprovado | fase 3 |
+| Beacon respeitando o consentimento | decidido | PR próprio, antes do teste do verde |
+| Teste clean × suave | critérios definidos | depois do beacon |
+| Isa, Antifalência e Justiça(mento) no visual clean | só o texto foi atualizado | skill `pagina-de-obra` |
+| Esteira forge → site (nota de mercado visível, slug legível, biblioteca de manuscritos, painel no admin, EN/ES) | identificado | projeto do forge |
 | Skill de capa no forge | decidido que será separada | projeto do forge |
-| Pergunta 8 da entrevista da skill | aberta | resposta do dono → `.claude/skills/pagina-de-obra/notas.md` |
+| Home: `assets/hero-reel.mp4` (7,5 MB) começa a tocar sozinho no celular (conferido em 27/10 com Playwright; o JS dá play, `preload="none"` não impede) | confirmado | PR próprio: versão leve ou pôster estático no celular, conferido pela prova (limite de 1 MB para vídeo automático) |
+| Home: âncoras do FAQ (relato da auditoria) | as 17 âncoras da home levam a destinos que existem no código atual | conferir no aparelho em que o problema apareceu |
