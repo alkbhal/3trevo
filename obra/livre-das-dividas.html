@@ -26,7 +26,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Editora Três Trevo", "item": "https://3trevo.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Catálogo", "item": "https://3trevo.com.br/catalogo.html"}, {"@type": "ListItem", "position": 3, "name": "Livre das Dívidas", "item": "https://www.3trevo.com.br/obra/livre-das-dividas.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--creme:#f4efe5;--creme2:#ece6d6;--card:#ffffff;--verde-nav:#0f2d1a;--verde:#1a4a2e;--verde2:#256640;--ouro:#c8a84b;--ouro-texto:#7a5c1e;--tinta:#1a1a16;--tinta2:#3d3c35;--tinta3:#6b6860;--tinta4:#9a9790;--borda:rgba(26,74,46,.12);--borda-ouro:rgba(200,168,75,.25);--footer:#06091a;}
@@ -129,6 +129,119 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 
 .compra-fixa{display:none}
 @media(max-width:900px){.compra-fixa{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:950;align-items:center;justify-content:space-between;gap:12px;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:var(--verde-nav);border-top:1px solid rgba(200,168,75,.3)}.compra-fixa-preco{font-family:'Lora',serif;font-size:20px;font-weight:600;color:var(--ouro)}.compra-fixa a{padding:12px 22px;background:var(--ouro);color:var(--verde-nav);font-size:14px;font-weight:600}body{padding-bottom:72px}#waBtn{bottom:88px}html.tt-com-aviso .compra-fixa{display:none}}
+
+/* ── B+C clean ─────────────────────────────────────────────────────────────
+   Identidade: verde da marca + dourado. Leis de UX aplicadas:
+   Hick (uma decisão por tela), Von Restorff (só o botão de compra é dourado cheio),
+   Fitts (botão grande e perto do polegar), Proximidade (preço colado no botão),
+   Miller (a oferta em 4 blocos), Jakob (capa à esquerda, como nas livrarias online),
+   Estética-usabilidade (menos bordas, menos rótulos em caixa alta, mais respiro). */
+:root{--verde-nav:#1e3528;--verde:#2c4a38;--ouro-claro:#d6b762;--papel:#faf7f0}
+body::before{display:none}
+.divisor{display:none}
+nav,nav.scrolled{background:#1e3528}
+.nav-cta{background:transparent;color:var(--ouro-claro);border:1px solid rgba(214,183,98,.6)}
+.nav-cta:hover{background:rgba(214,183,98,.12)}
+
+.obra-hero{background:radial-gradient(110% 90% at 30% 0%,#33503f 0%,#24392d 55%,#1c2d23 100%);border-bottom:0;min-height:0;padding:128px 48px 96px}
+.obra-hero-inner{grid-template-columns:300px 1fr;gap:72px;max-width:1080px}
+.obra-mockup-grande{order:-1;width:260px!important;height:390px!important;margin:0 auto}
+.obra-mockup-grande img{width:260px!important;height:390px!important;border-radius:2px;box-shadow:0 30px 60px -20px rgba(0,0,0,.55),0 0 80px rgba(214,183,98,.14)!important}
+.obra-mockup-grande:hover{transform:none}
+.obra-breadcrumb{text-transform:none;letter-spacing:.2px;font-size:12px;color:rgba(244,239,229,.5);margin-bottom:28px}
+.obra-breadcrumb::before{display:none}
+.obra-breadcrumb a{color:rgba(244,239,229,.7)}
+.obra-genero{color:var(--ouro-claro);letter-spacing:2.5px;font-size:11px;margin-bottom:18px}.obra-genero::before{display:none}
+h1.obra-titulo,h2.sec-titulo,.programa-titulo,.obra-preco,.ficha b{font-family:'Playfair Display',serif}
+h1.obra-titulo{color:#f6f1e6;font-weight:700;font-size:clamp(44px,5.2vw,68px);line-height:1;letter-spacing:-.5px;margin-bottom:14px}
+.obra-autor{color:rgba(244,239,229,.62);font-size:14px;letter-spacing:.3px;margin-bottom:22px}
+.obra-desc{font-family:'Lora',serif;font-style:italic;color:rgba(246,241,230,.92);font-size:21px;line-height:1.45;margin-bottom:32px}
+.ficha{list-style:none;display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:0;margin:0 0 32px;padding:0}
+.ficha li{padding:0 28px;border-left:1px solid rgba(244,239,229,.16);font-size:12px;line-height:1.35;color:rgba(244,239,229,.68)}
+.ficha li:first-child{padding-left:0;border-left:0}
+.ficha b{display:block;font-size:28px;font-weight:600;color:#f6f1e6;line-height:1.1}
+.compra-linha{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.obra-preco-badge{background:none;border:0;padding:0;margin:0;display:block}
+.obra-preco{color:#f6f1e6;font-size:36px;font-weight:600;line-height:1}
+.obra-faixa{color:rgba(244,239,229,.6);letter-spacing:1.5px;font-size:10px;margin-bottom:6px}
+.obra-cotas{color:rgba(244,239,229,.6);font-size:12px;margin-top:6px}
+.btn-adquirir{background:var(--ouro-claro);color:#1c2d23;font-weight:600;font-size:16px;border-radius:8px;padding:18px 36px;letter-spacing:.2px}
+.btn-adquirir:hover{background:#e2c675}
+.obra-hero a:focus-visible,.compra-fixa a:focus-visible{outline-color:var(--ouro-claro)}
+
+/* corpo: papel claro, leitura confortável, sem molduras */
+.obra-content{background:var(--papel);padding:96px 48px}
+.obra-content-inner{max-width:1080px;gap:80px}
+.obra-texto{max-width:640px}
+.obra-lead{font-family:'Lora',serif;font-size:21px;line-height:1.55;color:var(--tinta);margin-bottom:28px}
+.obra-texto p{font-size:16px;line-height:1.8}
+.sec-label::before{display:none}.sec-label{letter-spacing:3px}
+.sidebar-card{background:transparent;border:0;border-top:1px solid var(--borda);padding:24px 0;margin:0}
+.sidebar-card::before{display:none}
+.autor-info a{text-decoration:underline;text-underline-offset:3px}
+.obra-lista li::before{content:'—';font-size:14px;margin-top:0}
+
+/* Nema em papel, não em mais um bloco verde */
+.obra-programa{background:#f1ece0;padding:72px 48px}
+.cotas-badge{background:transparent;border:0;padding:0;color:var(--ouro-texto);font-size:30px;margin-bottom:12px}
+.cotas-badge span{opacity:1;color:var(--ouro-texto)}
+.programa-titulo{color:var(--tinta)}.programa-desc{color:var(--tinta2);margin-bottom:28px}
+.btn-programa{color:var(--ouro-texto);border-color:rgba(122,92,30,.45)}
+.obra-outros{background:var(--papel)}
+
+/* rodapé grafite, legível */
+footer{background:#1b1d1b}
+.footer-desc{color:rgba(255,255,255,.7)}
+.footer-grid>div:first-child>div:last-child{color:rgba(255,255,255,.62)!important}
+.footer-col h4{color:rgba(255,255,255,.62)}
+.footer-col a,.footer-contato{color:rgba(255,255,255,.75)}
+.footer-legal{color:rgba(255,255,255,.6)}
+.footer-selo{color:rgba(214,183,98,.85);border-color:rgba(214,183,98,.4)}
+@media(min-width:901px){.footer-bottom{padding-right:84px}}
+.compra-fixa-wa{display:none}
+
+@media(max-width:900px){
+ .obra-hero{padding:80px 20px 32px}
+ .obra-hero-inner{grid-template-columns:112px 1fr;grid-template-areas:"crumb crumb" "capa gen" "capa h1" "capa autor" "desc desc" "ficha ficha" "compra compra";column-gap:18px;row-gap:0;align-items:end}
+ .obra-hero-inner>div:first-child{display:contents}
+ .obra-breadcrumb{grid-area:crumb;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;margin-bottom:16px}
+ .obra-genero{grid-area:gen;font-size:10px;letter-spacing:2px;margin-bottom:8px}
+ h1.obra-titulo{grid-area:h1;font-size:34px;margin-bottom:6px}
+ .obra-autor{grid-area:autor;font-size:12px;margin-bottom:0;align-self:start}
+ .obra-mockup-grande{grid-area:capa;width:112px!important;height:168px!important;margin:0;align-self:center}
+ .obra-mockup-grande img{width:112px!important;height:168px!important}
+ .obra-desc{grid-area:desc;font-size:18px;margin:20px 0 18px}
+ .ficha{grid-area:ficha;grid-template-columns:repeat(3,1fr);margin-bottom:20px}
+ .ficha li{padding:0 10px}.ficha b{font-size:24px}
+ .compra-linha{grid-area:compra;flex-wrap:nowrap;gap:16px}
+ .obra-preco{font-size:30px}.obra-faixa{font-size:9px;white-space:nowrap}
+ .obra-cotas{display:none}
+ .obra-acoes{flex:1 1 auto;display:flex}
+ .btn-adquirir{width:100%;justify-content:center;padding:16px 12px}
+ .obra-content{padding:56px 20px}
+ .obra-lead{font-size:19px}
+ .obra-programa{padding:56px 20px}
+ /* WhatsApp sai de cima do texto e vai para a barra fixa */
+ #waBtn{display:none}
+ .compra-fixa{background:#1e3528;transform:translateY(110%);transition:transform .25s ease}
+ .compra-fixa.visivel{transform:none}
+ .compra-fixa-preco{color:#f6f1e6!important}
+ .compra-fixa .compra-fixa-wa{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--verde);flex-shrink:0;padding:0!important}
+ .compra-fixa-wa svg{width:22px;height:22px}
+ .compra-fixa-acoes{display:flex;align-items:center;gap:10px}
+ .compra-fixa .compra-fixa-comprar{background:var(--ouro-claro);color:#1c2d23;border-radius:8px}
+}
+@media(max-width:900px) and (max-height:700px){
+ .obra-hero{padding-top:68px}
+ .obra-breadcrumb{display:none}
+ .obra-hero-inner{grid-template-columns:92px 1fr}
+ .obra-mockup-grande{width:92px!important;height:138px!important}
+ .obra-mockup-grande img{width:92px!important;height:138px!important}
+ h1.obra-titulo{font-size:30px}
+ .obra-desc{font-size:17px;margin:14px 0 12px}
+ .ficha{margin-bottom:14px}.ficha b{font-size:21px}
+}
+@media(prefers-reduced-motion:reduce){.compra-fixa{transition:none}}
 </style>
 </head>
 <body>
@@ -159,17 +272,19 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
       <div class="obra-genero">Finanças pessoais · Guia prático</div>
       <h1 class="obra-titulo reveal">Livre das<br>Dívidas</h1>
       <p class="obra-autor reveal" style="transition-delay:.05s">Said Anes · Editora Três Trevo · 2026</p>
-      <p class="obra-desc reveal" style="transition-delay:.1s">Quebre as correntes que te prendem ao desespero. Um guia em linguagem simples para entender os juros, decidir o que pagar primeiro, negociar sem cair em armadilhas e conhecer os seus direitos.</p>
+      <p class="obra-desc reveal" style="transition-delay:.1s">Quebre as correntes que te prendem ao desespero.</p>
+      <ul class="ficha" aria-label="O que você leva"><li><b>62</b> páginas</li><li><b>4</b> roteiros de negociação</li><li><b>12</b> meses de plano</li></ul>
+      <div class="compra-linha">
       <div class="obra-preco-badge reveal" style="transition-delay:.15s">
         <div>
           <div class="obra-faixa">E-book · PDF e EPUB</div>
           <div class="obra-preco" id="preco-livre-das-dividas">R$15,35</div>
         </div>
-        <div class="obra-cotas">Rende Nema:<br>10% de volta em desconto</div>
+        <div class="obra-cotas">Rende Nema (N$), a moeda da editora</div>
       </div>
       <div class="obra-acoes reveal" style="transition-delay:.2s">
         <a href="/checkout.html?slug=livre-das-dividas" class="btn-adquirir">Adquirir agora →</a>
-        <a href="/catalogo.html" class="btn-catalogo">← Ver catálogo</a>
+      </div>
       </div>
     </div>
     <a class="obra-mockup-grande reveal" style="transition-delay:.1s;display:block;height:300px" href="/checkout.html?slug=livre-das-dividas" aria-label="Adquirir Livre das Dívidas"><img src="/assets/capas/livre-das-dividas.jpg" width="200" height="300" alt="Capa de Livre das Dívidas: uma corrente verde com um elo dourado se abrindo." style="width:200px;height:300px;display:block;box-shadow:0 18px 40px rgba(15,45,26,.28)"></a>
@@ -184,6 +299,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
       <div class="sec-label">Sobre a obra</div>
       <h2 class="sec-titulo reveal">O que você vai ler</h2>
       <div class="obra-texto">
+        <p class="obra-lead">Um guia em linguagem simples para entender os juros, decidir o que pagar primeiro, negociar sem cair em armadilhas e conhecer os seus direitos.</p>
         <p>Se você tem medo de atender o telefone ou de abrir o extrato, este livro começa dizendo uma coisa simples: a culpa não é só sua. No Brasil, mais de 8 em cada 10 famílias têm dívidas, segundo a Confederação Nacional do Comércio (setembro de 2026). Quase ninguém aprendeu como os juros funcionam.</p>
         <p>Com as histórias de Joana, Carlos e Márcia, o guia mostra como a fatura do cartão cresce, por que o cheque especial e o agiota são as dívidas mais caras, o que pagar primeiro quando o dinheiro não dá para tudo e como negociar sem assinar o que não deve. Traz quatro roteiros de negociação prontos, um capítulo inteiro sobre os seus direitos (Lei do Superendividamento, cobrança abusiva, nome negativado, Registrato do Banco Central) e um plano de 12 meses para sair do vermelho e montar uma reserva.</p>
         <p>Atualizado em outubro de 2026, com as fontes no fim do livro. E, para o seu caso, ele mostra onde buscar ajuda gratuita.</p>
@@ -213,9 +329,9 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 
 <section class="obra-programa">
   <div class="obra-programa-inner">
-    <div class="cotas-badge"><span>Nema</span>10% de volta</div>
-    <h2 class="programa-titulo">Sua compra volta como desconto</h2>
-    <p class="programa-desc">10% do que você paga volta como desconto no seu próximo livro.</p>
+    <div class="cotas-badge"><span>Nema</span>N$</div>
+    <h2 class="programa-titulo">Sua compra rende Nema</h2>
+    <p class="programa-desc">Cada e-book rende Nema (N$), a moeda da Editora Três Trevo. Para usar o saldo, você escolhe uma ação da editora e aceita o regulamento dela.</p>
     <a href="/nema.html" class="btn-programa">Ver as regras do Nema →</a>
   </div>
 </section>
@@ -247,7 +363,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
   </div>
 </footer>
 
-<div class="compra-fixa" aria-label="Comprar"><span class="compra-fixa-preco">R$15,35</span><a href="/checkout.html?slug=livre-das-dividas">Adquirir agora →</a></div>
+<div class="compra-fixa" aria-label="Comprar"><span class="compra-fixa-preco">R$15,35</span><span class="compra-fixa-acoes"><a class="compra-fixa-wa" href="https://wa.me/5554999467085?text=Olá!%20Quero%20saber%20mais%20sobre%20Livre%20das%20D%C3%ADvidas." target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp"><svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.268 2 2 8.268 2 16c0 2.46.664 4.763 1.822 6.74L2 30l7.463-1.793A13.94 13.94 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2z" fill="#fff"/><path d="M22.5 19.5c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01s-.52.07-.79.37c-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z" fill="#25d366"/></svg></a><a class="compra-fixa-comprar" href="/checkout.html?slug=livre-das-dividas">Adquirir agora →</a></span></div>
 <a id="waBtn" href="https://wa.me/5554999467085?text=Olá!%20Quero%20saber%20mais%20sobre%20Livre%20das%20D%C3%ADvidas." target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp">
   <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.268 2 2 8.268 2 16c0 2.46.664 4.763 1.822 6.74L2 30l7.463-1.793A13.94 13.94 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2z" fill="#fff"/><path d="M22.5 19.5c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01s-.52.07-.79.37c-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z" fill="#25d366"/></svg>
 </a>
@@ -260,6 +376,10 @@ document.addEventListener('DOMContentLoaded',function(){
   window.toggleMenu=function(){var nav=document.getElementById('navMobile');var btn=document.getElementById('menuBtn');nav.classList.toggle('aberto');btn.setAttribute('aria-expanded',String(nav.classList.contains('aberto')));};
   var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visivel');});},{threshold:0.1});
   document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
+
+  (function(){var barra=document.querySelector('.compra-fixa'),alvo=document.querySelector('.obra-acoes');
+    if(!barra||!alvo||!('IntersectionObserver' in window)){if(barra)barra.classList.add('visivel');return;}
+    new IntersectionObserver(function(es){barra.classList.toggle('visivel',!es[0].isIntersecting);}).observe(alvo);})();
   setTimeout(function(){document.querySelectorAll('.obra-hero .reveal').forEach(function(el){el.classList.add('visivel');});},80);
   (function(){var SLUG='livre-das-dividas';
     TTClient.getCatalogo(SLUG).then(function(data){if(Array.isArray(data)&&data[0]){var el=document.getElementById('preco-livre-das-dividas');if(el)el.textContent='R$'+TTClient.formatMoney(data[0].preco);var fx=document.querySelector('.compra-fixa-preco');if(fx)fx.textContent='R$'+TTClient.formatMoney(data[0].preco);}}).catch(function(){});
