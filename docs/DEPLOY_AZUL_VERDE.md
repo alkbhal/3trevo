@@ -42,6 +42,7 @@ O workflow **Health Check** (a cada 6h) e o `/api/health/status` confirmam a sa�
 | 18/10/2026 | `azul-20261018` | PR `verde-20261018` | Leitor novo, música liberada na CSP, capas tipográficas, banner de clássicos condicional, Nema como pontos, policy dos produtos comprados |
 | 18/10/2026 | `azul-20261018b` | PR `verde-20261018-membros` | Área de membros grátis: pop-up e /gratis criam a conta, amostra em EPUB, 1 clássico por membro (tabela `leitura_livre` + função `livre-epub`), cartão do Nema |
 | 18/10/2026 | `azul-20261018b` | PR `verde-20261018-idiomas` (inclui o de membros) | Três sites (PT, /en/, /es/) gerados do PT por `scripts/i18n.mjs`; estantes de clássicos por idioma (`estante_intl`); privacidade |
+| 27/10/2026 | `azul-20261027` | PR #31 | Garantia como benefício, sem jargão jurídico (checado no CI); Nema como moeda N$; Livre das Dívidas no visual B+C clean (oferta na 1ª tela, WhatsApp na barra, WCAG AA) |
 
 ## Idiomas (PT, EN, ES)
 
