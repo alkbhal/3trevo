@@ -54,11 +54,12 @@ Página ruim não é a feia: é a que atrapalha o objetivo dela. É ruim quando:
 ## Passos
 1. Conferir a nota de mercado do idioma contra o corte. Sem nota visível → declarar "não conferível" e parar no PR.
 2. Trocar o slug `forge-xxxxxxxx` por um slug legível (sem acento, com hífen) no admin.
-3. Copiar o molde `obra/livre-das-dividas.html` para `obra/<slug>.html` e trocar só o conteúdo: `<title>`, meta description, og:*, canonical, os dois JSON-LD (Book com preço; BreadcrumbList), trilha, gênero, título, autor/ano, **uma frase de promessa** no topo, o resto da sinopse em `.obra-lead`, os 3 números de `.ficha`, preço, links de checkout (`/checkout.html?slug=<slug>`), WhatsApp, "Detalhes do ebook", "Para quem é".
-4. Não mexer no CSS do molde. Mudança de visual é decisão do dono e vale para todas as obras.
-5. Registrar a página: `PAGINAS_OBRA` em `catalogo.html`, `sitemap.xml`, sugestão na `area-cliente.html`.
-6. Rodar `node scripts/i18n.mjs`, `node scripts/stamp.mjs`, depois as checagens do CI e a prova (seção "Pronto quando").
-7. Deploy azul/verde (`docs/DEPLOY_AZUL_VERDE.md`): marcar `azul-AAAAMMDD` a partir do `main` no ar, PR, CI verde, aval do dono (PT), merge, conferir "Verificação pós-deploy".
+3. Página no molde anterior (as obras de 2026): escrever `arquivos/obras/<slug>.json` (promessa, resto da sinopse, 3 números) e rodar `arquivos/gerar-pagina-obra.py`. Página nova do zero: copiar o molde `obra/livre-das-dividas.html` para `obra/<slug>.html` e trocar só o conteúdo: `<title>`, meta description, og:*, canonical, os dois JSON-LD (Book com preço; BreadcrumbList), trilha, gênero, título, autor/ano, **uma frase de promessa** no topo, o resto da sinopse em `.obra-lead`, os 3 números de `.ficha`, preço, links de checkout (`/checkout.html?slug=<slug>`), WhatsApp, "Detalhes do ebook", "Para quem é".
+4. Não mexer no CSS do molde. Mudança de visual é decisão do dono e vale para todas as obras: muda no gerador e regenera todas.
+5. Olhar as capturas (celular e computador) antes do PR: a prova não vê tudo (ex.: capa escura sumindo no fundo escuro).
+6. Registrar a página: `PAGINAS_OBRA` em `catalogo.html`, `sitemap.xml`, sugestão na `area-cliente.html`.
+7. Rodar `node scripts/i18n.mjs`, `node scripts/stamp.mjs`, depois as checagens do CI e a prova (seção "Pronto quando").
+8. Deploy azul/verde (`docs/DEPLOY_AZUL_VERDE.md`): marcar `azul-AAAAMMDD` a partir do `main` no ar, PR, CI verde, aval do dono (PT), merge, conferir "Verificação pós-deploy".
 
 ## Decisões
 - **Texto:** a página vende o livro, a história e a experiência. Lei, número de artigo, sigla técnica e mecânica de pontos ficam nos Termos e nas regras. Ver `arquivos/regras-de-tom.md`.
@@ -94,3 +95,5 @@ Ver `notas.md` (o mais novo em cima). Resumo:
 - Texto vazando da caixa do preço em 360px — a primeira versão da prova não pegava.
 - Página escrita prometendo "desconto" com o Nema.
 - PR mergeado antes dos últimos commits: a correção ficou fora do ar.
+- Capa escura sumindo no topo escuro (Isa, 28/10): resolvido com contorno claro no molde.
+- Preço divergente entre `catalogo` e `products` (Antifalência e 3ª Guerra, 28/10): conferir as duas tabelas antes de publicar.

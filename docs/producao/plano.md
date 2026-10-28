@@ -15,7 +15,8 @@ Regra da linha (dono, 27/10/2026): nada fica inacabado. Uma etapa por vez, cada 
 |---|---|---|---|---|
 | 1 | Fechar a skill | PR da branch `skill-pagina-de-obra` → `main` (skill, regulamento-rascunho, plano; nada vai ao site) | skill carregável em qualquer sessão; site inalterado | aval |
 | 2 | Isa, Isma e Tintim no padrão clean | PR com `obra/isa-isma-tintim.html` | prova da skill com 0 falhas; números da ficha conferidos no livro | etapa 1 |
-| 3 | Antifalência no padrão clean (hoje sem capa real) | PR | idem; capa real ou etapa de capa registrada | etapa 1 |
+| 2b | Preços divergentes no banco (28/10): Antifalência `catalogo` R$ 29,90 × `products` R$ 46,04; 3ª Guerra R$ 35,00 × R$ 76,74 | ajuste no admin (espelha `catalogo` → `products`) + página e JSON-LD com o mesmo preço | as duas tabelas e a página iguais, conferido no banco | decisão do dono sobre o preço certo |
+| 3 | Antifalência no padrão clean (hoje sem capa real) | PR | idem; capa real ou etapa de capa registrada | etapa 1 e 2b |
 | 4 | Justiça(mento) no padrão clean (hoje sem capa real) | PR | idem | etapa 1 |
 | 5 | Vídeo da home (7,5 MB tocando sozinho no celular) | PR: versão leve ou pôster no celular | prova: nenhum vídeo automático > 1 MB; home sem regressão | — |
 | 6 | Medidor próprio respeitando os cookies | PR em `js/beacon.js` + carregar nas páginas de obra | sem evento nem `_tt_anon` antes do aceite; com recusa, página funcional e sem medição; eventos marcam a versão vista | — |

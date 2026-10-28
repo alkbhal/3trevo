@@ -1,5 +1,10 @@
 # Notas — correções da skill (a mais nova em cima)
 
+## 28/10/2026
+- **Capa escura sobre o topo escuro** (Isa, Isma e Tintim): a borda da capa sumia no computador; a prova passava. Camada: processo (faltava olhar as capturas). Mudança: contorno claro de 1px na capa, no molde (Livre regenerada junto); passo 5 do SKILL.md manda olhar as capturas.
+- **Preço em duas tabelas**: Antifalência (`catalogo` 29,90 × `products` 46,04) e 3ª Guerra (35,00 × 76,74) divergem no banco de produção. Camada: prova. Mudança: conferir as duas tabelas antes de publicar; a decisão do preço é do dono.
+- **Gerador**: a página clean passa a sair de `gerar-pagina-obra.py` + `obras/<slug>.json`, conferido byte a byte com Livre das Dívidas.
+
 ## 27/10/2026
 - **PR mergeado só com o 1º commit** (#31): a correção do Nema e o visual clean ficaram fora do ar e entraram no #32. Mudança: antes de pedir o merge, conferir que o head do PR é o último commit; depois do merge, comparar o `main` com a branch.
 - **Nema prometido como desconto** nas 4 obras ("10% do que você paga volta como desconto"). Camada: processo (regra nunca escrita). Mudança: regra em `regras-de-tom.md` e em Decisões do SKILL.md.
