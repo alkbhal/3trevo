@@ -13,6 +13,7 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { notify } from '../notify';
 import { arquivoForge, resolverUrlExterna } from '../forge-download';
 import { verificarToken } from './admin-catalog';
 import {
@@ -208,6 +209,9 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
     await registrarAuditoria(env, 'webhook_erro', { mpPaymentId, erro: rpc.erro });
     return new Response('rpc_error', { status: 200 });
   }
+
+  // Rede de proteção (não bloqueia: o cliente já pagou). Só na 1ª vez que o pagamento é registrado.
+  if (rpc.novo) await alertarValorDivergente(env, productSlug, valor, String(mpPaymentId));
 
   // Nema: confirma o saldo usado nesta compra e credita o Nema que ela gera.
   // As duas funções são idempotentes, então rodam também quando o MP reenvia o aviso.
@@ -466,6 +470,34 @@ async function buscarOuCriarUsuario(email: string, nome: string, env: Env): Prom
   const users: any[] = data.users ?? (Array.isArray(data) ? data : []);
   const found = users.find((u: any) => u.email === email);
   return found?.id ?? null;
+}
+
+// ─── Conferência do valor pago ───────────────────────────────────────────────
+// O servidor cria a cobrança com o preço do catálogo menos o desconto do Nema (no máximo metade do
+// preço). Logo o valor aprovado no MP deve ficar entre 50% do preço e o preço cheio. Fora disso é
+// anômalo: só avisamos, pois recusar um pagamento já aprovado deixaria o cliente sem o ebook.
+export function valorDivergente(valor: number, preco: number): boolean {
+  if (!Number.isFinite(valor) || !Number.isFinite(preco) || preco <= 0) return false; // sem referência: não opina
+  return valor < preco * 0.5 - 0.01 || valor > preco + 0.01;
+}
+
+async function alertarValorDivergente(env: Env, slug: string, valor: number, mpPaymentId: string): Promise<void> {
+  try {
+    const r = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/catalogo?slug=eq.${encodeURIComponent(slug)}&select=preco`,
+      { headers: supabaseHeaders(env) }
+    );
+    const [row] = (await r.json()) as Array<{ preco: number | string }>;
+    const preco = Number(row?.preco);
+    if (!valorDivergente(valor, preco)) return;
+    await registrarAuditoria(env, 'webhook_valor_divergente', { mpPaymentId, slug, valor, preco });
+    await notify(
+      env,
+      `⚠️ Pagamento ${mpPaymentId} (${slug}): valor R$ ${valor.toFixed(2)} fora da faixa do catálogo (R$ ${preco.toFixed(2)}). Conferir no Mercado Pago.`
+    );
+  } catch (e) {
+    console.error('[webhook] conferência de valor falhou:', e);
+  }
 }
 
 // ─── Helpers: RPC registrar_compra_mp ────────────────────────────────────────
