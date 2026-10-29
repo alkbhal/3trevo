@@ -1,3 +1,5 @@
+-- ATENÇÃO (28/10/2026): os preços abaixo estão desatualizados (ex.: Isa 15,35; Antifalência 29,90).
+-- Não rodar de novo: desfaria os preços certos. Preços vigentes: scripts/precos_20261028.sql e o admin.
 -- ============================================================
 -- FIX: Sincronizar tabela products com catalogo (fonte de verdade)
 -- Corrigir UTF-8 quebrado no catalogo

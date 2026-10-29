@@ -1,11 +1,11 @@
 # Ponto de parada
 
 **Última atualização:** 28/10/2026.
-**No ar:** #31, #32 e #33 (skill e plano no `main`). Ponto de volta: `azul-20261027c`.
+**No ar:** #31 a #34 (Isa no padrão clean). Ponto de volta: `azul-20261028`.
 
-**Etapa 1 concluída:** PR #33 mergeado.
-**Etapa 2 em andamento:** branch `etapa2-isa`: Isa, Isma e Tintim no padrão clean (prova 49/0; preço R$ 19,90 conferido no banco) + contorno da capa no molde (Livre regenerada) + gerador na skill. Aguarda PR, CI e aval.
+**Etapas 1 e 2 concluídas.**
+**Etapa 2b em andamento:** preços aplicados no banco em 28/10 (Antifalência R$ 19,90 nas duas tabelas, 1 cota; 3ª Guerra R$ 35,00 nas duas; script e reversão em `scripts/precos_20261028.sql`). Branch `etapa2b-precos-heroi`: páginas, JSON-LD e fallbacks com os preços novos + botão "Ver ebook" do destaque da home (não navegava) + aviso no script antigo. Aguarda PR, CI e aval.
 
-**Próxima ação exata:** com o aval, marcar `azul-20261028`, merge da etapa 2 e começar a **etapa 3** (Antifalência). Antes da etapa 3, o dono decide o preço de Antifalência (`catalogo` R$ 29,90 × `products` R$ 46,04) — e o da 3ª Guerra (R$ 35,00 × R$ 76,74), que não tem etapa: entra na fila.
+**Próxima ação exata:** com o aval, marcar `azul-AAAAMMDD`, merge da 2b e começar a **etapa 3** (Antifalência no padrão clean, já com R$ 19,90).
 
 **Materiais:** skill em `.claude/skills/pagina-de-obra/`; regulamento em `docs/nema/regulamento-geral-v1-rascunho.md`; decisões e pendências em `docs/nema/modelo-e-plano.md`.

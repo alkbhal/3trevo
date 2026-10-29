@@ -1100,16 +1100,13 @@ document.addEventListener('DOMContentLoaded', () => {
         var b = document.getElementById('heb-badge');
         if (b) b.textContent = cfg.destaque_badge;
       }
-      // CTA → scroll ao card do slug destaque
+      // CTA → página da obra em destaque (ou o checkout, se o livro ainda não tem página).
+      // Mesma lista de PAGINAS_OBRA do catalogo.html.
       var slug = cfg.destaque_slug;
-      if (slug) {
+      var PAGINAS_OBRA = {'antifalencia':1,'justicamento':1,'isa-isma-tintim':1,'livre-das-dividas':1};
+      if (slug && /^[a-z0-9-]+$/.test(slug)) {
         var cta = document.getElementById('heb-cta-link');
-        if (cta) cta.onclick = function(e){
-          e.preventDefault();
-          var c = document.querySelector('[data-slug=' + slug + ']');
-          if (c) { c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.transition='box-shadow .3s'; c.style.boxShadow='0 0 0 3px #ffa028'; setTimeout(function(){c.style.boxShadow=''},2000); }
-          else { document.getElementById('catalogo').scrollIntoView({behavior:'smooth'}); }
-        };
+        if (cta) cta.href = PAGINAS_OBRA[slug] ? '/obra/' + slug + '.html' : '/checkout.html?slug=' + slug;
       }
     })
     .catch(function(){});
