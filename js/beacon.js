@@ -2,6 +2,11 @@
  * beacon.js — Growth Engine Fase 4
  * Tracking frontend + pop-up de cadastro de membro grátis (amostra + clássico)
  * Dispara eventos para POST /api/track (Worker)
+ *
+ * LGPD: a medição (id anônimo _tt_anon e eventos) só começa depois do "Aceitar" do
+ * js/consentimento.js; sem escolha ou com recusa, nada é gravado nem enviado.
+ * <script src="/js/beacon.js" data-sem-popup> mede sem abrir o pop-up de cadastro
+ * (páginas de obra). Cada evento leva a versão da página (<html data-versao="...">).
  */
 (function () {
   'use strict';
@@ -10,16 +15,25 @@
   var ANON_KEY = '_tt_anon';
   var LEAD_SHOWN_KEY = '_tt_lead_shown';
   var LEAD_CAPTURED_KEY = '_tt_lead_ok';
+  var SEM_POPUP = !!(document.currentScript && document.currentScript.hasAttribute('data-sem-popup'));
+  var VERSAO = document.documentElement.getAttribute('data-versao') || null;
+  function medindo() { return !!(window.TTConsent && window.TTConsent.aceito()); }
+  // Quem recusou não guarda o id anônimo criado antes desta regra.
+  try { if (localStorage.getItem('tt-consentimento') === 'recusado') localStorage.removeItem(ANON_KEY); } catch (e) { /* modo privado */ }
+  document.addEventListener('tt:consentimento', function (e) { if (e.detail === 'recusado') { try { localStorage.removeItem(ANON_KEY); } catch (err) { /* modo privado */ } } });
 
   // ── Anon ID ────────────────────────────────────────────────────────────────
   function getAnonId() {
-    var id = localStorage.getItem(ANON_KEY);
+    if (!medindo()) return null;
+    var id = null;
+    try { id = localStorage.getItem(ANON_KEY); } catch (e) { /* modo privado */ }
     if (!id) {
       id = 'a-' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-      localStorage.setItem(ANON_KEY, id);
+      try { localStorage.setItem(ANON_KEY, id); } catch (e) { /* modo privado */ }
     }
     return id;
   }
+
 
   // ── UTM params ─────────────────────────────────────────────────────────────
   function getUtm() {
@@ -34,6 +48,9 @@
 
   // ── Fire event ─────────────────────────────────────────────────────────────
   function track(eventType, props) {
+    if (!medindo()) return;
+    props = props || {};
+    if (VERSAO) props.versao = VERSAO;
     var payload = {
       anon_id: getAnonId(),
       event_type: eventType,
@@ -52,7 +69,9 @@
   }
 
   // ── Page view ──────────────────────────────────────────────────────────────
-  track('page_view', { referrer: document.referrer || null, title: document.title });
+  function pageView() { track('page_view', { referrer: document.referrer || null, title: document.title }); }
+  if (medindo()) pageView();
+  else document.addEventListener('tt:consentimento', function (e) { if (e.detail === 'aceito') pageView(); });
 
   // ── Scroll depth (25/50/75/100) ────────────────────────────────────────────
   var scrollMarks = {};
@@ -97,7 +116,7 @@
   var popupShown = false;
 
   function maybeShowLeadPopup() {
-    if (popupShown) return;
+    if (popupShown || SEM_POPUP) return;
     if (!AMOSTRA_PRONTA) return;
     if (localStorage.getItem(LEAD_CAPTURED_KEY)) return;
     if (sessionStorage.getItem(LEAD_SHOWN_KEY)) return;

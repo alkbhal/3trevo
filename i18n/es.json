@@ -290,7 +290,7 @@
  "priv.coleta.t": "Qué recogemos",
  "priv.compartilha": "Solo con los servicios necesarios para que el sitio funcione: alojamiento y base de datos (Supabase, Cloudflare y GitHub), pagos (Mercado Pago), envío de correos y medición de audiencia (Google Analytics y Meta). No vendemos tus datos.",
  "priv.compartilha.t": "Con quién los compartimos",
- "priv.cookies": "Google Analytics y el píxel de Meta solo se activan después de que haces clic en \"Aceptar\" en el aviso de cookies. Si los rechazas, el sitio funciona con normalidad, sin esas cookies. Puedes cambiar tu elección cuando quieras: <a href=\"#\" onclick=\"TTConsent.reabrir();return false\">revisar mi elección</a>.",
+ "priv.cookies": "Google Analytics, el píxel de Meta y la medición propia del sitio (un código anónimo guardado en tu navegador y las páginas que visitas) solo se activan después de que haces clic en \"Aceptar\" en el aviso de cookies. Si la rechazas, el sitio funciona con normalidad, sin esa medición. Puedes cambiar tu elección cuando quieras: <a href=\"#\" onclick=\"TTConsent.reabrir();return false\">revisar mi elección</a>.",
  "priv.cookies.t": "Cookies de medición",
  "priv.data": "Actualizado el 21 de octubre de 2026.",
  "priv.direitos": "Puedes pedir el acceso, la rectificación, la portabilidad o la supresión de tus datos, saber con quién se compartieron y retirar tu consentimiento, según la Ley General de Protección de Datos de Brasil (LGPD). Si estás en la Unión Europea, también tienes los derechos del Reglamento General de Protección de Datos (RGPD). Escribe a <a href=\"mailto:sac@3trevo.com.br\">sac@3trevo.com.br</a>.",

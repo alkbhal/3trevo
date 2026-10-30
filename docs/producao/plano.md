@@ -19,7 +19,7 @@ Regra da linha (dono, 27/10/2026): nada fica inacabado. Uma etapa por vez, cada 
 | 3 | Antifalência no padrão clean (hoje sem capa real) | PR | idem; capa real ou etapa de capa registrada | etapa 1 e 2b |
 | 4 | Justiça(mento) no padrão clean (hoje sem capa real) | PR | idem | etapa 1 |
 | 4b | Página de obra da 3ª Guerra (hoje `obra/terceiraguerra.html` só redireciona ao checkout; o destaque da home leva ao checkout) | PR com `obra/3a-guerra.html` no padrão clean + `PAGINAS_OBRA` (catálogo e home) + sitemap | prova da skill com 0 falhas; destaque da home abre a página | sinopse e números do livro (forge/PDF) |
-| 5 | Vídeo da home (7,5 MB tocando sozinho no celular) | PR: versão leve ou pôster no celular | prova: nenhum vídeo automático > 1 MB; home sem regressão | — |
+| 5 | ✅ Vídeo da home (7,5 MB tocando sozinho no celular) | PR: versão leve ou pôster no celular | prova: nenhum vídeo automático > 1 MB; home sem regressão | — |
 | 6 | Medidor próprio respeitando os cookies | PR em `js/beacon.js` + carregar nas páginas de obra | sem evento nem `_tt_anon` antes do aceite; com recusa, página funcional e sem medição; eventos marcam a versão vista | — |
 | 7 | Nema fase 1 — fundação | PR: versões do regulamento, aceite (versão, data e hora, participante), histórico, liga/desliga; uso e geração de Nema exigem aceite; consulta livre | migração aditiva aplicada; saldos intactos (conferido antes/depois); testes do worker; gate N2 | — |
 | 8 | Nema fase 2 — motor de campanhas | PR: ficha com os 10 campos; compra de e-book como campanha permanente; crédito único por atividade | testes de geração, limites, validade, combinação | 7 |

@@ -1,5 +1,8 @@
 # Notas — correções da skill (a mais nova em cima)
 
+## 30/10/2026
+- **Medição nas páginas de obra**: o gerador põe `<html data-versao="clean">` e o `js/beacon.js` com `data-sem-popup` (mede só depois do aceite de cookies, sem o pop-up de cadastro). Prepara o teste clean × suave.
+
 ## 28/10/2026
 - **Capa escura sobre o topo escuro** (Isa, Isma e Tintim): a borda da capa sumia no computador; a prova passava. Camada: processo (faltava olhar as capturas). Mudança: contorno claro de 1px na capa, no molde (Livre regenerada junto); passo 5 do SKILL.md manda olhar as capturas.
 - **Preço em duas tabelas**: Antifalência (`catalogo` 29,90 × `products` 46,04) e 3ª Guerra (35,00 × 76,74) divergem no banco de produção. Camada: prova. Mudança: conferir as duas tabelas antes de publicar; a decisão do preço é do dono.

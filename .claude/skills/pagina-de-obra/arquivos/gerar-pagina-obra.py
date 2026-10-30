@@ -171,5 +171,8 @@ h = troca(h, '\n        <a href="/catalogo.html" class="btn-catalogo">← Ver ca
 h = troca(h, 'Rende Nema (N$),<br>a moeda da editora', 'Rende Nema (N$), a moeda da editora')
 h = troca(h, BARRA_ORIG, BARRA)
 h = troca(h, "  setTimeout(function(){document.querySelectorAll('.obra-hero .reveal')", JS_BARRA + "  setTimeout(function(){document.querySelectorAll('.obra-hero .reveal')")
+# Medição própria (só depois do aceite de cookies), sem o pop-up de cadastro; cada evento leva a versão da página.
+h = troca(h, '<html lang="pt-BR">', '<html lang="pt-BR" data-versao="clean">')
+h = troca(h, '</body>', '<script src="/js/beacon.js?v=a4453a06" data-sem-popup defer></script>\n</body>')
 out.write_text(h, encoding='utf-8')
 print(SLUG, 'ok')
