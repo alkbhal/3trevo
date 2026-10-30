@@ -1,13 +1,17 @@
 /**
  * nema.ts — Três Trevo Worker
- * Nema (N$), fase 0: ponto de fidelidade fechado.
- *   GET /api/nema/saldo  — saldo do cliente logado (Authorization: Bearer <token do Supabase>)
+ * Nema (N$): a moeda da editora.
+ *   GET  /api/nema/saldo        — saldo do cliente logado (Authorization: Bearer <token do Supabase>)
+ *   GET  /api/nema/regulamento  — versão vigente do Regulamento Geral (e, logado, se já aceitou)
+ *   POST /api/nema/aceite       — registra o aceite da versão vigente { versao, origem }
+ *   GET  /api/nema/extrato      — histórico do cliente logado (consulta livre, sem exigir aceite)
  *
  * As regras (taxa, valor de 1 Nema, teto, carência) moram no banco, em
  * public.nema_parametros e nas funções nema_* (supabase/nema.sql). Aqui o worker
  * só identifica o cliente e chama essas funções; nenhum cálculo de saldo é feito em TS.
  */
 
+import { z } from 'zod';
 import type { Env } from '../types';
 import { sb } from '../sb';
 
@@ -91,14 +95,70 @@ export function reservaDoMetadata(metadata: unknown): string | null {
   return typeof ref === 'string' && /^[0-9a-f-]{36}$/i.test(ref) ? ref : null;
 }
 
+// ─── Regulamento Geral e aceite (supabase/nema_v1_aceite.sql) ────────────────
+// Enquanto a migração não estiver aplicada, as funções não existem: tudo responde
+// "sem regulamento vigente" e "não precisa aceitar", que é o comportamento de antes.
+
+export interface Regulamento { versao: number; titulo: string; url: string; vigente_desde: string }
+
+export async function regulamentoVigente(env: Env): Promise<Regulamento | null> {
+  const v = await rpc<number | null>(env, 'nema_versao_vigente', {});
+  if (typeof v !== 'number') return null;
+  const r = await sb(env, `nema_regulamentos?versao=eq.${v}&select=versao,titulo,url,vigente_desde`);
+  if (!r.ok) return null;
+  const linhas = (await r.json().catch(() => [])) as Regulamento[];
+  return Array.isArray(linhas) && linhas[0] ? linhas[0] : null;
+}
+
+/** true quando o uso do saldo está bloqueado até o leitor aceitar a versão vigente. */
+export async function precisaAceite(env: Env, userId: string): Promise<boolean> {
+  const exige = await rpc<number | null>(env, 'nema_param', { p_chave: 'exige_aceite' });
+  if (Number(exige ?? 0) !== 1) return false;
+  const ok = await rpc<boolean | null>(env, 'nema_aceite_ok', { p_user: userId });
+  return ok === false;
+}
+
+export const aceiteSchema = z.object({
+  versao: z.number().int().positive(),
+  origem: z.enum(['area_cliente', 'checkout']),
+});
+
+export async function handleNemaRegulamento(request: Request, env: Env): Promise<Response> {
+  const vigente = await regulamentoVigente(env);
+  const user = extrairBearer(request) ? await usuarioDoToken(request, env) : null;
+  let aceito: boolean | undefined;
+  if (user && vigente) aceito = (await rpc<boolean | null>(env, 'nema_aceite_ok', { p_user: user.id })) === true;
+  return Response.json({ ok: true, vigente, ...(aceito === undefined ? {} : { aceito }) });
+}
+
+export async function handleNemaAceite(request: Request, env: Env): Promise<Response> {
+  const user = await usuarioDoToken(request, env);
+  if (!user) return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
+  const corpo = aceiteSchema.safeParse(await request.json().catch(() => null));
+  if (!corpo.success) return Response.json({ ok: false, erro: 'dados_invalidos' }, { status: 400 });
+  const r = await rpc<any>(env, 'nema_aceitar', { p_user: user.id, p_versao: corpo.data.versao, p_origem: corpo.data.origem });
+  if (!r) return Response.json({ ok: false, erro: 'aceite_indisponivel' }, { status: 503 });
+  if (!r.ok) return Response.json({ ok: false, erro: r.erro ?? 'aceite_recusado', vigente: r.vigente ?? null }, { status: 409 });
+  return Response.json({ ok: true, versao: r.versao });
+}
+
+export async function handleNemaExtrato(request: Request, env: Env): Promise<Response> {
+  const user = await usuarioDoToken(request, env);
+  if (!user) return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
+  const linhas = await rpc<any[]>(env, 'nema_extrato', { p_user: user.id, p_limite: 100 });
+  if (!Array.isArray(linhas)) return Response.json({ ok: false, erro: 'extrato_indisponivel' }, { status: 503 });
+  return Response.json({ ok: true, movimentos: linhas });
+}
+
 export async function handleNemaSaldo(request: Request, env: Env): Promise<Response> {
   const user = await usuarioDoToken(request, env);
   if (!user) return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
-  const [saldo, valor] = await Promise.all([saldoNema(env, user.id), valorNemaReais(env)]);
+  const [saldo, valor, precisa] = await Promise.all([saldoNema(env, user.id), valorNemaReais(env), precisaAceite(env, user.id)]);
   if (!saldo) return Response.json({ ok: false, erro: 'saldo_indisponivel' }, { status: 503 });
   return Response.json({
     ok: true,
     ...saldo,
+    precisa_aceite: precisa,
     valor_nema_reais: valor,
     disponivel_em_reais: Math.round(saldo.disponivel * valor * 100) / 100,
   });
