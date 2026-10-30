@@ -38,7 +38,7 @@ import {
   handleHeroConfigPut,
 } from './routes/admin-hero';
 import { handleAiStudio } from './routes/admin-ai-studio';
-import { handleNemaSaldo } from './routes/nema';
+import { handleNemaSaldo, handleNemaRegulamento, handleNemaAceite, handleNemaExtrato } from './routes/nema';
 import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha } from './routes/admin-auth';
 import { handleAdminForge } from './routes/admin-forge';
 import { handleTrack, handleMetaCapi } from './routes/track';
@@ -253,6 +253,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     if (path === '/api/nema/saldo' && method === 'GET') {
       return handleNemaSaldo(request, env);
     }
+    if (path === '/api/nema/regulamento' && method === 'GET') return handleNemaRegulamento(request, env);
+    if (path === '/api/nema/aceite' && method === 'POST') return handleNemaAceite(request, env);
+    if (path === '/api/nema/extrato' && method === 'GET') return handleNemaExtrato(request, env);
 
     if (path === '/api/webhook/pagamento' && (method === 'POST' || method === 'GET')) {
       return handleWebhookPagamento(request, env);
