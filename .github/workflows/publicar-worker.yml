@@ -1,0 +1,68 @@
+# Publica o servidor do site (Worker tres-trevo-api) pela Cloudflare, sem computador.
+# Disparo: Actions → "Publicar servidor do site" → Run workflow → digite PUBLICAR.
+#
+# Precisa de dois secrets neste repositório (criados uma vez pelo titular):
+#   CLOUDFLARE_API_TOKEN  — token da Cloudflare com o modelo "Edit Cloudflare Workers"
+#   CLOUDFLARE_ACCOUNT_ID — ID da conta Cloudflare (não é segredo, mas fica aqui)
+#
+# Opção "gerar_segredo_forge": cria um FORGE_DOWNLOAD_SECRET novo e aleatório e grava o MESMO valor
+# no Worker do site e no Worker tr3vo-forge. O valor nunca aparece no log e ninguém precisa conhecê-lo;
+# para trocar, basta rodar de novo com a opção marcada.
+name: Publicar servidor do site
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Digite PUBLICAR para confirmar'
+        required: true
+      gerar_segredo_forge:
+        description: 'Gerar e gravar um FORGE_DOWNLOAD_SECRET novo (site + forge)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: publicar-worker
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirmar == 'PUBLICAR' }}
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - name: Conferir secrets
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Falta o secret CLOUDFLARE_API_TOKEN (ver AGENDA, item B5)"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Falta o secret CLOUDFLARE_ACCOUNT_ID (ver AGENDA, item B5)"; exit 1; }
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Testes (não publica se falhar)
+        run: npm test
+      - name: Publicar Worker
+        run: npx wrangler deploy --config wrangler.toml
+      - name: Gerar e gravar FORGE_DOWNLOAD_SECRET (site + forge)
+        if: ${{ github.event.inputs.gerar_segredo_forge == 'true' }}
+        run: |
+          S="$(openssl rand -hex 32)"
+          echo "::add-mask::$S"
+          printf '%s' "$S" | npx wrangler secret put FORGE_DOWNLOAD_SECRET --name tres-trevo-api
+          printf '%s' "$S" | npx wrangler secret put FORGE_DOWNLOAD_SECRET --name tr3vo-forge
+          unset S
+          echo "Segredo gravado nos dois Workers (valor não exibido)."
+      - name: Conferir que o site responde
+        working-directory: .
+        run: |
+          for i in 1 2 3; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://tres-trevo-api.al-kbhal.workers.dev/health) && [ "$code" = "200" ] && { echo "health 200"; exit 0; }
+            sleep 10
+          done
+          echo "::error::Worker publicado, mas /health não respondeu 200. Use o workflow 'reverter'."; exit 1
