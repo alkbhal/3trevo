@@ -224,6 +224,7 @@ async function init() {
     return;
   }
   produtoSlug = slug;
+  preencherDoLink();
 
   await carregarPorSlug(slug);
 
@@ -234,6 +235,19 @@ async function init() {
   } else if (status === 'pending') {
     mostrarAlerta('Pagamento pendente. Você receberá um e-mail quando for confirmado.', 'sucesso');
   }
+}
+
+// Link de lembrete traz e-mail e nome no fragmento (#): preenche e limpa a barra de endereço.
+function preencherDoLink() {
+  try {
+    const h = new URLSearchParams(window.location.hash.slice(1));
+    const email = (h.get('email') || '').trim();
+    const nome = (h.get('nome') || '').trim();
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) document.getElementById('emailInput').value = email.slice(0, 254);
+    if (nome.length >= 2) document.getElementById('nomeInput').value = nome.slice(0, 120);
+    if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
+    validarFormulario();
+  } catch (e) { /* sem preenchimento, segue normal */ }
 }
 
 // ── PRODUTO ───────────────────────────────────────────────
@@ -311,7 +325,7 @@ async function iniciarPagamento() {
     var resp = await fetch(WORKER + '/api/checkout/preferencia', {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({ slug: produtoSlug, email: email, usar_nema: usarNema })
+      body: JSON.stringify({ slug: produtoSlug, email: email, nome: nome, usar_nema: usarNema })
     });
     var data = await resp.json();
 

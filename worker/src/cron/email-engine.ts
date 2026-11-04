@@ -51,10 +51,17 @@ export async function handleEmailEngine(env: Env): Promise<void> {
       const [ev] = (await evResp.json()) as any[];
       const slug = ev?.props?.slug;
       if (!slug) continue; // sem carrinho pra recuperar, não tem o que mandar
-      linkUrl = `https://3trevo.com.br/checkout.html?slug=${encodeURIComponent(slug)}`;
-      const catResp = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}&select=titulo`);
+      const catResp = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}&select=titulo,ativo`);
       const [cat] = (await catResp.json()) as any[];
-      titulo = cat?.titulo ?? '';
+      if (!cat || cat.ativo !== true) {
+        // Título saiu de venda: lembrar seria levar o leitor a uma página de "indisponível".
+        await sb(env, `email_sequence?id=eq.${item.id}`, { method: 'DELETE' });
+        continue;
+      }
+      titulo = cat.titulo ?? '';
+      // Dados no fragmento (#): preenchem o formulário no navegador e nunca vão ao servidor nem a logs.
+      const frag = new URLSearchParams({ email: lead.email, ...(lead.nome ? { nome: lead.nome } : {}) });
+      linkUrl = `https://3trevo.com.br/checkout.html?slug=${encodeURIComponent(slug)}#${frag.toString()}`;
     }
 
     // Templates novos (recovery_*) já trazem o link de descadastro embutido no
