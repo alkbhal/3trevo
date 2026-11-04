@@ -59,7 +59,8 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
 
   // Instrumentação de funil (Fase 1 recuperação de carrinho): registra o início do checkout
   // sem bloquear nem atrasar o pagamento — mesmo padrão fire-and-forget de leads.ts/track.ts.
-  registrarInicioCheckout(env, email, slug).catch((e) =>
+  const nome = typeof body?.nome === 'string' ? body.nome.trim().slice(0, 120) : '';
+  registrarInicioCheckout(env, email, slug, nome).catch((e) =>
     console.error('[checkout] registrarInicioCheckout falhou:', e)
   );
 
@@ -752,7 +753,7 @@ async function enviarEmailCompra(
 // a coluna `email` vai no payload, igual ao padrão de leads.ts) + evento
 // `checkout_start` em `lead_events`, consumido pelo cron de recuperação
 // (worker/src/cron/cart-recovery.ts).
-async function registrarInicioCheckout(env: Env, email: string, slug: string): Promise<void> {
+async function registrarInicioCheckout(env: Env, email: string, slug: string, nome = ''): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
   const upsertResp = await sb(env, 'leads?on_conflict=email', {
     method: 'POST',
@@ -765,6 +766,14 @@ async function registrarInicioCheckout(env: Env, email: string, slug: string): P
   }
   const [lead] = (await upsertResp.json()) as any[];
   if (!lead) return;
+  if (nome.length >= 2 && !lead.nome) {
+    // Nome só preenche lead sem nome — nunca sobrescreve o que já existe.
+    await sb(env, `leads?id=eq.${lead.id}&nome=is.null`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' } as any,
+      body: JSON.stringify({ nome }),
+    }).catch(() => {});
+  }
 
   const eventResp = await sb(env, 'lead_events', {
     method: 'POST',
