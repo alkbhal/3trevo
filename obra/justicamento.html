@@ -15,7 +15,7 @@
 <meta property="og:title" content="Justiça(mento) para Orelha — Said Anes">
 <meta property="og:description" content="Ensaio sobre justiça, linguagem e poder. Compre e ganhe Nema, o ponto de fidelidade da editora.">
 <meta property="og:url" content="https://www.3trevo.com.br/obra/justicamento.html">
-<meta property="og:image" content="https://www.3trevo.com.br/og-image.png">
+<meta property="og:image" content="https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/justicamento-1782321124486-sctxd2.png">
 <meta property="book:author" content="Said Anes">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -82,7 +82,7 @@ h2.sec-titulo{font-family:'Lora',serif;font-size:clamp(22px,3vw,32px);font-weigh
 .obra-texto p{font-size:16px;color:var(--tinta2);line-height:1.85;margin-bottom:20px}
 .obra-lista{margin:16px 0 0;padding-left:0;list-style:none}
 .obra-lista li{font-size:15px;color:var(--tinta2);padding:12px 0;border-bottom:1px solid var(--borda);display:flex;align-items:flex-start;gap:12px;line-height:1.5}
-.obra-lista li::before{content:'✦';color:var(--ouro-texto);font-size:10px;margin-top:4px;flex-shrink:0}
+.obra-lista li::before{content:'';width:10px;height:1px;background:var(--ouro-texto);margin-top:.75em;flex-shrink:0}
 .sidebar-card{background:var(--card);border:1px solid var(--borda);padding:28px;margin-bottom:24px;position:relative}
 .sidebar-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)}
 .sidebar-card h3{font-family:'Lora',serif;font-size:16px;font-weight:400;color:var(--tinta);margin-bottom:14px}
@@ -172,9 +172,7 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
         <a href="/catalogo.html" class="btn-catalogo">← Ver catálogo</a>
       </div>
     </div>
-    <div class="obra-mockup-grande reveal" style="transition-delay:.1s" id="mockup-principal"
-      data-mockup-cor="#1a4a2e" data-mockup-titulo="Justiça(mento) para Orelha" data-mockup-w="200" data-mockup-h="280"
-      onclick="location.href='/checkout.html?slug=justicamento'" aria-label="Capa"></div>
+    <a class="obra-mockup-grande reveal" style="transition-delay:.1s;display:block;height:300px" href="/checkout.html?slug=justicamento" aria-label="Adquirir Justiça(mento) para Orelha"><img data-capa-obra src="https://tres-trevo-api.al-kbhal.workers.dev/api/public/capas/justicamento-1782321124486-sctxd2.png" width="200" height="300" alt="Capa de Justiça(mento) para Orelha" style="width:200px;height:300px;display:block;object-fit:cover;box-shadow:0 18px 40px rgba(15,45,26,.28)"></a>
   </div>
 </section>
 
@@ -256,16 +254,14 @@ footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);paddin
 
 <script src="/js/tt-client.js?v=27f42f5f" onerror="console.error('tt-client falhou ao carregar')"></script>
 <script>
-function gerarMockup(cor,titulo,w,h){cor=cor||'#1a4a2e';var r=parseInt(cor.slice(1,3),16),g=parseInt(cor.slice(3,5),16),b=parseInt(cor.slice(5,7),16);var lombada='rgb('+Math.max(0,r-30)+','+Math.max(0,g-30)+','+Math.max(0,b-30)+')';var destaque='rgb('+Math.min(255,r+40)+','+Math.min(255,g+40)+','+Math.min(255,b+40)+')';var cw=w*0.72,ch=h*0.88,lw=w*0.18,depth=h*0.04;var cx=lw,cy=depth,lx=0,ly=depth;var palavras=titulo.split(' '),linhas=[],linha='';palavras.forEach(function(p){if((linha+' '+p).trim().length>14){if(linha)linhas.push(linha);linha=p;}else linha=(linha+' '+p).trim();});if(linha)linhas.push(linha);linhas=linhas.slice(0,4);var fs=Math.max(6,Math.round(cw*0.13));var midY=cy+ch/2-(linhas.length-1)*fs*0.65;var esc=function(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};var textLines=linhas.map(function(l,i){return '<text x="'+(cx+cw/2)+'" y="'+(midY+i*fs*1.3)+'" text-anchor="middle" font-family="serif" font-size="'+fs+'" font-weight="bold" fill="#fff" fill-opacity="0.92">'+esc(l)+'</text>';}).join('');return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><ellipse cx="'+(cx+cw*.55)+'" cy="'+(cy+ch+4)+'" rx="'+(cw*.45)+'" ry="4" fill="rgba(0,0,0,.25)"/><polygon points="'+lw+',0 '+(lw+cw)+',0 '+(cx+cw)+','+cy+' '+cx+','+cy+'" fill="'+destaque+'"/><rect x="'+lx+'" y="'+ly+'" width="'+lw+'" height="'+ch+'" fill="'+lombada+'"/><rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="'+cor+'"/><rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+(ch*.18)+'" fill="rgba(255,255,255,.06)"/>'+textLines+'<line x1="'+(cx+cw*.15)+'" y1="'+(cy+ch*.78)+'" x2="'+(cx+cw*.85)+'" y2="'+(cy+ch*.78)+'" stroke="rgba(200,168,75,.6)" stroke-width=".8"/></svg>';}
 document.addEventListener('DOMContentLoaded',function(){
-  var m=document.getElementById('mockup-principal');if(m)m.innerHTML=gerarMockup(m.dataset.mockupCor,m.dataset.mockupTitulo,parseInt(m.dataset.mockupW),parseInt(m.dataset.mockupH));
   var navbar=document.getElementById('navbar');window.addEventListener('scroll',function(){navbar.classList.toggle('scrolled',window.scrollY>60);},{passive:true});
   window.toggleMenu=function(){var nav=document.getElementById('navMobile');var btn=document.getElementById('menuBtn');nav.classList.toggle('aberto');btn.setAttribute('aria-expanded',String(nav.classList.contains('aberto')));};
   var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visivel');});},{threshold:0.1});
   document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
   setTimeout(function(){document.querySelectorAll('.obra-hero .reveal').forEach(function(el){el.classList.add('visivel');});},80);
   (function(){var SLUG='justicamento';
-    TTClient.getCatalogo(SLUG).then(function(data){if(Array.isArray(data)&&data[0]){var el=document.getElementById('preco-justicamento');if(el)el.textContent='R$'+TTClient.formatMoney(data[0].preco);var fx=document.querySelector('.compra-fixa-preco');if(fx)fx.textContent='R$'+TTClient.formatMoney(data[0].preco);}}).catch(function(){});
+    TTClient.getCatalogo(SLUG).then(function(data){if(Array.isArray(data)&&data[0]){var cp=document.querySelector('img[data-capa-obra]');if(cp&&data[0].capa_url&&cp.getAttribute('src')!==data[0].capa_url)cp.src=data[0].capa_url;var el=document.getElementById('preco-justicamento');if(el)el.textContent='R$'+TTClient.formatMoney(data[0].preco);var fx=document.querySelector('.compra-fixa-preco');if(fx)fx.textContent='R$'+TTClient.formatMoney(data[0].preco);}}).catch(function(){});
     TTClient.getCatalogo().then(function(rows){
       var grid=document.getElementById('outrosGrid');if(!grid||!Array.isArray(rows))return;
       var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
@@ -278,6 +274,6 @@ document.addEventListener('DOMContentLoaded',function(){
   })();
 });
 </script>
-<script src="/js/beacon.js?v=a11c883d" data-sem-popup defer></script>
+<script src="/js/beacon.js?v=14074ec7" data-sem-popup defer></script>
 </body>
 </html>

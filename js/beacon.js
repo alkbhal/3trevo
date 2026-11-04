@@ -193,7 +193,7 @@
     overlay.innerHTML = [
       '<div class="tt-lead-box">',
       '  <button class="tt-lead-close" aria-label="' + T('js.cad.fechar') + '">&times;</button>',
-      '  <p class="tt-lead-kicker">✦ ' + T('js.cad.kicker') + '</p>',
+      '  <p class="tt-lead-kicker">' + T('js.cad.kicker') + '</p>',
       '  <h3 class="tt-lead-title" id="tt-lead-title">' + T('js.cad.titulo') + '</h3>',
       '  <p class="tt-lead-sub">' + T('js.cad.sub') + '</p>',
       '  <form id="tt-lead-form" novalidate>',
@@ -250,7 +250,7 @@
       criarMembro({ nome: form.nome.value, email: form.email.value, malaDireta: !!(form.mala_direta && form.mala_direta.checked), origem: 'popup' })
         .then(function (res) {
           if (res.ok) {
-            form.innerHTML = '<p class="tt-lead-msg" style="color:#1e5c3a;font-size:15px">✦ ' +
+            form.innerHTML = '<p class="tt-lead-msg" style="color:#1e5c3a;font-size:15px">' +
               T('js.cad.ok', { email: '<strong>' + form.email.value.replace(/[<>&"]/g, '') + '</strong>' }) + '</p>';
           } else {
             msg.style.color = '#b23b2e';

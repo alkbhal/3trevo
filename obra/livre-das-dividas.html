@@ -15,7 +15,7 @@
 <meta property="og:title" content="Livre das Dívidas — Said Anes">
 <meta property="og:description" content="Quebre as correntes que te prendem ao desespero. Guia prático, com scripts de negociação e os seus direitos de devedor.">
 <meta property="og:url" content="https://www.3trevo.com.br/obra/livre-das-dividas.html">
-<meta property="og:image" content="https://www.3trevo.com.br/assets/capas/livre-das-dividas.jpg">
+<meta property="og:image" content="https://3trevo.com.br/assets/capas/livre-das-dividas.jpg">
 <meta property="book:author" content="Said Anes">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -82,7 +82,7 @@ h2.sec-titulo{font-family:'Lora',serif;font-size:clamp(22px,3vw,32px);font-weigh
 .obra-texto p{font-size:16px;color:var(--tinta2);line-height:1.85;margin-bottom:20px}
 .obra-lista{margin:16px 0 0;padding-left:0;list-style:none}
 .obra-lista li{font-size:15px;color:var(--tinta2);padding:12px 0;border-bottom:1px solid var(--borda);display:flex;align-items:flex-start;gap:12px;line-height:1.5}
-.obra-lista li::before{content:'✦';color:var(--ouro-texto);font-size:10px;margin-top:4px;flex-shrink:0}
+.obra-lista li::before{content:'';width:10px;height:1px;background:var(--ouro-texto);margin-top:.75em;flex-shrink:0}
 .sidebar-card{background:var(--card);border:1px solid var(--borda);padding:28px;margin-bottom:24px;position:relative}
 .sidebar-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)}
 .sidebar-card h3{font-family:'Lora',serif;font-size:16px;font-weight:400;color:var(--tinta);margin-bottom:14px}
@@ -287,7 +287,7 @@ footer{background:#1b1d1b}
       </div>
       </div>
     </div>
-    <a class="obra-mockup-grande reveal" style="transition-delay:.1s;display:block;height:300px" href="/checkout.html?slug=livre-das-dividas" aria-label="Adquirir Livre das Dívidas"><img src="/assets/capas/livre-das-dividas.jpg" width="200" height="300" alt="Capa de Livre das Dívidas: uma corrente verde com um elo dourado se abrindo." style="width:200px;height:300px;display:block;box-shadow:0 18px 40px rgba(15,45,26,.28)"></a>
+    <a class="obra-mockup-grande reveal" style="transition-delay:.1s;display:block;height:300px" href="/checkout.html?slug=livre-das-dividas" aria-label="Adquirir Livre das Dívidas"><img data-capa-obra src="https://3trevo.com.br/assets/capas/livre-das-dividas.jpg" width="200" height="300" alt="Capa de Livre das Dívidas: uma corrente verde com um elo dourado se abrindo." style="width:200px;height:300px;display:block;box-shadow:0 18px 40px rgba(15,45,26,.28)"></a>
   </div>
 </section>
 
@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded',function(){
     new IntersectionObserver(function(es){barra.classList.toggle('visivel',!es[0].isIntersecting);}).observe(alvo);})();
   setTimeout(function(){document.querySelectorAll('.obra-hero .reveal').forEach(function(el){el.classList.add('visivel');});},80);
   (function(){var SLUG='livre-das-dividas';
-    TTClient.getCatalogo(SLUG).then(function(data){if(Array.isArray(data)&&data[0]){var el=document.getElementById('preco-livre-das-dividas');if(el)el.textContent='R$'+TTClient.formatMoney(data[0].preco);var fx=document.querySelector('.compra-fixa-preco');if(fx)fx.textContent='R$'+TTClient.formatMoney(data[0].preco);}}).catch(function(){});
+    TTClient.getCatalogo(SLUG).then(function(data){if(Array.isArray(data)&&data[0]){var cp=document.querySelector('img[data-capa-obra]');if(cp&&data[0].capa_url&&cp.getAttribute('src')!==data[0].capa_url)cp.src=data[0].capa_url;var el=document.getElementById('preco-livre-das-dividas');if(el)el.textContent='R$'+TTClient.formatMoney(data[0].preco);var fx=document.querySelector('.compra-fixa-preco');if(fx)fx.textContent='R$'+TTClient.formatMoney(data[0].preco);}}).catch(function(){});
     TTClient.getCatalogo().then(function(rows){
       var grid=document.getElementById('outrosGrid');if(!grid||!Array.isArray(rows))return;
       var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
@@ -395,6 +395,6 @@ document.addEventListener('DOMContentLoaded',function(){
   })();
 });
 </script>
-<script src="/js/beacon.js?v=a11c883d" data-sem-popup defer></script>
+<script src="/js/beacon.js?v=14074ec7" data-sem-popup defer></script>
 </body>
 </html>
