@@ -63,7 +63,7 @@ nav{
   color:var(--ouro-claro);text-decoration:none;letter-spacing:.3px;
   display:flex;align-items:center;gap:9px;
 }
-.nav-marca::before{content:'✦';font-size:13px;opacity:.75}
+.nav-marca::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .nav-right{display:flex;align-items:center;gap:16px}
 .nav-idiomas{display:flex;gap:2px;margin-left:auto;margin-right:12px}
 .nav-idiomas a{font-size:12px;letter-spacing:.06em;padding:8px 7px;color:rgba(255,255,255,.55);text-decoration:none}
@@ -99,7 +99,9 @@ nav{
 .login-logo{
   font-family:'Lora',serif;font-size:27px;font-weight:400;
   color:var(--verde-medio);margin-bottom:8px;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:.4em;
 }
+.login-logo::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .login-sub{font-size:13px;color:var(--t3);text-align:center;margin-bottom:36px;line-height:1.6}
 .campo-label{
   font-size:11px;letter-spacing:1.8px;text-transform:uppercase;
@@ -774,7 +776,7 @@ nav{
 <!-- ══ TELA: LOGIN ══ -->
 <div id="tela-login" class="tela ativa">
   <div class="login-box">
-    <div class="login-logo">✦ Três Trevo</div>
+    <div class="login-logo">Três Trevo</div>
     <p class="login-sub" data-i18n="ac.login.sub">Open your personal library. New here? Choose “Email me a sign-in link” and your free member area is created on the spot.</p>
     <label class="campo-label" for="emailLogin" data-i18n="ac.login.email">Email</label>
     <input type="email" id="emailLogin" class="campo-input" data-i18n-attr="placeholder:ac.login.email.ph" placeholder="you@email.com"

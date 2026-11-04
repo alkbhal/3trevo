@@ -36,7 +36,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:0 48px;height:64px;
   border-bottom:1px solid rgba(200,168,75,.2)}
 .nav-marca{font-family:'Lora',serif;font-size:20px;font-weight:600;
   color:var(--ouro);text-decoration:none;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
-.nav-marca::before{content:'✦';font-size:14px;opacity:.7}
+.nav-marca::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .nav-back{font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}
 .nav-back:hover{color:var(--ouro)}
 

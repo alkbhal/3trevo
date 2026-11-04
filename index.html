@@ -53,7 +53,9 @@
       max-width: var(--max); margin: 0 auto; padding: 0 24px;
       height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
-    .logo { font-family: var(--serif); font-weight: 400; font-size: 16px; color: rgba(255,255,255,.92); letter-spacing: .02em; }
+    .logo { font-family: var(--serif); font-weight: 400; font-size: 16px; color: rgba(255,255,255,.92); letter-spacing: .02em; white-space: nowrap; }
+    .logo::before { margin-right: .45em; }
+    .logo::before, .ft-logo::before { content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em; color: var(--v6); }
     .logo span { color: var(--v6); }
     nav { display: flex; align-items: center; gap: 24px; }
     nav a { font-size: 13px; color: rgba(255,255,255,.5); transition: color .2s; }
@@ -492,7 +494,7 @@
     footer { background: var(--v0); padding: 56px 24px 36px; }
     .ft-in { max-width: var(--max); margin: 0 auto; }
     .ft-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 44px; }
-    .ft-logo { font-family: var(--serif); font-size: 19px; font-weight: 300; color: rgba(255,255,255,.8); margin-bottom: 10px; }
+    .ft-logo { font-family: var(--serif); font-size: 19px; font-weight: 300; color: rgba(255,255,255,.8); margin-bottom: 10px; display: flex; align-items: center; gap: .55em; }
     .ft-tag { font-size: 13px; color: rgba(255,255,255,.3); line-height: 1.65; max-width: 260px; margin-bottom: 16px; }
     #membros { padding: 96px 24px; background: var(--bg2, #0d1a12); }
     #membros .sec-in { max-width: 920px; margin: 0 auto; }
