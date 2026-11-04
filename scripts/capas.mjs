@@ -25,14 +25,16 @@ try {
 }
 const capa = Object.fromEntries((Array.isArray(rows) ? rows : []).filter((r) => r.slug && r.capa_url).map((r) => [r.slug, r.capa_url]));
 
-const problemas = [], mudou = [];
+const problemas = [], mudou = [], suspensos = [];
 for (const nome of readdirSync(join(ROOT, 'obra'))) {
   if (!nome.endsWith('.html')) continue;
   const arq = join(ROOT, 'obra', nome), slug = nome.replace(/\.html$/, '');
   const html = readFileSync(arq, 'utf8');
   if (/http-equiv="refresh"/i.test(html)) continue; // redirecionamento
   const url = capa[slug];
-  if (!url) { problemas.push(`obra/${nome}: o livro não tem capa no catálogo`); continue; }
+  // Livro fora do catálogo público (suspenso ou inativo): não há capa a conferir; a página segue como está.
+  if (!url) suspensos.push(slug);
+  if (!url) { if (!/data-capa-obra/.test(html)) problemas.push(`obra/${nome}: falta a imagem da capa (img com data-capa-obra)`); continue; }
   let novo = html
     .replace(/(<meta property="og:image" content=")[^"]*(")/, `$1${url}$2`)
     .replace(/(<img [^>]*data-capa-obra[^>]*\ssrc=")[^"]*(")/, `$1${url}$2`)
@@ -46,4 +48,5 @@ for (const nome of readdirSync(join(ROOT, 'obra'))) {
 }
 if (check && mudou.length) problemas.push(...mudou.map((p) => `${p}: capa diferente do catálogo (rode node scripts/capas.mjs)`));
 if (problemas.length) { console.error('[capas] ' + problemas.join('\n  ')); process.exit(1); }
-console.log(check ? '[capas] ok — páginas de obra com a capa do catálogo.' : `[capas] ${mudou.length ? 'atualizadas: ' + mudou.join(', ') : 'nada a mudar'}.`);
+const aviso = suspensos.length ? ` Fora do catálogo público (não conferidos): ${suspensos.join(', ')}.` : '';
+console.log(check ? `[capas] ok — páginas de obra com a capa do catálogo.${aviso}` : `[capas] ${mudou.length ? 'atualizadas: ' + mudou.join(', ') : 'nada a mudar'}.${aviso}`);
