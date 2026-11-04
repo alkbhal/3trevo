@@ -228,6 +228,7 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
         nome: nomePagador,
         ebookTitulo: rpc.ebook_titulo ?? productSlug,
         downloadToken: rpc.download_token,
+        tipo: rpc.tipo ?? 'ebook',
         productSlug,
         nema: nemaGanho,
         valorNema: nemaGanho > 0 ? await valorNemaReais(env) : 0,
@@ -607,19 +608,22 @@ async function enviarEmailCompra(
     nome: string;
     ebookTitulo: string;
     downloadToken: string;
+    tipo?: string;
     productSlug: string;
     nema: number;
     valorNema: number;
     valor: number;
   }
 ): Promise<void> {
-  const downloadUrl = `${WORKER_URL}/api/download?token=${opts.downloadToken}`;
+  // acesso_app (plano do Ático): não há arquivo; o botão leva à área do cliente.
+  const acessoApp = opts.tipo === 'acesso_app';
+  const downloadUrl = acessoApp ? `${SITE_URL}/area-cliente.html` : `${WORKER_URL}/api/download?token=${opts.downloadToken}`;
   const areaClienteUrl = `${SITE_URL}/area-cliente.html`;
   // Anexa o arquivo (normalmente PDF) direto no e-mail, além do link de 72h -- pedido
   // explícito do usuário. Se qualquer coisa falhar, o e-mail ainda sai sem anexo -- o
   // link de download continua sendo o caminho garantido, nunca bloqueia a entrega.
   let attachment: { filename: string; content: string } | null = null;
-  try {
+  if (!acessoApp) try {
     const prodResp = await fetch(`${env.SUPABASE_URL}/rest/v1/products?slug=eq.${opts.productSlug}&select=arquivo_url,epub_url`, { headers: supabaseHeaders(env) });
     const [produto] = (await prodResp.json()) as any[];
     const arquivo: string | undefined = produto?.arquivo_url || produto?.epub_url;
@@ -658,7 +662,7 @@ async function enviarEmailCompra(
       Olá, <em style="font-style:italic;color:#1a4a2e">${escapeHtml(opts.nome.split(' ')[0])}</em> —
     </h1>
     <p style="margin:0 0 24px;font-size:15px;color:#555;line-height:1.7">
-      Seu pagamento foi aprovado. <strong>${escapeHtml(opts.ebookTitulo)}</strong> está pronto para leitura.
+      Seu pagamento foi aprovado. <strong>${escapeHtml(opts.ebookTitulo)}</strong> ${acessoApp ? 'está liberado.' : 'está pronto para leitura.'}
     </p>
     <p style="margin:0 0 8px;font-size:13px;color:#888">
       Valor pago: <strong style="color:#1a4a2e">${valorFmt}</strong>
@@ -667,11 +671,11 @@ async function enviarEmailCompra(
 
   <!-- Download CTA -->
   <tr><td style="padding:28px 48px">
-    <p style="margin:0 0 12px;font-size:12px;color:#888">Link válido por 72 horas:</p>
+    <p style="margin:0 0 12px;font-size:12px;color:#888">${acessoApp ? 'Acesso permanente, sem prazo:' : 'Link válido por 72 horas:'}</p>
     <a href="${downloadUrl}"
        style="display:block;padding:18px;background:#1a4a2e;color:#f0ebe0;text-decoration:none;
               text-align:center;font-size:15px;font-weight:500">
-      Baixar ${escapeHtml(opts.ebookTitulo)} →
+      ${acessoApp ? `Abrir ${escapeHtml(opts.ebookTitulo)} →` : `Baixar ${escapeHtml(opts.ebookTitulo)} →`}
     </a>
     <p style="margin:12px 0 0;font-size:12px;color:#888;text-align:center">
       Prefere ler o EPUB no leitor do site?
@@ -679,7 +683,7 @@ async function enviarEmailCompra(
     </p>
   </td></tr>
 
-  <!-- Biblioteca TT -->
+  ${acessoApp ? '' : `<!-- Biblioteca TT -->
   <tr><td style="padding:0 48px 24px">
     <table width="100%" cellpadding="0" cellspacing="0"
            style="background:#f5f0e8;border:1px solid rgba(26,74,46,.1);border-left:3px solid #c8a84b">
@@ -695,7 +699,7 @@ async function enviarEmailCompra(
       </a>
     </td></tr>
     </table>
-  </td></tr>
+  </td></tr>`}
 
   <!-- Nema -->
   ${opts.nema > 0 ? `<tr><td style="padding:0 48px 28px">
