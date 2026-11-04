@@ -37,6 +37,7 @@ jobs:
         working-directory: worker
     steps:
       - name: Conferir secrets
+        working-directory: .
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Falta o secret CLOUDFLARE_API_TOKEN (ver AGENDA, item B5)"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Falta o secret CLOUDFLARE_ACCOUNT_ID (ver AGENDA, item B5)"; exit 1; }
