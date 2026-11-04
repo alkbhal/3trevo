@@ -6,6 +6,7 @@
 import type { Env } from '../types';
 import { sb } from '../sb';
 import { TAG_RECOVERY_1, TAG_RECOVERY_2, leadTemCompraAtiva } from './cart-recovery';
+import { emSilencio } from './janela-envio';
 
 export async function handleEmailEngine(env: Env): Promise<void> {
   if (!env.RESEND_API_KEY) return;
@@ -17,7 +18,12 @@ export async function handleEmailEngine(env: Env): Promise<void> {
   const due = (await dueResp.json()) as any[];
   if (!Array.isArray(due) || due.length === 0) return;
 
+  const silencio = emSilencio(Date.now());
+
   for (const item of due) {
+    // Rede de segurança: recuperação nunca sai entre 22h e 8h; fica para o próximo ciclo.
+    if (silencio && (item.tag === TAG_RECOVERY_1 || item.tag === TAG_RECOVERY_2)) continue;
+
     const leadResp = await sb(env, `leads?id=eq.${item.lead_id}&select=email,nome,status,unsub_token`);
     const [lead] = (await leadResp.json()) as any[];
     if (!lead || lead.status === 'unsub') {

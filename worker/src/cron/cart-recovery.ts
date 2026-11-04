@@ -12,9 +12,9 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { agendarRecovery1, agendarRecovery2 } from './janela-envio';
 
-const JANELA_DETECCAO_HORAS = 2;
-const ATRASO_RECOVERY_2_HORAS = 22; // total +24h desde o checkout_start
+const JANELA_DETECCAO_HORAS = 1; // horários finais: ver janela-envio.ts
 export const TAG_RECOVERY_1 = 'recovery_1';
 export const TAG_RECOVERY_2 = 'recovery_2';
 
@@ -22,7 +22,7 @@ export async function handleCartRecovery(env: Env): Promise<void> {
   const limite = new Date(Date.now() - JANELA_DETECCAO_HORAS * 3600000).toISOString();
 
   const eventosResp = await sb(env,
-    `lead_events?event_type=eq.checkout_start&criado_em=lte.${limite}&order=criado_em.desc&limit=200&select=id,lead_id,props`
+    `lead_events?event_type=eq.checkout_start&criado_em=lte.${limite}&order=criado_em.desc&limit=200&select=id,lead_id,props,criado_em`
   );
   const eventos = (await eventosResp.json()) as any[];
   if (!Array.isArray(eventos) || eventos.length === 0) return;
@@ -31,14 +31,14 @@ export async function handleCartRecovery(env: Env): Promise<void> {
     if (!evento.lead_id || !evento.props?.slug) continue;
 
     try {
-      await processarEvento(env, evento.lead_id);
+      await processarEvento(env, evento.lead_id, Date.parse(evento.criado_em));
     } catch (e) {
       console.error(`[cart-recovery] falha no lead ${evento.lead_id}:`, e);
     }
   }
 }
 
-async function processarEvento(env: Env, leadId: string): Promise<void> {
+async function processarEvento(env: Env, leadId: string, inicioMs: number): Promise<void> {
   // Dedupe: já existe recuperação agendada/enviada pra esse lead (não é por slug —
   // 1 tentativa de recuperação por lead é suficiente, evita spam se ele testar
   // vários checkouts sem comprar nenhum).
@@ -54,13 +54,15 @@ async function processarEvento(env: Env, leadId: string): Promise<void> {
 
   if (await leadTemCompraAtiva(env, lead.email)) return;
 
-  const now = Date.now();
+  const inicio = Number.isFinite(inicioMs) ? inicioMs : Date.now();
+  const r1 = agendarRecovery1(inicio, Date.now());
+  const r2 = agendarRecovery2(inicio, r1);
   const seedResp = await sb(env, 'email_sequence', {
     method: 'POST',
     headers: { Prefer: 'return=minimal,resolution=ignore-duplicates' } as any,
     body: JSON.stringify([
-      { lead_id: leadId, sequence_step: 100, scheduled_at: new Date(now).toISOString(), tag: TAG_RECOVERY_1 },
-      { lead_id: leadId, sequence_step: 101, scheduled_at: new Date(now + ATRASO_RECOVERY_2_HORAS * 3600000).toISOString(), tag: TAG_RECOVERY_2 },
+      { lead_id: leadId, sequence_step: 100, scheduled_at: new Date(r1).toISOString(), tag: TAG_RECOVERY_1 },
+      { lead_id: leadId, sequence_step: 101, scheduled_at: new Date(r2).toISOString(), tag: TAG_RECOVERY_2 },
     ]),
   });
   if (!seedResp.ok) {
