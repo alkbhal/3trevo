@@ -46,7 +46,6 @@ nav{position:sticky;top:0;z-index:100;background:var(--verde-nav);display:flex;a
 
 /* HERO */
 .lib-hero{background:var(--verde-nav);padding:64px 32px 48px;text-align:center;position:relative;overflow:hidden}
-.lib-hero::before{content:'✦';font-size:200px;position:absolute;top:-40px;left:50%;transform:translateX(-50%);color:rgba(200,168,75,.04);pointer-events:none;font-family:'Cormorant Garamond',serif}
 .lib-hero-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(200,168,75,.6);margin-bottom:16px}
 .lib-hero-titulo{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,52px);font-weight:300;color:#f4efe5;line-height:1.2;margin-bottom:16px}
 .lib-hero-titulo em{color:var(--ouro);font-style:italic}
@@ -259,7 +258,7 @@ function renderizar() {
       ? `<div class="musica-universo${m.produto_id?' com-link':''}" onclick="event.stopPropagation();${m.produto_id?`irParaLivro('${m.universo_slug}')`:''}">${escHtml(m.universo_slug)}</div>`
       : '';
     const footerHtml = temAcesso
-      ? `<span class="musica-badge-gratis">${m.gratuita ? '✦ Gratuita' : '✦ Desbloqueada'}</span><span></span>`
+      ? `<span class="musica-badge-gratis">${m.gratuita ? 'Gratuita' : 'Desbloqueada'}</span><span></span>`
       : `<span class="musica-badge-lock">🔒 Exclusivo</span><a class="musica-adquirir" href="/checkout.html?slug=${m.universo_slug||''}" onclick="event.stopPropagation()">Adquirir livro →</a>`;
 
     return `<div class="musica-card" onclick="tocarMusica('${m.id}',${temAcesso})">

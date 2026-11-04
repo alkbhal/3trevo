@@ -152,7 +152,6 @@ nav{
   font-size:11px;letter-spacing:3px;text-transform:uppercase;
   color:var(--ouro-escuro);margin-bottom:8px;display:flex;align-items:center;gap:8px;
 }
-.dash-saudacao::before{content:'✦';opacity:.7}
 .dash-titulo{font-family:'Lora',serif;font-size:32px;font-weight:400;line-height:1.15;color:var(--tinta)}
 .dash-titulo em{font-style:italic;color:var(--verde-medio)}
 
@@ -844,7 +843,7 @@ nav{
     <div id="bannerClassicos" class="banner-classicos" hidden data-so-pt style="margin-top:36px;padding:28px 32px;background:linear-gradient(135deg,#0f2d1a 0%,#1e5c3a 100%);border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
       <div>
         <p style="color:var(--ouro);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin:0 0 8px;">Incluído na sua compra</p>
-        <h3 style="font-family:'Lora',serif;font-weight:400;font-size:20px;color:#fff;margin:0 0 10px;"><span style="color:var(--ouro)">✦</span> Biblioteca Clássica TT</h3>
+        <h3 style="font-family:'Lora',serif;font-weight:400;font-size:20px;color:#fff;margin:0 0 10px;">Biblioteca Clássica TT</h3>
         <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.6;margin:0;">Clássicos da literatura brasileira em domínio público, no mesmo leitor da editora. Leia até 3 obras ao mesmo tempo, com o progresso salvo.</p>
       </div>
       <a id="link-bib-classica" href="/minha-biblioteca.html" style="flex-shrink:0;display:inline-block;background:var(--ouro);color:#0f2d1a;text-decoration:none;padding:13px 28px;border-radius:3px;font-size:14px;font-weight:600;white-space:nowrap;">Acessar biblioteca →</a>
@@ -894,7 +893,7 @@ nav{
 <script data-so-pt src="/js/player.js?v=1228b01f"></script>
 <script src="/js/leitor.js?v=56ae9591"></script>
 <script src="/js/estante.js?v=fc77c52c"></script>
-<script src="/js/membro.js?v=720de1fb"></script>
+<script src="/js/membro.js?v=8df4bfab"></script>
 <script>
 // ============================================================
 // ÁREA DO CLIENTE — Editora Três Trevo
@@ -997,7 +996,7 @@ async function enviarMagicLink() {
     msg.textContent = /rate|limit|429/i.test(error.message) ? T('js.cad.erro.tentativas') : T('js.ac.erro.link');
     msg.className = 'login-msg erro';
   } else {
-    msg.innerHTML = '✦ ' + T('js.ac.link.ok');
+    msg.innerHTML = T('js.ac.link.ok');
     msg.className = 'login-msg sucesso';
   }
 }
@@ -1255,7 +1254,7 @@ function capaTipografica(titulo, autor, slug) {
   return `<div class="capa-tipo" style="--capa-a:${a};--capa-b:${b}">
     <span><span class="capa-tipo-titulo">${escHtml(titulo)}</span><span class="capa-tipo-filete"></span>
     <span class="capa-tipo-autor">${escHtml(autor)}</span></span>
-    <span class="capa-tipo-selo">✦ Três Trevo</span>
+    <span class="capa-tipo-selo">Três Trevo</span>
   </div>`;
 }
 
@@ -1320,7 +1319,7 @@ async function baixar(productId, titulo, formato) {
       toast(`Formato ${rotulo} não disponível para este título.`, 'erro');
     } else {
       window.open(item.download_url, '_blank');
-      toast(`✦ Arquivo ${rotulo} de "${titulo}" baixado.`);
+      toast(`Arquivo ${rotulo} de "${titulo}" baixado.`);
     }
   } catch {
     toast(T('js.erro.conexao'), 'erro');
@@ -1576,7 +1575,7 @@ async function carregarSorteios() {
                 <button class="rede-btn" onclick="toggleRede(this,'${p.id}','tiktok')">TikTok</button>
                 <button class="rede-btn" onclick="toggleRede(this,'${p.id}','youtube')">YouTube</button>
               </div>
-              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participação ✦</button>
+              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participação</button>
             </div>
           </div>`;
         }).join('')}
@@ -1695,7 +1694,7 @@ async function enviarValidacao(drawId, purchaseId) {
       toast(data.error || 'Erro ao validar participação.', 'erro');
       return;
     }
-    toast(`✦ Participação confirmada! ${data.cotas_total} cotas (${data.multiplicador}×)`);
+    toast(`Participação confirmada! ${data.cotas_total} cotas (${data.multiplicador}×)`);
     abasCarregadas['sorteios'] = false;
     setTimeout(() => { abasCarregadas['sorteios'] = false; carregarSorteios(); }, 1200);
   } catch {
