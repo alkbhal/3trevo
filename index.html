@@ -2,6 +2,21 @@
 <html lang="pt-BR" data-lang="pt">
 <head>
   <script src="/js/consentimento.js?v=31017ee2" data-fb="PageView" defer></script>
+  <script src="/js/vinheta.js?v=7148aa15" defer></script>
+  <style>
+    /* vinheta de abertura (js/vinheta.js) */
+    #tt-vinheta { position: fixed; inset: 0; z-index: 2147483000; background: #0f2d1a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease; }
+    #tt-vinheta[hidden] { display: none; }
+    #tt-vinheta img { width: min(46vw, 260px); height: auto; }
+    #tt-vinheta .vt-marca { text-align: center; color: #f4efe5; opacity: 0; transform: translateY(6px); transition: opacity .5s ease, transform .5s ease; }
+    #tt-vinheta.vt-nome .vt-marca { opacity: 1; transform: none; }
+    #tt-vinheta .vt-nome-t { font-family: var(--serif); font-size: clamp(30px, 6vw, 46px); font-weight: 400; letter-spacing: -.01em; }
+    #tt-vinheta .vt-desc { display: block; margin-top: 10px; font-size: 12px; letter-spacing: .32em; text-transform: uppercase; color: #c9a84c; }
+    #tt-vinheta .vt-pular { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: transparent; border: 1px solid rgba(244,239,229,.35); color: rgba(244,239,229,.8); font: inherit; font-size: 13px; padding: 9px 16px; border-radius: 999px; cursor: pointer; }
+    #tt-vinheta .vt-pular:focus-visible { outline: 2px solid #c9a84c; outline-offset: 2px; }
+    #tt-vinheta.vt-sai { opacity: 0; pointer-events: none; }
+    html.tt-vinheta, html.tt-vinheta body { overflow: hidden; }
+  </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" data-i18n-attr="content:meta.inicio.desc" content="Editora Três Trevo — editora digital independente de Montauri/RS. Ebooks de ficção, ensaio e negócios, com um programa de incentivo à leitura como bônus.">
@@ -566,6 +581,8 @@
 <link rel="alternate" hreflang="x-default" href="https://3trevo.com.br/">
 </head>
 <body>
+<div id="tt-vinheta" hidden><img src="/assets/marca/animado-negativo.svg" alt="" width="260" height="260"><div class="vt-marca"><span class="vt-nome-t">Três Trevo</span><span class="vt-desc"></span></div><button type="button" class="vt-pular"></button></div>
+<script>try{if(!sessionStorage.getItem('tt-vinheta')&&!location.hash&&scrollY<10&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.getElementById('tt-vinheta').hidden=false;document.documentElement.classList.add('tt-vinheta')}}catch(e){}</script>
 
 <!-- ── HEADER ───────────────────────────────────────────────────────────────── -->
 <header id="hdr">
