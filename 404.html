@@ -25,7 +25,7 @@ html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--bg);color:var(--t0);min-height:100vh;display:flex;flex-direction:column}
 
 .hdr{background:rgba(10,31,14,.97);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:center}
-.logo{font-family:var(--serif);font-weight:400;font-size:16px;color:rgba(255,255,255,.92);text-decoration:none}
+.logo{font-family:var(--serif);font-weight:400;font-size:16px;color:rgba(255,255,255,.92);text-decoration:none;white-space:nowrap}.logo::before{margin-right:.45em;content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em;color:var(--v6)}
 .logo span{color:var(--v6)}
 
 .main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px;text-align:center}
@@ -45,7 +45,7 @@ h1{font-family:var(--serif);font-size:clamp(22px,4vw,32px);font-weight:300;color
 </head>
 <body>
 <header class="hdr">
-  <a href="/" class="logo">Editora Tres <span>Trevo</span></a>
+  <a href="/" class="logo">Editora Três <span>Trevo</span></a>
 </header>
 <main class="main">
   <div class="card">

@@ -54,7 +54,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--verde);outline-offs
 nav{position:fixed;top:0;left:0;right:0;z-index:900;background:var(--verde-nav);border-bottom:1px solid rgba(200,168,75,.2);padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;transition:height .3s}
 nav.scrolled{height:54px;background:rgba(10,30,18,.98);backdrop-filter:blur(12px)}
 .nav-marca{font-family:'Lora',serif;font-size:20px;font-weight:600;color:var(--ouro);letter-spacing:.5px;display:flex;align-items:center;gap:10px}
-.nav-marca::before{content:'✦';font-size:14px;opacity:.7}
+.nav-marca::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
 .nav-links a{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);transition:color .2s}
 .nav-links a:hover,.nav-links a.ativa{color:var(--ouro)}
@@ -153,7 +153,7 @@ h2.sec-titulo{font-family:'Lora',serif;font-size:clamp(26px,3.5vw,42px);font-wei
 /* FOOTER */
 footer{background:var(--footer);border-top:1px solid rgba(200,168,75,.15);padding:56px 48px 32px}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:48px}
-.footer-marca{font-family:'Lora',serif;font-size:24px;color:var(--ouro);margin-bottom:12px}
+.footer-marca{font-family:'Lora',serif;font-size:24px;color:var(--ouro);margin-bottom:12px}.footer-marca{display:flex;align-items:center;gap:10px}.footer-marca::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.35);line-height:1.8;max-width:280px}
 .footer-col h4{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px}
 .footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.4);margin-bottom:8px;transition:color .2s}
@@ -338,7 +338,7 @@ var PAGINAS_OBRA = {'antifalencia':1,'justicamento':1,'isa-isma-tintim':1,'livre
 <footer>
   <div class="footer-grid">
     <div>
-      <div class="footer-marca">✦ Editora Três Trevo</div>
+      <div class="footer-marca">Editora Três Trevo</div>
       <p class="footer-desc">Literatura e conhecimento aplicado. Publicamos o que importa, para quem realmente lê.</p>
       <div style="margin-top:20px;font-size:11px;color:rgba(255,255,255,.2)">Uma empresa RDS Anúncios Ltda<br>CNPJ 18.928.966/0001-59<br>Montauri/RS · Brasil</div>
     </div>

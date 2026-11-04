@@ -37,7 +37,7 @@ a{text-decoration:none;color:inherit}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:100;background:var(--verde-nav);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px}
-.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ouro);letter-spacing:.5px}
+.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ouro);letter-spacing:.5px;display:inline-flex;align-items:center;gap:10px}.nav-marca::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .nav-links{display:flex;gap:28px;list-style:none}
 .nav-links a{font-size:13px;color:rgba(255,255,255,.6);letter-spacing:.3px;transition:color .2s}
 .nav-links a:hover,.nav-links a.ativo{color:var(--ouro)}
@@ -130,7 +130,7 @@ footer.lib-footer a{color:rgba(200,168,75,.5);text-decoration:none}
 <body>
 
 <nav>
-  <a href="/" class="nav-marca">✦ Editora Três Trevo</a>
+  <a href="/" class="nav-marca">Editora Três Trevo</a>
   <ul class="nav-links">
     <li><a href="/#catalogo">Catálogo</a></li>
     <li><a href="/#nema">Nema</a></li>
