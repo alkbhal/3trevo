@@ -87,22 +87,24 @@ describe('núcleo SFDTT', () => {
     expect(M.calcDDO(500, 1500)).toBe(10);
     expect(M.calcDDO(100, 0)).toBe(999);
   });
-  it('perfil derivado: 3 dívidas com atraso => bola de neve, com alerta se taxa > 10%', () => {
-    const d = M.diagnostico({ ...base, dividas: [...base.dividas, { id: 'x', nome: 'Rotativo', saldo: 900, juros: 18 }] });
-    expect(d.ordem.metodo).toBe('bola_de_neve');
-    expect(d.ordem.alerta).toMatch(/10%/);
-  });
-  it('avalanche quando não há atraso; pensão e garantia sempre primeiro', () => {
+  it('ordem vem do R-DIVIDA-ORDEM do SFDTT; prioridade legal do livro na frente', () => {
     const d = M.diagnostico({
-      ...base,
+      ...base, rendaCerta: 6000,
       dividas: [
         { id: '1', nome: 'Rotativo', saldo: 900, juros: 15 },
         { id: '2', nome: 'Moto', saldo: 5000, juros: 2, garantia: true },
         { id: '3', nome: 'Pensão atrasada', saldo: 800, tipo: 'pensao' },
       ],
     });
-    expect(d.ordem.metodo).toBe('avalanche');
+    expect(d.ordem.bloqueada).toBe(false);
     expect(d.ordem.ordem.map((o: any) => o.id)).toEqual(['3', '2', '1']);
+  });
+  it('guarda do SFDTT: renda abaixo de 2 salários mínimos não recebe ordem de quitação', () => {
+    const d = M.diagnostico(base);
+    expect(d.ordem.bloqueada).toBe(true);
+    expect(d.guarda).toBe('renda_subsistencia');
+    expect(d.ordem.recursos.length).toBeGreaterThan(0);
+    expect(d.acoes.some((a: any) => a.id === 'l35-renda_subsistencia')).toBe(true);
   });
   it('nunca inventa taxa: dívida sem juros não gera juros', () => {
     const d = M.diagnostico({ rendaCerta: 3000, essenciais: { moradia: 800 }, dividas: [{ id: 'z', nome: 'Sem taxa', saldo: 1000 }] });
@@ -114,10 +116,10 @@ describe('núcleo SFDTT', () => {
     expect(r.sobra).toBe(-200);
     expect(r.sobraComIncerta).toBe(300);
   });
-  it('guarda de insolvência grave', () => {
-    const r = M.resumo({ rendaCerta: 2000, dividas: [{ id: 'g', nome: 'X', saldo: 60000, atraso: true }] });
-    expect(M.guardaUniversal(r)).toBe('insolvencia_grave');
-    expect(M.calcEstado(r.comp, r.inad, r.entradas, r.dividaTotal).id).toBe('colapso');
+  it('guarda de insolvência grave (dívida > 2 × renda anual)', () => {
+    const d = M.diagnostico({ rendaCerta: 2000, dividas: [{ id: 'g', nome: 'X', saldo: 60000, atraso: true }] });
+    expect(d.guarda).toBe('insolvencia_grave');
+    expect(d.estado.id).toBe('colapso');
   });
   it('reserva inicial antes da avalanche; depois estanca a dívida cara', () => {
     const r1 = M.resumo({ rendaCerta: 3000, saldo: 100, dividas: [{ id: 'c', nome: 'Rotativo', saldo: 900, juros: 15 }] });

@@ -148,21 +148,18 @@ function menu() {
 
 // ─── Carga: amostra pública + edição completa para quem comprou ──────────────
 async function carregar() {
-  const a = await fetch('/leitura/livre-das-dividas/amostra.json?v=0').then((r) => r.json());
-  LIVRO.indice = a.indice; a.capitulos.forEach((c) => (LIVRO.capitulos[c.id] = c));
-  abrir(S.cap, false);
+  // Uma fonte só: o worker entrega o índice, os capítulos livres e, a quem comprou, o resto.
   for (let i = 0; i < 20 && !window.sb; i++) await new Promise((r) => setTimeout(r, 150));
-  try {
-    const { data: { session } } = window.sb ? await window.sb.auth.getSession() : { data: {} };
-    if (!session) return;
-    const r = await fetch(`${API}/api/leitura/${SLUG}`, { headers: { Authorization: 'Bearer ' + session.access_token } });
-    if (r.status === 403) { ACESSO = 'sem_compra'; abrir(S.cap, false); return; }
-    const d = await r.json();
-    if (!d.ok) { ACESSO = 'erro'; return; }
-    d.capitulos.forEach((c) => (LIVRO.capitulos[c.id] = c)); ACESSO = 'completa';
-    $('#edicao').textContent = 'Edição completa';
-    abrir(S.cap, false);
-  } catch { ACESSO = 'erro'; }
+  let token = null;
+  try { const { data } = window.sb ? await window.sb.auth.getSession() : { data: {} }; token = data && data.session ? data.session.access_token : null; } catch { /* visitante */ }
+  const r = await fetch(`${API}/api/leitura/${SLUG}`, token ? { headers: { Authorization: 'Bearer ' + token } } : {});
+  const d = await r.json();
+  if (!d.ok) throw new Error(d.erro || 'indisponivel');
+  LIVRO.indice = d.indice.map((i) => ({ ...i, aberto: i.acesso === 'livre' }));
+  d.capitulos.forEach((c) => (LIVRO.capitulos[c.id] = c));
+  ACESSO = d.comprador ? 'completa' : d.logado ? 'sem_compra' : 'amostra';
+  if (d.comprador) $('#edicao').textContent = 'Edição completa';
+  abrir(S.cap, false);
 }
 
 function noite(on) { document.body.classList.toggle('night', !!on); $('#nightBtn').textContent = on ? '☀️' : '🌙'; gravar(NOITE, !!on); }
