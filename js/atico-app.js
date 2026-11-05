@@ -6,7 +6,7 @@ const API = 'https://tres-trevo-api.al-kbhal.workers.dev';
 const KEY = 'tt_atico_v1', IMPORT_KEY = 'tt_atico_import', TEMA = 'tt_atico_tema';
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const R = (v) => 'R$ ' + M.fmt(v);
+const R = (v) => (v < 0 ? '−R$ ' : 'R$ ') + M.fmt(Math.abs(v));
 const ler = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const gravar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* modo privado */ } };
 const novo = () => ({ etapa: 1, rendaCerta: 0, rendaIncerta: 0, saldo: 0, essenciais: {}, outrosGastos: 0, dividas: [], mesesOk: 0, feitos: {}, historico: [] });

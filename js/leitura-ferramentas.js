@@ -5,7 +5,7 @@ import * as M from './sfdtt-motor.js';
 const IMPORT_KEY = 'tt_atico_import';
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = (v) => { const x = parseFloat(String(v ?? '').replace(/\./g, '').replace(',', '.')); return Number.isFinite(x) && x >= 0 ? Math.min(x, 1e8) : 0; };
-const R = (v) => 'R$ ' + M.fmt(v);
+const R = (v) => (v < 0 ? '−R$ ' : 'R$ ') + M.fmt(Math.abs(v));
 const campo = (k, rot, ph = '0,00', pre = 'R$') => `<label class="tl"><span>${rot}</span><span class="tm"><i>${pre}</i><input data-k="${k}" inputmode="decimal" placeholder="${ph}"></span></label>`;
 const ler = (el) => { const o = {}; el.querySelectorAll('[data-k]').forEach((i) => { o[i.dataset.k] = i.type === 'checkbox' ? i.checked : i.value; }); return o; };
 const paraAtico = (dados) => { try { localStorage.setItem(IMPORT_KEY, JSON.stringify(dados)); } catch { /* ignora */ } };
