@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="/js/consentimento.js?v=31017ee2" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Livre das Dívidas — edição interativa · Editora Três Trevo</title>
+<meta name="description" content="Leia o Livre das Dívidas com cenas de decisão, calculadoras com os seus números e missões práticas. Prefácio e capítulos 1 e 2 grátis.">
+<meta name="theme-color" content="#EDE6DC">
+<meta property="og:type" content="book">
+<meta property="og:site_name" content="Editora Três Trevo">
+<meta property="og:title" content="Livre das Dívidas — edição interativa">
+<meta property="og:url" content="https://3trevo.com.br/leitura/livre-das-dividas.html">
+<meta property="og:image" content="https://3trevo.com.br/og-image.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@700&family=Merriweather:wght@400;700&display=swap">
+<style>
+:root{--bg:#F6F1EB;--surface:#EDE6DC;--line:#E0D6C8;--card:#FFFDF9;--card-line:#E8DFD4;--card-fg:#2C241E;--fg:#2C241E;--fg-2:#6B5E54;--accent:#B45F06;--accent-bg:#FFF4E6;--gain:#047857;--loss:#B91C1C;--warn:#B45F06;
+--serif:"Merriweather",Georgia,serif;--sans:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace;color-scheme:light}
+body.night{--bg:#12100E;--surface:#1C1917;--line:#2E2A26;--card:#24201D;--card-line:#3A342E;--card-fg:#F5F0EB;--fg:#F5F0EB;--fg-2:#A8A29E;--accent:#F59E0B;--accent-bg:#2A241F;--gain:#34D399;--loss:#F87171;--warn:#FBBF24;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg);margin:0;transition:background .25s,color .25s}
+body{font-family:var(--sans);font-size:19px;line-height:1.75;-webkit-font-smoothing:antialiased;padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
+header{position:fixed;top:0;left:0;right:0;z-index:9;background:var(--surface);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
+.bar{max-width:680px;margin:0 auto;height:56px;display:flex;align-items:center;gap:10px}
+.icon-btn{background:var(--card);border:1px solid var(--card-line);color:var(--fg);width:44px;height:44px;border-radius:10px;font-size:18px;cursor:pointer;flex:none}
+.book{flex:1;min-width:0;font-size:15px;color:var(--fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.book b{color:var(--fg);font-weight:600}
+.hud{font:700 15px var(--mono);padding:8px 12px;border:1.5px solid var(--accent);border-radius:10px;background:var(--card);color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.hud.pulse{animation:pulse .45s ease}@keyframes pulse{50%{transform:scale(1.12)}}
+main{max-width:680px;margin:0 auto;padding:88px 0 110px}
+.eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-2);margin:0 0 8px}
+h1{font:700 clamp(25px,6vw,32px)/1.3 var(--serif);margin:0 0 8px}
+.sub{color:var(--fg-2);font-style:italic;margin:0 0 28px}
+.prose h2{font:700 22px/1.35 var(--serif);margin:36px 0 12px}.prose h3{font:700 19px var(--serif);margin:28px 0 10px}
+.prose p,.prose li{max-width:65ch}.prose p{margin:0 0 18px}
+.prose blockquote{margin:24px 0;padding:16px 20px;border-left:4px solid var(--accent);background:var(--accent-bg);border-radius:0 12px 12px 0}
+.tw{overflow-x:auto;margin:0 0 22px;border:1px solid var(--card-line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:15px;line-height:1.45}th,td{padding:10px 12px;border-bottom:1px solid var(--card-line);text-align:left;vertical-align:top}th{background:var(--surface);font-weight:600}
+.scene{animation:enter .35s ease both}@keyframes enter{from{opacity:0;transform:translateY(8px)}}
+.ferr,.cena,.panel{background:var(--card);border:1px solid var(--card-line);border-radius:14px;padding:20px;margin:24px 0}
+.ferr{border-left:4px solid var(--accent)}
+.ferr-t{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 12px}
+.tl{display:block;margin:0 0 12px;font-size:16px}.tl>span:first-child{display:block;margin-bottom:4px;color:var(--fg-2)}
+.tm{display:flex;align-items:center;background:var(--bg);border:1px solid var(--card-line);border-radius:10px;padding:0 12px;min-height:48px}
+.tm i{font-style:normal;color:var(--fg-2);font-family:var(--mono);margin-right:8px}
+.tm input,.mrow>input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);font:500 17px var(--sans);outline:none}
+.tm:focus-within{border-color:var(--accent)}
+.mrow{display:grid;grid-template-columns:1.3fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px}
+.mrow>input{border:1px solid var(--card-line);border-radius:10px;padding:0 12px;min-height:48px;background:var(--bg)}
+.tc{display:flex;gap:10px;align-items:flex-start;font-size:16px;margin:6px 0;cursor:pointer}.tc input{width:20px;height:20px;margin-top:4px;accent-color:var(--accent);flex:none}
+.ferr-r{font-size:16px;margin-top:8px}.ferr-r:empty{display:none}
+.tt{font-size:15px;margin:8px 0}
+.ferr-b{margin-top:12px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#FFFDF9;font:600 16px var(--sans);cursor:pointer}
+.ferr-b.sec{background:transparent;color:var(--accent)}
+.choices{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.choice{text-align:left;width:100%;background:var(--bg);border:1px solid var(--card-line);color:var(--card-fg);border-radius:12px;padding:16px 18px;font:500 17px/1.45 var(--sans);cursor:pointer;transition:transform .15s,border-color .15s}
+.choice:hover,.choice:focus-visible{transform:translateY(-2px);border-color:var(--accent);outline:none}
+.choice .key{color:var(--accent);font-family:var(--mono);margin-right:8px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14px;color:var(--fg-2)}
+.delta{font-family:var(--mono);font-weight:700}.up{color:var(--gain)}.down{color:var(--loss)}.flat{color:var(--warn)}
+.float{position:fixed;z-index:20;font:700 22px var(--mono);pointer-events:none;animation:rise .8s ease-out forwards}@keyframes rise{to{transform:translateY(-80px);opacity:0}}
+.missao{display:flex;gap:10px;align-items:center;padding:14px 16px;border:1px dashed var(--accent);border-radius:12px;margin:0 0 20px;cursor:pointer;font-weight:500}.missao input{width:22px;height:22px;accent-color:var(--accent)}
+.fimcena{font-weight:600}
+.primary{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 22px;border-radius:12px;border:0;background:var(--accent);color:#FFFDF9;font:600 17px var(--sans);cursor:pointer;text-decoration:none}
+.ghost{background:none;border:0;color:var(--fg-2);font:500 16px var(--sans);text-decoration:underline;text-underline-offset:4px;cursor:pointer;padding:8px 0}
+.capnav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:32px;flex-wrap:wrap}
+footer.progress{position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--surface);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.pwrap{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.track{flex:1;height:8px;border-radius:8px;background:var(--line);overflow:hidden}.fill{height:100%;background:var(--accent);width:0;transition:width .4s}
+.pct{font-size:13px;color:var(--fg-2);font-variant-numeric:tabular-nums}
+.sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5);display:flex;justify-content:center;align-items:flex-start;padding:64px 16px 16px;overflow-y:auto}
+.sheet[hidden]{display:none}
+.sheet-box{width:100%;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;position:relative}
+.sheet-box h2{font:700 20px var(--serif);margin:8px 0 10px}
+.sheet-close{position:absolute;top:10px;right:10px;background:none;border:0;font-size:26px;cursor:pointer;color:var(--fg-2);width:44px;height:44px}
+.sum,.conq{list-style:none;padding:0;margin:0 0 16px}.sum button{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--card-line);padding:10px 4px;color:var(--fg);font:400 16px var(--sans);cursor:pointer}.sum .atual{color:var(--accent);font-weight:600}
+.conq li{display:flex;flex-direction:column;padding:8px 10px;border-radius:10px;margin-bottom:6px;opacity:.5;border:1px solid var(--card-line);font-size:15px}.conq li.ok{opacity:1;border-color:var(--accent);background:var(--accent-bg)}.conq span{color:var(--fg-2);font-size:14px}
+.note{font-size:14px;color:var(--fg-2)}
+.aviso{position:fixed;left:50%;top:72px;transform:translate(-50%,-140px);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;z-index:30;font-size:15px;transition:transform .25s;max-width:calc(100% - 32px)}.aviso.on{transform:translate(-50%,0)}
+.rodape{font-size:13px;color:var(--fg-2);text-align:center;margin-top:40px}
+@media (max-width:520px){.mrow{grid-template-columns:1fr 1fr}.mrow>input{grid-column:1/-1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <button class="icon-btn" id="menuBtn" aria-label="Sumário e conquistas">≡</button>
+  <div class="book"><b>Livre das Dívidas</b> · <span id="titCap">Prefácio</span> · <span id="edicao">Amostra</span></div>
+  <button class="icon-btn" id="nightBtn" aria-label="Modo noturno">🌙</button>
+  <div class="hud" id="hud" title="Pontos de leitura">0 PL</div>
+</div></header>
+<main>
+  <div id="app"><p>Abrindo o livro…</p></div>
+  <p class="rodape">Said Anes · Editora Três Trevo · Edição revisada de novembro de 2026. Conteúdo educativo: não substitui a Defensoria Pública ou o Procon no seu caso. · <a href="/privacidade.html">Privacidade</a> · <a href="/obra/livre-das-dividas.html">Sobre o livro</a></p>
+</main>
+<footer class="progress"><div class="pwrap"><div class="track"><div class="fill" id="fill"></div></div><div class="pct" id="pct"></div></div></footer>
+<div class="sheet" id="sheet" hidden><div class="sheet-box"><button class="sheet-close" data-fecha aria-label="Fechar">×</button><div id="sheetBody"></div></div></div>
+<div class="aviso" id="aviso" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+<script src="/js/supabase-client.js?v=bace3c9d" defer></script>
+<script type="module" src="/js/leitura-interativa.js?v=86cf2795"></script>
+</body>
+</html>

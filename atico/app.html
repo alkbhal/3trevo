@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="/js/consentimento.js?v=31017ee2" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ático — o seu diagnóstico financeiro em 3 perguntas</title>
+<meta name="description" content="Responda 3 perguntas e veja, em segundos, a sua situação, a próxima ação e a ordem certa para pagar as dívidas. Grátis, sem cadastro.">
+<meta name="theme-color" content="#1e5c3a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Editora Três Trevo">
+<meta property="og:title" content="Ático — o seu diagnóstico financeiro em 3 perguntas">
+<meta property="og:url" content="https://3trevo.com.br/atico/app.html">
+<meta property="og:image" content="https://3trevo.com.br/og-image.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{--brand:#1e5c3a;--brand-hover:#174a2f;--brand-soft:#e8f0eb;--brand-softer:#f3f7f4;--bg:#F7F5F0;--surface:#FFFFFF;--surface-2:#F1EEE7;--border:#E6E1D7;--text:#1A1A18;--text-2:#5C5A55;--muted:#8A877F;--warning:#C47D1A;--warning-soft:#FDF6EB;--danger:#B33A3A;--danger-soft:#FCECEC;--info:#4A6FA5;--info-soft:#EDF2F8;
+--serif:"Fraunces",Georgia,serif;--sans:"Instrument Sans",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--brand:#5fb184;--brand-hover:#7cc49c;--brand-soft:#1d2b23;--brand-softer:#18221c;--bg:#141412;--surface:#1d1c19;--surface-2:#24231f;--border:#34322c;--text:#F2EFE8;--text-2:#B9B5AB;--muted:#8d897f;--warning:#e2a54a;--warning-soft:#2c2417;--danger:#e07a7a;--danger-soft:#2d1b1b;--info:#8fb0de;--info-soft:#1b2230;color-scheme:dark}}
+:root[data-theme="dark"]{--brand:#5fb184;--brand-hover:#7cc49c;--brand-soft:#1d2b23;--brand-softer:#18221c;--bg:#141412;--surface:#1d1c19;--surface-2:#24231f;--border:#34322c;--text:#F2EFE8;--text-2:#B9B5AB;--muted:#8d897f;--warning:#e2a54a;--warning-soft:#2c2417;--danger:#e07a7a;--danger-soft:#2d1b1b;--info:#8fb0de;--info-soft:#1b2230;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:400 17px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding:0 16px}
+a{color:var(--brand)}
+.wrap{max-width:720px;margin:0 auto;padding:16px 0 96px}
+.top{display:flex;align-items:center;gap:12px;height:56px;max-width:720px;margin:0 auto}
+.marca{font:700 20px var(--serif);color:var(--brand);text-decoration:none;flex:1}
+.chip{font:500 13px var(--sans);color:var(--text-2);border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip.pro{border-color:var(--brand);color:var(--brand)}
+h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.25}
+h1{font-size:clamp(26px,6vw,32px);margin:8px 0 12px}
+h2{font-size:20px;margin:0 0 10px}
+.sub{color:var(--text-2)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin:0 0 14px;transition:transform .15s,border-color .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;border:0;background:var(--brand);color:#fff;font:600 16px var(--sans);cursor:pointer;text-decoration:none;transition:background .15s,transform .15s}
+.btn:hover{background:var(--brand-hover)}.btn:active{transform:scale(.98)}
+.btn.sec{background:var(--surface-2);color:var(--text)}
+.btn.lg{width:100%;min-height:56px;font-size:17px}
+.link{background:none;border:0;color:var(--brand);font:500 15px var(--sans);cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px 0}
+label.f{display:block;font-weight:500;margin:14px 0 6px}
+.money{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0 14px;min-height:56px}
+.money:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.money span{color:var(--muted);font-family:var(--mono);margin-right:8px}
+.money input,.in{flex:1;border:0;background:transparent;color:var(--text);font:500 20px var(--mono);min-width:0;outline:none;width:100%}
+.in{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font:400 16px var(--sans);background:var(--surface)}
+.hint{font-size:14px;color:var(--muted);margin-top:6px}
+.steps{display:flex;gap:6px;margin:8px 0 18px}.steps i{flex:1;height:4px;border-radius:4px;background:var(--border)}.steps i.on{background:var(--brand)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.divrow{border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--surface-2)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:15px;margin-top:8px;cursor:pointer}
+.toggle input{width:20px;height:20px;accent-color:var(--brand)}
+.estado{font:700 clamp(24px,5.5vw,30px)/1.25 var(--serif);margin:4px 0 14px}
+.voz{font-size:15px;color:var(--text-2);margin-bottom:6px}
+.irf{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.irf b{font:700 40px var(--mono);font-variant-numeric:tabular-nums;color:var(--brand)}
+.irf span{font-weight:600}
+.selo{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:2px 10px}
+.pontos{list-style:none;margin:16px 0 18px}.pontos li{padding:8px 0 8px 22px;position:relative;border-bottom:1px solid var(--border)}
+.pontos li::before{content:"";position:absolute;left:4px;top:17px;width:8px;height:8px;border-radius:50%;background:var(--warning)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.kpi .t{font-size:14px;color:var(--text-2)}
+.kpi .v{font:700 26px var(--mono);font-variant-numeric:tabular-nums}
+.kpi .i{font-size:14px;color:var(--text-2)}
+.st{align-self:flex-start;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px}
+.st.bom{background:var(--brand-soft);color:var(--brand)}.st.atencao{background:var(--warning-soft);color:var(--warning)}.st.critico{background:var(--danger-soft);color:var(--danger)}
+.kpi button{align-self:flex-start;margin-top:4px}
+.bar{height:10px;border-radius:10px;background:var(--surface-2);overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--brand);border-radius:10px;transition:width .3s}
+.sem{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.sem div{border-radius:12px;padding:10px;text-align:center;background:var(--surface-2);cursor:default;font-size:13px}
+.sem b{display:block;font:700 16px var(--mono);margin-top:2px}
+.sem .pos{background:var(--brand-soft)}.sem .neg{background:var(--danger-soft)}
+.q3 h3{font-size:17px;margin:14px 0 4px}.q3 p{font-size:15px;color:var(--text-2)}
+.lista{list-style:none}.lista li{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.lista input{width:22px;height:22px;margin-top:2px;accent-color:var(--brand);flex:none}
+.lista .u{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.u.agora{color:var(--danger)}.u.semana{color:var(--warning)}.u.mes{color:var(--info)}
+.lista li.feito .tx{text-decoration:line-through;color:var(--muted)}
+.ordem li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);list-style:none}
+.ordem small{display:block;color:var(--text-2)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+details{border-top:1px solid var(--border);padding:12px 0}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+summary::after{content:"+";color:var(--brand);font:700 18px var(--mono)}details[open] summary::after{content:"−"}
+details .corpo{padding-top:10px;font-size:15px;color:var(--text-2)}
+.lock{border:1px dashed var(--brand);background:var(--brand-softer);border-radius:14px;padding:16px;margin:10px 0}
+.ask{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.resp{margin-top:12px;padding:14px;border-radius:12px;background:var(--brand-softer);border-left:3px solid var(--brand);font-size:15px}
+.rodape{font-size:13px;color:var(--muted);text-align:center;margin-top:24px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;transition:transform .25s;z-index:50;font-size:15px;max-width:calc(100% - 32px)}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.fade{animation:fd .25s ease both}@keyframes fd{from{opacity:0;transform:translateY(6px)}}
+@media (max-width:420px){.grid2{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="marca" href="/atico.html">Ático</a>
+  <button class="chip" id="btnTema" aria-label="Alternar tema claro e escuro">Tema</button>
+  <button class="chip" id="btnPlano">Grátis</button>
+</header>
+<main class="wrap" id="app" aria-live="polite"></main>
+<p class="rodape">Seus números ficam só neste aparelho. Ático é educativo e não substitui a Defensoria Pública ou o Procon no seu caso. ·
+  <a href="/privacidade.html">Privacidade</a> · <a href="/obra/livre-das-dividas.html">Livro “Livre das Dívidas”</a></p>
+<div class="toast" id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+<script src="/js/supabase-client.js?v=bace3c9d" defer></script>
+<script type="module" src="/js/atico-app.js?v=f5726b58"></script>
+</body>
+</html>

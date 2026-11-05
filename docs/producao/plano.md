@@ -28,5 +28,6 @@ Regra da linha (dono, 27/10/2026): nada fica inacabado. Uma etapa por vez, cada 
 | 11 | Teste clean × suave | variante sorteada nas obras + leitura dos critérios | mínimo de visitas/vendas por versão definido antes; decisão registrada | 6 |
 | 12 | Esteira forge → site | nota de mercado visível no admin, slug legível, biblioteca de manuscritos etiquetados | definida no início da etapa | repositório do forge |
 | 13 | Skill de capa (forge) | skill própria | idem | repositório do forge |
+| 14 | ✅ Livre das Dívidas interativo + Ático (05/11) | edição revisada 2026-11 (forge), leitor gamificado `leitura/livre-das-dividas.html`, app `atico/app.html` com o motor SFDTT (`js/sfdtt-motor.js`), rota `/api/leitura/:slug`, tabela `obra_conteudo` | testes do worker (139) e checks do CI verdes; conteúdo pago no banco conferido por hash; só comprador lê | — |
 
 **Em paralelo, fora do código:** revisão jurídica do Regulamento v1 (3 marcas [JURÍDICO]) — bloqueia só a publicação da etapa 9.
