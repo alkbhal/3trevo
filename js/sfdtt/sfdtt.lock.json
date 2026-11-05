@@ -1,0 +1,32 @@
+{
+  "origem": "alkbhal/SFDTT",
+  "ref": "v8",
+  "commit": "9a9d0405610f374651ee4723cca2c516a7884d67",
+  "sincronizado": "2026-11-05",
+  "arquivos": {
+    "utils/index.js": {
+      "origem": "src/utils/index.js",
+      "sha256": "c864b83002189b74dee51ee5ca2a418c36738b839ebffd8a42eb532c83c3cf0c"
+    },
+    "constants.js": {
+      "origem": "src/constants.js",
+      "sha256": "87de914a7442d14bc8c23da9525011f59ae66ea1ee06c8aeb033e64223aeba39"
+    },
+    "engine/index.js": {
+      "origem": "src/engine/index.js",
+      "sha256": "196cf99c8cfa5837c025efc9999578439e39b27af7e8ba8ae790429d7d86c12b"
+    },
+    "engine/fiscal.js": {
+      "origem": "src/engine/fiscal.js",
+      "sha256": "bb05105e55935502bded7288a5fbd0e5ef374b1d91a60c60d5b838f4d55cac13"
+    },
+    "engine/grupos.js": {
+      "origem": "src/engine/grupos.js",
+      "sha256": "b50d0185cc60897c6b43bc1709026ea899da53d1c1ce46ebce24b46823a87817"
+    },
+    "engine/decisao.js": {
+      "origem": "src/engine/decisao.js",
+      "sha256": "3275f0efd8db02fb2ecf163b1b585bc5e6447e3faddcaf3380dbf697a430e39b"
+    }
+  }
+}

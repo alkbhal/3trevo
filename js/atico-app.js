@@ -1,8 +1,9 @@
 // Ático — interface do SFDTT (contrato de interface v1.0: 5 quadros, zero fricção).
-// Local-first: nada sai do aparelho. Plano pago (atico-plano) liberado por /api/atico/acesso.
+// Local-first: nada sai do aparelho. Motor = SFDTT (js/sfdtt, cópia sem edição). O plano pago,
+// o histórico e o Morning Brief existem num lugar só: o Ático completo (SFDTT, finintel.com.br).
 import * as M from './sfdtt-motor.js';
 
-const API = 'https://tres-trevo-api.al-kbhal.workers.dev';
+const ATICO_COMPLETO = 'https://finintel.com.br/';
 const KEY = 'tt_atico_v1', IMPORT_KEY = 'tt_atico_import', TEMA = 'tt_atico_tema';
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -14,7 +15,6 @@ const dinheiro = (v) => { const n = parseFloat(String(v).replace(/\./g, '').repl
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()));
 
 let S = Object.assign(novo(), ler(KEY) || {});
-let PRO = false;
 const salvar = () => gravar(KEY, S);
 
 // Dados que o leitor do livro preparou (mapa das dívidas e orçamento): entram sem digitar de novo.
@@ -108,7 +108,7 @@ function responder(q, D) {
   const r = D.resumo, cart = r.dividas.find((d) => d.tipo === 'cartao');
   if (q === 'minimo') return 'Pagar só o mínimo joga o resto no rotativo, que passa de 400% ao ano, mas só por um mês. Na fatura seguinte, ou você paga tudo ou o banco precisa oferecer um parcelamento, e juros e encargos somados não podem passar de 100% do valor financiado (Lei 14.690/2023). Se o mínimo vai faltar para o aluguel ou a comida, pague primeiro a base (capítulo 5).' + (cart && cart.juros ? ' O seu cartão custa ' + R(cart.saldo * cart.juros / 100) + ' por mês de juros.' : '');
   if (q === 'guardar') { const g = D.reserva; return g.fase === 'inicial' ? 'Primeiro uma reserva pequena: ' + g.mensagem + ' Depois disso, o dinheiro extra vai para a dívida mais cara.' : g.mensagem; }
-  if (q === 'investir') { if (D.guarda) return 'Agora não: ' + (D.guarda === 'insolvencia_grave' ? 'a dívida passou de duas vezes a renda do ano. Procure a Defensoria Pública e peça a repactuação.' : 'a renda está toda no básico. O foco é proteger a base.'); const topo = D.ordem.ordem.find((o) => o.taxa > 0); return topo ? M.investirOuQuitar({ juros: topo.taxa * 100 }).motivo : D.reserva.fase === 'completa' ? 'Sim: reserva completa e sem dívidas caras. Defina prazo e objetivo antes de escolher onde.' : D.reserva.mensagem; }
+  if (q === 'investir') { if (D.guarda) return 'Agora não: ' + (D.guarda === 'insolvencia_grave' ? 'a dívida passou de duas vezes a renda do ano. Procure a Defensoria Pública e peça a repactuação.' : 'a renda está toda no básico. O foco é proteger a base.'); const topo = D.ordem.ordem.find((o) => o.taxa > 0); return topo ? M.investirOuQuitar({ nome: topo.nome, saldo: topo.saldo, juros: topo.taxa * 100 }, D.resumo, D.perfil).motivo : D.reserva.fase === 'completa' ? 'Sim: reserva completa e sem dívidas caras. Defina prazo e objetivo antes de escolher onde.' : D.reserva.mensagem; }
   if (q === 'super') { const m = D.minimoExistencial; return m.abaixo && r.dividas.length ? 'Depois das parcelas sobram ' + R(m.sobra) + ', abaixo dos ' + R(m.minimo) + ' do mínimo existencial. Isso é um forte indício de superendividamento: leve os contratos à Defensoria ou ao Procon e peça a conciliação com todos os credores (Lei 14.181/2021).' : 'Pelos seus números, sobram ' + R(m.sobra) + ' depois das parcelas, acima do mínimo existencial de ' + R(m.minimo) + '. O caminho é negociar uma a uma, na ordem do plano.'; }
   if (q === 'oferta') { const c = D.parcelaQueCabe; return c.teto > 0 ? 'O seu teto para todos os acordos juntos é ' + R(c.teto) + ' por mês. Comece oferecendo ' + R(c.oferta) + ' ao primeiro credor, por escrito, e nunca aceite a primeira proposta na hora (capítulo 6).' : 'Hoje não sobra nada para acordos depois do básico. Antes de negociar, feche a conta do mês: corte um gasto invisível ou busque uma renda extra (capítulo 8).'; }
   return '';
@@ -149,7 +149,7 @@ function painel() {
     <h2>Como o mês está andando</h2>
     <div class="sem">${['Fim deste mês', 'Fim do próximo', 'Daqui a 3 meses'].map((t, i) => `<div class="${sem[i] >= 0 ? 'pos' : 'neg'}" title="Saldo de hoje + o que sobra (ou falta) por mês">${t}<b>${R(sem[i])}</b></div>`).join('')}</div>
     <p>${r.sobra < 0 ? 'Todo mês faltam ' + R(-r.sobra) + '. Por que importa: o buraco vai para o cartão. O que fazer: um corte e uma renda extra, como a Joana no capítulo 8.' : 'Sobra ' + R(r.sobra) + ' por mês. O que fazer: dê um destino a esse dinheiro antes de gastar.'}</p>
-    ${r.dividas.length ? `<h3>Dívidas: a ordem de ataque</h3><p>${D.ordem.metodo === 'avalanche' ? 'Primeiro a que mais cresce: você paga menos juros no total.' : 'Primeiro a menor: a primeira vitória dá fôlego para seguir.'}${D.ordem.alerta ? ' ' + esc(D.ordem.alerta) : ''}</p>
+    ${r.dividas.length && D.ordem.bloqueada ? `<h3>Dívidas</h3><p>${esc(D.ordem.mensagem)}</p><ul class="ordem">${D.ordem.recursos.map((x) => `<li><div><b>${esc(x.nome)}</b><small>${esc(x.desc)}</small></div><div class="mono">${esc(x.contato)}</div></li>`).join('')}</ul>` : ''}${r.dividas.length && !D.ordem.bloqueada ? `<h3>Dívidas: a ordem de ataque</h3><p>${D.ordem.metodo === 'avalanche' ? 'Primeiro a que mais cresce: você paga menos juros no total.' : 'Primeiro a menor: a primeira vitória dá fôlego para seguir.'}${D.ordem.alerta ? ' ' + esc(D.ordem.alerta) : ''}</p>
     <ul class="ordem">${D.ordem.ordem.map((o) => `<li><div><b>${o.ordem}. ${esc(o.nome)}</b><small>${esc(o.motivo)}</small></div><div class="mono">${R(o.saldo)}${o.jurosMes ? `<small>${R(o.jurosMes)}/mês de juros</small>` : ''}</div></li>`).join('')}</ul>` : ''}
     <h3>Para onde vai o dinheiro</h3>${top3.slice(0, 3).map(([n, x]) => `<p>${esc(n)} <span class="mono">${R(x)}</span> · ${M.pct(r.entradas ? x / r.entradas : 0, 0)} da renda</p><div class="bar"><i style="width:${Math.min(100, r.entradas ? (x / r.entradas) * 100 : 0)}%"></i></div>`).join('')}
     <p>Escada do capítulo 8: <b>fase ${D.escada.fase} · ${esc(D.escada.nome)}</b> (${M.pct(D.escada.pct, 0)} da renda vai para o dia a dia).</p>
@@ -161,17 +161,11 @@ function painel() {
     <details><summary>Como calculamos a nota de resiliência</summary><div class="corpo">Cinco partes de até 200 pontos: comprometimento da renda (${D.irf.breakdown.c1}), contas em dia (${D.irf.breakdown.c2}), reserva em meses (${D.irf.breakdown.c3}), meses seguidos sem faltar dinheiro (${D.irf.breakdown.c4}) e peso das parcelas (${D.irf.breakdown.c5}). Fórmula do SFDTT, a mesma em todas as versões.</div></details>
     <details><summary>Qual é a taxa desta proposta?</summary><div class="corpo"><div class="grid2"><div class="money"><span>R$</span><input id="sv" inputmode="decimal" placeholder="dívida hoje"></div><div class="money"><span>R$</span><input id="sp" inputmode="decimal" placeholder="valor da parcela"></div><div class="money"><span>×</span><input id="sn" inputmode="numeric" placeholder="nº de parcelas"></div></div><p id="sr" class="resp" hidden></p></div></details>
     <details><summary>Quanto a dívida cresce sem pagamento</summary><div class="corpo"><div class="grid2"><div class="money"><span>R$</span><input id="jv" inputmode="decimal" placeholder="valor"></div><div class="money"><span>%</span><input id="jt" inputmode="decimal" placeholder="juros ao mês"></div></div><p id="jr" class="resp" hidden></p></div></details>
-    <details><summary>Fechamento do mês e histórico ${PRO ? '' : '· Plano'}</summary><div class="corpo">${PRO ? `<button class="btn" id="fechar">Fechar ${new Date().toLocaleDateString('pt-BR', { month: 'long' })}</button><ul class="ordem">${S.historico.slice(-12).reverse().map((h) => `<li><span>${esc(h.mes)}</span><span class="mono">${R(h.sobra)} · nota ${h.irf}</span></li>`).join('')}</ul>` : bloqueio('Guarde cada mês e acompanhe a nota subir.')}</div></details>
-    <details><summary>Morning Brief: 5 minutos por dia ${PRO ? '' : '· Plano'}</summary><div class="corpo">${PRO ? brief(D) : bloqueio('Toda manhã: saldo livre, ritmo do mês, vencimentos e as 3 ações do dia.')}</div></details>
+    <div class="lock"><p><b>Quer acompanhar mês a mês?</b> Histórico, fechamento do mês, Morning Brief e análise por IA ficam no Ático completo, com o mesmo motor.</p><p style="margin-top:10px"><a class="btn" href="${ATICO_COMPLETO}" rel="noopener">Abrir o Ático completo</a></p></div>
     <details><summary>Imprimir o meu plano</summary><div class="corpo"><button class="btn sec" onclick="window.print()">Imprimir ou salvar em PDF</button></div></details>
     <p style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap"><button class="link" id="editar">Corrigir meus números</button><button class="link" id="zerar">Apagar tudo deste aparelho</button></p>
   </section></div>`;
   ligar(D);
-}
-function bloqueio(txt) { return `<div class="lock"><p>${esc(txt)}</p><p style="margin-top:10px"><a class="btn" href="/checkout.html?slug=atico-plano">Conhecer o Plano Ático</a></p><p class="hint">Já assinou? <a href="/area-cliente.html">Entre na sua conta</a> e volte aqui.</p></div>`; }
-function brief(D) {
-  const r = D.resumo, livre = r.saldo + r.sobra;
-  return `<ol style="padding-left:20px"><li>Saldo previsto no fim do mês, depois de todas as contas: <b class="mono">${R(livre)}</b></li><li>Ritmo: ${r.sobra >= 0 ? 'o mês fecha com ' + R(r.sobra) : 'faltam ' + R(-r.sobra)}</li><li>Dívidas em atraso: ${r.inad ? R(r.inad) : 'nenhuma'}</li><li>As 3 ações de hoje:<ul>${D.acoes.filter((a) => !S.feitos[a.id]).slice(0, 3).map((a) => `<li>${esc(a.texto)}</li>`).join('') || '<li>Registrar os gastos do dia.</li>'}</ul></li></ol>`;
 }
 function ligar(D) {
   document.querySelectorAll('[data-ir]').forEach((b) => b.onclick = () => document.getElementById(b.dataset.ir).scrollIntoView({ behavior: 'smooth' }));
@@ -181,27 +175,13 @@ function ligar(D) {
   ['sv', 'sp', 'sn'].forEach((id) => $('#' + id).oninput = sim);
   const cres = () => { const val = v('jv'), t = v('jt') / 100, o = $('#jr'); if (!val || !t) return (o.hidden = true); o.hidden = false; o.textContent = 'Em 6 meses: ' + R(M.jurosCompostos(val, t, 6)) + '. Em 12 meses: ' + R(M.jurosCompostos(val, t, 12)) + '. Isso é ' + M.pct(M.taxaAnual(t), 0) + ' ao ano, não ' + M.pct(t * 12, 0) + '.'; };
   ['jv', 'jt'].forEach((id) => $('#' + id).oninput = cres);
-  const f = $('#fechar'); if (f) f.onclick = () => { const mes = new Date().toISOString().slice(0, 7); S.historico = S.historico.filter((h) => h.mes !== mes).concat({ mes, sobra: D.resumo.sobra, irf: D.irf.score }); let ok = 0; for (const h of S.historico.slice().reverse()) { if (h.sobra >= 0) ok++; else break; } S.mesesOk = ok; salvar(); toast('Mês fechado.'); painel(); };
   $('#editar').onclick = () => { S.etapa = 1; salvar(); etapa1(); };
   $('#zerar').onclick = () => { if (!confirm('Apagar todos os seus números deste aparelho?')) return; S = novo(); salvar(); etapa1(); };
 }
 
-// ─── Plano pago e tema ───────────────────────────────────────────────────────
-async function verificarPlano() {
-  for (let i = 0; i < 20 && !window.sb; i++) await new Promise((r) => setTimeout(r, 150));
-  if (!window.sb) return;
-  try {
-    const { data: { session } } = await window.sb.auth.getSession();
-    if (!session) return;
-    const r = await fetch(API + '/api/atico/acesso', { headers: { Authorization: 'Bearer ' + session.access_token } });
-    const d = await r.json();
-    if (d.ok && d.acesso) { PRO = true; $('#btnPlano').textContent = 'Plano ativo'; $('#btnPlano').classList.add('pro'); if (S.etapa >= 4) painel(); }
-  } catch { /* sem rede: segue no grátis */ }
-}
+// ─── Tema ─────────────────────────────────────────────────────────────────────
 function tema(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
 $('#btnTema').onclick = () => { const atual = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); const n = atual === 'dark' ? 'light' : 'dark'; tema(n); gravar(TEMA, n); };
-$('#btnPlano').onclick = () => { if (!PRO) location.href = '/checkout.html?slug=atico-plano'; };
 tema(ler(TEMA));
 
 ({ 1: etapa1, 2: etapa2, 3: etapa3 }[S.etapa] || painel)();
-verificarPlano();

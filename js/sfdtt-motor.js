@@ -12,9 +12,7 @@
 // que cabe), 7 (mínimo existencial), 8 (escada) e 9 (reserva).
 
 export const PARAMS = {
-  salarioMinimo: 1621,      // Decreto 12.797/2025 (2026)
   minimoExistencial: 600,   // Decreto 11.567/2023, mantido pelo STF em 23/04/2026
-  cdiMensal: 0.0114,        // referência do SFDTT v8; atualizar com a série SGS 4391/12 do BCB
   alertaSequestro: 0.30,    // capítulo 3
   tetoChequeEspecial: 0.08, // Resolução CMN 4.765/2019
   reservaInicial: 500,      // capítulo 9
@@ -89,11 +87,16 @@ export function metaReserva(despesasBasicas, rendaIncerta = false) {
   return { inicial: PARAMS.reservaInicial, meses, final: r2(num(despesasBasicas) * meses), maxima: r2(num(despesasBasicas) * (rendaIncerta ? 12 : 6)) };
 }
 
-// ─── Núcleo SFDTT ────────────────────────────────────────────────────────────
-export const COMP_CRITICO = 0.9, COMP_ALERTA = 0.65, COMP_ATENCAO = 0.4;
+// ─── Núcleo SFDTT: vem do repositório SFDTT (js/sfdtt/, cópia sem edição + lock) ───
+export { calcEstado, calcNivel, calcIRF, calcDDO, COMP_CRITICO, COMP_ALERTA, COMP_ATENCAO } from './sfdtt/engine/index.js';
+import { calcEstado, calcNivel, calcIRF, calcDDO } from './sfdtt/engine/index.js';
+import { detectarPerfil as perfilSFDTT } from './sfdtt/engine/fiscal.js';
+import { R_DIVIDA_ORDEM, R_RESERVA, R_INVESTIR_OU_QUITAR } from './sfdtt/engine/decisao.js';
 
 export function ativas(dividas) { return (dividas || []).filter((d) => num(d.saldo) > 0 && d.status !== 'quitada'); }
 export function taxaMensal(d) { return d && num(d.juros) ? num(d.juros) / 100 : 0; }
+// Formato de dívida que o motor SFDTT espera (juros em pontos percentuais, status do v8).
+const paraSFDTT = (d) => ({ ...d, saldo: num(d.saldo), parcela: num(d.parcela), juros: num(d.juros), status: d.atraso ? 'inadimplente' : 'em_dia' });
 
 export function resumo(estado) {
   const e = estado || {};
@@ -101,12 +104,12 @@ export function resumo(estado) {
   const ess = e.essenciais || {};
   const essencial = ['moradia', 'comida', 'contas', 'transporte', 'remedios', 'pensao'].reduce((s, k) => s + num(ess[k]), 0);
   const outros = num(e.outrosGastos);
-  const dividas = ativas(e.dividas);
-  const parcelas = dividas.reduce((s, d) => s + num(d.parcela), 0);
-  const inad = dividas.filter((d) => d.atraso).reduce((s, d) => s + num(d.saldo), 0);
-  const dividaTotal = dividas.reduce((s, d) => s + num(d.saldo), 0);
+  const dividas = ativas(e.dividas).map(paraSFDTT);
+  const parcelas = dividas.reduce((s, d) => s + d.parcela, 0);
+  const inad = dividas.filter((d) => d.atraso).reduce((s, d) => s + d.saldo, 0);
+  const dividaTotal = dividas.reduce((s, d) => s + d.saldo, 0);
   const saidas = essencial + outros + parcelas;
-  const entradas = rendaCerta;  // base sempre sem renda incerta
+  const entradas = rendaCerta;  // renda incerta nunca entra na base (regra do SFDTT)
   return {
     rendaCerta, rendaIncerta, essencial: r2(essencial), outros: r2(outros), parcelas: r2(parcelas),
     saidas: r2(saidas), entradas: r2(entradas), sobra: r2(entradas - saidas),
@@ -117,108 +120,57 @@ export function resumo(estado) {
   };
 }
 
-export function calcEstado(comp, inad, entradas = 0, dividaTotal = 0) {
-  const ratio = entradas > 0 ? dividaTotal / (entradas * 12) : 0;
-  if (inad > 0 && ratio > 2) return { id: 'colapso', label: 'Colapso Estrutural' };
-  if (inad > 0 && comp > COMP_CRITICO) return { id: 'pre_colapso', label: 'Pré-Colapso' };
-  if (inad > 0 || comp > COMP_CRITICO) return { id: 'sobrevivencia', label: 'Sobrevivência' };
-  if (comp > COMP_ALERTA) return { id: 'reorganizacao', label: 'Reorganização' };
-  if (comp > COMP_ATENCAO) return { id: 'atencao', label: 'Atenção' };
-  return { id: 'crescimento', label: 'Crescimento' };
-}
-export function calcNivel(sobra) {
-  if (sobra < 0) return { nivel: 0, label: 'Déficit', desc: 'Corte e renegociação agora.' };
-  if (sobra <= 200) return { nivel: 1, label: 'Sobrevida', desc: 'Primeira vitória: a dívida certa primeiro.' };
-  if (sobra <= 500) return { nivel: 2, label: 'Reorganização', desc: 'Suba um degrau da escada.' };
-  if (sobra <= 1000) return { nivel: 3, label: 'Estabilidade', desc: 'Monte a reserva de emergência.' };
-  return { nivel: 4, label: 'Expansão', desc: 'Invista o excedente.' };
-}
-export function calcIRF({ comp = 0, inad = 0, saldo = 0, gastosMes = 0, entradas = 0, parcelas = 0, mesesOk = 0 }) {
-  const c1 = Math.round(200 * Math.max(0, 1 - comp));
-  const c2 = inad > 0 ? 0 : 200;
-  const cob = gastosMes > 0 ? Math.max(0, saldo) / gastosMes : saldo > 0 ? 3 : 0;
-  const c3 = Math.min(200, Math.round((cob / 3) * 200));
-  const c4 = Math.min(200, mesesOk * 40);
-  const rp = entradas > 0 ? parcelas / entradas : parcelas > 0 ? 1 : 0;
-  const c5 = Math.round(200 * Math.max(0, 1 - rp * 2));
-  const score = Math.min(1000, c1 + c2 + c3 + c4 + c5);
-  const label = score >= 800 ? 'Excelente' : score >= 600 ? 'Bom' : score >= 400 ? 'Regular' : score >= 200 ? 'Frágil' : 'Crítico';
-  return { score, label, breakdown: { c1, c2, c3, c4, c5 } };
-}
-export function calcDDO(saldo, gastosMes, diasMes = 30) {
-  if (gastosMes <= 0) return saldo > 0 ? 999 : 0;
-  return Math.max(0, Math.floor(saldo / (gastosMes / diasMes)));
-}
+// Estado no formato das regras L3.5 do SFDTT.
+const estadoL35 = (r, perfil, extra = {}) => ({ renda: r.entradas, fixos: r.essencial, dividas: r.dividas, perfil, despesaEssencial: r.essencial, ...extra });
 
-// Guardas universais do L3.5 (salário mínimo atualizado para 2026).
-export function guardaUniversal(r) {
-  if (r.entradas > 0 && r.dividaTotal > r.entradas * 12 * 2) return 'insolvencia_grave';
-  if (r.entradas > 0 && r.entradas < r.essencial) return 'renda_subsistencia';
-  if (r.entradas > 0 && r.entradas < PARAMS.salarioMinimo * 2 && r.sobra <= 0) return 'renda_subsistencia';
-  return null;
-}
+export function detectarPerfil(r, irfScore) { return perfilSFDTT([], r.dividas, irfScore); }
 
-// Perfil derivado dos dados (nunca declarado). Só muda tom e ordem.
-export function detectarPerfil(r) {
-  if (r.dividas.length >= 3 && r.inad > 0) return 'ansioso';
-  if (r.dividas.length && r.dividas.every((d) => !num(d.juros))) return 'negador';
-  return 'controlado';
-}
+// Prioridade legal do capítulo 5 do livro (vem antes da ordem financeira do SFDTT):
+// pensão alimentícia, empréstimo informal com risco e bem em garantia nunca vão para o fim da fila.
+function prioridadeLegal(d) { return d.tipo === 'pensao' ? 0 : d.tipo === 'agiota' ? 1 : d.garantia ? 2 : 3; }
+const MOTIVO_LEGAL = ['Pensão alimentícia: sustento de criança, cobrada com medidas duras.', 'Empréstimo informal: juros ilegais e risco à segurança. Procure a Defensoria.', 'Bem em garantia: atrasar pode custar o bem.'];
 
-// Prioridade legal do capítulo 5: pensão e bem em garantia antes das demais.
-function prioridadeLegal(d) {
-  if (d.tipo === 'pensao') return 0;
-  if (d.tipo === 'agiota') return 1;
-  if (d.garantia) return 2;
-  return 3;
-}
-export function ordemDividas(r, perfil = detectarPerfil(r)) {
-  const lista = r.dividas.slice();
-  const bola = perfil === 'ansioso' || perfil === 'negador';
-  lista.sort((a, b) => {
-    const p = prioridadeLegal(a) - prioridadeLegal(b);
-    if (p) return p;
-    if (bola) return num(a.saldo) - num(b.saldo);
-    const t = taxaMensal(b) - taxaMensal(a);
-    return t || num(a.saldo) - num(b.saldo);
-  });
-  const taxas = lista.filter((d) => num(d.juros)).map(taxaMensal);
-  const max = taxas.length ? Math.max(...taxas) : 0, min = taxas.length ? Math.min(...taxas) : 0;
-  const alerta = bola && max > 0.1 && max > min * 3
-    ? 'Uma dívida cobra mais de 10% ao mês: ela cresce rápido demais para esperar a vez.' : null;
+export function ordemDividas(r, perfil) {
+  const res = R_DIVIDA_ORDEM.executar(estadoL35(r, perfil));
+  const jurosMes = r2(r.dividas.reduce((s, d) => s + d.saldo * taxaMensal(d), 0));
+  if (res.bloqueada) return { bloqueada: true, contraindicacao: res.contraindicacao, mensagem: res.mensagem_base, recursos: res.recursos || [], ordem: [], jurosMes, alerta: null, metodo: null };
+  const porNome = new Map(r.dividas.map((d) => [d.nome, d]));
+  const doMotor = (res.decisao || []).map((o) => ({ ...o, d: porNome.get(o.nome) })).filter((o) => o.d);
+  const legais = doMotor.filter((o) => prioridadeLegal(o.d) < 3).sort((a, b) => prioridadeLegal(a.d) - prioridadeLegal(b.d));
+  const resto = doMotor.filter((o) => prioridadeLegal(o.d) === 3);
   return {
-    metodo: bola ? 'bola_de_neve' : 'avalanche', alerta,
-    ordem: lista.map((d, i) => ({
-      ordem: i + 1, id: d.id, nome: d.nome, saldo: r2(d.saldo), taxa: taxaMensal(d),
-      jurosMes: r2(num(d.saldo) * taxaMensal(d)),
-      motivo: prioridadeLegal(d) < 3
-        ? (d.tipo === 'pensao' ? 'Pensão alimentícia: sustento de criança, cobrada com medidas duras.' : d.tipo === 'agiota' ? 'Empréstimo informal: juros ilegais e risco à segurança. Procure a Defensoria.' : 'Bem em garantia: atrasar pode custar o bem.')
-        : !num(d.juros) ? 'Taxa não informada: confira no contrato ou no Registrato.'
-        : bola ? 'Menor saldo: quitar gera a primeira vitória.' : 'Maior taxa: é a que mais cresce.',
+    bloqueada: false,
+    metodo: /bola|Ramsey|vitória/i.test(res.principio + res.fonte) ? 'bola_de_neve' : 'avalanche',
+    alerta: res.alerta || null, fonte: res.fonte,
+    ordem: [...legais, ...resto].map((o, i) => ({
+      ordem: i + 1, id: o.d.id, nome: o.d.nome, saldo: r2(o.d.saldo), taxa: taxaMensal(o.d), jurosMes: r2(o.d.saldo * taxaMensal(o.d)),
+      motivo: prioridadeLegal(o.d) < 3 ? MOTIVO_LEGAL[prioridadeLegal(o.d)] : o.motivo,
     })),
-    jurosMes: r2(lista.reduce((s, d) => s + num(d.saldo) * taxaMensal(d), 0)),
+    jurosMes,
   };
 }
 
-export function regraReserva(r, rendaIncerta = false) {
-  const meta = metaReserva(r.essencial, rendaIncerta || r.rendaIncerta > 0);
-  const cara = r.dividas.find((d) => taxaMensal(d) > PARAMS.cdiMensal * 5);
+export function regraReserva(r, perfil) {
+  const res = R_RESERVA.executar(estadoL35(r, perfil));
+  const meta = metaReserva(r.essencial, r.rendaIncerta > 0);
   const saldo = Math.max(0, r.saldo);
-  if (cara && saldo >= meta.inicial)
-    return { fase: 'estancar', meta, mensagem: 'Reserva inicial formada. Agora o dinheiro extra vai para a dívida mais cara: ' + cara.nome + '.' };
-  if (saldo < meta.inicial)
-    return { fase: 'inicial', meta, falta: r2(meta.inicial - saldo), mensagem: 'Junte R$ ' + fmt(meta.inicial) + ' para o próximo imprevisto não voltar ao cartão.' };
-  if (saldo < meta.final)
-    return { fase: 'crescer', meta, falta: r2(meta.final - saldo), mensagem: 'Faltam R$ ' + fmt(meta.final - saldo) + ' para ' + meta.meses + ' meses de despesas básicas.' };
+  if (res.bloqueada && res.contraindicacao === 'divida_cara_ativa') {
+    // O SFDTT manda estancar a dívida cara primeiro; o livro (cap. 9) guarda antes uma reserva inicial.
+    return saldo < meta.inicial
+      ? { fase: 'inicial', meta, falta: r2(meta.inicial - saldo), mensagem: 'Junte R$ ' + fmt(meta.inicial) + ' para o próximo imprevisto não voltar ao cartão; depois, todo extra vai para a dívida cara.' }
+      : { fase: 'estancar', meta, mensagem: res.mensagem_base };
+  }
+  if (res.bloqueada) return { fase: 'bloqueada', meta, mensagem: res.mensagem_base };
+  const alvo = res.decisao.alvoMinimo;
+  if (saldo < meta.inicial) return { fase: 'inicial', meta, falta: r2(meta.inicial - saldo), mensagem: 'Junte R$ ' + fmt(meta.inicial) + ' para o próximo imprevisto não voltar ao cartão.' };
+  if (saldo < alvo) return { fase: 'crescer', meta: { ...meta, final: alvo, meses: res.decisao.mesesMin }, falta: r2(alvo - saldo), mensagem: 'Faltam R$ ' + fmt(alvo - saldo) + ' para ' + res.decisao.mesesMin + ' meses de despesas básicas. Onde: ' + res.decisao.onde + '.' };
   return { fase: 'completa', meta, falta: 0, mensagem: 'Reserva completa. O excedente já pode ser investido.' };
 }
 
-export function investirOuQuitar(divida, cdi = PARAMS.cdiMensal) {
-  if (!divida || !num(divida.juros)) return { acao: null, motivo: 'Sem taxa informada não dá para comparar com o CDI.' };
-  const i = taxaMensal(divida);
-  return i > cdi
-    ? { acao: 'quitar', motivo: 'A dívida cobra ' + pct(i) + ' ao mês e a aplicação segura rende ' + pct(cdi) + '. Quitar rende mais, sem risco e sem imposto.' }
-    : { acao: 'investir', motivo: 'A aplicação segura rende mais que essa dívida. Mantenha a parcela em dia e invista o excedente.' };
+export function investirOuQuitar(divida, r, perfil) {
+  const res = R_INVESTIR_OU_QUITAR.executar({ ...estadoL35(r || { entradas: 0, essencial: 0, dividas: [] }, perfil), divida: divida ? paraSFDTT(divida) : {} });
+  if (res.bloqueada) return { acao: null, motivo: res.mensagem_base };
+  return { acao: res.decisao.acao, motivo: res.decisao.racional };
 }
 
 export function fmt(v) { return (Number(v) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -236,18 +188,18 @@ const FRASES = {
 // Diagnóstico completo para a interface (Quadros 1 a 5 do contrato Ático).
 export function diagnostico(estado) {
   const r = resumo(estado);
-  const estadoFin = calcEstado(r.comp, r.inad, r.entradas, r.dividaTotal);
+  const estadoFin = calcEstado(r.comp, r.inad, r.entradas, r.dividas);
   const nivel = calcNivel(r.sobra);
   const irf = calcIRF({ comp: r.comp, inad: r.inad, saldo: r.saldo, gastosMes: r.saidas, entradas: r.entradas, parcelas: r.parcelas, mesesOk: r.mesesOk });
   const ddo = calcDDO(Math.max(0, r.saldo), r.saidas);
-  const guarda = guardaUniversal(r);
-  const perfil = detectarPerfil(r);
+  const perfil = detectarPerfil(r, irf.score);
   const ordem = ordemDividas(r, perfil);
+  const guarda = ordem.bloqueada ? ordem.contraindicacao : null;
   const seq = sequestro(r.parcelas, r.entradas);
   const minEx = minimoExistencial(r.entradas, r.parcelas);
   const cabe = parcelaQueCabe(r.entradas, r.essencial, r.parcelas);
   const escada = faseEscada(r.essencial + r.outros, r.entradas, r.dividas.length > 0);
-  const reserva = regraReserva(r);
+  const reserva = regraReserva(r, perfil);
 
   // Ações: uma lista única, ordenada por dinheiro perdido a cada semana de espera.
   const acoes = [];
@@ -258,6 +210,7 @@ export function diagnostico(estado) {
   }));
   if (r.dividas.some((d) => d.tipo === 'agiota')) acoes.push({ id: 'agiota', urgencia: 'agora', texto: 'Registrar boletim de ocorrência se houver ameaça e procurar a Defensoria Pública.', perdaSemana: 9e9, capitulo: 3 });
   if (minEx.abaixo && r.dividas.length) acoes.push({ id: 'superendividamento', urgencia: 'agora', texto: 'Levar os contratos à Defensoria ou ao Procon e pedir a repactuação (Lei 14.181/2021).', perdaSemana: 8e9, capitulo: 7 });
+  if (ordem.bloqueada) acoes.push({ id: 'l35-' + ordem.contraindicacao, urgencia: 'agora', texto: ordem.mensagem, perdaSemana: 7e9, capitulo: 7 });
   const topo = ordem.ordem.find((o) => o.taxa > 0);
   if (topo) acoes.push({ id: 'topo-' + topo.id, urgencia: 'semana', texto: 'Atacar ' + topo.nome + ': custa R$ ' + fmt(topo.jurosMes) + ' por mês só de juros.', perdaSemana: semana(topo.jurosMes), capitulo: 5 });
   if (r.dividas.some((d) => !num(d.juros))) acoes.push({ id: 'registrato', urgencia: 'semana', texto: 'Pedir o relatório do Registrato para descobrir as taxas que faltam.', perdaSemana: 0.5, capitulo: 7 });
