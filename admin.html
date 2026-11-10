@@ -343,6 +343,7 @@
       transform-origin:left center; transform:rotateY(90deg);
     }
   </style>
+  <link rel="stylesheet" href="css/admin-glass.css?v=1">
 </head>
 <body>
 
@@ -432,6 +433,10 @@
           <div class="kpi alerta" onclick="irPara('depoimentos')" title="Revisar fila"><div class="kpi-v" id="kpi-fila">—</div><div class="kpi-l">Fila revisão</div></div>
           <div class="kpi" title="Receita últimos 30 dias"><div class="kpi-v" id="kpi-receita">—</div><div class="kpi-l">Receita (30d)</div></div>
         </div>
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card-hdr"><span class="card-titulo">Forge, produção de livros</span><button class="btn btn-s btn-sm" onclick="irPara('forge', document.querySelector('.sb-item[onclick*=forge]'))">Abrir o Forge</button></div>
+          <div class="fg-mini" id="fg-mini"><div class="field-sub">Carregando…</div></div>
+        </div>
         <div class="quick-actions" id="quick-actions"></div>
         <div id="draw-area"></div>
         <div class="card" id="draw-progress-card" style="margin-bottom:16px;display:none;">
@@ -489,6 +494,16 @@
           </div>
         </div>
 
+        <div class="fg-stats" id="fg-stats" aria-live="polite"></div>
+        <div class="fg-alerta card" id="fg-alerta" style="display:none;"></div>
+        <div class="card fg-esteira">
+          <div class="fg-esteira-cab">
+            <span class="card-titulo">Esteira de produção</span>
+            <span class="field-sub" id="fg-esteira-sub">Onde cada livro está agora, das 10 etapas do Forge.</span>
+          </div>
+          <div class="fg-esteira-lista" id="fg-esteira"></div>
+        </div>
+
         <div id="forge-aba-lista">
           <div class="card" style="margin-bottom:16px;">
             <div class="card-hdr">
@@ -498,7 +513,7 @@
                 <button class="btn-ghost" onclick="forgeListar()">Atualizar</button>
               </span>
             </div>
-            <div id="forge-lista-aviso" style="display:none;background:#fff8e1;color:#7a5a00;padding:10px 16px;font-size:13px;"></div>
+            <div id="forge-lista-aviso" style="display:none;background:rgba(240,196,99,.14);color:#f0c463;padding:10px 16px;font-size:13px;"></div>
             <div style="overflow-x:auto;">
               <table>
                 <thead><tr><th>Tema</th><th>Estado</th><th>Criado</th><th>Ações</th></tr></thead>
@@ -897,7 +912,7 @@
 
       <!-- ── Modal Nova/Editar Obra ── -->
       <div class="modal-overlay" id="bib-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;">
-        <div class="modal" style="background:#fff;border-radius:6px;padding:28px;max-width:560px;width:92%;max-height:90vh;overflow-y:auto;">
+        <div class="modal" style="border-radius:6px;padding:28px;max-width:560px;width:92%;max-height:90vh;overflow-y:auto;">
           <h3 style="font-family:var(--serif);font-size:20px;margin-bottom:20px;" id="bib-modal-titulo">Nova obra</h3>
           <div style="display:grid;gap:14px;">
             <div class="form-group"><label>Slug *</label><input id="bib-slug" class="input" placeholder="ex: dom-casmurro"></div>
@@ -1285,7 +1300,7 @@ function irPara(panel, btn) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-function inicializarApp() { carregarStats(); carregarDrawProgress(); }
+function inicializarApp() { carregarStats(); carregarDrawProgress(); if (typeof forgeResumoDashboard === 'function') forgeResumoDashboard(); }
 
 async function carregarDrawProgress() {
   try {
@@ -1580,7 +1595,7 @@ async function carregarForgeProjeto() {
     document.getElementById('forge-status-body').innerHTML =
       `Status: <strong>${escapeHtml(d.status)}</strong>` +
       (d.currentWorker ? ` — worker atual: ${escapeHtml(d.currentWorker)}` : '') +
-      (d.errorMessage ? ` — <span style="color:#c62828">${escapeHtml(d.errorMessage)}</span>` : '');
+      (d.errorMessage ? ` — <span style="color:#ff8a80">${escapeHtml(d.errorMessage)}</span>` : '');
 
     if (d.status !== 'complete') return;
 
@@ -2219,7 +2234,7 @@ function renderTabelaBib(livros) {
       <td>
         <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="lerObraAdmin('${escapeHtml(l.slug)}')">Ler</button>
         <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="editarObra('${escapeHtml(l.slug)}')">Editar</button>
-        <button class="btn-ghost" style="padding:4px 10px;font-size:12px;color:#c62828" onclick="desativarObra('${escapeHtml(l.slug)}','${l.ativo}')">${l.ativo ? 'Desativar' : 'Ativar'}</button>
+        <button class="btn-ghost" style="padding:4px 10px;font-size:12px;color:#ff8a80" onclick="desativarObra('${escapeHtml(l.slug)}','${l.ativo}')">${l.ativo ? 'Desativar' : 'Ativar'}</button>
       </td>
     </tr>
   `).join('');
@@ -2490,7 +2505,7 @@ function renderMarketing(d) {
       const pct = Math.round((eb[k] / maxVal) * 100);
       return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
         <div style="width:130px;font-size:12px;color:var(--t1);text-align:right;flex-shrink:0">${escapeHtml(k)}</div>
-        <div style="flex:1;background:#e8f5e9;border-radius:3px;height:20px;overflow:hidden">
+        <div style="flex:1;background:rgba(52,211,153,.13);border-radius:3px;height:20px;overflow:hidden">
           <div style="width:${pct}%;background:var(--v3);height:100%;border-radius:3px;transition:width .3s"></div>
         </div>
         <div style="width:50px;font-size:12px;font-weight:600;color:var(--t0)">${eb[k]}</div>
@@ -2520,7 +2535,7 @@ function renderMarketing(d) {
 
 // ── MONITOR ───────────────────────────────────────────────────────────────────
 function monStatus(ok, latencia_ms) {
-  if (!ok) return '<span style="color:#e74c3c;font-weight:700">✗ ERRO</span>';
+  if (!ok) return '<span style="color:#ff8a80;font-weight:700">✗ ERRO</span>';
   const cor = latencia_ms > 2000 ? '#e67e22' : '#27ae60';
   return `<span style="color:${cor};font-weight:700">✓ ${latencia_ms}ms</span>`;
 }
