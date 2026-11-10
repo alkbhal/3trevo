@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
   <meta name="robots" content="noindex,nofollow">
-  <script src="/js/consentimento.js?v=31017ee2" data-fb="PageView" defer></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin · Três Trevo</title>
@@ -494,12 +493,13 @@
           </div>
         </div>
 
+        <div class="field-sub" style="margin-bottom:10px;">Toque num número para filtrar a lista de projetos. Toque de novo para mostrar todos.</div>
         <div class="fg-stats" id="fg-stats" aria-live="polite"></div>
         <div class="fg-alerta card" id="fg-alerta" style="display:none;"></div>
         <div class="card fg-esteira">
           <div class="fg-esteira-cab">
             <span class="card-titulo">Esteira de produção</span>
-            <span class="field-sub" id="fg-esteira-sub">Onde cada livro está agora, das 10 etapas do Forge.</span>
+            <span class="field-sub" id="fg-esteira-sub">Cada livro passa por estas 10 etapas, em ordem. Toque numa etapa para ver os livros dela.</span>
           </div>
           <div class="fg-esteira-lista" id="fg-esteira"></div>
         </div>
@@ -513,7 +513,18 @@
                 <button class="btn-ghost" onclick="forgeListar()">Atualizar</button>
               </span>
             </div>
-            <div id="forge-lista-aviso" style="display:none;background:rgba(240,196,99,.14);color:#f0c463;padding:10px 16px;font-size:13px;"></div>
+            <div class="fg-filtro" id="fg-filtro" style="display:none;"></div>
+          <details class="fg-legenda">
+            <summary>O que cada botão faz</summary>
+            <dl>
+              <dt>Revisar e publicar</dt><dd>Abre a capa, os arquivos (EPUB, PDF e HTML), o marketing e a decisão de venda. Só aparece em livro pronto.</dd>
+              <dt>Detalhes</dt><dd>Mostra os capítulos, quantas vezes a revisão devolveu cada um, o custo em IA e o motivo de uma falha.</dd>
+              <dt>Tentar de novo</dt><dd>Recomeça a produção de um livro que falhou.</dd>
+              <dt>Refazer HTML</dt><dd>Monta de novo só a versão de leitura online, com o visual atual. EPUB e PDF ficam iguais; para refazê-los, use “Nova edição” em Revisar e publicar.</dd>
+              <dt>Apagar</dt><dd>Apaga o livro e os arquivos para sempre. Pede um segundo toque em até 5 segundos.</dd>
+            </dl>
+          </details>
+          <div id="forge-lista-aviso" style="display:none;background:rgba(240,196,99,.14);color:#f0c463;padding:10px 16px;font-size:13px;"></div>
             <div style="overflow-x:auto;">
               <table>
                 <thead><tr><th>Tema</th><th>Estado</th><th>Criado</th><th>Ações</th></tr></thead>

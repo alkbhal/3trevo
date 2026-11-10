@@ -164,3 +164,17 @@ select option { background: #0f1a13; color: var(--t0); }
 /* Esteira em 2 fileiras de 5 no desktop; cabeçalhos quebram linha no celular. */
 @media (min-width: 900px) { .fg-esteira-lista { grid-template-columns: repeat(5, 1fr); } }
 .section-hdr { flex-wrap: wrap; gap: 12px; }
+
+/* Esteira clicável e explicada; faixa do filtro; legenda das ações. */
+.fg-etapa { font-family: var(--sans); text-align: left; color: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+.fg-etapa-topo { display: flex; justify-content: space-between; align-items: baseline; }
+.fg-etapa-explica { font-size: 12.5px; color: var(--t3); line-height: 1.4; }
+.fg-etapa:hover, .fg-etapa[aria-pressed="true"], .fg-stat[aria-pressed="true"] { border-color: var(--esmeralda); }
+.fg-etapa[aria-pressed="true"], .fg-stat[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--esmeralda) inset; }
+.fg-filtro { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; font-size: 14.5px; color: var(--t1); background: rgba(52, 211, 153, .08); border-bottom: 1px solid var(--borda); }
+.fg-legenda { padding: 12px 20px; border-bottom: 1px solid var(--borda); font-size: 14px; }
+.fg-legenda summary { cursor: pointer; color: var(--esmeralda-t); font-weight: 500; }
+.fg-legenda dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin-top: 12px; }
+.fg-legenda dt { font-weight: 600; color: var(--t0); }
+.fg-legenda dd { color: var(--t2); margin: 0; }
+@media (max-width: 600px) { .fg-legenda dl { grid-template-columns: 1fr; } .fg-legenda dd { margin-bottom: 6px; } }

@@ -106,13 +106,21 @@ function forgeFormatoMudou() {
 
 // As 10 etapas do Forge, na ordem da esteira (o status do projeto diz em qual ele está).
 const FORGE_ETAPAS = [
-  ['intake', 'Triagem'], ['architect', 'Arquitetura'], ['researcher', 'Pesquisa'], ['writing', 'Escrita'],
-  ['editing', 'Revisão'], ['design', 'Capa e design'], ['marketing', 'Marketing'], ['translation', 'Tradução'],
-  ['render', 'Arquivos'], ['delivery', 'Entrega'],
+  ['intake', 'Triagem', 'Nota o potencial do tema em cada idioma.'],
+  ['architect', 'Arquitetura', 'Escolhe título e planeja os capítulos.'],
+  ['researcher', 'Pesquisa', 'Busca fontes na web para cada capítulo.'],
+  ['writing', 'Escrita', 'Escreve os capítulos, um por vez.'],
+  ['editing', 'Revisão', 'Corta clichê e devolve o que não passa.'],
+  ['design', 'Capa e design', 'Gera a capa e o visual próprio da obra.'],
+  ['marketing', 'Marketing', 'Escreve sinopse, posts e anúncios.'],
+  ['translation', 'Tradução', 'Reescreve nos idiomas escolhidos.'],
+  ['render', 'Arquivos', 'Monta EPUB, PDF e a versão HTML.'],
+  ['delivery', 'Entrega', 'Avisa o site que o livro está pronto.'],
 ];
 const FORGE_EM_PRODUCAO = new Set([...FORGE_ETAPAS.map(([s]) => s), 'awaiting_character_images']);
 const FORGE_FALHAS = new Set(['failed', 'rejected_format', 'rejected_quality']);
 const FORGE_FILTROS = {
+  // "etapa:<status>" filtra pela etapa da esteira (ver forgeFiltrar).
   todos: () => true, producao: (p) => FORGE_EM_PRODUCAO.has(p.status),
   prontos: (p) => p.status === 'complete', falhas: (p) => FORGE_FALHAS.has(p.status),
 };
@@ -128,6 +136,15 @@ const FORGE_ICONES = {
 };
 const forgeIcone = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FORGE_ICONES[n]}</svg>`;
 const forgeDias = (s) => (Date.now() - new Date(String(s).replace(' ', 'T') + 'Z')) / 864e5;
+
+const forgeNaEtapa = (p, s) => p.status === s || (s === 'design' && p.status === 'awaiting_character_images');
+function forgeFiltrar(p) {
+  return forgeFiltro.startsWith('etapa:') ? forgeNaEtapa(p, forgeFiltro.slice(6)) : FORGE_FILTROS[forgeFiltro](p);
+}
+function forgeNomeFiltro() {
+  if (forgeFiltro.startsWith('etapa:')) return 'que estão na etapa ' + ((FORGE_ETAPAS.find(([s]) => s === forgeFiltro.slice(6)) || [])[1] || '');
+  return { todos: '', producao: 'em produção', prontos: 'prontos', falhas: 'que precisam de você' }[forgeFiltro];
+}
 
 function forgeContagem(lista) {
   const prontos = lista.filter(FORGE_FILTROS.prontos);
@@ -153,10 +170,12 @@ function forgeResumo() {
     card('falhas', 'falha', 'Precisam de você', c.falhas, c.falhas ? 'Falharam ou foram reprovados' : 'Nenhuma falha', c.falhas ? 'alerta' : 'neutra');
 
   // Esteira: quantos livros estão em cada etapa agora.
-  const naEtapa = (s) => forgeProjetos.filter((p) => p.status === s || (s === 'design' && p.status === 'awaiting_character_images')).length;
-  forgeEl('fg-esteira').innerHTML = FORGE_ETAPAS.map(([s, nome], i) => {
-    const n = naEtapa(s);
-    return `<div class="fg-etapa${n ? ' ativa' : ''}"><div class="fg-etapa-n">${i + 1}</div><div class="fg-etapa-nome">${nome}</div><div class="fg-etapa-qtd">${n}</div></div>`;
+  forgeEl('fg-esteira').innerHTML = FORGE_ETAPAS.map(([s, nome, explica], i) => {
+    const n = forgeProjetos.filter((p) => forgeNaEtapa(p, s)).length;
+    const sel = forgeFiltro === 'etapa:' + s;
+    return `<button type="button" class="fg-etapa${n ? ' ativa' : ''}" data-etapa="${s}" aria-pressed="${sel}" title="Mostrar os livros nesta etapa">
+      <div class="fg-etapa-topo"><span class="fg-etapa-n">${i + 1}</span><span class="fg-etapa-qtd">${n}</span></div>
+      <div class="fg-etapa-nome">${nome}</div><div class="fg-etapa-explica">${explica}</div></button>`;
   }).join('');
 
   // A falha mais recente fica em destaque, com o atalho para corrigir.
@@ -177,10 +196,13 @@ function forgeResumo() {
 
 function forgeRenderTabela() {
   const corpo = forgeEl('forge-lista-body');
-  const lista = forgeProjetos.filter(FORGE_FILTROS[forgeFiltro]);
-  const rotulo = { todos: '', producao: ' em produção', prontos: ' prontos', falhas: ' com falha' }[forgeFiltro];
+  const lista = forgeProjetos.filter(forgeFiltrar);
+  const nome = forgeNomeFiltro();
+  const faixa = forgeEl('fg-filtro');
+  faixa.style.display = nome ? '' : 'none';
+  if (nome) faixa.innerHTML = `Mostrando ${lista.length} de ${forgeProjetos.length} livros: só os ${escapeHtml(nome)}. <button type="button" class="btn-ghost" data-filtro-limpar>Mostrar todos</button>`;
   if (!lista.length) {
-    corpo.innerHTML = `<tr><td colspan="4">${forgeProjetos.length ? `Nenhum projeto${rotulo}.` : 'Nenhum projeto ainda. Use “+ Novo projeto”.'}</td></tr>`;
+    corpo.innerHTML = `<tr><td colspan="4">${forgeProjetos.length ? 'Nenhum livro nesta seleção.' : 'Nenhum projeto ainda. Use “+ Novo projeto”.'}</td></tr>`;
     return;
   }
   corpo.innerHTML = lista.map((p) => {
@@ -350,8 +372,14 @@ async function forgeCriar() {
 document.addEventListener('click', (e) => {
   const b = e.target.closest('#forge-lista-body [data-acao], #fg-alerta [data-acao]');
   if (b) return forgeAcao(b.dataset.acao, b.dataset.id, b);
-  const f = e.target.closest('#fg-stats [data-filtro]');
-  if (f) { forgeFiltro = forgeFiltro === f.dataset.filtro ? 'todos' : f.dataset.filtro; forgeAba('lista'); forgeResumo(); forgeRenderTabela(); return; }
+  const f = e.target.closest('#fg-stats [data-filtro], #fg-esteira [data-etapa], [data-filtro-limpar]');
+  if (f) {
+    const novo = f.dataset.filtro || (f.dataset.etapa ? 'etapa:' + f.dataset.etapa : 'todos');
+    forgeFiltro = forgeFiltro === novo ? 'todos' : novo;
+    forgeAba('lista'); forgeResumo(); forgeRenderTabela();
+    if (!f.hasAttribute('data-filtro-limpar')) forgeEl('fg-filtro').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
   const d = e.target.closest('[data-filtro-dash]');
   if (d) { forgeFiltro = d.dataset.filtroDash; irPara('forge', document.querySelector('.sb-item[onclick*="forge"]')); }
 });
