@@ -1,140 +1,134 @@
-# Esteira da Editora — do manuscrito ao pós-venda
+# Esteira da Editora — Versão 2.0
 
-**Criado em:** 11/11/2026, a pedido do dono.
-**Para que serve:** definir os setores da editora, o que cada um entrega, o número que mostra se está vivo, e como o gestor coordena tudo sem o dono presente.
+**Data:** 11/11/2026. **Substitui** a versão 1 do mesmo dia.
+**Formato:** apresentação a uma plateia cética. Cada afirmação vem com a fonte ou com o aviso "não verificado".
 
-## 1. O retrato de hoje (medido em 11/11/2026)
+## 1. A tese, em uma frase
 
-| O que | Número | Fonte |
-|---|---|---|
-| Pessoas no site em 30 dias | 14 | `lead_events` |
-| Visitas com origem identificada (UTM) | 0 | `lead_events` |
-| Pessoas que chegaram ao checkout em 30 dias | 4 | `lead_events` |
-| Pagamentos aprovados desde o início | 1 (Pix, 06/05) — teste do próprio dono | `payments` |
-| Vendas para desconhecidos | 0 | `payments` |
-| Leads captados desde o início | 8 | `leads` |
-| Obras ativas à venda | 6 | `products` |
-| Obras ativas sem EPUB (não abrem no leitor) | 1 — A Última Coisa que Ela Disse | `products` |
+**A editora não precisa de mais sistemas. Precisa que um livro atravesse a casa inteira, do texto ao leitor, sem que ninguém carregue no colo.**
 
-Ressalva: o medidor só conta quem aceita os cookies, então o número real de visitantes é um pouco maior. A ordem de grandeza não muda.
+Hoje nenhum livro atravessa. A prova está na seção 5.
 
-**Leitura do retrato:** a loja não vende porque quase ninguém chega nela. Nenhuma melhoria de página resolve isso sozinha. O trabalho tem duas frentes que andam juntas: a experiência de leitura (o que o dono pediu) e a chegada de leitores (o que falta para haver venda).
+## 2. O que a versão 1 errou, e a regra que nasceu de cada erro
 
-### O que já existe e funciona
-- Catálogo, página de obra, checkout próprio com Pix (Mercado Pago), área do cliente com login.
-- Leitor da editora (`js/leitor.js`): abre o EPUB com um clique, tamanho de texto, modo noite, lembra a posição.
-- Recuperação de carrinho e sequência de e-mails para leads (cron de hora em hora).
-- Leitor interativo do Livre das Dívidas com amostra pública.
-- Guardião de segurança, CI, deploy azul/verde, health-check.
-
-### O que falta para "clicar e ler como no Kindle"
-1. O progresso dos livros **comprados** fica só no aparelho (`localStorage`). Trocou de celular, perdeu. Na Biblioteca de clássicos já vai para o servidor; nos comprados, não.
-2. A biblioteca do cliente não mostra "x% lido" nem "Continuar de onde parou".
-3. Não existe virar página. O leitor rola por capítulo (decisão de 16/out, porque a paginação cortava títulos no celular).
-4. Não existe trilha por capítulo (o que foi lido, o que falta).
-5. Uma obra ativa não tem EPUB.
-
-## 2. Os setores
-
-Cada setor é independente: tem entrada, saída, um número de pulso e um dono operacional (automação ou agente). Um setor parado não trava os outros. Eles se falam pelo banco de dados, nunca pelo dono.
-
-| Setor | Recebe | Entrega | Pulso | Quem opera |
-|---|---|---|---|---|
-| **1. Obra** | Manuscrito e direção do autor | Pacote de lançamento: EPUB, PDF, capa, ficha | Obras ativas com pacote completo (hoje 5 de 6) | Forge (`tr3vo-forge`) |
-| **2. Vitrine** | Pacote de lançamento | Página de obra no padrão, catálogo, amostra grátis | Obras ativas com página no padrão (hoje no máximo 2 de 6) | Skill `pagina-de-obra` + `gate-site-tt` |
-| **3. Aquisição** | Trechos e temas das obras | Visitantes com origem identificada | Visitantes por semana, por origem | Agente de conteúdo + agendador |
-| **4. Venda** | Visitante na página de obra | Pagamento aprovado | Checkout iniciado → pago | Worker `checkout` + recuperação de carrinho |
-| **5. Entrega e leitura** | Pagamento aprovado | Livro na biblioteca, aberto no leitor | % de compradores que abriram; % médio lido | Worker + leitor |
-| **6. Cliente (pós-venda)** | Compra e progresso de leitura | E-mails no momento certo, depoimento, segunda compra, suporte | Recompra; depoimentos; reembolsos | Motor de e-mail (cron) |
-| **7. Fiscal** | Pagamento aprovado | Nota fiscal, conciliação, relatório ao contador | Vendas sem nota (meta: 0) | A definir com o contador |
-| **Gestor** | O pulso dos 7 setores | Resumo das 08:00 e 20:00; só sobe o que exige decisão | Setores no verde / no vermelho | Claude (tarefa agendada) |
-
-### Restrições que valem para todos os setores
-- Autor público: Said Anes. Nenhum outro nome.
-- Venda só para desconhecido. Nada de divulgação no meio militar nem na rede pessoal.
-- Sorteio pausado até a regularização. Nenhuma peça de marketing promete prêmio.
-- Legibilidade é requisito: corpo grande, entrelinha generosa, texto à esquerda, sem hifenização, contraste alto.
-- Nada de sistema novo quando já existe solução validada. Cada obra mantém identidade visual própria.
-
-## 3. Como o gestor coordena
-
-O gestor não executa o trabalho dos setores. Ele lê uma única fonte (`gestor_pulso`, uma visão no banco com uma linha por setor) e aplica três regras:
-
-1. **Verde:** o setor rodou e o número está dentro do esperado. Não sobe nada.
-2. **Amarelo:** o número saiu do esperado. O gestor abre a tarefa para o setor e avisa no resumo, sem pedir nada ao dono.
-3. **Vermelho:** precisa de decisão ou de algo que só o dono tem (dinheiro, senha, aval, voz do autor). Sobe no resumo com a pergunta pronta e a recomendação.
-
-O dono recebe, em cada resumo: os números dos setores, o que foi feito sozinho e, no máximo, três decisões.
-
-## 4. Fases
-
-Cada fase termina com prova, no ciclo de `plano.md` (branch, CI verde, PR, aval, merge, checkpoint).
-
-### Fase A — Ler como no Kindle (âncora)
-| # | Entrega | Pronto quando |
-|---|---|---|
-| A1 | Progresso dos livros comprados salvo no servidor (posição, % lido, capítulos lidos) | Abrir em outro aparelho volta ao mesmo ponto |
-| A2 | Biblioteca com capa grande, barra de progresso e botão "Continuar" | Um toque na capa abre o livro no ponto certo |
-| A3 | Modo "virar página" (toque nas bordas e deslizar), ao lado do modo rolagem | Testado em celular pequeno sem cortar título |
-| A4 | Trilha de leitura: sumário com capítulos lidos e por ler | Marca atualiza ao concluir um capítulo |
-| A5 | EPUB de A Última Coisa que Ela Disse | Abre no leitor |
-
-### Fase B — Vitrine completa
-| # | Entrega | Pronto quando |
-|---|---|---|
-| B1 | Páginas de Antifalência, Justiça(mento), 3ª Guerra e A Última Coisa no padrão | Prova da skill com 0 falhas |
-| B2 | Os números de cada livro extraídos do próprio arquivo, para o dono só aprovar | Destrava as etapas 3, 4 e 4b sem trabalho do dono |
-| B3 | Cada página de obra com amostra que abre no leitor | "Ler um trecho" funciona sem cadastro |
-
-### Fase C — Pós-venda guiado pela leitura
-| # | Entrega | Pronto quando |
-|---|---|---|
-| C1 | E-mail de acesso na hora da compra, com botão direto para o leitor | Chega em até 2 minutos |
-| C2 | Dia 2: se não abriu o livro, lembrete; se abriu, incentivo | Usa o progresso real (A1) |
-| C3 | Ao concluir: pedido de depoimento | Depoimento aprovado aparece na página da obra |
-| C4 | Dia 14: próxima obra sugerida | Clique medido com origem |
-| C5 | Ficha do cliente no admin: compras, leitura, e-mails, contatos | Uma tela por cliente |
-
-### Fase D — Aquisição (satélite, em paralelo com a A)
-| # | Entrega | Pronto quando |
-|---|---|---|
-| D1 | Todo link divulgado sai com origem marcada (UTM) | Nenhuma visita "sem origem" vinda de campanha |
-| D2 | Posicionamento novo: a leitura na frente, sem prêmio | `PLANO_CAMPANHA.md` de junho substituído |
-| D3 | Lote semanal de conteúdo por obra (trechos, carrosséis, roteiros curtos) pronto para agendar | Dono agenda o lote em uma sessão por semana |
-| D4 | Amostra grátis como porta de entrada (e-mail em troca do capítulo) | Taxa de captura medida |
-| D5 | Portão de tráfego pago: só abre com 300 visitantes orgânicos medidos e taxa de captura conhecida | Decisão registrada com teto de gasto |
-
-### Fase E — Fiscal
-| # | Entrega | Pronto quando |
-|---|---|---|
-| E1 | Pergunta fechada ao contador: nota por venda de e-book no Lucro Presumido, quem emite e como | Resposta por escrito |
-| E2 | Cada pagamento aprovado gera registro em `notas_fiscais` (pendente → emitida) | Vendas sem nota = 0 |
-| E3 | Relatório mensal de vendas conciliado com o Mercado Pago, para o Controle RDS | Bate centavo a centavo |
-
-### Fase F — Gestor
-| # | Entrega | Pronto quando |
-|---|---|---|
-| F1 | Visão `gestor_pulso` no banco, uma linha por setor | Números conferidos à mão uma vez |
-| F2 | Resumos das 08:00 e 20:00 leem o pulso e aplicam verde/amarelo/vermelho | Resumo cita número real de cada setor |
-
-## 5. Ordem recomendada
-
-1. **A (âncora) + D1 a D3 (satélite)** agora. A resolve o que o dono vê; D resolve o que impede a venda.
-2. **F1** logo em seguida, para o resumo diário já mostrar os números.
-3. **B e C** quando A estiver no ar (C depende do progresso de A1).
-4. **E1** pode ser perguntado ao contador já; E2 e E3 antes de qualquer campanha paga.
-5. **Nema:** o crédito por compra já existe no código (`creditarCompraNema` → `nema_creditar_compra`) e a promessa já está pública no site, então os primeiros compradores recebem Nema desde a primeira venda. Falta prová-lo com uma compra de ponta a ponta (entra na etapa 15 como teste). O que fica para depois da décima venda é só o motor de campanhas e as telas novas (etapas 8 a 10). A etapa 7 (aceite do regulamento) segue antes de qualquer campanha paga.
-
-## 6. Marcos
-
-| Marco | Significa |
+| Erro da versão 1 | Regra da versão 2 |
 |---|---|
-| 1ª venda para desconhecido com origem identificada | A esteira inteira funcionou uma vez |
-| 10 vendas | Dá para ler conversão por obra; reabre o Nema |
-| 1ª recompra | O pós-venda funciona |
+| Diagnostiquei antes de ler o código | **Regra 1 — Ler antes de falar.** Nenhuma afirmação sobre o sistema sem abrir a fonte. |
+| Contei um teste como venda | **Regra 2 — Todo número tem fonte, data e dono.** Venda só conta se o pagador for desconhecido. |
+| Marquei obra como pronta porque o arquivo existia | **Regra 3 — Abrir a caixa.** "Pronto" é conteúdo conferido, não arquivo presente. |
+| Planejei seis frentes ao mesmo tempo | **Regra 4 — Um livro por vez.** O segundo só entra quando o primeiro chegou ao leitor. |
+| Entreguei plano em vez de peça funcionando | **Regra 5 — Entrega é algo que o dono usa no celular.** Documento não conta como entrega. |
+| Diagnostiquei o Forge sem tê-lo lido | **Regra 6 — O que não foi verificado é dito em voz alta.** Ver seção 9. |
 
-## 7. O que só o dono pode dar
-1. Aval para esta ordem (inclusive adiar o Nema).
-2. Uma sessão por semana para agendar o lote de conteúdo nas redes (as contas são dele).
-3. A pergunta fiscal ao contador (E1).
-4. Aprovar os números de cada livro quando chegarem prontos (B2).
+## 3. Os setores e seus agentes
+
+Um **agente** aqui não é um robô solto. É uma tarefa com hora marcada, um mandato escrito e uma lista curta do que pode fazer sozinho. Fora da lista, ele para e pergunta.
+
+| Setor | Agente | Faz sozinho | Só com aval do dono | Pulso |
+|---|---|---|---|---|
+| **1. Obra** | Editor | Montar EPUB e PDF a partir da fonte canônica; conferir autor, fatos citados e promessas | Mudar o texto; aprovar edição | Obras com edição aprovada |
+| **2. Vitrine** | Vitrinista | Montar a página da obra no padrão; rodar a prova da página | Publicar página nova; mudar preço | Obras ativas com página aprovada |
+| **3. Aquisição** | Divulgador | Preparar o lote semanal de conteúdo com origem marcada | Publicar nas redes; gastar com anúncio | Visitantes por semana, por origem |
+| **4. Venda** | Caixa | Lembrar carrinho abandonado; conferir pagamento | Reembolsar; mudar meio de pagamento | Checkout iniciado → pago |
+| **5. Leitura** | Bibliotecário | Liberar o livro; salvar o progresso; avisar se um arquivo não abre | Trocar o arquivo de uma obra | % de compradores que abriram |
+| **6. Cliente** | Atendente | E-mails por etapa de leitura; pedir depoimento; sugerir a próxima obra | Responder reclamação; publicar depoimento | Recompra; reembolsos |
+| **7. Fiscal** | Escriturário | Registrar cada venda; conciliar com o Mercado Pago; montar o relatório do mês | Emitir nota; falar com o contador | Vendas sem nota |
+| **Gestor** | Gerente de ronda | Ler os sete pulsos às 08:00 e 20:00; abrir tarefa para o setor em amarelo | Tudo o que estiver em vermelho | Setores no verde |
+
+**Exemplo prático.** Um cliente paga às 15h, com o dono de serviço. O Caixa confirma o Pix. O Bibliotecário libera o livro e o Atendente envia o acesso. Dois dias depois, o Atendente vê que o livro não foi aberto e manda um lembrete. Às 20h o Gestor registra "1 venda, origem Instagram, livro aberto". O dono lê uma linha.
+
+## 4. A esteira de ferramentas: o caminho de um livro
+
+Oito estações. Em cada uma, a ferramenta que já existe na casa.
+
+| # | Estação | O que acontece | Ferramenta |
+|---|---|---|---|
+| 1 | **Fonte canônica** | O texto vive em um único documento | Google Drive, pasta "Canônico" da obra |
+| 2 | **Composição** | O texto vira EPUB e PDF, com a identidade da obra | Forge + GitHub Actions |
+| 3 | **Pacote de lançamento** | Arquivos, capa, ficha e números numa caixa com lista | `manifest.json` validado |
+| 4 | **Estoque** | Os arquivos entram no depósito privado | Supabase Storage / Cloudflare R2 |
+| 5 | **Vitrine** | Página da obra, catálogo e amostra | Site (GitHub Pages) + skill `pagina-de-obra` |
+| 6 | **Caixa** | Pix confirmado, compra registrada, Nema creditado | Worker Cloudflare + Mercado Pago |
+| 7 | **Leitura** | Biblioteca, leitor, progresso salvo | `js/leitor.js` + Supabase |
+| 8 | **Pós-venda e fiscal** | E-mails, depoimento, registro da nota | Worker (cron) + Resend + banco |
+
+**Tudo na mesma casa:** um repositório, um banco, um servidor. Os agentes conversam pelo banco, não entre si.
+
+## 5. Os portões entre as estações
+
+Nada passa de uma estação para a outra sem o portão abrir. É o que a versão 1 não tinha.
+
+| Portão | Pergunta | Quem confere |
+|---|---|---|
+| **P1 — Texto** | O autor é Said Anes? Cada dado citado tem fonte que existe? Cada promessa (bônus, série, assinatura) é verdadeira hoje? | Editor + aval do dono |
+| **P2 — Pacote** | A caixa tem tudo o que a lista diz? O arquivo é o da edição aprovada? | Validador automático |
+| **P3 — Vitrine** | A página passa na prova (`gate-site-tt`)? Preço e situação iguais no banco e na página? | Vitrinista |
+| **P4 — Venda** | Uma compra de teste atravessou tudo: Pix, biblioteca, leitura, e-mail, Nema? | Caixa + dono no celular |
+| **P5 — Rua** | P1 a P4 abertos para esta obra? | Gestor |
+
+### Exemplo real: o Antifalência, conferido hoje
+
+| O que encontrei | Portão que teria barrado |
+|---|---|
+| O PDF à venda é de março; as revisões ficaram em "Manuscritos" | P2 |
+| A capa do PDF à venda traz o nome civil do dono, não Said Anes | P1 |
+| A obra estava ativa numa tabela e inativa em outra | P3 |
+| O texto canônico cita números e estudos que não consegui confirmar (por exemplo, "82% das falências", "78% fecharam em 18 meses") | P1 |
+| O texto promete bônus por assinatura mensal e uma série de 5 volumes que não existem na loja | P1 |
+| A edição consta "aprovada" por uma migração em lote, sem leitura de ninguém | P1 |
+
+**Ação tomada:** o Antifalência foi retirado da vitrine em 11/11, com aval do dono. Reversível.
+
+## 6. A sequência
+
+Sem datas inventadas. Cada etapa tem um critério de pronto; a estimativa de esforço sai ao fim da etapa 0, quando eu souber o tamanho real.
+
+| Etapa | Entrega | Pronto quando |
+|---|---|---|
+| **0 — Abrir todas as caixas** | Laudo dos 5 títulos ativos: autor na capa, versão do arquivo, promessas, dados citados; leitura do repositório do Forge | Uma tabela com verde ou vermelho por título e por portão |
+| **1 — Um livro de ponta a ponta** | Antifalência: pasta "Canônico", texto com fatos conferidos, EPUB e PDF novos, página no padrão, progresso de leitura no servidor, compra de teste | O dono compra no celular, lê, troca de aparelho e continua do mesmo ponto |
+| **2 — Repetir** | Os demais títulos pela mesma esteira, um por vez | Cada um com os cinco portões abertos |
+| **3 — Abrir a rua** | Conteúdo semanal com origem marcada, amostra grátis como porta de entrada | 300 a 500 visitantes de fora em uma obra, com conversão medida |
+| **4 — Ligar o gestor** | Painel dos sete pulsos nas rondas das 08:00 e 20:00 | O resumo cita o número real de cada setor |
+| **5 — Pós-venda e fiscal** | E-mails por leitura, depoimentos, registro de nota por venda | Vendas sem nota = 0 |
+
+A etapa 4 pode andar junto com a 1 e a 2, porque só lê dados.
+
+## 7. As perguntas da plateia
+
+**"Quem garante que um agente não quebra a loja de madrugada?"**
+Ninguém garante; o desenho limita. Agente não publica nem altera produção sem aval. Toda mudança passa por revisão, teste automático e ponto de volta marcado. Isso já existe no repositório.
+
+**"Hoje você errou seis vezes. Por que confiar na versão 2?"**
+Não peça confiança, peça prova. A etapa 1 tem um critério que o dono confere sozinho, no celular, sem depender da minha palavra.
+
+**"E se você sumir amanhã?"**
+A casa fica de pé. Código, banco e contas são do dono. O ponto de parada e os manuais por setor ficam no repositório. Outro profissional, ou o próprio dono, retoma dali.
+
+**"Quanto custa manter isso?"**
+Não levantei. Entra no laudo da etapa 0, com o custo mensal de cada ferramenta.
+
+**"Por que não vender na Amazon ou na Hotmart, onde já há público?"**
+Foi decisão do dono vender só pelo site próprio. O ganho é margem, dados do cliente e independência. O preço é ter de trazer cada visitante. Por isso a etapa 3 existe.
+
+**"Cadê o lucro?"**
+Não prometo. O que entrego é a conta: a 1 a 3 compras por 100 visitantes interessados, dez vendas pedem de 500 a 1.000 visitantes. Hoje entram 14 por mês. A etapa 3 transforma essa estimativa em número medido.
+
+**"O que acontece com o dono de serviço e sem sinal?"**
+As máquinas com timer seguem: confirmação de pagamento, liberação do livro, e-mails, vigilância. O que exige aval espera na fila do vermelho. Nada se perde; apenas espera.
+
+## 8. O que só o dono faz
+
+1. Aprovar texto e edição de cada obra (portão P1).
+2. Publicar nas redes e decidir gasto com anúncio.
+3. Falar com o contador sobre a nota por venda.
+4. Dar o aval de cada publicação em produção.
+
+## 9. O que eu ainda não verifiquei
+
+- O repositório do Forge. Todo o diagnóstico da estação 2 é hipótese.
+- Os outros cinco títulos ativos: autor na capa, versão, promessas.
+- Se a página ao vivo ainda exibe promessa de prêmio.
+- Se o crédito de Nema funciona numa compra real.
+- O custo mensal das ferramentas.
+- A exatidão dos dados citados no texto do Antifalência. Não os confirmei nem desmenti.
