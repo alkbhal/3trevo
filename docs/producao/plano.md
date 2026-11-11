@@ -36,6 +36,6 @@ Regra da linha (dono, 27/10/2026): nada fica inacabado. Uma etapa por vez, cada 
 | 19 | Fase C — pós-venda guiado pela leitura | e-mails por progresso, depoimento, próxima obra, ficha do cliente | cada e-mail testado com envio real | 15 |
 | 20 | Fase E — fiscal | registro de nota por venda + conciliação mensal | vendas sem nota = 0 | resposta do contador |
 
-**Proposta de 11/11/2026 (aguarda aval do dono):** as etapas 15 e 16 passam à frente; Nema (7 a 10) fica para depois da décima venda. Motivo e números em `esteira-editora.md`.
+**Proposta de 11/11/2026 (aguarda aval do dono):** as etapas 15 e 16 passam à frente; do Nema, só o motor de campanhas e as telas (8 a 10) ficam para depois da décima venda; o crédito por compra já existe e será provado na etapa 15. Motivo e números em `esteira-editora.md`.
 
 **Em paralelo, fora do código:** revisão jurídica do Regulamento v1 (3 marcas [JURÍDICO]) — bloqueia só a publicação da etapa 9.

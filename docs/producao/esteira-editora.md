@@ -10,7 +10,8 @@
 | Pessoas no site em 30 dias | 14 | `lead_events` |
 | Visitas com origem identificada (UTM) | 0 | `lead_events` |
 | Pessoas que chegaram ao checkout em 30 dias | 4 | `lead_events` |
-| Pagamentos aprovados desde o início | 1 (Pix) | `payments` |
+| Pagamentos aprovados desde o início | 1 (Pix, 06/05) — teste do próprio dono | `payments` |
+| Vendas para desconhecidos | 0 | `payments` |
 | Leads captados desde o início | 8 | `leads` |
 | Obras ativas à venda | 6 | `products` |
 | Obras ativas sem EPUB (não abrem no leitor) | 1 — A Última Coisa que Ela Disse | `products` |
@@ -122,7 +123,7 @@ Cada fase termina com prova, no ciclo de `plano.md` (branch, CI verde, PR, aval,
 2. **F1** logo em seguida, para o resumo diário já mostrar os números.
 3. **B e C** quando A estiver no ar (C depende do progresso de A1).
 4. **E1** pode ser perguntado ao contador já; E2 e E3 antes de qualquer campanha paga.
-5. **Nema (etapas 7 a 10)** vai para depois da décima venda. Ponto de fidelidade não tem função sem cliente.
+5. **Nema:** o crédito por compra já existe no código (`creditarCompraNema` → `nema_creditar_compra`) e a promessa já está pública no site, então os primeiros compradores recebem Nema desde a primeira venda. Falta prová-lo com uma compra de ponta a ponta (entra na etapa 15 como teste). O que fica para depois da décima venda é só o motor de campanhas e as telas novas (etapas 8 a 10). A etapa 7 (aceite do regulamento) segue antes de qualquer campanha paga.
 
 ## 6. Marcos
 
