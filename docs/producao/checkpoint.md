@@ -13,6 +13,8 @@ Para nova edição do livro: editar o `.md` no forge → `python3 gerar-leitura.
 
 **Esteira da editora (11/11):** plano dos 7 setores + gestor em `docs/producao/esteira-editora.md`, branch `esteira-editora-plano`; etapas 15 a 20 entraram na fila. Retrato medido: 14 pessoas no site em 30 dias, 0 com origem identificada, 1 pagamento aprovado desde o início, que é teste do dono (0 vendas a desconhecidos).
 
-**Próxima ação exata:** merge da 6. Depois, **se o dono der o aval da nova ordem**, começar a **etapa 15** (A1: progresso dos livros comprados no servidor) com a 16 em paralelo; sem aval, segue a **etapa 7** (Nema fase 1).
+**11/11, com aval do dono:** Antifalência retirado da vitrine (`products.ativo=false`; `catalogo` já estava falso). Motivo: PDF à venda é o de março e traz o nome civil na capa. Texto canônico apontado pelo dono: Drive, pasta da obra → Manuscritos (lido o Doc "Anti Falência v1", de abril). Plano em versão 2.0 (portões P1 a P5, etapas 0 a 5).
+
+**Próxima ação exata:** merge da 6. Depois, **se o dono der o aval da nova ordem**, começar a **etapa 0 da esteira v2** (laudo dos 5 títulos ativos + leitura do Forge) e a **etapa 1** (Antifalência de ponta a ponta); sem aval, segue a **etapa 7** (Nema fase 1).
 
 **Materiais:** skill em `.claude/skills/pagina-de-obra/`; regulamento em `docs/nema/regulamento-geral-v1-rascunho.md`; decisões e pendências em `docs/nema/modelo-e-plano.md`.
