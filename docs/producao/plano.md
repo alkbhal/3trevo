@@ -29,5 +29,13 @@ Regra da linha (dono, 27/10/2026): nada fica inacabado. Uma etapa por vez, cada 
 | 12 | Esteira forge → site | nota de mercado visível no admin, slug legível, biblioteca de manuscritos etiquetados | definida no início da etapa | repositório do forge |
 | 13 | Skill de capa (forge) | skill própria | idem | repositório do forge |
 | 14 | ✅ Livre das Dívidas interativo + Ático (05/11) | edição revisada 2026-11 (forge), leitor gamificado `leitura/livre-das-dividas.html`, app `atico/app.html` com o motor SFDTT (`js/sfdtt-motor.js`), rota `/api/leitura/:slug`, tabela `obra_conteudo` | testes do worker (139) e checks do CI verdes; conteúdo pago no banco conferido por hash; só comprador lê | — |
+| 15 | Fase A da esteira — ler como no Kindle (ver `esteira-editora.md`) | progresso dos comprados no servidor, biblioteca com "Continuar", modo virar página, trilha por capítulo, EPUB de A Última Coisa | abrir em outro aparelho volta ao mesmo ponto; teste em celular pequeno; testes do worker e CI verdes | aval da ordem |
+| 16 | Fase D da esteira — aquisição (D1 a D3) | UTM em todo link, posicionamento sem prêmio, lote semanal de conteúdo | visitas de campanha com origem identificada | aval da ordem |
+| 17 | Fase F — gestor | visão `gestor_pulso` + resumos lendo o pulso | números conferidos à mão uma vez | 15 |
+| 18 | Fase B — vitrine completa (absorve as etapas 3, 4 e 4b) | páginas no padrão com números extraídos do próprio livro | prova da skill com 0 falhas | aprovação dos números pelo dono |
+| 19 | Fase C — pós-venda guiado pela leitura | e-mails por progresso, depoimento, próxima obra, ficha do cliente | cada e-mail testado com envio real | 15 |
+| 20 | Fase E — fiscal | registro de nota por venda + conciliação mensal | vendas sem nota = 0 | resposta do contador |
+
+**Proposta de 11/11/2026 (aguarda aval do dono):** as etapas 15 e 16 passam à frente; do Nema, só o motor de campanhas e as telas (8 a 10) ficam para depois da décima venda; o crédito por compra já existe e será provado na etapa 15. Motivo e números em `esteira-editora.md`.
 
 **Em paralelo, fora do código:** revisão jurídica do Regulamento v1 (3 marcas [JURÍDICO]) — bloqueia só a publicação da etapa 9.
