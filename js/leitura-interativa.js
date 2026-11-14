@@ -14,6 +14,8 @@ const hoje = () => new Date().toISOString().slice(0, 10);
 let S = Object.assign({ cap: 'prefacio', pl: 0, lidos: {}, missoes: {}, cenas: {}, ferramentas: {}, dias: [], conquistas: {} }, ler(KEY) || {});
 const salvar = () => gravar(KEY, S);
 let LIVRO = { indice: [], capitulos: {} }, ACESSO = 'amostra';
+const AUDIO_BASE = '/assets/audio/' + SLUG + '/';
+let AUDIO = {}; // capítulo → faixa narrada (só os que têm áudio publicado)
 
 // ─── Markdown seguro (escapa antes de formatar) ──────────────────────────────
 const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -101,6 +103,7 @@ function abrir(id, rolar = true) {
   if (!cap) { $('#app').innerHTML = `<article class="scene"><p class="eyebrow">${esc(item.titulo)}</p>${paywall()}</article>${nav}`; ligarNav(); return; }
   $('#app').innerHTML = `<article class="scene"><p class="eyebrow">${S.lidos[item.id] ? 'Lido ✓' : 'Leitura'}</p><h1>${esc(cap.titulo)}</h1>${cap.subtitulo ? `<p class="sub">${esc(cap.subtitulo)}</p>` : ''}<div class="prose">${md(cap.md)}</div><div id="fimcap"></div></article>${nav}`;
   const prose = $('.prose');
+  ouvir(item.id, prose);
   // calculadoras depois das seções indicadas
   FERRAMENTAS.filter((f) => f.cap === item.id).forEach((f) => {
     const h = [...prose.querySelectorAll('[data-sec]')].find((x) => x.dataset.sec === f.depois);
@@ -127,6 +130,17 @@ function abrir(id, rolar = true) {
   ligarNav(); progresso();
   if (rolar) window.scrollTo(0, 0);
 }
+// ─── Áudio do capítulo (narração publicada em /assets/audio) ─────────────────
+function ouvir(id, prose) {
+  const faixa = AUDIO[id]; if (!faixa) return;
+  const box = document.createElement('section'); box.className = 'ouvir';
+  box.innerHTML = `<p class="ferr-t">Ouvir este capítulo · ${Math.max(1, Math.round(faixa.segundos / 60))} min</p><audio controls preload="none" src="${esc(AUDIO_BASE + faixa.arquivo)}"></audio><p class="note">Narração por voz sintética.</p>`;
+  prose.before(box);
+  const a = box.querySelector('audio'); const pos = (S.audio || {})[id] || 0; let ult = 0;
+  a.addEventListener('loadedmetadata', () => { if (pos > 5 && pos < a.duration - 5) a.currentTime = pos; });
+  a.addEventListener('timeupdate', () => { if (Math.abs(a.currentTime - ult) < 5) return; ult = a.currentTime; S.audio = Object.assign({}, S.audio, { [id]: Math.floor(ult) }); salvar(); });
+  a.addEventListener('ended', () => { S.audio = Object.assign({}, S.audio, { [id]: 0 }); salvar(); });
+}
 function ligarNav() { document.querySelectorAll('[data-ir]').forEach((b) => (b.onclick = () => abrir(b.dataset.ir))); }
 function paywall() {
   if (ACESSO === 'sem_compra') return `<div class="panel"><h2>Este capítulo é da edição completa</h2><p>Você já leu a amostra. A edição completa traz os capítulos 3 a 9, as calculadoras, as cenas e o apêndice com todas as contas.</p><p><a class="primary" href="/checkout.html?slug=${SLUG}">Ler a edição completa</a></p></div>`;
@@ -150,6 +164,9 @@ function menu() {
 async function carregar() {
   const a = await fetch('/leitura/livre-das-dividas/amostra.json?v=0').then((r) => r.json());
   LIVRO.indice = a.indice; a.capitulos.forEach((c) => (LIVRO.capitulos[c.id] = c));
+  // sem áudio publicado (ou falha de rede), o livro abre igual, só sem o tocador
+  const au = await fetch(AUDIO_BASE + 'manifest-audio.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (au && Array.isArray(au.faixas)) au.faixas.forEach((f) => (AUDIO[f.id] = f));
   abrir(S.cap, false);
   for (let i = 0; i < 20 && !window.sb; i++) await new Promise((r) => setTimeout(r, 150));
   try {
