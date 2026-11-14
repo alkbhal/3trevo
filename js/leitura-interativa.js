@@ -134,7 +134,7 @@ function abrir(id, rolar = true) {
 function ouvir(id, prose) {
   const faixa = AUDIO[id]; if (!faixa) return;
   const box = document.createElement('section'); box.className = 'ouvir';
-  box.innerHTML = `<p class="ferr-t">Ouvir este capítulo · ${Math.max(1, Math.round(faixa.segundos / 60))} min</p><audio controls preload="none" src="${esc(AUDIO_BASE + faixa.arquivo)}"></audio><p class="note">Narração por voz sintética.</p>`;
+  box.innerHTML = `<p class="ferr-t">Ouvir este capítulo · ${Math.max(1, Math.round(faixa.segundos / 60))} min</p><audio controls preload="none" src="${esc(faixa.url || AUDIO_BASE + faixa.arquivo)}"></audio><p class="note">Narração por voz sintética.</p>`;
   prose.before(box);
   const a = box.querySelector('audio'); const pos = (S.audio || {})[id] || 0; let ult = 0;
   a.addEventListener('loadedmetadata', () => { if (pos > 5 && pos < a.duration - 5) a.currentTime = pos; });
@@ -178,6 +178,13 @@ async function carregar() {
     if (!d.ok) { ACESSO = 'erro'; return; }
     d.capitulos.forEach((c) => (LIVRO.capitulos[c.id] = c)); ACESSO = 'completa';
     $('#edicao').textContent = 'Edição completa';
+    // Áudio dos capítulos pagos: links assinados por 1 hora, só para quem comprou.
+    // Falha aqui não tira o texto: o livro segue sem o tocador desses capítulos.
+    try {
+      const ra = await fetch(`${API}/api/leitura/${SLUG}/audio`, { headers: { Authorization: 'Bearer ' + session.access_token } });
+      const da = ra.ok ? await ra.json() : null;
+      if (da && Array.isArray(da.faixas)) da.faixas.forEach((f) => (AUDIO[f.id] = Object.assign({ segundos: f.segundos }, f)));
+    } catch { /* sem áudio agora */ }
     abrir(S.cap, false);
   } catch { ACESSO = 'erro'; }
 }

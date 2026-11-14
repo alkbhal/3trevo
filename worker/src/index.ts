@@ -40,7 +40,7 @@ import {
 import { handleAiStudio } from './routes/admin-ai-studio';
 import { handleNemaSaldo } from './routes/nema';
 import { handleAticoAcesso } from './routes/atico';
-import { handleLeitura } from './routes/leitura';
+import { handleLeitura, handleLeituraAudio } from './routes/leitura';
 import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha } from './routes/admin-auth';
 import { handleAdminForge } from './routes/admin-forge';
 import { handleTrack, handleMetaCapi } from './routes/track';
@@ -260,6 +260,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleAticoAcesso(request, env);
     }
 
+    if (path.startsWith('/api/leitura/') && path.endsWith('/audio') && method === 'GET') {
+      return handleLeituraAudio(request, env, path.slice('/api/leitura/'.length, -'/audio'.length));
+    }
     if (path.startsWith('/api/leitura/') && method === 'GET') {
       return handleLeitura(request, env, path.slice('/api/leitura/'.length));
     }
