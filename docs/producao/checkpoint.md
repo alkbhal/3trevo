@@ -1,6 +1,6 @@
 # Ponto de parada
 
-**Última atualização:** 11/11/2026.
+**Última atualização:** 18/11/2026.
 **No ar:** #31 a #34, #38 e #43 (vídeo leve da home). Ponto de volta: `azul-20261030`.
 **Aval do dono (29/10):** "concluir o projeto" — cada etapa entra com prova e CI verdes.
 
@@ -31,3 +31,6 @@ Para nova edição do livro: editar o `.md` no forge → `python3 gerar-leitura.
 **Falta para o áudio do livro inteiro:** os 2 secrets no forge → "Narrar obra" com PUBLICAR (grava em `media/audiobooks/<slug>/`) → rota no worker que assina o áudio para quem comprou → tocador ler dessa rota nos capítulos pagos.
 
 **Materiais:** skill em `.claude/skills/pagina-de-obra/`; regulamento em `docs/nema/regulamento-geral-v1-rascunho.md`; decisões e pendências em `docs/nema/modelo-e-plano.md`.
+
+**18/11, operação autônoma:** branch `ccr-030563a1-3omzdw`. Modelo genérico "empresa-ia-v2" adaptado à editora em `docs/producao/empresa-ia-editora.md` (12 agentes no worker, matriz de alçada, migração aditiva, Para Aprovar com 2FA, rotinas, etapas 21 a 26). Desenho do Panos e Estrada em `docs/panos-e-estrada/estrutura-operacao.md` (v0.1, 8 perguntas para o dono). Nada construído ainda.
+**Próxima ação:** aval do dono à ordem das etapas 21–26 e aos limites da matriz (seção 4); então etapa 21.

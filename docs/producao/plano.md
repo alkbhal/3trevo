@@ -35,7 +35,15 @@ Regra da linha (dono, 27/10/2026): nada fica inacabado. Uma etapa por vez, cada 
 | 18 | Fase B — vitrine completa (absorve as etapas 3, 4 e 4b) | páginas no padrão com números extraídos do próprio livro | prova da skill com 0 falhas | aprovação dos números pelo dono |
 | 19 | Fase C — pós-venda guiado pela leitura | e-mails por progresso, depoimento, próxima obra, ficha do cliente | cada e-mail testado com envio real | 15 |
 | 20 | Fase E — fiscal | registro de nota por venda + conciliação mensal | vendas sem nota = 0 | resposta do contador |
+| 21 | Operação autônoma — destravar (ver `empresa-ia-editora.md`) | PRs do forge, 2 secrets, compra de teste do Livre das Dívidas | dono compra no celular, lê, recebe e-mail | aval + secrets |
+| 22 | Barramento + Para Aprovar (absorve 17) | migração `empresa-ia.sql`, Ronda, alçada, inibições, aba com 2FA, resumo 07:30/20:00 | evento de teste atravessa fila → toque → execução → desfazer | 21 + limites da matriz |
+| 23 | Aquisição (absorve 16) | UTM em tudo, origem no resumo, lote semanal para aprovar | visitas de campanha com origem identificada | 22 |
+| 24 | Recepção e Atendente no WhatsApp | respostas com catálogo do banco + Guardião | 30 perguntas de teste: 0 preço inventado, 0 promessa vetada | 22 + número na Cloud API |
+| 25 | Leitura e Acompanhante (absorve 15 e 19) | progresso entre aparelhos, e-mails por leitura, depoimento | troca de aparelho volta ao ponto; e-mails com envio real | 22 |
+| 26 | Escriturário (absorve 20) | registro por venda + conciliação mensal | vendas sem nota = 0 | contador |
 
 **Proposta de 11/11/2026 (aguarda aval do dono):** as etapas 15 e 16 passam à frente; do Nema, só o motor de campanhas e as telas (8 a 10) ficam para depois da décima venda; o crédito por compra já existe e será provado na etapa 15. Motivo e números em `esteira-editora.md`.
+
+**Proposta de 18/11/2026 (aguarda aval do dono):** etapas 21 a 26 conforme `empresa-ia-editora.md`, na ordem 21 → 22 → 23 → 24/25 → 26. O desenho do Panos e Estrada (`docs/panos-e-estrada/estrutura-operacao.md`) só começa depois da 22.
 
 **Em paralelo, fora do código:** revisão jurídica do Regulamento v1 (3 marcas [JURÍDICO]) — bloqueia só a publicação da etapa 9.
