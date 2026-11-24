@@ -1,7 +1,7 @@
 /**
  * conciliacao.ts — Três Trevo Worker
  * Cron horário: pergunta ao Mercado Pago quais pagamentos foram aprovados nas últimas
- * 24h e processa cada um pelo mesmo caminho do webhook (processarPagamentoAprovado).
+ * 7 dias e processa cada um pelo mesmo caminho do webhook (processarPagamentoAprovado).
  *
  * Por que existe: o webhook depende de a notificação chegar. Se ela não chega (assinatura
  * divergente, configuração de conta, falha de rede), a compra e a entrega nunca acontecem.
