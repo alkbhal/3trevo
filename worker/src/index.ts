@@ -52,6 +52,7 @@ import { handleDrawProgress } from './routes/admin-draw';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
 import { handleCartRecovery } from './cron/cart-recovery';
+import { handleConciliacao } from './cron/conciliacao';
 import {
   handleAdminDepoimentosList,
   handleAdminDepoimentoUpdate,
@@ -157,6 +158,7 @@ export default {
       ctx.waitUntil(handleEmailEngine(env));
       ctx.waitUntil(handleBudgetController(env));
       ctx.waitUntil(handleCartRecovery(env));
+      ctx.waitUntil(handleConciliacao(env));
     }
   },
 };

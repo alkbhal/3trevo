@@ -185,6 +185,12 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
     return new Response('not_approved', { status: 200 });
   }
 
+  return processarPagamentoAprovado(env, mpPayment, String(mpPaymentId));
+}
+
+// Processa um pagamento já confirmado como aprovado no MP. Usado pelo webhook e pela conciliação.
+// Idempotente: registrarCompraMp só marca 'novo' na primeira gravação, então reprocessar não duplica nada.
+export async function processarPagamentoAprovado(env: Env, mpPayment: any, mpPaymentId: string): Promise<Response> {
   const productSlug = mpPayment.external_reference ?? '';
   const emailPagador = mpPayment.payer?.email ?? '';
   const nomePagador = mpPayment.payer?.first_name
@@ -205,7 +211,7 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   const rpc = await registrarCompraMp({
     env,
     userId: userId ?? null,
-    mpPaymentId: String(mpPaymentId),
+    mpPaymentId: mpPaymentId,
     productSlug,
     valor,
     metodo,
@@ -220,13 +226,13 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   }
 
   // Rede de proteção (não bloqueia: o cliente já pagou). Só na 1ª vez que o pagamento é registrado.
-  if (rpc.novo) await alertarValorDivergente(env, productSlug, valor, String(mpPaymentId));
+  if (rpc.novo) await alertarValorDivergente(env, productSlug, valor, mpPaymentId);
 
   // Nema: confirma o saldo usado nesta compra e credita o Nema que ela gera.
   // As duas funções são idempotentes, então rodam também quando o MP reenvia o aviso.
   // O sorteio está parado até a autorização legal: a compra não distribui números.
   const reservaRef = reservaDoMetadata(mpPayment.metadata);
-  if (reservaRef) await confirmarResgateNema(env, reservaRef, String(mpPaymentId), rpc.purchase_id ?? null);
+  if (reservaRef) await confirmarResgateNema(env, reservaRef, mpPaymentId, rpc.purchase_id ?? null);
   let nemaGanho = 0;
   if (userId && rpc.purchase_id) nemaGanho = await creditarCompraNema(env, userId, rpc.purchase_id, valor);
 
@@ -254,6 +260,8 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
 
   return Response.json({ ok: true });
 }
+
+
 
 // ─── 3. Download (UUID token) ─────────────────────────────────────────────────
 export async function handleDownload(request: Request, env: Env): Promise<Response> {
