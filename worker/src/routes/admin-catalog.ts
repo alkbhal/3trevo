@@ -37,6 +37,8 @@ export const catalogoInputSchema = z.object({
   ordem: z.number().int().min(0).max(9999).optional(),
   ativo: z.boolean().optional(),
   motivo_inativo: z.string().max(500).nullable().optional(),
+  // true só quando o dono mudou o checkbox "Ativo" nesta edição; sem isso, status não é gravado
+  ativo_alterado: z.boolean().optional(),
 });
 
 function erroValidacao(issues: z.ZodIssue[]): Response {
@@ -200,6 +202,9 @@ export async function handleAdminCatalogoUpdate(request: Request, env: Env, slug
     'utm_campaign','bg_color','capa_url','ordem','ativo','slug','motivo_inativo',
   ];
   for (const k of allowed) { if (k in body) updates[k] = body[k]; }
+  // Status comercial só muda por ação explícita. Um salvamento comum do admin com o checkbox
+  // pré-marcado reativava o livro suspenso (04/11 e 15/11). Agora ativo/motivo só entram com ativo_alterado.
+  if (body.ativo_alterado !== true) { delete updates.ativo; delete updates.motivo_inativo; }
   if ('preco' in updates) updates.cotas = cotasPorPreco(updates.preco);
 
   const r = await sb(env, `catalogo?slug=eq.${encodeURIComponent(slug)}`, {

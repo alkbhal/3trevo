@@ -1152,7 +1152,7 @@
         </div>
         <div class="field" style="align-items:flex-start;justify-content:flex-end;padding-top:20px;">
           <div class="toggle-row">
-            <label class="toggle"><input type="checkbox" id="livro-ativo" checked onchange="atualizarMotivoInativoVisivel()"><span class="toggle-slider"></span></label>
+            <label class="toggle"><input type="checkbox" id="livro-ativo" checked onchange="this.dataset.alterado='1';atualizarMotivoInativoVisivel()"><span class="toggle-slider"></span></label>
             <span style="font-size:13px;color:var(--t1)">Ativo (visível no site)</span>
           </div>
         </div>
@@ -1453,6 +1453,7 @@ function abrirModalLivro(slug) {
   document.getElementById('livro-accent-txt').value = livro?.accent_color || '#7ab88a';
   document.getElementById('livro-utm').value = livro?.utm_campaign || '';
   document.getElementById('livro-ativo').checked = livro?.ativo !== false;
+  document.getElementById('livro-ativo').dataset.alterado = ''; // status só muda se o dono mexer no checkbox
   document.getElementById('livro-motivo-inativo').value = livro?.motivo_inativo || '';
   atualizarMotivoInativoVisivel();
   document.getElementById('btn-deletar-livro').style.display = livro ? '' : 'none';
@@ -1525,6 +1526,7 @@ async function salvarLivro() {
     ordem: parseInt(document.getElementById('livro-ordem').value) || 99,
     ativo: document.getElementById('livro-ativo').checked,
     motivo_inativo: document.getElementById('livro-motivo-inativo').value.trim() || null,
+    ativo_alterado: document.getElementById('livro-ativo').dataset.alterado === '1',
   };
   if (!payload.autor) {
     toast('Informe o autor — ele aparece na loja e nos exemplares vendidos.', 'err');
