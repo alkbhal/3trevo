@@ -168,8 +168,10 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   // Buscar pagamento completo na API MP
   const mpPayment = await buscarPagamentoMP(String(mpPaymentId), env.MP_ACCESS_TOKEN ?? '');
   if (!mpPayment) {
+    // 5xx de propósito: o MP reenvia a notificação. Com 200 a falha some sem registro.
     console.error('[webhook] falha ao buscar pagamento MP:', mpPaymentId);
-    return new Response('mp_error', { status: 200 });
+    await registrarAuditoria(env, 'webhook_erro', { mpPaymentId, erro: 'mp_fetch_falhou' });
+    return new Response('mp_error', { status: 500 });
   }
 
   // Só processar aprovados
@@ -208,7 +210,8 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   if (!rpc.ok) {
     console.error('[webhook] rpc falhou:', rpc.erro);
     await registrarAuditoria(env, 'webhook_erro', { mpPaymentId, erro: rpc.erro });
-    return new Response('rpc_error', { status: 200 });
+    // 5xx: o MP reenvia; a gravação é idempotente por mp_payment_id, então o reenvio é seguro.
+    return new Response('rpc_error', { status: 500 });
   }
 
   // Rede de proteção (não bloqueia: o cliente já pagou). Só na 1ª vez que o pagamento é registrado.
