@@ -148,7 +148,12 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
     return new Response('Service Unavailable', { status: 503 });
   }
   const valido = await verificarAssinaturaMP(request.clone(), env.WEBHOOK_HMAC_SECRET);
-  if (!valido) return new Response('Unauthorized', { status: 401 });
+  if (!valido) {
+    // Antes a rejeição não deixava rastro: um segredo errado fazia o pagamento sumir sem registro.
+    console.error('[webhook] assinatura inválida');
+    await registrarAuditoria(env, 'webhook_assinatura_invalida', { headers: 'x-signature-presente' });
+    return new Response('Unauthorized', { status: 401 });
+  }
 
   let body: any;
   try { body = await request.clone().json(); } catch {
