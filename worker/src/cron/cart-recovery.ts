@@ -92,5 +92,24 @@ export async function leadTemCompraAtiva(env: Env, email: string): Promise<boole
 
   const compraResp = await sb(env, `purchases?user_id=eq.${userId}&status=eq.active&select=id&limit=1`);
   const compras = (await compraResp.json()) as any[];
-  return Array.isArray(compras) && compras.length > 0;
+  if (Array.isArray(compras) && compras.length > 0) return true;
+  // Segunda fonte: o Mercado Pago. Se o webhook falhou, não há compra nem usuário no banco,
+  // mas o pagamento existe. Em dúvida (erro ao consultar), não cobra: trata como pago.
+  return pagamentoAprovadoNoMP(env, email);
+}
+
+// Consulta o MP por e-mail do pagador. Erro = true (fail-closed: não cobrar quem pode ter pago).
+export async function pagamentoAprovadoNoMP(env: Env, email: string): Promise<boolean> {
+  try {
+    const resp = await fetch(
+      `https://api.mercadopago.com/v1/payments/search?payer.email=${encodeURIComponent(email)}&status=approved&sort=date_created&criteria=desc&limit=5`,
+      { headers: { Authorization: `Bearer ${env.MP_ACCESS_TOKEN ?? ''}` } },
+    );
+    if (!resp.ok) return true;
+    const data = (await resp.json()) as any;
+    const results: any[] = Array.isArray(data?.results) ? data.results : [];
+    return results.some((p) => p?.status === 'approved');
+  } catch {
+    return true;
+  }
 }
