@@ -425,7 +425,7 @@ async function buscarPagamentoMP(paymentId: string, accessToken: string): Promis
 }
 
 // Verifica assinatura MP x-signature: ts=...,v1=...
-async function verificarAssinaturaMP(request: Request, secret: string): Promise<boolean> {
+export async function verificarAssinaturaMP(request: Request, secret: string): Promise<boolean> {
   const xSig = request.headers.get('x-signature') ?? '';
   const xReqId = request.headers.get('x-request-id') ?? '';
   const body = await request.clone().json() as any;
@@ -435,11 +435,10 @@ async function verificarAssinaturaMP(request: Request, secret: string): Promise<
   const ts = xSig.match(/ts=([^,]+)/)?.[1] ?? '';
   const v1 = xSig.match(/v1=([^,]+)/)?.[1] ?? '';
 
-  const tsNum = parseInt(ts, 10);
-  const agora = Math.floor(Date.now() / 1000);
-  if (isNaN(tsNum) || Math.abs(agora - tsNum) > 300) {
-    return false; // timestamp ausente ou fora da janela de 5 minutos
-  }
+  // Sem janela de tempo: o MP reenvia a notificação depois, com a assinatura original, e uma
+  // janela de 5 minutos derrubava todo reenvio com 401. A assinatura cobre o ts; a segurança
+  // contra aviso falso vem de buscar o pagamento na API do MP antes de gravar qualquer coisa.
+  if (!ts) return false;
 
   if (!ts || !v1 || !mpId) {
     // Fallback: aceitar se secret não está configurado (dev)
