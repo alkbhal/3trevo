@@ -22,7 +22,7 @@ export async function handleConciliacao(env: Env): Promise<void> {
     return;
   }
   const fim = new Date();
-  const inicio = new Date(fim.getTime() - 24 * 60 * 60 * 1000);
+  const inicio = new Date(fim.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 dias: cobre pagamentos que o webhook perdeu
   const params = new URLSearchParams({
     status: 'approved',
     range: 'date_created',
