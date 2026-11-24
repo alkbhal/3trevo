@@ -31,3 +31,13 @@ Para nova edição do livro: editar o `.md` no forge → `python3 gerar-leitura.
 **Falta para o áudio do livro inteiro:** os 2 secrets no forge → "Narrar obra" com PUBLICAR (grava em `media/audiobooks/<slug>/`) → rota no worker que assina o áudio para quem comprou → tocador ler dessa rota nos capítulos pagos.
 
 **Materiais:** skill em `.claude/skills/pagina-de-obra/`; regulamento em `docs/nema/regulamento-geral-v1-rascunho.md`; decisões e pendências em `docs/nema/modelo-e-plano.md`.
+
+## Regra de fonte única (adotada em 24/11/2026)
+
+- **Fonte única:** o Doc "Livre das Dívidas — texto canônico" no Drive. Uma revisão é uma edição nesse Doc.
+- **Banco e site são espelhos gerados** por pipeline. Conteúdo não é editado direto no banco nem no admin.
+- **Derivados** (EPUB, PDF, manifesto, amostra) são gerados por script a partir do canônico e nunca editados à mão. Cada derivado guarda o hash do canônico de origem; hash diferente = build falha.
+- **Status comercial** (ativo, motivo de suspensão) não é conteúdo: muda só por ação explícita (`ativo_alterado`).
+- **Vedação:** revisão que exige editar mais de um arquivo à mão é bloqueada. Altera-se o canônico e regenera-se.
+- **Arquivo morto** (fora do depósito): PDF curto vendido até hoje, Doc "Edição revisada 2026 (texto final)", PDF de março.
+- **Pendente:** confirmar que o livro inteiro (não só a amostra) bate com o canônico.
