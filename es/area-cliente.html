@@ -832,11 +832,11 @@ nav{
       <h2 style="margin:0 0 6px;font-size:1.25rem;color:#1e5c3a">Completa tu perfil (opcional)</h2>
       <p style="margin:0 0 14px">Tu CPF (documento fiscal brasileño) y tu teléfono se usan para la factura y para avisarte de nuevas obras. Puedes omitir este paso cuando quieras.</p>
       <form id="formCadastroOpcional" onsubmit="salvarCadastroOpcional(event)" style="display:grid;gap:12px">
-        <label>Nome completo<br><input name="nome" type="text" maxlength="120" style="width:100%;font-size:1rem;padding:8px"></label>
+        <label>Nombre completo<br><input name="nome" type="text" maxlength="120" style="width:100%;font-size:1rem;padding:8px"></label>
         <label>CPF<br><input name="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" style="width:100%;font-size:1rem;padding:8px"></label>
-        <label>Telefone com DDD<br><input name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" style="width:100%;font-size:1rem;padding:8px"></label>
+        <label>Teléfono (con código de área)<br><input name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" style="width:100%;font-size:1rem;padding:8px"></label>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-          <button type="submit" style="font-size:1rem;padding:10px 18px;background:#1e5c3a;color:#fff;border:0;border-radius:6px;cursor:pointer">Salvar</button>
+          <button type="submit" style="font-size:1rem;padding:10px 18px;background:#1e5c3a;color:#fff;border:0;border-radius:6px;cursor:pointer">Guardar</button>
           <span id="cadastroOpcionalMsg" role="status" style="font-size:1rem"></span>
         </div>
       </form>
@@ -1120,7 +1120,7 @@ async function salvarCadastroOpcional(ev) {
     const v = form.elements[c].value.trim();
     if (v) dados[c] = v;
   });
-  if (Object.keys(dados).length === 0) { msg.textContent = 'Preencha ao menos um campo.'; return; }
+  if (Object.keys(dados).length === 0) { msg.textContent = 'Completa al menos un campo.'; return; }
   try {
     const { data: { session } } = await sb.auth.getSession();
     const r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/cliente/perfil', {
@@ -1130,14 +1130,14 @@ async function salvarCadastroOpcional(ev) {
     });
     const d = await r.json();
     if (d.ok) {
-      msg.textContent = 'Cadastro salvo. Obrigado!';
+      msg.textContent = 'Registro guardado. ¡Gracias!';
       if (dados.cpf) document.getElementById('cadastroOpcional').style.display = 'none';
       return;
     }
-    const motivos = { cpf_invalido: 'CPF inválido. Confira os números.', telefone_invalido: 'Telefone inválido.', nome_invalido: 'Nome inválido.' };
-    msg.textContent = motivos[d.erro] || 'Não foi possível salvar agora. Tente de novo em alguns minutos.';
+    const motivos = { cpf_invalido: 'CPF no válido. Revisa los números.', telefone_invalido: 'Teléfono no válido.', nome_invalido: 'Nombre no válido.' };
+    msg.textContent = motivos[d.erro] || 'No pudimos guardar ahora. Inténtalo de nuevo en unos minutos.';
   } catch (e) {
-    msg.textContent = 'Erro de conexão. Tente de novo.';
+    msg.textContent = 'Error de conexión. Inténtalo de nuevo.';
   }
 }
 
@@ -1171,7 +1171,7 @@ async function carregarBiblioteca() {
     cont.innerHTML = `<div class="vazio">
       <div class="vazio-icone">📚</div>
       <div class="vazio-titulo">Biblioteca vazia</div>
-      <p class="vazio-texto">Você ainda não tem ebooks.<br>Adquira um título e ele aparecerá aqui.</p>
+      <p class="vazio-texto">Todavía no tienes ebooks.<br>Adquiere un título y aparecerá aquí.</p>
       <a href="/#catalogo" class="vazio-link">Ver catálogo →</a>
     </div>`;
     return;
@@ -1337,12 +1337,12 @@ async function baixar(productId, titulo, formato) {
     const item = data?.formatos?.[formato];
 
     if (!res.ok || data.error) {
-      toast(data.error || 'Erro ao gerar link de download.', 'erro');
+      toast(data.error || 'No se pudo generar el enlace de descarga.', 'erro');
     } else if (!item) {
-      toast(`Formato ${rotulo} não disponível para este título.`, 'erro');
+      toast(`El formato ${rotulo} no está disponible para este título.`, 'erro');
     } else {
       window.open(item.download_url, '_blank');
-      toast(`Arquivo ${rotulo} de "${titulo}" baixado.`);
+      toast(`Archivo ${rotulo} de "${titulo}" descargado.`);
     }
   } catch {
     toast(T('js.erro.conexao'), 'erro');
@@ -1400,7 +1400,7 @@ function fecharLeitor() { TTLeitor.fechar(); }
 // ══════════════════════════════════════════════════════════
 async function carregarMusicas() {
   const cont = document.getElementById('listaMusicas');
-  cont.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Carregando</span></div>`;
+  cont.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span class="loading-txt">Cargando</span></div>`;
 
   const { data: todasMusicas } = await sb.from('musicas').select('*').eq('ativo', true).order('ordem');
   const { data: lib } = await sb.from('user_library').select('product_id').eq('user_id', usuarioAtual.id);
@@ -1427,12 +1427,12 @@ async function carregarMusicas() {
       <div class="musica-equalizador" aria-hidden="true">
         <span></span><span></span><span></span>
       </div>
-      <button class="musica-btn-play" aria-label="${semAudio ? 'Indisponível' : 'Tocar ' + m.titulo}" ${semAudio ? 'disabled' : ''}>
+      <button class="musica-btn-play" aria-label="${semAudio ? 'No disponible' : 'Reproducir ' + m.titulo}" ${semAudio ? 'disabled' : ''}>
         <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
       </button>
       <div>
         <div class="musica-nome">${m.titulo || 'Faixa'}</div>
-        <div class="musica-sub">${m.artista || 'Três Trevo'}${semAudio ? ' · indisponível' : ''}</div>
+        <div class="musica-sub">${m.artista || 'Três Trevo'}${semAudio ? ' · no disponible' : ''}</div>
       </div>
       <div class="musica-dur">${m.duracao ? fmtTempo(m.duracao) : '—'}</div>
     </div>`;
@@ -1491,16 +1491,16 @@ async function carregarSorteios() {
       const isMoeda   = rodadaAtiva.meta_tipo !== 'quantidade';
       const fmt       = v => isMoeda
         ? v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
-        : v.toLocaleString('pt-BR') + ' exemplares';
+        : v.toLocaleString('pt-BR') + ' ejemplares';
 
       document.getElementById('meta-progresso-bar').style.width = pct.toFixed(1) + '%';
       document.getElementById('meta-progresso-txt').textContent = `${fmt(metaAtual)} / ${fmt(metaTotal)} (${pct.toFixed(0)}%)`;
 
       const faltam = Math.max(0, metaTotal - metaAtual);
       if (faltam <= 0) {
-        document.getElementById('meta-faltam').textContent = 'Meta atingida — aguardando premiação';
+        document.getElementById('meta-faltam').textContent = 'Meta alcanzada — esperando el sorteo del premio';
       } else {
-        document.getElementById('meta-faltam').textContent = `Faltam ${fmt(faltam)} para a premiação`;
+        document.getElementById('meta-faltam').textContent = `Faltan ${fmt(faltam)} para el sorteo del premio`;
       }
     } else {
       wrap.style.display = 'none';
@@ -1520,8 +1520,8 @@ async function carregarSorteios() {
   if (draws.length === 0) {
     html += `<div class="vazio">
       <div class="vazio-icone">🎯</div>
-      <div class="vazio-titulo">Nenhuma premiação aberta</div>
-      <p class="vazio-texto">Nenhuma premiação em andamento no momento.<br>Fique de olho — novas premiações são anunciadas pelo e-mail.</p>
+      <div class="vazio-titulo">No hay sorteos abiertos</div>
+      <p class="vazio-texto">No hay ningún sorteo en curso en este momento.<br>Estate atento: los nuevos sorteos se anuncian por correo.</p>
     </div>`;
   } else {
     const partes = await Promise.all(draws.map(async (draw) => {
@@ -1539,21 +1539,21 @@ async function carregarSorteios() {
       const purchasesPendentes  = purchases.filter(p => !purchasesComEntry.has(p.id));
 
       return `<div class="sorteio-card">
-        <div class="sorteio-status">Premiação aberta</div>
-        <div class="sorteio-titulo">${draw.titulo || 'Premiação'}</div>
+        <div class="sorteio-status">Sorteo abierto</div>
+        <div class="sorteio-titulo">${draw.titulo || 'Sorteo'}</div>
         ${(draw.premio_1 || draw.premio_2) ? `<div class="sorteio-premios">
-          ${draw.premio_1 ? `1° — <strong>${draw.premio_1}</strong>` : ''}
-          ${draw.premio_2 ? `&nbsp;·&nbsp; 2° — ${draw.premio_2}` : ''}
+          ${draw.premio_1 ? `1.º — <strong>${draw.premio_1}</strong>` : ''}
+          ${draw.premio_2 ? `&nbsp;·&nbsp; 2.º — ${draw.premio_2}` : ''}
         </div>` : ''}
 
         <div class="cotas-grid">
           <div class="cota-item">
             <div class="cota-num">${totBase}</div>
-            <div class="cota-label">Cotas base</div>
+            <div class="cota-label">Números base</div>
           </div>
           <div class="cota-item">
             <div class="cota-num">${totBonus}</div>
-            <div class="cota-label">Cotas bônus</div>
+            <div class="cota-label">Números de bonificación</div>
           </div>
           <div class="cota-item">
             <div class="cota-num">${totBase + totBonus}</div>
@@ -1562,7 +1562,7 @@ async function carregarSorteios() {
         </div>
 
         ${qualif > 0 ? `<div class="entry-linha">
-          <span class="entry-chave">Participações qualificadas</span>
+          <span class="entry-chave">Participaciones calificadas</span>
           <span class="entry-val ok">✓ ${qualif} confirmada${qualif !== 1 ? 's' : ''}</span>
         </div>` : ''}
 
@@ -1572,24 +1572,24 @@ async function carregarSorteios() {
           const faltam     = 7 - dias;
           return `<div style="margin-top:16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--borda2)">
             <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:10px">
-              ${p.produto?.titulo || 'Produto'} · ${p.cotas || 0} cota${(p.cotas || 0) !== 1 ? 's' : ''}
+              ${p.produto?.titulo || 'Produto'} · ${p.cotas || 0} número${(p.cotas || 0) !== 1 ? 's' : ''}
             </div>
             ${!podeValid ? `<div style="font-size:12px;color:var(--ouro);margin-bottom:10px">
-              Disponível para validação em ${faltam} dia${faltam !== 1 ? 's' : ''}
+              Disponible para validar en ${faltam} día${faltam !== 1 ? 's' : ''}
             </div>` : ''}
             <button class="btn-validar" onclick="abrirFormDep('${draw.id}','${p.id}','${(p.produto?.titulo || '').replace(/'/g, "\\'")}')" ${!podeValid ? 'disabled' : ''}>
-              ${podeValid ? 'Validar participação →' : 'Aguardando período de leitura'}
+              ${podeValid ? 'Validar participación →' : 'Esperando el período de lectura'}
             </button>
             <div class="dep-form" id="dep-${p.id}">
               <label style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:8px">
-                Depoimento (mín. 20 palavras)
+                Testimonio (mín. 20 palabras)
               </label>
               <textarea class="dep-textarea" id="txt-${p.id}"
-                placeholder="O que você aprendeu ou sentiu lendo este livro? Mínimo 20 palavras."
+                placeholder="¿Qué aprendiste o qué sentiste al leer este libro? Mínimo 20 palabras."
                 oninput="contarPalavras('${p.id}')"></textarea>
-              <div class="contador-palavras" id="cnt-${p.id}">0 palavras</div>
+              <div class="contador-palavras" id="cnt-${p.id}">0 palabras</div>
               <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">
-                Redes sociais que segue (multiplica cotas)
+                Redes sociales que sigues (multiplica tus números)
               </div>
               <div class="redes-check" id="redes-${p.id}">
                 <button class="rede-btn" onclick="toggleRede(this,'${p.id}','whatsapp')">WhatsApp</button>
@@ -1598,7 +1598,7 @@ async function carregarSorteios() {
                 <button class="rede-btn" onclick="toggleRede(this,'${p.id}','tiktok')">TikTok</button>
                 <button class="rede-btn" onclick="toggleRede(this,'${p.id}','youtube')">YouTube</button>
               </div>
-              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participação</button>
+              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participación</button>
             </div>
           </div>`;
         }).join('')}
@@ -1612,7 +1612,7 @@ async function carregarSorteios() {
     html += `<div style="margin-top:32px">
       <div class="sec-titulo">Histórico de vencedores</div>
       <div class="vencedores-lista" id="vencedoresList">
-        <div class="loading-txt" style="padding:20px 0;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:2px">Carregando…</div>
+        <div class="loading-txt" style="padding:20px 0;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:2px">Cargando…</div>
       </div>
     </div>`;
   }
@@ -1631,7 +1631,7 @@ async function carregarSorteios() {
     const listEl = document.getElementById('vencedoresList');
     if (listEl) {
       if (!winners || winners.length === 0) {
-        listEl.innerHTML = '<div class="vazio-texto" style="padding:12px 0;font-size:13px">Nenhum vencedor registrado ainda.</div>';
+        listEl.innerHTML = '<div class="vazio-texto" style="padding:12px 0;font-size:13px">Todavía no hay ganadores registrados.</div>';
       } else {
         // Verificar se o usuário atual venceu algum desses
         const myWins = (winners || []).filter(w => w.user_id === usuarioAtual.id);
@@ -1639,12 +1639,12 @@ async function carregarSorteios() {
         // Destaque especial se venceu
         let destaque = '';
         if (myWins.length > 0) {
-          const pos = myWins[0].posicao === 1 ? '🥇 1º Lugar' : '🥈 2º Lugar';
+          const pos = myWins[0].posicao === 1 ? '🥇 1.er lugar' : '🥈 2.º lugar';
           destaque = `<div style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.4);padding:20px;margin-bottom:20px;position:relative">
             <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)"></div>
             <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-bottom:8px">${pos}</div>
-            <div style="font-family:'Lora',serif;font-size:22px;margin-bottom:4px">Você foi selecionado(a)!</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.5)">Parabéns! Verifique seu e-mail para instruções de resgate do prêmio.</div>
+            <div style="font-family:'Lora',serif;font-size:22px;margin-bottom:4px">¡Has sido seleccionado!</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">¡Felicidades! Revisa tu correo para ver las instrucciones para reclamar tu premio.</div>
           </div>`;
         }
 
@@ -1677,7 +1677,7 @@ function contarPalavras(pid) {
   const txt = (document.getElementById('txt-' + pid)?.value || '').trim();
   const n   = txt ? txt.split(/\s+/).filter(Boolean).length : 0;
   const el  = document.getElementById('cnt-' + pid);
-  if (el) el.textContent = n + ' palavra' + (n !== 1 ? 's' : '') + (n >= 20 ? ' ✓' : ' (mín. 20)');
+  if (el) el.textContent = n + ' palabra' + (n !== 1 ? 's' : '') + (n >= 20 ? ' ✓' : ' (mín. 20)');
 }
 
 const redesSelecionadas = {};
@@ -1691,7 +1691,7 @@ async function enviarValidacao(drawId, purchaseId) {
   const dep   = (document.getElementById('txt-' + purchaseId)?.value || '').trim();
   const words = dep ? dep.split(/\s+/).filter(Boolean).length : 0;
   if (words < 20) {
-    toast('O depoimento precisa ter pelo menos 20 palavras.', 'erro');
+    toast('Tu testimonio necesita al menos 20 palabras.', 'erro');
     return;
   }
 
@@ -1700,7 +1700,7 @@ async function enviarValidacao(drawId, purchaseId) {
     .map(([k]) => k.replace(purchaseId + '_', ''));
 
   const { data: { session } } = await sb.auth.getSession();
-  toast('Enviando validação…');
+  toast('Enviando…');
 
   try {
     const res = await fetch(`${EDGE_BASE}/validate-entry`, {
@@ -1714,10 +1714,10 @@ async function enviarValidacao(drawId, purchaseId) {
     const data = await res.json();
 
     if (!res.ok || data.error) {
-      toast(data.error || 'Erro ao validar participação.', 'erro');
+      toast(data.error || 'No pudimos validar tu participación.', 'erro');
       return;
     }
-    toast(`Participação confirmada! ${data.cotas_total} cotas (${data.multiplicador}×)`);
+    toast(`¡Participación confirmada! ${data.cotas_total} números (${data.multiplicador}×)`);
     abasCarregadas['sorteios'] = false;
     setTimeout(() => { abasCarregadas['sorteios'] = false; carregarSorteios(); }, 1200);
   } catch {
@@ -1796,14 +1796,14 @@ async function carregarExtrato() {
         <div class="resumo-val">R$\u00a0${totalPago.toFixed(2).replace('.', ',')}</div>
       </div>
       <div class="resumo-item">
-        <div class="resumo-label">Transações aprovadas</div>
+        <div class="resumo-label">Pagos aprobados</div>
         <div class="resumo-val">${payments.filter(p => p.status === 'approved').length}</div>
       </div>
     </div>` : ''}`;
 }
 
 async function cancelarPayment(paymentId, btn) {
-  if (!confirm('Cancelar esta compra pendente? A ação não pode ser desfeita.')) return;
+  if (!confirm('¿Cancelar esta compra pendiente? La acción no se puede deshacer.')) return;
   btn.textContent = '…';
   btn.disabled = true;
   const { error } = await sb.from('payments')
@@ -1811,7 +1811,7 @@ async function cancelarPayment(paymentId, btn) {
     .eq('id', paymentId)
     .eq('user_id', usuarioAtual.id)
     .eq('status', 'pending');
-  if (error) { btn.textContent = 'Erro'; return; }
+  if (error) { btn.textContent = 'Error'; return; }
   toast('Compra cancelada.', 'info');
   carregarExtrato();
 }
@@ -1823,8 +1823,8 @@ async function ocultarDaBiblioteca(libId, btn) {
     .update({ oculto: true })
     .eq('id', libId)
     .eq('user_id', usuarioAtual.id);
-  if (error) { btn.textContent = 'Erro'; return; }
-  toast('Removido da biblioteca.', 'info');
+  if (error) { btn.textContent = 'Error'; return; }
+  toast('Quitado de la biblioteca.', 'info');
   carregarBiblioteca();
 }
 
@@ -1848,12 +1848,12 @@ async function carregarAssinatura() {
       <div class="plano-nome">Sem assinatura ativa</div>
       <span class="plano-badge sem-plano">Gratuito</span>
       <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:24px">
-        Com a assinatura você acessa músicas autorais, lançamentos antecipados
-        e conteúdo exclusivo dos títulos.
+        Con la suscripción accedes a música original, estrenos anticipados
+        y contenido exclusivo de los títulos.
       </p>
       <div class="plano-beneficios">
-        <div class="beneficio-item"><strong>Músicas autorais</strong>Acesso ilimitado às faixas da editora</div>
-        <div class="beneficio-item"><strong>Lançamentos antecipados</strong>Acesso antes do público geral</div>
+        <div class="beneficio-item"><strong>Música original</strong>Acceso ilimitado a las pistas de la editorial</div>
+        <div class="beneficio-item"><strong>Estrenos anticipados</strong>Acceso antes que el público general</div>
         <div class="beneficio-item"><strong>Conteúdo exclusivo</strong>Material complementar dos títulos</div>
       </div>
       <a href="https://wa.me/5554999467085?text=Quero+saber+mais+sobre+a+assinatura+da+Editora+Tr%C3%AAs+Trevo"
@@ -1938,7 +1938,7 @@ function carregarPlanilhaViva() {
         <div class="plano-nome">Planilha Viva</div>
         <p style="font-size:14px;color:rgba(26,26,22,.6);line-height:1.8;margin-bottom:24px">
           Sistema Financeiro Doméstico — controle financeiro pessoal com diagnóstico adaptativo.<br>
-          Cole abaixo o código de acesso UUID que você recebeu.
+          Pega abajo el código de acceso (UUID) que recibiste.
         </p>
         <label class="campo-label" for="sfdttTokenInput">Código de acesso</label>
         <input id="sfdttTokenInput" class="campo-input" type="text"
@@ -1961,7 +1961,7 @@ function salvarTokenSFDTT() {
   if (!input) return;
   const token = input.value.trim();
   if (!token || token.length < 32) {
-    toast('Código inválido. Cole o UUID completo recebido por e-mail.', 'erro');
+    toast('Código no válido. Pega el UUID completo que recibiste por correo.', 'erro');
     return;
   }
   localStorage.setItem('tt_sfdtt_token', token);
