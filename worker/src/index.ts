@@ -40,6 +40,7 @@ import {
 import { handleAiStudio } from './routes/admin-ai-studio';
 import { handleNemaSaldo } from './routes/nema';
 import { handleAticoAcesso } from './routes/atico';
+import { handleClientePerfil } from './routes/perfil';
 import { handleLeitura, handleLeituraAudio } from './routes/leitura';
 import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha } from './routes/admin-auth';
 import { handleAdminForge } from './routes/admin-forge';
@@ -258,6 +259,9 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleNemaSaldo(request, env);
     }
 
+    if (path === '/api/cliente/perfil' && (method === 'GET' || method === 'POST')) {
+      return handleClientePerfil(request, env);
+    }
     if (path === '/api/atico/acesso' && method === 'GET') {
       return handleAticoAcesso(request, env);
     }

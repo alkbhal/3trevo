@@ -93,7 +93,7 @@ describe('POST /api/checkout/preferencia com Nema', () => {
     const pref = JSON.parse(String(mp.init!.body));
     expect(pref.items[0].unit_price).toBe(41.04);
     expect(pref.payer.email).toBe('dono@x.com');
-    expect(pref.metadata).toEqual({ comprador_email: 'dono@x.com', nema_reserva: REF, nema_quantidade: 10 });
+    expect(pref.metadata).toEqual({ comprador_email: 'dono@x.com', comprador_user_id: 'u1', nema_reserva: REF, nema_quantidade: 10 });
   });
 
   it('sem login não usa Nema', async () => {

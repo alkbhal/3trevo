@@ -70,11 +70,14 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   let desconto = 0;
   let nemaUsado = 0;
   let reservaRef: string | null = null;
-  if (body?.usar_nema === true) {
-    const user = await usuarioDoToken(request, env);
-    if (!user) return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
-    email = user.email; // o pagamento fica no nome de quem é dono do saldo
-    const reserva = await reservarNema(env, user.id, preco);
+  // Cliente logado: a compra fica na conta dele, independente do e-mail digitado no checkout.
+  const logado = await usuarioDoToken(request, env);
+  if (body?.usar_nema === true && !logado) {
+    return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
+  }
+  if (logado) email = logado.email;
+  if (body?.usar_nema === true && logado) {
+    const reserva = await reservarNema(env, logado.id, preco);
     if (reserva && reserva.quantidade > 0 && reserva.reserva_ref) {
       desconto = reserva.desconto;
       nemaUsado = reserva.quantidade;
@@ -84,7 +87,7 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
 
   // Conta do comprador nasce já no checkout, sem depender do pagamento. O id segue no metadata da
   // preferência e volta no webhook: quem pagou é identificado por ele, não pelo e-mail devolvido pelo MP.
-  const compradorId = await garantirContaComprador(env, String(email).trim().toLowerCase(), nome);
+  const compradorId = logado?.id ?? (await garantirContaComprador(env, String(email).trim().toLowerCase(), nome));
 
   // Criar preferência no MP
   const prefBody = {
