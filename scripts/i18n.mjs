@@ -35,6 +35,7 @@ const ler = (p) => readFileSync(join(ROOT, p), 'utf8');
 const lerJson = (p) => JSON.parse(ler(p));
 const config = lerJson('i18n/paginas.json'); // (config.json é ignorado pelo .gitignore)
 const PAGINAS = config.paginas;            // páginas que existem nos três idiomas
+const PAGINAS_LINK = [...config.paginas, ...(config.nativas || [])]; // páginas com versão em cada idioma (traduzidas ou nativas)
 const IDIOMAS = Object.keys(config.idiomas); // ['en', 'es']
 const dic = Object.fromEntries(['pt', ...IDIOMAS].map((l) => [l, lerJson(`i18n/${l}.json`)]));
 const basePath = 'i18n/base-pt.json';
@@ -161,7 +162,7 @@ function traduzir(html, pagina, lang) {
       return `${a}${local.startsWith('/') ? local : '/' + local}${resto}"`;
     }
     const pag = local === '/' || local === '' ? 'index.html' : local.replace(/^\//, '');
-    if (PAGINAS.includes(pag)) return `${a}${pre}/${pag === 'index.html' ? '' : pag}${resto}"`;
+    if (PAGINAS_LINK.includes(pag)) return `${a}${pre}/${pag === 'index.html' ? '' : pag}${resto}"`;
     erro(`${lang}/${pagina}: link para página só em português: ${url}`);
     return tudo;
   }).replace(/(\ssrc=")(?!\/|https?:|data:)([^"]+)"/g, '$1/$2"'));
@@ -271,6 +272,14 @@ for (const pagina of config.so_pt_com_textos || []) {
   if (!orig.includes('<script id="tt-textos">')) { erro(`${pagina}: falta <script id="tt-textos"></script> no <head>`); continue; }
   const novo = textosJs(orig, 'pt');
   if (novo !== orig) { mudou.push(pagina); if (!CHECK) writeFileSync(join(ROOT, pagina), novo); }
+}
+// Páginas nativas: escritas à mão em cada idioma; o gerador não as toca, só confere que não há português.
+for (const pagina of config.nativas || []) {
+  for (const lang of IDIOMAS) {
+    const destino = join(config.idiomas[lang].pasta, pagina);
+    if (!existsSync(join(ROOT, destino))) { erro(`${destino}: página nativa ausente`); continue; }
+    vazamentos(ler(destino), destino);
+  }
 }
 // Chaves de JS: todas as do PT precisam existir em EN/ES.
 for (const k of Object.keys(dic.pt).filter((k) => k.startsWith('js.') || k.startsWith('meta.'))) {

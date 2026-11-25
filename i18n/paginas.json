@@ -1,6 +1,7 @@
 {
-  "_doc": "Páginas que existem nos três idiomas. As demais existem só no site PT (catálogo, checkout, sorteio, obras em português). Ver scripts/i18n.mjs.",
-  "paginas": ["index.html", "gratis.html", "area-cliente.html", "nema.html", "privacidade.html"],
+  "_doc": "Páginas traduzidas pelo gerador (paginas) e páginas nativas, escritas à mão em cada idioma (nativas; só checagem de vazamento de português). As demais existem só no site PT (catálogo, checkout, sorteio, obras em português). Ver scripts/i18n.mjs.",
+  "paginas": ["index.html", "gratis.html", "nema.html", "privacidade.html"],
+  "nativas": ["area-cliente.html"],
   "so_pt_com_textos": ["catalogo.html", "checkout.html"],
   "idiomas": {
     "en": { "pasta": "en", "html_lang": "en" },

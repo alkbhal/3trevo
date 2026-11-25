@@ -827,6 +827,21 @@ nav{
       <div class="loading"><div class="loading-spinner"></div><span class="loading-txt" data-i18n="ac.carregando">Cargando</span></div>
     </div>
 
+    <!-- Cadastro opcional: pedido depois da compra. Nada aqui é obrigatório para acessar os ebooks. -->
+    <section id="cadastroOpcional" style="display:none;margin:0 0 24px;padding:20px;border:2px solid #1e5c3a;border-radius:8px;background:#fff;font-size:1rem;line-height:1.6;color:#1a1a1a">
+      <h2 style="margin:0 0 6px;font-size:1.25rem;color:#1e5c3a">Completa tu perfil (opcional)</h2>
+      <p style="margin:0 0 14px">Tu CPF (documento fiscal brasileño) y tu teléfono se usan para la factura y para avisarte de nuevas obras. Puedes omitir este paso cuando quieras.</p>
+      <form id="formCadastroOpcional" onsubmit="salvarCadastroOpcional(event)" style="display:grid;gap:12px">
+        <label>Nome completo<br><input name="nome" type="text" maxlength="120" style="width:100%;font-size:1rem;padding:8px"></label>
+        <label>CPF<br><input name="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" style="width:100%;font-size:1rem;padding:8px"></label>
+        <label>Telefone com DDD<br><input name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" style="width:100%;font-size:1rem;padding:8px"></label>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <button type="submit" style="font-size:1rem;padding:10px 18px;background:#1e5c3a;color:#fff;border:0;border-radius:6px;cursor:pointer">Salvar</button>
+          <span id="cadastroOpcionalMsg" role="status" style="font-size:1rem"></span>
+        </div>
+      </form>
+    </section>
+
     <!-- Biblioteca Clássica TT — exibido por carregarBiblioteca() só quando há ebook na conta -->
     
   </div>
@@ -987,6 +1002,7 @@ function mostrarDashboard() {
   document.getElementById('navRight').style.display = 'flex';
   document.getElementById('navEmail').textContent = usuarioAtual.email;
   carregarBiblioteca();
+  carregarCadastroOpcional();
   carregarStats();
 }
 
@@ -1081,6 +1097,50 @@ function animarNum(id, target) {
 // ══════════════════════════════════════════════════════════
 // BIBLIOTECA (EBOOKS)
 // ══════════════════════════════════════════════════════════
+// Cadastro opcional (nome, CPF, telefone): pedido depois da compra. Não bloqueia nada.
+async function carregarCadastroOpcional() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/cliente/perfil', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+    });
+    const d = await r.json();
+    if (!d.ok || (d.perfil && d.perfil.cpf)) return;
+    document.getElementById('cadastroOpcional').style.display = 'block';
+  } catch (e) { /* sem o cartão, a área segue normal */ }
+}
+
+async function salvarCadastroOpcional(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const msg = document.getElementById('cadastroOpcionalMsg');
+  const dados = {};
+  ['nome', 'cpf', 'telefone'].forEach(function (c) {
+    const v = form.elements[c].value.trim();
+    if (v) dados[c] = v;
+  });
+  if (Object.keys(dados).length === 0) { msg.textContent = 'Preencha ao menos um campo.'; return; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/cliente/perfil', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body: JSON.stringify(dados),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      msg.textContent = 'Cadastro salvo. Obrigado!';
+      if (dados.cpf) document.getElementById('cadastroOpcional').style.display = 'none';
+      return;
+    }
+    const motivos = { cpf_invalido: 'CPF inválido. Confira os números.', telefone_invalido: 'Telefone inválido.', nome_invalido: 'Nome inválido.' };
+    msg.textContent = motivos[d.erro] || 'Não foi possível salvar agora. Tente de novo em alguns minutos.';
+  } catch (e) {
+    msg.textContent = 'Erro de conexão. Tente de novo.';
+  }
+}
+
 async function carregarBiblioteca() {
   const cont = document.getElementById('listaEbooks');
   cont.innerHTML = skeletonCards(4);
