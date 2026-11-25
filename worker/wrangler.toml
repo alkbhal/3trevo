@@ -35,4 +35,4 @@ service = "tr3vo-forge"
 # - Toda hora: health monitor (checa componentes, detecta ataques, alerta via email)
 # Sorteio puro RNG: disparado manualmente via POST /api/admin/sorteio (sem data fixa)
 [triggers]
-crons = ["0 * * * *"]
+crons = ["0 * * * *", "*/5 * * * *"]

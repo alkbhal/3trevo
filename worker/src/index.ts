@@ -160,6 +160,11 @@ export default {
       ctx.waitUntil(handleCartRecovery(env));
       ctx.waitUntil(handleConciliacao(env));
     }
+    // Conciliação a cada 5 min enquanto o webhook do Mercado Pago não estiver confiável.
+    // Quando o problema estiver resolvido, remover este bloco e o cron "*/5 * * * *" do wrangler.toml.
+    if (event.cron === '*/5 * * * *') {
+      ctx.waitUntil(handleConciliacao(env));
+    }
   },
 };
 
