@@ -93,7 +93,12 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     }],
     payer: { email },
     external_reference: slug,
-    ...(reservaRef ? { metadata: { nema_reserva: reservaRef, nema_quantidade: nemaUsado } } : {}),
+    // O e-mail do comprador vai no metadata da preferência: o Mercado Pago devolve o pagador
+    // mascarado em pagamentos PIX (ex.: "XXXXXXXXXXX"), e sem e-mail válido não há conta nem entrega.
+    metadata: {
+      comprador_email: String(email).trim().toLowerCase(),
+      ...(reservaRef ? { nema_reserva: reservaRef, nema_quantidade: nemaUsado } : {}),
+    },
     notification_url: `${WORKER_URL}/api/webhook/pagamento`,
     back_urls: {
       success: `${SITE_URL}/area-cliente.html?status=success&slug=${slug}`,
@@ -192,16 +197,24 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
 // Idempotente: registrarCompraMp só marca 'novo' na primeira gravação, então reprocessar não duplica nada.
 export async function processarPagamentoAprovado(env: Env, mpPayment: any, mpPaymentId: string): Promise<Response> {
   const productSlug = mpPayment.external_reference ?? '';
-  const emailPagador = mpPayment.payer?.email ?? '';
+  // Prioridade: e-mail do checkout (metadata, gravado por nós) > e-mail do pagador no MP.
+  // O MP pode devolver o e-mail mascarado; só aceitamos um endereço com formato válido.
+  const emailPagador = emailValido(mpPayment.metadata?.comprador_email) ?? emailValido(mpPayment.payer?.email) ?? '';
   const nomePagador = mpPayment.payer?.first_name
     ? `${mpPayment.payer.first_name} ${mpPayment.payer.last_name ?? ''}`.trim()
     : emailPagador.split('@')[0];
   const valor = Number(mpPayment.transaction_amount ?? 0);
   const metodo = mpPayment.payment_type_id ?? 'unknown';
 
-  if (!emailPagador || !productSlug) {
-    console.error('[webhook] dados ausentes:', { emailPagador, productSlug });
+  if (!productSlug) {
+    console.error('[webhook] dados ausentes:', { mpPaymentId });
     return new Response('dados_ausentes', { status: 200 });
+  }
+  if (!emailPagador) {
+    // Pagamento aprovado sem nenhum e-mail utilizável: 5xx e auditoria, nunca um 200 silencioso.
+    console.error('[webhook] e-mail do comprador indisponível:', { mpPaymentId, productSlug });
+    await registrarAuditoria(env, 'webhook_usuario_indisponivel', { mpPaymentId, productSlug, motivo: 'sem_email_valido' });
+    return new Response('usuario_indisponivel', { status: 500 });
   }
 
   // Encontrar ou criar usuário em auth.users
@@ -464,6 +477,13 @@ function timingSafeEqualHex(a: string, b: string): boolean {
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
+}
+
+// Aceita só e-mail com formato básico válido (rejeita valores mascarados como "XXXXXXXXXXX").
+function emailValido(valor: unknown): string | null {
+  if (typeof valor !== 'string') return null;
+  const e = valor.trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) ? e : null;
 }
 
 // ─── Helpers: Supabase Auth ───────────────────────────────────────────────────
