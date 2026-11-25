@@ -16,6 +16,21 @@ import { processarPagamentoAprovado } from '../routes/checkout';
 
 const MP_API = 'https://api.mercadopago.com';
 
+// Slugs de todo o catálogo (inclusive inativos: vendas antigas também precisam ser conciliadas).
+async function slugsDoCatalogo(env: Env): Promise<Set<string> | null> {
+  try {
+    const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/catalogo?select=slug`, {
+      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` },
+    });
+    if (!resp.ok) { console.error('[conciliacao] catálogo indisponível:', resp.status); return null; }
+    const rows = (await resp.json()) as any[];
+    return new Set(rows.map(r => String(r.slug)));
+  } catch (e) {
+    console.error('[conciliacao] falha ao ler catálogo:', e);
+    return null;
+  }
+}
+
 export async function handleConciliacao(env: Env): Promise<void> {
   if (!env.MP_ACCESS_TOKEN) {
     console.error('[conciliacao] MP_ACCESS_TOKEN ausente — conciliação pulada');
@@ -48,8 +63,17 @@ export async function handleConciliacao(env: Env): Promise<void> {
     return;
   }
 
+  // Pagamentos de outras vitrines da mesma conta MP (referência que não é slug de catálogo) não são
+  // desta loja. Antes eram reprocessados a cada hora e geravam erro para sempre.
+  const slugs = await slugsDoCatalogo(env);
+  if (!slugs) return; // sem catálogo legível não dá para separar: não processa agora
+
   for (const p of pagamentos) {
     if (p?.status !== 'approved' || !p?.id) continue;
+    if (!slugs.has(String(p.external_reference ?? ''))) {
+      console.log('[conciliacao] pagamento de outra vitrine ignorado:', p.id);
+      continue;
+    }
     try {
       await processarPagamentoAprovado(env, p, String(p.id));
     } catch (e) {
