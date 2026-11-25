@@ -370,7 +370,9 @@ async function iniciarPagamento() {
   try {
     var headers = { 'Content-Type': 'application/json' };
     var usarNema = !!(document.getElementById('usarNema') && document.getElementById('usarNema').checked && nemaToken);
-    if (usarNema) headers['Authorization'] = 'Bearer ' + nemaToken;
+    // Cliente logado: o token vai sempre, e a compra fica na conta dele.
+    var tokenSessao = usarNema ? nemaToken : sessaoToken;
+    if (tokenSessao) headers['Authorization'] = 'Bearer ' + tokenSessao;
     var resp = await fetch(WORKER + '/api/checkout/preferencia', {
       method: 'POST',
       headers: headers,
@@ -404,12 +406,17 @@ async function iniciarPagamento() {
 // ── NEMA ──────────────────────────────────────────────────
 // Só para quem já está logado na área do cliente: mostra o saldo e o desconto possível.
 var nemaToken = null;
+var sessaoToken = null;
 async function carregarNemaCheckout() {
   try {
     if (!window.sb) return;
     var r = await window.sb.auth.getSession();
     var session = r && r.data && r.data.session;
     if (!session) return;
+    // Logado: a compra vai para esta conta; o e-mail é o da conta e não se altera aqui.
+    sessaoToken = session.access_token;
+    var emailEl = document.getElementById('emailInput');
+    if (emailEl) { emailEl.value = session.user.email; emailEl.readOnly = true; }
     var resp = await fetch(WORKER + '/api/nema/saldo', { headers: { 'Authorization': 'Bearer ' + session.access_token } });
     var d = await resp.json();
     if (!d.ok || Number(d.disponivel) <= 0) return;

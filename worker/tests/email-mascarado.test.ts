@@ -65,6 +65,40 @@ describe('e-mail mascarado pelo MP', () => {
   });
 });
 
+describe('conta criada no checkout', () => {
+  it('identifica o comprador pelo id do metadata, sem criar conta pelo e-mail', async () => {
+    const UID = '11111111-2222-3333-4444-555555555555';
+    const chamadas = simular((url, method) => {
+      if (url.includes('/rpc/registrar_compra_mp')) {
+        return new Response(JSON.stringify({ ok: true, novo: true, purchase_id: 'p1', download_token: 't' }));
+      }
+      return undefined;
+    });
+
+    const resp = await processarPagamentoAprovado(env, {
+      ...pagamentoMascarado,
+      metadata: { comprador_email: 'camila_dambros523@hotmail.com', comprador_user_id: UID },
+    }, '190344306558');
+
+    expect(resp.status).toBe(200);
+    expect(chamadas.some(c => c.url.includes('/auth/v1/admin/users') && c.method === 'POST')).toBe(false);
+    const rpc = chamadas.find(c => c.url.includes('/rpc/registrar_compra_mp'));
+    expect(JSON.parse(rpc!.body!).p_user_id).toBe(UID);
+  });
+
+  it('pagamento já vinculado não é reprocessado', async () => {
+    const chamadas = simular((url) => {
+      if (url.includes('/rest/v1/payments?id_externo')) return new Response(JSON.stringify([{ id: 'x' }]));
+      return undefined;
+    });
+
+    const resp = await processarPagamentoAprovado(env, pagamentoMascarado, '190344306558');
+
+    expect(resp.status).toBe(200);
+    expect(chamadas.some(c => c.url.includes('/rpc/registrar_compra_mp'))).toBe(false);
+  });
+});
+
 describe('conciliação: só processa pagamentos do catálogo', () => {
   it('ignora pagamento de outra vitrine e processa o nosso', async () => {
     const chamadas = simular((url, method) => {
