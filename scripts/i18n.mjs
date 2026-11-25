@@ -278,7 +278,12 @@ for (const pagina of config.nativas || []) {
   for (const lang of IDIOMAS) {
     const destino = join(config.idiomas[lang].pasta, pagina);
     if (!existsSync(join(ROOT, destino))) { erro(`${destino}: página nativa ausente`); continue; }
-    vazamentos(ler(destino), destino);
+    const html = ler(destino);
+    vazamentos(html, destino);
+    // palavras só do português (ambíguas em espanhol ficam de fora)
+    const visivel = html.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n'); // comentários de código não aparecem ao visitante
+    const achados = visivel.match(/\b(você|Você|não|Cole|Tente|possível|premiação|Premiação|cadastro|Obrigado|aguardando|Indisponível|Carregando|palavra|Participação)\b/g);
+    if (achados) erro(`${destino}: português em página nativa: ${[...new Set(achados)].join(', ')}`);
   }
 }
 // Chaves de JS: todas as do PT precisam existir em EN/ES.
