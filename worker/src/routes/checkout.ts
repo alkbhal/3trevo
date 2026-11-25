@@ -82,6 +82,10 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     }
   }
 
+  // Conta do comprador nasce já no checkout, sem depender do pagamento. O id segue no metadata da
+  // preferência e volta no webhook: quem pagou é identificado por ele, não pelo e-mail devolvido pelo MP.
+  const compradorId = await garantirContaComprador(env, String(email).trim().toLowerCase(), nome);
+
   // Criar preferência no MP
   const prefBody = {
     items: [{
@@ -97,6 +101,7 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     // mascarado em pagamentos PIX (ex.: "XXXXXXXXXXX"), e sem e-mail válido não há conta nem entrega.
     metadata: {
       comprador_email: String(email).trim().toLowerCase(),
+      ...(compradorId ? { comprador_user_id: compradorId } : {}),
       ...(reservaRef ? { nema_reserva: reservaRef, nema_quantidade: nemaUsado } : {}),
     },
     notification_url: `${WORKER_URL}/api/webhook/pagamento`,
@@ -206,6 +211,10 @@ export async function processarPagamentoAprovado(env: Env, mpPayment: any, mpPay
   const valor = Number(mpPayment.transaction_amount ?? 0);
   const metodo = mpPayment.payment_type_id ?? 'unknown';
 
+  if (await pagamentoJaVinculado(env, mpPaymentId)) {
+    return Response.json({ ok: true, ja_processado: true });
+  }
+
   if (!productSlug) {
     console.error('[webhook] dados ausentes:', { mpPaymentId });
     return new Response('dados_ausentes', { status: 200 });
@@ -217,8 +226,9 @@ export async function processarPagamentoAprovado(env: Env, mpPayment: any, mpPay
     return new Response('usuario_indisponivel', { status: 500 });
   }
 
-  // Encontrar ou criar usuário em auth.users
-  const userId = await buscarOuCriarUsuario(emailPagador, nomePagador, env);
+  // Quem pagou: a conta criada no checkout (metadata, id); sem ela, achamos/criamos pelo e-mail.
+  const compradorId = uuidValido(mpPayment.metadata?.comprador_user_id);
+  const userId = compradorId ?? (await buscarOuCriarUsuario(emailPagador, nomePagador, env));
   if (!userId) {
     // Sem comprador não há compra nem entrega. Não gravamos compra órfã: 5xx faz o MP reenviar
     // e a conciliação horária tenta de novo. A falha fica na auditoria, não some em silêncio.
@@ -484,6 +494,35 @@ function emailValido(valor: unknown): string | null {
   if (typeof valor !== 'string') return null;
   const e = valor.trim().toLowerCase();
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) ? e : null;
+}
+
+function uuidValido(valor: unknown): string | null {
+  return typeof valor === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(valor) ? valor : null;
+}
+
+// Conta do comprador criada no checkout. Falha aqui não bloqueia o pagamento: o webhook tenta de novo pelo e-mail.
+async function garantirContaComprador(env: Env, email: string, nome: string): Promise<string | null> {
+  try {
+    return await buscarOuCriarUsuario(email, nome, env);
+  } catch (e) {
+    console.error('[checkout] conta do comprador não criada:', e);
+    return null;
+  }
+}
+
+// Pagamento que já tem comprador gravado (reprocessamento da conciliação): não há o que refazer.
+async function pagamentoJaVinculado(env: Env, mpPaymentId: string): Promise<boolean> {
+  try {
+    const r = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/payments?id_externo=eq.${encodeURIComponent(mpPaymentId)}&user_id=not.is.null&select=id&limit=1`,
+      { headers: supabaseHeaders(env) }
+    );
+    if (!r.ok) return false;
+    const rows = (await r.json()) as any[];
+    return rows.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 // ─── Helpers: Supabase Auth ───────────────────────────────────────────────────
