@@ -4,7 +4,9 @@
  *
  * GET  /api/admin/producao/obras               — obras cadastradas em scripts/obras/obras.json
  * GET  /api/admin/producao/execucoes?slug=X    — últimas execuções dos dois workflows
- * POST /api/admin/producao/disparar            — { slug, etapa: compor|narrar, publicar, capitulos? }
+ * POST /api/admin/producao/disparar            — { slug, etapa: compor|narrar|ilustrar, publicar, capitulos?, fase?, itens? }
+ * GET  /api/admin/producao/ilustracoes?slug=X  — galeria para aprovar (admin-ilustracoes.ts)
+ * POST /api/admin/producao/ilustracoes/decidir — aprova ou rejeita uma imagem
  *
  * O token do GitHub (GH_PRODUCAO_TOKEN) fica só no worker. Ele deve ser fine-grained, restrito ao
  * tr3vo-forge, com Actions read/write e Contents read: o pior que vaza é disparar uma composição.
@@ -14,24 +16,29 @@
 import { z } from 'zod';
 import type { Env } from '../types';
 import { verificarToken } from './admin-catalog';
+import { handleIlustracoes } from './admin-ilustracoes';
 
 const REPO_PADRAO = 'alkbhal/tr3vo-forge';
 const PREFIXO = '/api/admin/producao/';
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
-// Etapa → arquivo do workflow. Lista fechada: só estes dois podem ser disparados daqui.
+// Etapa → arquivo do workflow. Lista fechada: só estes podem ser disparados daqui.
 export const WORKFLOWS = {
   compor: 'compor-obra.yml',
   narrar: 'narrar-obra.yml',
+  ilustrar: 'ilustrar-obra.yml',
 } as const;
 type Etapa = keyof typeof WORKFLOWS;
 
 const dispararSchema = z.object({
   slug: z.string().regex(SLUG).max(80),
-  etapa: z.enum(['compor', 'narrar']),
+  etapa: z.enum(['compor', 'narrar', 'ilustrar']),
   publicar: z.boolean().default(false),
   // Só o narrar aceita: "prefacio,cap1" (vazio = todos)
   capitulos: z.string().regex(/^[a-z0-9-]+(,[a-z0-9-]+)*$/).max(400).optional(),
+  // Só o ilustrar: "folhas" (plano + folhas de personagem) ou "cenas"; itens refaz só algumas cenas
+  fase: z.enum(['folhas', 'cenas']).optional(),
+  itens: z.string().regex(/^[a-z0-9-]+(,[a-z0-9-]+)*$/).max(800).optional(),
 });
 
 function json(data: unknown, status = 200): Response {
@@ -123,14 +130,16 @@ type Run = {
   html_url: string; created_at: string; updated_at: string; path: string;
 };
 
-// O título de cada execução é "Compor · <slug>[ · publicar]" (run-name nos workflows).
+// O título de cada execução é "Compor · <slug>[ · publicar]" ou "Ilustrar · <slug> · <fase>"
+// (run-name nos workflows).
 export function resumirExecucao(run: Run) {
   const etapa = (Object.keys(WORKFLOWS) as Etapa[]).find((e) => run.path.endsWith(WORKFLOWS[e])) ?? null;
-  const [, slug = null] = run.display_title.split(' · ');
+  const [, slug = null, extra = null] = run.display_title.split(' · ');
   return {
     id: run.id,
     etapa,
     slug,
+    fase: etapa === 'ilustrar' ? extra : null,
     publicar: run.display_title.endsWith(' · publicar'),
     titulo: run.display_title,
     status: run.status,          // queued | in_progress | completed
@@ -161,10 +170,16 @@ async function disparar(request: Request, env: Env): Promise<Response> {
   const bruto = await request.json().catch(() => null);
   const v = dispararSchema.safeParse(bruto);
   if (!v.success) return json({ ok: false, erro: 'corpo_invalido', detalhe: v.error.issues[0]?.message }, 400);
-  const { slug, etapa, publicar, capitulos } = v.data;
+  const { slug, etapa, publicar, capitulos, fase, itens } = v.data;
   if (capitulos && etapa !== 'narrar') return json({ ok: false, erro: 'capitulos_so_no_narrar' }, 400);
+  if ((fase || itens) && etapa !== 'ilustrar') return json({ ok: false, erro: 'fase_so_no_ilustrar' }, 400);
+  if (etapa === 'ilustrar' && (!fase || publicar)) return json({ ok: false, erro: 'ilustrar_precisa_de_fase' }, 400);
+  if (itens && fase !== 'cenas') return json({ ok: false, erro: 'itens_so_nas_cenas' }, 400);
 
-  const inputs: Record<string, string> = { slug, publicar: publicar ? 'PUBLICAR' : '' };
+  // Ilustrar não publica nada: o resultado vai para aprovação no admin.
+  const inputs: Record<string, string> = etapa === 'ilustrar'
+    ? { slug, etapa: fase!, itens: itens ?? '' }
+    : { slug, publicar: publicar ? 'PUBLICAR' : '' };
   if (etapa === 'narrar') inputs.capitulos = capitulos ?? '';
 
   const r = await github(env, `/actions/workflows/${WORKFLOWS[etapa]}/dispatches`, {
@@ -172,15 +187,17 @@ async function disparar(request: Request, env: Env): Promise<Response> {
     body: JSON.stringify({ ref: 'main', inputs }),
   });
   if (!r.ok) return erroGithub(r); // 204 (ou 200, quando o GitHub devolve detalhes da execução)
-  console.log(`[producao] disparado ${etapa} ${slug}${publicar ? ' (publicar)' : ''}`);
-  return json({ ok: true, etapa, slug, publicar }, 202);
+  console.log(`[producao] disparado ${etapa} ${slug}${fase ? ' ' + fase : ''}${publicar ? ' (publicar)' : ''}`);
+  return json({ ok: true, etapa, slug, publicar, fase: fase ?? null }, 202);
 }
 
 export async function handleAdminProducao(request: Request, env: Env, path: string): Promise<Response> {
   if (!(await verificarToken(request, env))) return json({ ok: false, erro: 'unauthorized' }, 401);
+  const acao = path.slice(PREFIXO.length);
+  // A galeria lê e grava no Storage do Supabase; não depende do token do GitHub.
+  if (acao === 'ilustracoes' || acao.startsWith('ilustracoes/')) return handleIlustracoes(request, env, acao);
   if (!env.GH_PRODUCAO_TOKEN) return json({ ok: false, erro: 'github_token_ausente' }, 503);
 
-  const acao = path.slice(PREFIXO.length);
   try {
     if (acao === 'obras' && request.method === 'GET') return await listarObras(env);
     if (acao === 'execucoes' && request.method === 'GET') {

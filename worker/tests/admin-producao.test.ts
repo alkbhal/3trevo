@@ -90,7 +90,9 @@ describe('produção: disparar workflows do tr3vo-forge', () => {
     mockFetch((url) => new Response(JSON.stringify({
       workflow_runs: url.includes('compor-obra')
         ? [run(), run({ id: 2, display_title: 'Compor · outra-obra' })]
-        : [run({ id: 3, display_title: 'Narrar · livre-das-dividas · publicar', path: '.github/workflows/narrar-obra.yml', created_at: '2026-11-26T11:00:00Z', status: 'in_progress', conclusion: null })],
+        : url.includes('narrar-obra')
+          ? [run({ id: 3, display_title: 'Narrar · livre-das-dividas · publicar', path: '.github/workflows/narrar-obra.yml', created_at: '2026-11-26T11:00:00Z', status: 'in_progress', conclusion: null })]
+          : [],
     })));
     const r = await chamar(req('GET', 'execucoes?slug=livre-das-dividas'));
     const { execucoes } = await r.json() as { execucoes: { id: number; etapa: string; publicar: boolean }[] };
@@ -167,5 +169,85 @@ describe('portão central do /api/admin/*', () => {
     const patch = f.mock.calls.find((c) => (c[1] as RequestInit | undefined)?.method === 'PATCH')!;
     expect(patch[0]).toContain('admin_sessoes?token_hash=eq.');
     expect(JSON.parse((patch[1] as RequestInit).body as string)).toEqual({ ativa: false });
+  });
+});
+
+describe('ilustração: disparo e galeria de aprovação', () => {
+  const SHA_A = 'a'.repeat(64), SHA_B = 'b'.repeat(64);
+  const manifest = { slug: 'obra', modelo_imagem: 'gemini-2.5-flash-image', imagens: [
+    { id: 'joana', tipo: 'folha', arquivo: 'joana.jpg', sha256: SHA_A },
+    { id: 'cap1-1', tipo: 'cena', arquivo: 'cap1-1.jpg', sha256: SHA_B, capitulo: 'cap1', cena: 'Joana na cozinha.', alt: 'Joana' },
+  ] };
+
+  // Storage simulado: guarda o que for gravado para conferir depois.
+  function mockStorage(inicial: Record<string, unknown>) {
+    const gravado: Record<string, any> = {};
+    const f = mockFetch((url, init) => {
+      if (url.includes('/storage/v1/object/sign/media')) {
+        const { paths } = JSON.parse(init!.body as string);
+        return new Response(JSON.stringify(paths.map((p: string) => ({ path: p, signedURL: `/object/sign/media/${p}?token=t` }))));
+      }
+      const m = url.match(/\/storage\/v1\/object\/media\/ilustracoes\/obra\/(.+)$/);
+      if (m && init?.method === 'POST') { gravado[m[1]] = JSON.parse(init.body as string); return new Response('{}'); }
+      if (m) return m[1] in inicial ? new Response(JSON.stringify(inicial[m[1]])) : new Response('{"error":"not_found"}', { status: 400 });
+      return new Response(null, { status: 204 });
+    });
+    return { f, gravado };
+  }
+
+  it('dispara ilustrar-obra.yml com a fase e os itens; ilustrar nunca publica', async () => {
+    const f = mockFetch(() => new Response(null, { status: 204 }));
+    expect((await chamar(req('POST', 'disparar', { slug: 'obra', etapa: 'ilustrar', fase: 'cenas', itens: 'cap1-1,cap2-1' }))).status).toBe(202);
+    const [url, init] = chamadasGithub(f)[0] as [string, RequestInit];
+    expect(url).toContain('/ilustrar-obra.yml/dispatches');
+    expect(JSON.parse(init.body as string).inputs).toEqual({ slug: 'obra', etapa: 'cenas', itens: 'cap1-1,cap2-1' });
+    for (const corpo of [
+      { slug: 'obra', etapa: 'ilustrar' },                                  // sem fase
+      { slug: 'obra', etapa: 'ilustrar', fase: 'folhas', publicar: true },  // ilustrar não publica
+      { slug: 'obra', etapa: 'ilustrar', fase: 'folhas', itens: 'cap1-1' }, // itens só nas cenas
+      { slug: 'obra', etapa: 'compor', fase: 'cenas' },
+    ]) expect((await chamar(req('POST', 'disparar', corpo))).status).toBe(400);
+  });
+
+  it('galeria: links assinados e decisão só vale para o mesmo sha256', async () => {
+    mockStorage({
+      'manifest-ilustracao.json': manifest,
+      'aprovacao.json': { decisoes: {
+        'folha:joana': { decisao: 'aprovada', sha256: SHA_A, quando: 'x' },
+        'cena:cap1-1': { decisao: 'aprovada', sha256: 'c'.repeat(64), quando: 'x' }, // versão antiga
+      } },
+    });
+    const r = await chamar(req('GET', 'ilustracoes?slug=obra'), { ...env, GH_PRODUCAO_TOKEN: undefined });
+    const d = await r.json() as any;
+    expect(r.status).toBe(200);
+    expect(d.imagens.map((i: any) => [i.id, i.decisao])).toEqual([['joana', 'aprovada'], ['cap1-1', 'pendente']]);
+    expect(d.imagens[0].url).toBe('https://sb.test/storage/v1/object/sign/media/ilustracoes/obra/folhas/joana.jpg?token=t');
+    expect(d.imagens[1].url).toContain('/cenas/cap1-1.jpg');
+  });
+
+  it('obra sem ilustrações ainda: galeria vazia, sem erro', async () => {
+    mockStorage({});
+    const d = await (await chamar(req('GET', 'ilustracoes?slug=obra'))).json() as any;
+    expect(d).toMatchObject({ ok: true, imagens: [], plano: null });
+  });
+
+  it('decidir grava aprovacao.json com o sha256 e a nota', async () => {
+    const { gravado } = mockStorage({ 'manifest-ilustracao.json': manifest });
+    const r = await chamar(req('POST', 'ilustracoes/decidir', { slug: 'obra', tipo: 'cena', id: 'cap1-1', sha256: SHA_B, decisao: 'rejeitada', nota: 'mão com seis dedos' }));
+    expect(r.status).toBe(200);
+    expect(gravado['aprovacao.json'].decisoes['cena:cap1-1']).toMatchObject({ decisao: 'rejeitada', sha256: SHA_B, nota: 'mão com seis dedos' });
+  });
+
+  it('decidir sobre imagem já refeita (outro sha) ou inexistente é recusado', async () => {
+    const { gravado } = mockStorage({ 'manifest-ilustracao.json': manifest });
+    expect((await chamar(req('POST', 'ilustracoes/decidir', { slug: 'obra', tipo: 'cena', id: 'cap1-1', sha256: SHA_A, decisao: 'aprovada' }))).status).toBe(409);
+    expect((await chamar(req('POST', 'ilustracoes/decidir', { slug: 'obra', tipo: 'cena', id: 'cap9-1', sha256: SHA_A, decisao: 'aprovada' }))).status).toBe(404);
+    expect((await chamar(req('POST', 'ilustracoes/decidir', { slug: '../x', tipo: 'cena', id: 'cap1-1', sha256: SHA_A, decisao: 'aprovada' }))).status).toBe(400);
+    expect(gravado).toEqual({});
+  });
+
+  it('execução do ilustrar mostra a fase', () => {
+    const e = resumirExecucao(run({ display_title: 'Ilustrar · obra · folhas', path: '.github/workflows/ilustrar-obra.yml' }) as any);
+    expect(e).toMatchObject({ etapa: 'ilustrar', slug: 'obra', fase: 'folhas', publicar: false });
   });
 });

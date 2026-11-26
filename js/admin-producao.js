@@ -11,8 +11,11 @@ const PROD_ERROS = {
   github_entrada_recusada: 'O GitHub recusou a entrada (o workflow pode estar desatualizado).',
   github_indisponivel: 'O GitHub não respondeu. Tente de novo em instantes.',
   corpo_invalido: 'Dados inválidos.',
+  storage_indisponivel: 'O depósito de arquivos (Supabase) não respondeu. Tente de novo.',
+  imagem_nao_encontrada: 'Essa imagem não está mais na galeria; recarregue.',
+  imagem_mudou: 'A imagem foi refeita; recarregue a galeria.',
 };
-const PROD_ETAPAS = { compor: 'Compor EPUB + PDF', narrar: 'Narrar audiobook' };
+const PROD_ETAPAS = { compor: 'Compor EPUB + PDF', narrar: 'Narrar audiobook', ilustrar: 'Ilustrar' };
 const PROD_AUTO_MS = 15000;
 let prodTimer = null;
 let prodArmado = null; // { chave, ate } — publicar exige um segundo clique em até 6 s
@@ -52,6 +55,7 @@ async function producaoAbrir() {
 
 function producaoTrocarObra() {
   prodMostrarPerfil(prodObras.find((o) => o.slug === prodSlug()));
+  producaoGaleria();
   producaoListar();
 }
 
@@ -137,7 +141,7 @@ async function producaoListar(silencioso = false) {
       const link = prodLink(e.url);
       return `<tr>
         <td>${escapeHtml(PROD_ETAPAS[e.etapa] || e.etapa)}</td>
-        <td>${e.publicar ? '<strong>Publicar na loja</strong>' : 'Só conferir'}</td>
+        <td>${e.etapa === 'ilustrar' ? (e.fase === 'cenas' ? 'Cenas' : 'Plano e folhas') : e.publicar ? '<strong>Publicar na loja</strong>' : 'Só conferir'}</td>
         <td>${prodBadge(e)}</td>
         <td>${prodData(e.criado)}</td>
         <td>${link ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="font-size:12px;padding:4px 10px;">Ver no GitHub</a>` : ''}</td>
@@ -175,6 +179,102 @@ async function producaoDisparar(etapa, publicar, btn) {
     toast(`${PROD_ETAPAS[etapa]}: enviado ao GitHub${publicar ? ' (publicar)' : ''}.`, 'ok');
     // O GitHub leva alguns segundos para listar a execução nova.
     setTimeout(() => producaoListar(true), 4000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Ilustração (Nano Banana) e galeria de aprovação ──────────────────────────
+// O "Ilustrar obra" gera; aqui o dono aprova ou rejeita cada imagem. Só cena aprovada entra no
+// livro, e só folha aprovada serve de referência para as cenas.
+let prodGaleria = [];
+
+// Só links assinados do Storage do Supabase viram <img>.
+function prodUrlImagem(u) {
+  try {
+    const p = new URL(u);
+    return p.protocol === 'https:' && p.hostname.endsWith('.supabase.co') && p.pathname.startsWith('/storage/v1/object/sign/media/') ? u : null;
+  } catch { return null; }
+}
+
+async function producaoIlustrar(fase, btn, soRejeitadas = false) {
+  const slug = prodSlug();
+  if (!slug) { toast('Escolha a obra.', 'err'); return; }
+  const corpo = { slug, etapa: 'ilustrar', fase };
+  if (soRejeitadas) {
+    const ids = prodGaleria.filter((i) => i.tipo === 'cena' && i.decisao === 'rejeitada').map((i) => i.id);
+    if (!ids.length) { toast('Nenhuma cena rejeitada para refazer.', 'err'); return; }
+    corpo.itens = ids.join(',');
+  }
+  btn.disabled = true;
+  try {
+    const res = await prodApi('disparar', 'POST', corpo);
+    if (!res.ok) { toast(prodErro(res), 'err'); return; }
+    toast(fase === 'folhas' ? 'Plano e folhas de personagem: enviado ao GitHub.' : `Cenas${corpo.itens ? ' rejeitadas' : ''}: enviado ao GitHub.`, 'ok');
+    setTimeout(() => producaoListar(true), 4000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function producaoGaleria() {
+  const el = prodEl('prod-galeria');
+  const slug = prodSlug();
+  if (!el || !slug) return;
+  el.textContent = 'Carregando…';
+  const res = await prodApi('ilustracoes?slug=' + encodeURIComponent(slug));
+  if (!res.ok) { el.textContent = prodErro(res); return; }
+  prodGaleria = res.dados.imagens;
+  const plano = res.dados.plano;
+  const n = (d) => prodGaleria.filter((i) => i.decisao === d).length;
+  prodEl('prod-ilus-resumo').textContent =
+    (plano ? `Plano: ${plano.cenas} cenas · custo estimado ~US$ ${plano.custo_estimado_usd}. ` : 'Sem plano ainda. ')
+    + (prodGaleria.length ? `${n('aprovada')} aprovadas · ${n('rejeitada')} rejeitadas · ${n('pendente')} pendentes.` : '');
+  if (!prodGaleria.length) { el.textContent = 'Nenhuma imagem gerada ainda.'; return; }
+  const grupo = (tipo, titulo) => {
+    const itens = prodGaleria.filter((i) => i.tipo === tipo);
+    if (!itens.length) return '';
+    return `<div style="font-weight:600;margin:12px 0 8px;">${titulo}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">${itens.map(prodCartao).join('')}</div>`;
+  };
+  el.innerHTML = grupo('folha', 'Folhas de personagem (aprove antes de gerar as cenas)') + grupo('cena', 'Cenas');
+}
+
+// Botões usam data-* (não interpolam texto em onclick): id e sha vêm do Storage.
+function prodCartao(i) {
+  const url = prodUrlImagem(i.url);
+  const badge = { aprovada: 'badge-ok', rejeitada: 'badge-perigo', pendente: 'badge-warn' }[i.decisao] || 'badge-cinza';
+  const dados = `data-tipo="${escapeHtml(i.tipo)}" data-id="${escapeHtml(i.id)}" data-sha="${escapeHtml(i.sha256)}"`;
+  return `<div class="card" style="padding:10px;margin:0;" ${dados}>
+    ${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(url)}" alt="${escapeHtml(i.alt || i.id)}" style="width:100%;border-radius:4px;display:block;"></a>` : '<div class="field-sub">Imagem indisponível</div>'}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 4px;">
+      <strong style="font-size:12px;">${escapeHtml(i.id)}</strong><span class="badge ${badge}">${escapeHtml(i.decisao)}</span>
+    </div>
+    ${i.cena ? `<div class="field-sub" style="margin-bottom:6px;">${escapeHtml(i.cena)}</div>` : ''}
+    ${i.nota ? `<div class="field-sub" style="margin-bottom:6px;">Nota: ${escapeHtml(i.nota)}</div>` : ''}
+    <input type="text" class="input prod-nota" maxlength="500" aria-label="Nota sobre ${escapeHtml(i.id)}" placeholder="Nota (opcional, ex.: mão com seis dedos)" style="font-size:12px;margin-bottom:6px;">
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-p" style="font-size:12px;padding:4px 10px;" onclick="producaoDecidir(this, 'aprovada')">Aprovar</button>
+      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="producaoDecidir(this, 'rejeitada')">Rejeitar</button>
+    </div>
+  </div>`;
+}
+
+async function producaoDecidir(btn, decisao) {
+  const cartao = btn.closest('[data-id]');
+  const { tipo, id, sha } = cartao.dataset;
+  const nota = cartao.querySelector('.prod-nota').value.trim();
+  btn.disabled = true;
+  try {
+    const corpo = { slug: prodSlug(), tipo, id, sha256: sha, decisao };
+    if (nota) corpo.nota = nota;
+    const res = await prodApi('ilustracoes/decidir', 'POST', corpo);
+    if (!res.ok) {
+      toast(res.dados && res.dados.erro === 'imagem_mudou' ? 'A imagem foi refeita; recarregando a galeria.' : prodErro(res), 'err');
+    } else {
+      toast(`${id}: ${decisao}.`, 'ok');
+    }
+    producaoGaleria();
   } finally {
     btn.disabled = false;
   }
