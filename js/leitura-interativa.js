@@ -16,6 +16,9 @@ const salvar = () => gravar(KEY, S);
 let LIVRO = { indice: [], capitulos: {} }, ACESSO = 'amostra';
 const AUDIO_BASE = '/assets/audio/' + SLUG + '/';
 let AUDIO = {}; // capítulo → faixa narrada (só os que têm áudio publicado)
+let AUDIOBOOK = null; // livro inteiro em M4B, só para quem comprou (link assinado por 1 hora)
+// Só link assinado do depósito do Supabase vira botão de download.
+const linkDoDeposito = (u) => { try { const p = new URL(u); return p.protocol === 'https:' && p.hostname.endsWith('.supabase.co') && p.pathname.startsWith('/storage/v1/object/sign/media/audiobooks/'); } catch { return false; } };
 
 // ─── Markdown seguro (escapa antes de formatar) ──────────────────────────────
 const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -153,6 +156,8 @@ function menu() {
   $('#sheetBody').innerHTML = `<h2>Sumário</h2><ul class="sum">${LIVRO.indice.map((i) => `<li><button data-ir="${i.id}" class="${i.id === S.cap ? 'atual' : ''}">${S.lidos[i.id] ? '✓ ' : ''}${esc(i.titulo)}${LIVRO.capitulos[i.id] ? '' : ' 🔒'}</button></li>`).join('')}</ul>
     <h2>Conquistas · ${Object.keys(S.conquistas).length} de ${CONQUISTAS.length}</h2><ul class="conq">${CONQUISTAS.map((c) => `<li class="${S.conquistas[c.id] ? 'ok' : ''}"><b>${esc(c.nome)}</b><span>${esc(c.desc)}</span></li>`).join('')}</ul>
     <p class="note">Pontos de leitura (PL) medem o seu progresso neste aparelho. Não são dinheiro, desconto nem Nema.</p>
+    ${AUDIOBOOK ? `<h2>Audiobook</h2><p><a class="primary" href="${esc(AUDIOBOOK.url)}" download rel="noopener">Baixar o audiobook (M4B)</a></p>
+    <p class="note">Livro inteiro em um arquivo, com capítulos${AUDIOBOOK.minutos ? ` · ${Math.round(AUDIOBOOK.minutos)} min` : ''}${AUDIOBOOK.bytes ? ` · ${Math.round(AUDIOBOOK.bytes / 1048576)} MB` : ''}. Abre em apps de audiobook e no VLC. Narração por voz sintética. O link vale por 1 hora: se expirar, abra este menu de novo.</p>` : ''}
     <p><a class="primary" href="/atico/app.html">Abrir o Ático com os meus números</a></p>
     <button class="ghost" id="zerar">Recomeçar do zero</button>`;
   $('#sheet').hidden = false;
@@ -184,6 +189,7 @@ async function carregar() {
       const ra = await fetch(`${API}/api/leitura/${SLUG}/audio`, { headers: { Authorization: 'Bearer ' + session.access_token } });
       const da = ra.ok ? await ra.json() : null;
       if (da && Array.isArray(da.faixas)) da.faixas.forEach((f) => (AUDIO[f.id] = Object.assign({ segundos: f.segundos }, f)));
+      if (da && da.audiobook && linkDoDeposito(da.audiobook.url)) AUDIOBOOK = da.audiobook;
     } catch { /* sem áudio agora */ }
     abrir(S.cap, false);
   } catch { ACESSO = 'erro'; }
