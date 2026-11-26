@@ -48,6 +48,9 @@ const ROTAS: Record<string, Rota> = {
   'GET projetos': { metodo: 'GET', destino: () => '/projects?limit=50', id: false },
   'GET formatos': { metodo: 'GET', destino: () => '/formatos', id: false },
   'GET status': { metodo: 'GET', destino: (id) => `/status/${id}`, id: true },
+  // Resumo para a tela "Revisar Forge" (status simplificado + título/autor do brief).
+  'GET resumo': { metodo: 'GET', destino: (id) => `/project/${id}/status`, id: true },
+  'GET marketing': { metodo: 'GET', destino: (id) => `/project/${id}/marketing`, id: true },
   'GET custos': { metodo: 'GET', destino: (id) => `/costs/${id}`, id: true },
   'POST ingerir': { metodo: 'POST', destino: () => '/ingest', id: false, corpo: ingerirSchema },
   'POST novo': { metodo: 'POST', destino: () => '/', id: false, corpo: novoSchema },
