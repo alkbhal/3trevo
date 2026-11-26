@@ -1557,6 +1557,11 @@ async function deletarLivro() {
 }
 
 // ── REVISAR FORGE ─────────────────────────────────────────────────────────────
+function urlDoForge(u) {
+  try { const p = new URL(u); return p.protocol === 'https:' && p.origin === new URL(FORGE_URL).origin; }
+  catch { return false; }
+}
+
 function slugify(s) {
   return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -1573,7 +1578,8 @@ async function carregarForgeProjeto() {
   document.getElementById('forge-decisao-status').textContent = '';
 
   try {
-    const r = await fetch(`${FORGE_URL}/project/${id}/status`);
+    // Pela ponte autenticada do worker: o navegador nunca chama o Forge direto.
+    const r = await api(`/api/admin/forge/resumo/${id}`);
     const d = await r.json();
     if (!r.ok) { document.getElementById('forge-status-body').textContent = d.error || 'Projeto não encontrado.'; return; }
 
@@ -1591,9 +1597,9 @@ async function carregarForgeProjeto() {
     const links = await rLinks.json();
     if (!links.ok) toast('Links do forge indisponíveis: ' + (links.erro || rLinks.status), 'err');
     forgeLinks = links.ok ? links : {};
-    document.getElementById('forge-link-html').href = links.html || '#';
-    document.getElementById('forge-link-epub').href = links.epub || '#';
-    document.getElementById('forge-link-pdf').href = links.pdf || '#';
+    document.getElementById('forge-link-html').href = urlDoForge(links.html) ? links.html : '#';
+    document.getElementById('forge-link-epub').href = urlDoForge(links.epub) ? links.epub : '#';
+    document.getElementById('forge-link-pdf').href = urlDoForge(links.pdf) ? links.pdf : '#';
     // Título e autor do brief do forge — o autor é o que está gravado no EPUB/PDF.
     if (d.titulo) document.getElementById('forge-titulo').value = d.titulo;
     document.getElementById('forge-autor').value = d.autor || '';
@@ -1607,9 +1613,10 @@ async function carregarForgeMarketing(id) {
   const el = document.getElementById('forge-marketing-list');
   el.textContent = 'Carregando…';
   try {
-    const r = await fetch(`${FORGE_URL}/project/${id}/marketing`);
+    const r = await api(`/api/admin/forge/marketing/${id}`);
     const d = await r.json();
-    forgeMarketingFiles = Array.isArray(d.files) ? d.files : [];
+    // Só aceita links https do próprio Forge: um href vindo de fora nunca vira javascript: no admin.
+    forgeMarketingFiles = (Array.isArray(d.files) ? d.files : []).filter(f => urlDoForge(f && f.url));
     if (!forgeMarketingFiles.length) { el.textContent = 'Nenhum arquivo de marketing encontrado.'; return; }
     const porLang = {};
     forgeMarketingFiles.forEach(f => { (porLang[f.lang] ||= []).push(f); });
@@ -1617,7 +1624,7 @@ async function carregarForgeMarketing(id) {
       <div style="margin-bottom:10px;">
         <div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:4px;">${escapeHtml(lang)}</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${files.map(f => `<a href="${f.url}" target="_blank" class="btn-ghost" style="font-size:12px;padding:4px 10px;">${escapeHtml(f.name)}</a>`).join('')}
+          ${files.map(f => `<a href="${escapeHtml(f.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="font-size:12px;padding:4px 10px;">${escapeHtml(f.name)}</a>`).join('')}
         </div>
       </div>`).join('');
   } catch(e) { el.textContent = 'Erro ao carregar marketing: ' + e.message; }
