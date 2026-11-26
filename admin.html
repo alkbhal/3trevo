@@ -683,6 +683,21 @@
           </div>
         </div>
 
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hdr">
+            <span class="card-titulo">Ilustrações (Nano Banana)</span>
+            <button class="btn-ghost" onclick="producaoGaleria()">Atualizar</button>
+          </div>
+          <div class="field-sub" style="margin-bottom:10px;">A quantidade vem do perfil da obra. Ordem: 1) planejar e gerar as folhas de personagem; 2) aprovar as folhas; 3) gerar as cenas; 4) aprovar as cenas. Só cena aprovada entra no livro.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <button class="btn btn-s" onclick="producaoIlustrar('folhas', this)">1. Planejar e gerar folhas</button>
+            <button class="btn btn-s" onclick="producaoIlustrar('cenas', this)">3. Gerar cenas</button>
+            <button class="btn-ghost" onclick="producaoIlustrar('cenas', this, true)">Refazer cenas rejeitadas</button>
+          </div>
+          <div id="prod-ilus-resumo" class="field-sub" style="margin-bottom:8px;"></div>
+          <div id="prod-galeria" style="font-size:13px;"></div>
+        </div>
+
         <div class="card">
           <div class="card-hdr">
             <span class="card-titulo">Execuções desta obra</span>
@@ -2669,6 +2684,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
 }
 </script>
 <script src="js/admin-forge.js?v=5130e8d8"></script>
-<script src="js/admin-producao.js?v=6ed87659"></script>
+<script src="js/admin-producao.js?v=f0deb994"></script>
 </body>
 </html>
