@@ -656,7 +656,10 @@
             <select id="prod-obra" class="input" onchange="producaoTrocarObra()"></select>
           </div>
           <div style="margin-bottom:16px;">
-            <div style="font-weight:600;margin-bottom:6px;">Perfil de produção</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+              <span style="font-weight:600;">Classificação e perfil de produção</span>
+              <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="producaoDisparar('classificar', false, this)">Classificar obra (abre PR)</button>
+            </div>
             <div id="prod-perfil" style="font-size:13px;"></div>
           </div>
 
@@ -2684,6 +2687,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
 }
 </script>
 <script src="js/admin-forge.js?v=5130e8d8"></script>
-<script src="js/admin-producao.js?v=f0deb994"></script>
+<script src="js/admin-producao.js?v=2c1d5104"></script>
 </body>
 </html>

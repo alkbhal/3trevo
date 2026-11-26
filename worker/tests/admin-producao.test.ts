@@ -108,8 +108,43 @@ describe('produção: disparar workflows do tr3vo-forge', () => {
     const r = await chamar(req('GET', 'obras'));
     expect(await r.json()).toEqual({ ok: true, obras: [{
       slug: 'livre-das-dividas', titulo: 'Livre das Dívidas', autor: 'Said Anes', edicao: '2026-11',
-      tipo: 'manual', perfil: manual, ajustes: { impressao: { trim: '5.5x8.5' } },
+      tipo: 'manual', classificacao: null, perfil: manual, ajustes: { impressao: { trim: '5.5x8.5' } },
     }] });
+  });
+
+  it('obras: o tipo vem da classificação oficial (forma e, quando pede, registro)', async () => {
+    const tax = {
+      formas: {
+        'narrativa-infantojuvenil': { rotulo: 'Narrativa infantojuvenil em capítulos', perfil: 'infantojuvenil' },
+        romance: { rotulo: 'Romance', perfil_por_registro: { descritivo: 'ficcao-descritiva', leve: 'ficcao-leve' } },
+      },
+      niveis_leitor: { 'leitor-iniciante': { rotulo: 'Leitor iniciante (6 e 7 anos)' } },
+    };
+    const infantojuvenil = { rotulo: 'Narrativa infantojuvenil em capítulos' };
+    mockFetch((url) => new Response(JSON.stringify(
+      url.includes('perfis.json') ? { tipos: { infantojuvenil, 'ficcao-leve': { rotulo: 'Ficção leve' } } }
+      : url.includes('classificacao.json') ? tax
+      : {
+        'isa-isma-tintim': { classificacao: { forma: 'narrativa-infantojuvenil', nivel_leitor: 'leitor-iniciante', cdd: '028.5', thema: ['YFN'], bisac: ['JUV013000'] }, ficha: { titulo: 'Isa, Isma e Tintim' } },
+        'romance-sem-registro': { classificacao: { forma: 'romance', nivel_leitor: 'adulto' }, ficha: { titulo: 'R' } },
+        'nao-classificada': { ficha: { titulo: 'N' } },
+      })));
+    const { obras } = await (await chamar(req('GET', 'obras'))).json() as any;
+    expect(obras[0]).toMatchObject({
+      tipo: 'infantojuvenil', perfil: infantojuvenil,
+      classificacao: { forma_rotulo: 'Narrativa infantojuvenil em capítulos', nivel_rotulo: 'Leitor iniciante (6 e 7 anos)', cdd: '028.5', thema: ['YFN'] },
+    });
+    expect(obras[1]).toMatchObject({ tipo: null, perfil: null });       // romance sem registro: P0 do Forge reprova
+    expect(obras[2]).toMatchObject({ tipo: null, classificacao: null }); // aguardando "Classificar obra"
+  });
+
+  it('classificar: dispara classificar-obra.yml só com o slug; não publica', async () => {
+    const f = mockFetch(() => new Response(null, { status: 204 }));
+    expect((await chamar(req('POST', 'disparar', { slug: 'isa-isma-tintim', etapa: 'classificar' }))).status).toBe(202);
+    const [url, init] = chamadasGithub(f)[0] as [string, RequestInit];
+    expect(url).toContain('/classificar-obra.yml/dispatches');
+    expect(JSON.parse(init.body as string).inputs).toEqual({ slug: 'isa-isma-tintim' });
+    expect((await chamar(req('POST', 'disparar', { slug: 'x', etapa: 'classificar', publicar: true }))).status).toBe(400);
   });
 
   it('obras: sem perfis.json no repositório, a lista continua e o perfil fica vazio', async () => {
