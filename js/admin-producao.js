@@ -15,7 +15,7 @@ const PROD_ERROS = {
   imagem_nao_encontrada: 'Essa imagem não está mais na galeria; recarregue.',
   imagem_mudou: 'A imagem foi refeita; recarregue a galeria.',
 };
-const PROD_ETAPAS = { compor: 'Compor EPUB + PDF', narrar: 'Narrar audiobook', ilustrar: 'Ilustrar' };
+const PROD_ETAPAS = { compor: 'Compor EPUB + PDF', narrar: 'Narrar audiobook', ilustrar: 'Ilustrar', classificar: 'Classificar obra' };
 const PROD_AUTO_MS = 15000;
 let prodTimer = null;
 let prodArmado = null; // { chave, ate } — publicar exige um segundo clique em até 6 s
@@ -65,7 +65,7 @@ const PROD_ROTULOS = {
   'so-capa': 'Só a capa', 'vinheta': 'Vinhetas', 'cena-por-capitulo': 'Cenas por capítulo',
   'por-pagina': 'Uma por página dupla', 'diagrama': 'Diagramas',
   'refluivel': 'texto ajustável', 'pre-paginado': 'página fixa (dupla)',
-  'branco': 'papel branco', 'creme': 'papel creme', 'pb': 'preto e branco', 'colorido': 'colorido',
+  'branco': 'papel branco', 'creme': 'papel creme', 'couche-150': 'couché 150 g', 'pb': 'preto e branco', 'colorido': 'colorido',
   'unica': 'uma voz', 'narrador+personagens': 'narrador e personagens',
   'derivado': 'roteiro gerado do texto', 'revisado-humano': 'roteiro revisado por pessoa',
   'nenhuma': 'nenhuma', 'biblia-mundo': 'bíblia de mundo (ambientação)', 'factual-citada': 'factual, com fontes citadas',
@@ -77,26 +77,44 @@ const prodR = (v) => escapeHtml(PROD_ROTULOS[v] || String(v));
 function prodMostrarPerfil(obra) {
   const el = prodEl('prod-perfil');
   if (!obra) { el.innerHTML = ''; return; }
+  const c = obra.classificacao;
+  if (!c && !obra.tipo) {
+    el.innerHTML = '<span class="badge badge-warn">Aguardando classificação</span> Clique em "Classificar obra": o Forge lê o texto, '
+      + 'propõe gênero e forma, nível de leitor e códigos de catálogo, e abre um PR. Aprovar = fazer o merge. '
+      + 'Até lá, compor, ilustrar e narrar reprovam (portão P0).';
+    return;
+  }
   if (!obra.tipo || !obra.perfil) {
-    el.innerHTML = `<span class="badge badge-perigo">Sem perfil</span> A obra precisa de um "tipo" válido em scripts/obras/obras.json; sem ele o compor e o narrar reprovam (portão P0).`;
+    el.innerHTML = '<span class="badge badge-perigo">Classificação incompleta</span> A classificação em scripts/obras/obras.json '
+      + 'não aponta um perfil (falta o registro do romance, conto ou novela, ou a forma não existe). O Forge reprova no P0.';
     return;
   }
   const p = obra.perfil, il = p.ilustracao, im = p.impressao, au = p.audio;
   const porCap = il.por_capitulo && il.por_capitulo[1] > 0 ?` (${il.por_capitulo[0] === il.por_capitulo[1] ? il.por_capitulo[0] : il.por_capitulo.join(' a ')} por capítulo)` : '';
-  const linhas = [
+  const formato = (t) => escapeHtml(/cm$/.test(t) ? t.replace('x', ' × ').replace('cm', ' cm') : t.replace('x', '×') + '"');
+  const adicionais = ((obra.ajustes && obra.ajustes.impressao && obra.ajustes.impressao.adicionais) || im.adicionais || [])
+    .map((a) => `${formato(a.trim)} (${prodR(a.papel)})`);
+  const linhas = c ? [
+    ['Gênero e forma', escapeHtml(c.forma_rotulo || '') + (c.registro ? ` · registro ${escapeHtml(c.registro)}` : '')],
+    ['Leitor', `${escapeHtml(c.nivel_rotulo || '')} <span class="field-sub">(letra e fonte ajustadas pelo nível no Forge)</span>`],
+    ['Catálogo', `CDD ${escapeHtml(c.cdd || '—')} · Thema ${escapeHtml((c.thema || []).join(', '))} · BISAC ${escapeHtml((c.bisac || []).join(', '))}`],
+  ] : [['Classificação', '<span class="badge badge-warn">tipo legado</span> rode "Classificar obra" para a classificação oficial']];
+  linhas.push(
     ['Ilustração', `${prodR(il.densidade)}${porCap}${il.folha_personagem ? ' · folha de personagem' : ''} · até ${il.teto_custo_pct}% do custo`],
     ['Pesquisa', `${prodR(p.pesquisa)} · citação: ${prodR(p.citacao)}`],
     ['EPUB', prodR(p.epub.layout)],
-    ['Impressão', `${escapeHtml(im.trim.replace('x', '×'))}" · ${prodR(im.papel)} · ${prodR(im.cor)} · corpo ${escapeHtml(String(im.corpo_pt))} pt${im.sangria ? ' · com sangria' : ''}`],
+    ['Impressão', `${formato(im.trim)} · ${prodR(im.papel)} · ${prodR(im.cor)}${im.sangria ? ' · com sangria' : ''}`
+      + (adicionais.length ? ` · também ${adicionais.join(', ')}` : '')],
     ['Audiobook', au.entrega
       ? `${prodR(au.vozes)} · ${prodR(au.roteiro)}${au.pular.length ? ' · não lê: ' + au.pular.map(prodR).join(', ') : ''}`
       : 'não previsto'],
-  ];
+  );
   const ajustes = obra.ajustes ? Object.keys(obra.ajustes) : [];
   el.innerHTML = `
     <div style="margin-bottom:8px;"><span class="badge badge-info">${escapeHtml(p.rotulo)}</span>
       ${ajustes.length ? `<span class="field-sub"> · com ajustes da obra em: ${ajustes.map(escapeHtml).join(', ')} (o compor aplica)</span>` : ''}</div>
-    <table><tbody>${linhas.map(([k, v]) => `<tr><td style="width:120px;color:var(--t3);">${k}</td><td>${v}</td></tr>`).join('')}</tbody></table>`;
+    <table><tbody>${linhas.map(([k, v]) => `<tr><td style="width:120px;color:var(--t3);">${k}</td><td>${v}</td></tr>`).join('')}</tbody></table>
+    ${c && c.justificativa ? `<div class="field-sub" style="margin-top:6px;">Por quê: ${escapeHtml(c.justificativa)}</div>` : ''}`;
 }
 
 function prodAgendar(algumaRodando) {
@@ -141,7 +159,7 @@ async function producaoListar(silencioso = false) {
       const link = prodLink(e.url);
       return `<tr>
         <td>${escapeHtml(PROD_ETAPAS[e.etapa] || e.etapa)}</td>
-        <td>${e.etapa === 'ilustrar' ? (e.fase === 'cenas' ? 'Cenas' : 'Plano e folhas') : e.publicar ? '<strong>Publicar na loja</strong>' : 'Só conferir'}</td>
+        <td>${e.etapa === 'classificar' ? 'Proposta (abre PR)' : e.etapa === 'ilustrar' ? (e.fase === 'cenas' ? 'Cenas' : 'Plano e folhas') : e.publicar ? '<strong>Publicar na loja</strong>' : 'Só conferir'}</td>
         <td>${prodBadge(e)}</td>
         <td>${prodData(e.criado)}</td>
         <td>${link ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="font-size:12px;padding:4px 10px;">Ver no GitHub</a>` : ''}</td>

@@ -27,12 +27,13 @@ export const WORKFLOWS = {
   compor: 'compor-obra.yml',
   narrar: 'narrar-obra.yml',
   ilustrar: 'ilustrar-obra.yml',
+  classificar: 'classificar-obra.yml',
 } as const;
 type Etapa = keyof typeof WORKFLOWS;
 
 const dispararSchema = z.object({
   slug: z.string().regex(SLUG).max(80),
-  etapa: z.enum(['compor', 'narrar', 'ilustrar']),
+  etapa: z.enum(['compor', 'narrar', 'ilustrar', 'classificar']),
   publicar: z.boolean().default(false),
   // Só o narrar aceita: "prefacio,cap1" (vazio = todos)
   capitulos: z.string().regex(/^[a-z0-9-]+(,[a-z0-9-]+)*$/).max(400).optional(),
@@ -92,36 +93,69 @@ function erroGithub(r: Response): Response {
   return json({ ok: false, erro }, 502);
 }
 
+type Classificacao = {
+  forma?: string; registro?: string; nivel_leitor?: string; cdd?: string; thema?: string[]; bisac?: string[];
+  justificativa?: string; origem?: string;
+};
 type ObraJson = {
   tipo?: string;
+  classificacao?: Classificacao;
   perfil_ajustes?: Record<string, unknown>;
   ficha?: { titulo?: string; autor?: string; edicao?: string };
+};
+type Taxonomia = {
+  formas?: Record<string, { rotulo: string; perfil?: string; perfil_por_registro?: Record<string, string> }>;
+  niveis_leitor?: Record<string, { rotulo: string }>;
 };
 
 const lerArquivo = (env: Env, nome: string) =>
   github(env, `/contents/scripts/obras/${nome}?ref=main`, { headers: { Accept: 'application/vnd.github.raw+json' } });
 
-// O perfil de produção mora em scripts/obras/perfis.json (validado lá por perfil.py, que também
-// aplica perfil_ajustes). Aqui ele só é mostrado: perfil do tipo + ajustes da obra, sem mesclar.
+// Mesmo caminho do perfil.py: a forma (e o registro, quando a forma pede) aponta o tipo de perfil.
+// Classificação que não fecha com a taxonomia vira "sem tipo": o painel avisa e o P0 do Forge reprova.
+export function tipoDaClassificacao(c: Classificacao | undefined, tax: Taxonomia): string | null {
+  const forma = c?.forma ? tax.formas?.[c.forma] : undefined;
+  if (!forma) return null;
+  if (forma.perfil_por_registro) return (c?.registro && forma.perfil_por_registro[c.registro]) || null;
+  return forma.perfil ?? null;
+}
+
+// O perfil de produção mora em scripts/obras/perfis.json e a taxonomia em classificacao.json
+// (validados lá por perfil.py, que também aplica nível de leitor e perfil_ajustes). Aqui só se mostra.
 async function listarObras(env: Env): Promise<Response> {
-  const [rObras, rPerfis] = await Promise.all([lerArquivo(env, 'obras.json'), lerArquivo(env, 'perfis.json')]);
+  const [rObras, rPerfis, rTax] = await Promise.all([
+    lerArquivo(env, 'obras.json'), lerArquivo(env, 'perfis.json'), lerArquivo(env, 'classificacao.json'),
+  ]);
   if (!rObras.ok) return erroGithub(rObras);
   const dados = (await rObras.json()) as Record<string, ObraJson>;
-  // Sem perfis.json (repositório antigo) a lista de obras continua funcionando.
+  // Sem perfis.json ou classificacao.json (repositório antigo) a lista de obras continua funcionando.
   const tipos = rPerfis.ok
     ? (((await rPerfis.json()) as { tipos?: Record<string, unknown> }).tipos ?? {})
     : {};
+  const tax: Taxonomia = rTax.ok ? ((await rTax.json()) as Taxonomia) : {};
   const obras = Object.entries(dados)
     .filter(([slug]) => SLUG.test(slug))
-    .map(([slug, o]) => ({
+    .map(([slug, o]) => {
+      const tipo = o.classificacao ? tipoDaClassificacao(o.classificacao, tax) : (o.tipo ?? null);
+      const c = o.classificacao;
+      return {
       slug,
       titulo: o.ficha?.titulo ?? slug,
       autor: o.ficha?.autor ?? null,
       edicao: o.ficha?.edicao ?? null,
-      tipo: o.tipo ?? null,
-      perfil: (o.tipo && tipos[o.tipo]) || null,
+      tipo,
+      classificacao: c ? {
+        forma: c.forma ?? null, forma_rotulo: (c.forma && tax.formas?.[c.forma]?.rotulo) || c.forma || null,
+        registro: c.registro ?? null,
+        nivel_leitor: c.nivel_leitor ?? null,
+        nivel_rotulo: (c.nivel_leitor && tax.niveis_leitor?.[c.nivel_leitor]?.rotulo) || c.nivel_leitor || null,
+        cdd: c.cdd ?? null, thema: c.thema ?? [], bisac: c.bisac ?? [],
+        justificativa: c.justificativa ?? null, origem: c.origem ?? null,
+      } : null,
+      perfil: (tipo && tipos[tipo]) || null,
       ajustes: o.perfil_ajustes ?? null,
-    }));
+      };
+    });
   return json({ ok: true, obras });
 }
 
@@ -175,11 +209,15 @@ async function disparar(request: Request, env: Env): Promise<Response> {
   if ((fase || itens) && etapa !== 'ilustrar') return json({ ok: false, erro: 'fase_so_no_ilustrar' }, 400);
   if (etapa === 'ilustrar' && (!fase || publicar)) return json({ ok: false, erro: 'ilustrar_precisa_de_fase' }, 400);
   if (itens && fase !== 'cenas') return json({ ok: false, erro: 'itens_so_nas_cenas' }, 400);
+  if (etapa === 'classificar' && publicar) return json({ ok: false, erro: 'classificar_nao_publica' }, 400);
 
   // Ilustrar não publica nada: o resultado vai para aprovação no admin.
+  // Classificar abre um PR no tr3vo-forge: aprovar = merge.
   const inputs: Record<string, string> = etapa === 'ilustrar'
     ? { slug, etapa: fase!, itens: itens ?? '' }
-    : { slug, publicar: publicar ? 'PUBLICAR' : '' };
+    : etapa === 'classificar'
+      ? { slug }
+      : { slug, publicar: publicar ? 'PUBLICAR' : '' };
   if (etapa === 'narrar') inputs.capitulos = capitulos ?? '';
 
   const r = await github(env, `/actions/workflows/${WORKFLOWS[etapa]}/dispatches`, {
