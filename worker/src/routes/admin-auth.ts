@@ -111,6 +111,20 @@ export async function handleAdminLogin(request: Request, env: Env): Promise<Resp
   return json({ ok: true, token: rawToken, expira_em: sessao.expira_em });
 }
 
+// POST /api/admin/logout — encerra a sessão no servidor (antes o "Sair" só limpava o navegador
+// e o token continuava válido até expirar).
+export async function handleAdminLogout(request: Request, env: Env): Promise<Response> {
+  const token = (request.headers.get('Authorization') ?? '').replace('Bearer ', '').trim();
+  if (!token) return json({ ok: false, erro: 'unauthorized' }, 401);
+  const r = await sb(env, `admin_sessoes?token_hash=eq.${await sha256(token)}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ ativa: false }),
+  });
+  if (!r.ok) return json({ ok: false, erro: 'internal_error' }, 500);
+  return json({ ok: true });
+}
+
 // Grava a senha do admin a partir de um código de uso único (dash_usuarios.setup_hash, expira em 1h).
 export async function handleAdminDefinirSenha(request: Request, env: Env): Promise<Response> {
   let body: any;

@@ -22,6 +22,10 @@ export interface Env {
   FORGE_URL?: string;
   FORGE?: Fetcher; // service binding para o worker tr3vo-forge (ver wrangler.toml)
 
+  // Esteira de produção (scripts Python no GitHub Actions do tr3vo-forge)
+  GH_PRODUCAO_TOKEN?: string; // token fine-grained só do tr3vo-forge: Actions read/write + Contents read
+  GH_PRODUCAO_REPO?: string;  // padrão: alkbhal/tr3vo-forge
+
   // IA
   ANTHROPIC_KEY: string;
 
