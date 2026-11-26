@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { handleAdminProducao, resumirExecucao } from '../src/routes/admin-producao';
+import { handleAdminProducao, resumirExecucao, ESPERAS_MS } from '../src/routes/admin-producao';
 import worker from '../src/index';
 
 const env = { SUPABASE_URL: 'https://sb.test', SUPABASE_SERVICE_KEY: 'k', GH_PRODUCAO_TOKEN: 'gh-token' } as any;
@@ -98,10 +98,41 @@ describe('produção: disparar workflows do tr3vo-forge', () => {
     expect(execucoes[0]).toMatchObject({ etapa: 'narrar', publicar: true });
   });
 
-  it('obras: lê scripts/obras/obras.json do repositório', async () => {
-    mockFetch(() => new Response(JSON.stringify({ 'livre-das-dividas': { ficha: { titulo: 'Livre das Dívidas', autor: 'Said Anes', edicao: '2026-11' } } })));
+  it('obras: lê obras.json e o perfil do tipo em perfis.json', async () => {
+    const manual = { rotulo: 'Manual / guia prático', ilustracao: { densidade: 'diagrama' } };
+    mockFetch((url) => new Response(JSON.stringify(url.includes('perfis.json')
+      ? { versao: 1, tipos: { manual } }
+      : { 'livre-das-dividas': { tipo: 'manual', perfil_ajustes: { impressao: { trim: '5.5x8.5' } }, ficha: { titulo: 'Livre das Dívidas', autor: 'Said Anes', edicao: '2026-11' } } })));
     const r = await chamar(req('GET', 'obras'));
-    expect(await r.json()).toEqual({ ok: true, obras: [{ slug: 'livre-das-dividas', titulo: 'Livre das Dívidas', autor: 'Said Anes', edicao: '2026-11' }] });
+    expect(await r.json()).toEqual({ ok: true, obras: [{
+      slug: 'livre-das-dividas', titulo: 'Livre das Dívidas', autor: 'Said Anes', edicao: '2026-11',
+      tipo: 'manual', perfil: manual, ajustes: { impressao: { trim: '5.5x8.5' } },
+    }] });
+  });
+
+  it('obras: sem perfis.json no repositório, a lista continua e o perfil fica vazio', async () => {
+    mockFetch((url) => url.includes('perfis.json')
+      ? new Response('{}', { status: 404 })
+      : new Response(JSON.stringify({ 'x': { ficha: { titulo: 'X' } } })));
+    const r = await chamar(req('GET', 'obras'));
+    expect((await r.json() as any).obras[0]).toMatchObject({ slug: 'x', tipo: null, perfil: null });
+  });
+
+  it('leitura tenta de novo em falha passageira; disparo não repete (evita execução em dobro)', async () => {
+    const originais = [...ESPERAS_MS];
+    ESPERAS_MS.splice(0, ESPERAS_MS.length, 1, 1); // espera curta no teste
+    try {
+      let n = 0;
+      const f = mockFetch(() => (++n < 3 ? new Response('', { status: 502 }) : new Response(JSON.stringify({ workflow_runs: [] }))));
+      expect((await chamar(req('GET', 'execucoes'))).status).toBe(200);
+      expect(chamadasGithub(f).length).toBeGreaterThanOrEqual(3);
+
+      const g = mockFetch(() => new Response('', { status: 502 }));
+      expect((await chamar(req('POST', 'disparar', { slug: 'x', etapa: 'compor' }))).status).toBe(502);
+      expect(chamadasGithub(g)).toHaveLength(1);
+    } finally {
+      ESPERAS_MS.splice(0, ESPERAS_MS.length, ...originais);
+    }
   });
 
   it('execução antiga, sem run-name, fica sem slug', () => {

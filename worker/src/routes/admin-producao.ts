@@ -41,7 +41,26 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
-function github(env: Env, caminho: string, init: RequestInit = {}): Promise<Response> {
+// Leitura (GET) tenta de novo em falha passageira (rede, 429, 5xx) com espera crescente.
+// Disparo (POST) nunca repete sozinho: repetir criaria uma execução em dobro.
+export const ESPERAS_MS = [400, 1200];
+const passageira = (r: Response) => r.status === 429 || r.status >= 500;
+
+async function github(env: Env, caminho: string, init: RequestInit = {}): Promise<Response> {
+  const leitura = (init.method ?? 'GET') === 'GET';
+  for (let tentativa = 0; ; tentativa++) {
+    const ultima = !leitura || tentativa >= ESPERAS_MS.length;
+    try {
+      const r = await githubUmaVez(env, caminho, init);
+      if (ultima || !passageira(r)) return r;
+    } catch (e) {
+      if (ultima) throw e;
+    }
+    await new Promise((ok) => setTimeout(ok, ESPERAS_MS[tentativa]));
+  }
+}
+
+function githubUmaVez(env: Env, caminho: string, init: RequestInit): Promise<Response> {
   return fetch(`https://api.github.com/repos/${env.GH_PRODUCAO_REPO ?? REPO_PADRAO}${caminho}`, {
     ...init,
     signal: AbortSignal.timeout(15_000),
@@ -66,12 +85,25 @@ function erroGithub(r: Response): Response {
   return json({ ok: false, erro }, 502);
 }
 
+type ObraJson = {
+  tipo?: string;
+  perfil_ajustes?: Record<string, unknown>;
+  ficha?: { titulo?: string; autor?: string; edicao?: string };
+};
+
+const lerArquivo = (env: Env, nome: string) =>
+  github(env, `/contents/scripts/obras/${nome}?ref=main`, { headers: { Accept: 'application/vnd.github.raw+json' } });
+
+// O perfil de produção mora em scripts/obras/perfis.json (validado lá por perfil.py, que também
+// aplica perfil_ajustes). Aqui ele só é mostrado: perfil do tipo + ajustes da obra, sem mesclar.
 async function listarObras(env: Env): Promise<Response> {
-  const r = await github(env, '/contents/scripts/obras/obras.json?ref=main', {
-    headers: { Accept: 'application/vnd.github.raw+json' },
-  });
-  if (!r.ok) return erroGithub(r);
-  const dados = (await r.json()) as Record<string, { ficha?: { titulo?: string; autor?: string; edicao?: string } }>;
+  const [rObras, rPerfis] = await Promise.all([lerArquivo(env, 'obras.json'), lerArquivo(env, 'perfis.json')]);
+  if (!rObras.ok) return erroGithub(rObras);
+  const dados = (await rObras.json()) as Record<string, ObraJson>;
+  // Sem perfis.json (repositório antigo) a lista de obras continua funcionando.
+  const tipos = rPerfis.ok
+    ? (((await rPerfis.json()) as { tipos?: Record<string, unknown> }).tipos ?? {})
+    : {};
   const obras = Object.entries(dados)
     .filter(([slug]) => SLUG.test(slug))
     .map(([slug, o]) => ({
@@ -79,6 +111,9 @@ async function listarObras(env: Env): Promise<Response> {
       titulo: o.ficha?.titulo ?? slug,
       autor: o.ficha?.autor ?? null,
       edicao: o.ficha?.edicao ?? null,
+      tipo: o.tipo ?? null,
+      perfil: (o.tipo && tipos[o.tipo]) || null,
+      ajustes: o.perfil_ajustes ?? null,
     }));
   return json({ ok: true, obras });
 }

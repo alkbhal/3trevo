@@ -653,7 +653,11 @@
           <div class="card-hdr"><span class="card-titulo">Obra</span></div>
           <div class="field" style="margin-bottom:16px;">
             <label for="prod-obra">Obra cadastrada em scripts/obras/obras.json</label>
-            <select id="prod-obra" class="input" onchange="producaoListar()"></select>
+            <select id="prod-obra" class="input" onchange="producaoTrocarObra()"></select>
+          </div>
+          <div style="margin-bottom:16px;">
+            <div style="font-weight:600;margin-bottom:6px;">Perfil de produção</div>
+            <div id="prod-perfil" style="font-size:13px;"></div>
           </div>
 
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
@@ -2665,6 +2669,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
 }
 </script>
 <script src="js/admin-forge.js?v=5130e8d8"></script>
-<script src="js/admin-producao.js?v=630c9704"></script>
+<script src="js/admin-producao.js?v=6ed87659"></script>
 </body>
 </html>
