@@ -42,11 +42,57 @@ async function producaoAbrir() {
       prodEl('prod-execucoes').textContent = prodErro(res);
       return;
     }
-    sel.innerHTML = res.dados.obras.map((o) =>
+    prodObras = res.dados.obras;
+    sel.innerHTML = prodObras.map((o) =>
       `<option value="${escapeHtml(o.slug)}">${escapeHtml(o.titulo)}${o.edicao ? ' · edição ' + escapeHtml(o.edicao) : ''}</option>`
     ).join('') || '<option value="">Nenhuma obra em scripts/obras/obras.json</option>';
   }
+  producaoTrocarObra();
+}
+
+function producaoTrocarObra() {
+  prodMostrarPerfil(prodObras.find((o) => o.slug === prodSlug()));
   producaoListar();
+}
+
+// ── Perfil de produção (scripts/obras/perfis.json no tr3vo-forge) ────────────
+let prodObras = [];
+const PROD_ROTULOS = {
+  'so-capa': 'Só a capa', 'vinheta': 'Vinhetas', 'cena-por-capitulo': 'Cenas por capítulo',
+  'por-pagina': 'Uma por página dupla', 'diagrama': 'Diagramas',
+  'refluivel': 'texto ajustável', 'pre-paginado': 'página fixa (dupla)',
+  'branco': 'papel branco', 'creme': 'papel creme', 'pb': 'preto e branco', 'colorido': 'colorido',
+  'unica': 'uma voz', 'narrador+personagens': 'narrador e personagens',
+  'derivado': 'roteiro gerado do texto', 'revisado-humano': 'roteiro revisado por pessoa',
+  'nenhuma': 'nenhuma', 'biblia-mundo': 'bíblia de mundo (ambientação)', 'factual-citada': 'factual, com fontes citadas',
+  'nota-autor': 'nota do autor', 'rodape': 'notas de rodapé', 'abnt': 'ABNT',
+  'referencias': 'referências', 'tabelas': 'tabelas',
+};
+const prodR = (v) => escapeHtml(PROD_ROTULOS[v] || String(v));
+
+function prodMostrarPerfil(obra) {
+  const el = prodEl('prod-perfil');
+  if (!obra) { el.innerHTML = ''; return; }
+  if (!obra.tipo || !obra.perfil) {
+    el.innerHTML = `<span class="badge badge-perigo">Sem perfil</span> A obra precisa de um "tipo" válido em scripts/obras/obras.json; sem ele o compor e o narrar reprovam (portão P0).`;
+    return;
+  }
+  const p = obra.perfil, il = p.ilustracao, im = p.impressao, au = p.audio;
+  const porCap = il.por_capitulo && il.por_capitulo[1] > 0 ?` (${il.por_capitulo[0] === il.por_capitulo[1] ? il.por_capitulo[0] : il.por_capitulo.join(' a ')} por capítulo)` : '';
+  const linhas = [
+    ['Ilustração', `${prodR(il.densidade)}${porCap}${il.folha_personagem ? ' · folha de personagem' : ''} · até ${il.teto_custo_pct}% do custo`],
+    ['Pesquisa', `${prodR(p.pesquisa)} · citação: ${prodR(p.citacao)}`],
+    ['EPUB', prodR(p.epub.layout)],
+    ['Impressão', `${escapeHtml(im.trim.replace('x', '×'))}" · ${prodR(im.papel)} · ${prodR(im.cor)} · corpo ${escapeHtml(String(im.corpo_pt))} pt${im.sangria ? ' · com sangria' : ''}`],
+    ['Audiobook', au.entrega
+      ? `${prodR(au.vozes)} · ${prodR(au.roteiro)}${au.pular.length ? ' · não lê: ' + au.pular.map(prodR).join(', ') : ''}`
+      : 'não previsto'],
+  ];
+  const ajustes = obra.ajustes ? Object.keys(obra.ajustes) : [];
+  el.innerHTML = `
+    <div style="margin-bottom:8px;"><span class="badge badge-info">${escapeHtml(p.rotulo)}</span>
+      ${ajustes.length ? `<span class="field-sub"> · com ajustes da obra em: ${ajustes.map(escapeHtml).join(', ')} (o compor aplica)</span>` : ''}</div>
+    <table><tbody>${linhas.map(([k, v]) => `<tr><td style="width:120px;color:var(--t3);">${k}</td><td>${v}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function prodAgendar(algumaRodando) {
