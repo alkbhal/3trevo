@@ -68,7 +68,22 @@ export async function handleLeitura(request: Request, env: Env, slug: string): P
 // para cada faixa do manifest publicado pelo workflow "Narrar obra" em
 // media/audiobooks/<slug>/. O tocador não envia o token, por isso o link assinado vai no JSON.
 const ARQUIVO_AUDIO = /^\d{2}-[a-z0-9-]+\.mp3$/;
+const ARQUIVO_M4B = /^[a-z0-9-]+\.m4b$/;
 const TTL_AUDIO_S = 3600;
+
+// Link assinado de um arquivo de media/<pasta>; `baixar` faz o navegador salvar com esse nome.
+async function assinarAudio(env: Env, pasta: string, arquivo: string, baixar?: string): Promise<string> {
+  const r = await fetch(`${env.SUPABASE_URL}/storage/v1/object/sign/media/${pasta}/${arquivo}`, {
+    method: 'POST',
+    headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expiresIn: TTL_AUDIO_S }),
+    signal: AbortSignal.timeout(8000),
+  });
+  const d = (await r.json().catch(() => ({}))) as { signedURL?: string };
+  if (!r.ok || !d.signedURL) throw new Error(`assinatura ${arquivo}: ${r.status}`);
+  const url = `${env.SUPABASE_URL}/storage/v1${d.signedURL}`;
+  return baixar ? `${url}&download=${encodeURIComponent(baixar)}` : url;
+}
 
 export async function handleLeituraAudio(request: Request, env: Env, slug: string): Promise<Response> {
   const negado = await comprador(request, env, slug);
@@ -81,23 +96,33 @@ export async function handleLeituraAudio(request: Request, env: Env, slug: strin
     });
     if (mf.status === 404) return Response.json({ ok: false, erro: 'sem_audio' }, { status: 404 });
     if (!mf.ok) return Response.json({ ok: false, erro: 'indisponivel' }, { status: 503 });
-    const m = (await mf.json()) as { versao_texto?: string; faixas?: { id: string; titulo: string; arquivo: string; segundos: number }[] };
+    const m = (await mf.json()) as {
+      versao_texto?: string;
+      faixas?: { id: string; titulo: string; arquivo: string; segundos: number }[];
+      audiobook?: { arquivo: string; minutos?: number; bytes?: number } | null;
+    };
     const faixas = (m.faixas ?? []).filter((f) => ARQUIVO_AUDIO.test(f.arquivo));
     const assinadas = await Promise.all(
-      faixas.map(async (f) => {
-        const r = await fetch(`${env.SUPABASE_URL}/storage/v1/object/sign/media/${pasta}/${f.arquivo}`, {
-          method: 'POST',
-          headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ expiresIn: TTL_AUDIO_S }),
-          signal: AbortSignal.timeout(8000),
-        });
-        const d = (await r.json().catch(() => ({}))) as { signedURL?: string };
-        if (!r.ok || !d.signedURL) throw new Error(`assinatura ${f.arquivo}: ${r.status}`);
-        return { id: f.id, titulo: f.titulo, segundos: f.segundos, url: `${env.SUPABASE_URL}/storage/v1${d.signedURL}` };
-      })
+      faixas.map(async (f) => ({
+        id: f.id, titulo: f.titulo, segundos: f.segundos, url: await assinarAudio(env, pasta, f.arquivo),
+      }))
     );
+    // Livro inteiro em um arquivo (M4B com capítulos), para baixar e ouvir em qualquer app de audiobook.
+    // Se ele não estiver no depósito (acima do limite de upload), as faixas continuam valendo.
+    let audiobook: { url: string; minutos: number | null; bytes: number | null } | null = null;
+    if (m.audiobook && ARQUIVO_M4B.test(m.audiobook.arquivo)) {
+      try {
+        audiobook = {
+          url: await assinarAudio(env, pasta, m.audiobook.arquivo, m.audiobook.arquivo),
+          minutos: m.audiobook.minutos ?? null,
+          bytes: m.audiobook.bytes ?? null,
+        };
+      } catch (err) {
+        console.error('[leitura-audio] M4B indisponível:', err);
+      }
+    }
     return Response.json(
-      { ok: true, versao: m.versao_texto ?? '', faixas: assinadas },
+      { ok: true, versao: m.versao_texto ?? '', faixas: assinadas, audiobook },
       { headers: { 'Cache-Control': 'private, no-store' } }
     );
   } catch (err) {

@@ -110,6 +110,29 @@ describe('GET /api/leitura/:slug/audio', () => {
     expect(d.faixas[0].id).toBe('cap3');
     expect(d.faixas[0].url).toContain('/storage/v1/object/sign/media/audiobooks/livre-das-dividas/04-cap3.mp3');
   });
+  it('livro inteiro (M4B): link assinado para baixar com o nome do arquivo', async () => {
+    manifest.audiobook = { arquivo: 'livre-das-dividas.m4b', minutos: 154.2, bytes: 74000000 } as any;
+    try {
+      mockAudio({ compra: [{ product_id: 'p' }] });
+      const d: any = await (await handleLeituraAudio(req(TOKEN), env, 'livre-das-dividas')).json();
+      expect(d.audiobook.url).toContain('/object/sign/media/audiobooks/livre-das-dividas/livre-das-dividas.m4b?token=t&download=livre-das-dividas.m4b');
+      expect(d.audiobook.minutos).toBe(154.2);
+    } finally {
+      delete (manifest as any).audiobook;
+    }
+  });
+  it('M4B com nome estranho é ignorado; sem M4B, audiobook vem null e as faixas seguem', async () => {
+    (manifest as any).audiobook = { arquivo: '../../x.m4b' };
+    try {
+      const calls = mockAudio({ compra: [{ product_id: 'p' }] });
+      const d: any = await (await handleLeituraAudio(req(TOKEN), env, 'livre-das-dividas')).json();
+      expect(d.audiobook).toBeNull();
+      expect(d.faixas).toHaveLength(1);
+      expect(calls.some((u) => u.includes('x.m4b'))).toBe(false);
+    } finally {
+      delete (manifest as any).audiobook;
+    }
+  });
   it('falha ao assinar: 503, sem link parcial', async () => {
     mockAudio({ compra: [{ product_id: 'p' }], assinar: 500 });
     expect((await handleLeituraAudio(req(TOKEN), env, 'livre-das-dividas')).status).toBe(503);
