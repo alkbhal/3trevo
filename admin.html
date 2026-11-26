@@ -377,6 +377,9 @@
       <button class="sb-item" onclick="irPara('catalogo',this)">
         <span class="sb-ic">☰</span> Catálogo
       </button>
+      <button class="sb-item" onclick="irPara('producao',this)">
+        <span class="sb-ic">⚙</span> Produção
+      </button>
       <button class="sb-item" onclick="irPara('forge',this)">
         <span class="sb-ic">📖</span> Forge
       </button>
@@ -634,6 +637,54 @@
             </div>
             <div class="card-body" id="forge-decisao-status" style="padding-top:0;font-size:12px;color:var(--t3);"></div>
           </div>
+        </div>
+      </div>
+
+      <!-- ── PRODUÇÃO ──────────────────────────────────────────────────── -->
+      <div class="panel" id="panel-producao">
+        <div class="section-hdr">
+          <div>
+            <div class="section-titulo">Produção</div>
+            <div class="section-sub">Gera o EPUB, o PDF e o audiobook de uma obra a partir do texto publicado. Roda no GitHub (tr3vo-forge), sem computador ligado.</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hdr"><span class="card-titulo">Obra</span></div>
+          <div class="field" style="margin-bottom:16px;">
+            <label for="prod-obra">Obra cadastrada em scripts/obras/obras.json</label>
+            <select id="prod-obra" class="input" onchange="producaoListar()"></select>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+            <div>
+              <div style="font-weight:600;margin-bottom:6px;">Compor EPUB + PDF</div>
+              <div class="field-sub" style="margin-bottom:10px;">Confere os portões P1 e P2. "Só conferir" deixa os arquivos no GitHub por 14 dias; "Publicar" troca os arquivos que os compradores baixam.</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-s" onclick="producaoDisparar('compor', false, this)">Só conferir</button>
+                <button class="btn btn-p" onclick="producaoDisparar('compor', true, this)">Publicar na loja</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:600;margin-bottom:6px;">Narrar audiobook</div>
+              <div class="field" style="margin-bottom:10px;">
+                <label for="prod-capitulos">Só estes capítulos (opcional)</label>
+                <input type="text" id="prod-capitulos" class="input" maxlength="400" placeholder="Ex.: prefacio,cap1 — vazio narra todos">
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-s" onclick="producaoDisparar('narrar', false, this)">Só conferir</button>
+                <button class="btn btn-p" onclick="producaoDisparar('narrar', true, this)">Publicar áudio</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-titulo">Execuções desta obra</span>
+            <button class="btn-ghost" onclick="producaoListar()">Atualizar</button>
+          </div>
+          <div id="prod-execucoes" style="font-size:13px;">Escolha a obra.</div>
         </div>
       </div>
 
@@ -1253,6 +1304,8 @@ async function fazerLogin() {
 document.getElementById('pin-field').addEventListener('keydown', e => { if(e.key==='Enter') fazerLogin(); });
 
 function logout() {
+  // Encerra a sessão também no servidor; sem isso o token seguia válido até expirar.
+  if (token) fetch(`${API}/api/admin/logout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, keepalive: true }).catch(() => {});
   sessionStorage.removeItem('tt_admin_token');
   location.reload();
 }
@@ -1271,10 +1324,11 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', forge:'Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', producao:'Produção', forge:'Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
+  if (panel === 'producao') producaoAbrir();
   if (panel === 'forge') forgeAbrir();
   if (panel === 'hero') carregarHeroConfig();
   if (panel === 'depoimentos') carregarDepoimentos();
@@ -2611,5 +2665,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
 }
 </script>
 <script src="js/admin-forge.js?v=5130e8d8"></script>
+<script src="js/admin-producao.js?v=630c9704"></script>
 </body>
 </html>

@@ -42,7 +42,8 @@ import { handleNemaSaldo } from './routes/nema';
 import { handleAticoAcesso } from './routes/atico';
 import { handleClientePerfil } from './routes/perfil';
 import { handleLeitura, handleLeituraAudio } from './routes/leitura';
-import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha } from './routes/admin-auth';
+import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha, handleAdminLogout } from './routes/admin-auth';
+import { handleAdminProducao } from './routes/admin-producao';
 import { handleAdminForge } from './routes/admin-forge';
 import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
@@ -108,6 +109,8 @@ function corsHeaders(origin: string | null): HeadersInit {
     'Access-Control-Max-Age': '86400',
   };
 }
+
+const ADMIN_SEM_SESSAO = new Set(['/api/admin/login', '/api/admin/definir-senha']);
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -288,6 +291,20 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
 
     // ── Admin ──────────────────────────────────────────────────────────────
+    // Portão único: toda rota /api/admin/* exige sessão válida, exceto as que criam a sessão.
+    // Os handlers continuam conferindo (a consulta é feita uma vez por requisição); uma rota
+    // nova que esqueça a checagem não fica aberta.
+    if (path.startsWith('/api/admin/') && !ADMIN_SEM_SESSAO.has(path) && !(await verificarToken(request, env))) {
+      return json({ ok: false, erro: 'unauthorized' }, 401);
+    }
+
+    if (path === '/api/admin/logout' && method === 'POST') {
+      return handleAdminLogout(request, env);
+    }
+    if (path.startsWith('/api/admin/producao/')) {
+      return handleAdminProducao(request, env, path);
+    }
+
     if (path === '/api/admin/sorteio' && method === 'POST') {
       return handleSorteio(request, env);
     }
