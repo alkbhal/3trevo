@@ -17,6 +17,8 @@ jobs:
         run: node scripts/i18n.mjs --check
       - name: Site — títulos, descrições, og:image, alt, privacidade, marcações, sitemap e consentimento (LGPD)
         run: node scripts/site-check.mjs
+      - name: Capas — páginas de obra com a capa canônica do catálogo (scripts/capas.mjs)
+        run: node scripts/capas.mjs --check
 
   worker:
     runs-on: ubuntu-latest

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta name="robots" content="noindex,nofollow">
-  <script src="/js/consentimento.js?v=8ec92ecf" data-fb="PageView" defer></script>
+  <script src="/js/consentimento.js?v=31017ee2" data-fb="PageView" defer></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin · Três Trevo</title>
@@ -377,6 +377,9 @@
       <button class="sb-item" onclick="irPara('catalogo',this)">
         <span class="sb-ic">☰</span> Catálogo
       </button>
+      <button class="sb-item" onclick="irPara('producao',this)">
+        <span class="sb-ic">⚙</span> Produção
+      </button>
       <button class="sb-item" onclick="irPara('forge',this)">
         <span class="sb-ic">📖</span> Forge
       </button>
@@ -634,6 +637,76 @@
             </div>
             <div class="card-body" id="forge-decisao-status" style="padding-top:0;font-size:12px;color:var(--t3);"></div>
           </div>
+        </div>
+      </div>
+
+      <!-- ── PRODUÇÃO ──────────────────────────────────────────────────── -->
+      <div class="panel" id="panel-producao">
+        <div class="section-hdr">
+          <div>
+            <div class="section-titulo">Produção</div>
+            <div class="section-sub">Gera o EPUB, o PDF e o audiobook de uma obra a partir do texto publicado. Roda no GitHub (tr3vo-forge), sem computador ligado.</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hdr"><span class="card-titulo">Obra</span></div>
+          <div class="field" style="margin-bottom:16px;">
+            <label for="prod-obra">Obra cadastrada em scripts/obras/obras.json</label>
+            <select id="prod-obra" class="input" onchange="producaoTrocarObra()"></select>
+          </div>
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+              <span style="font-weight:600;">Classificação e perfil de produção</span>
+              <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="producaoDisparar('classificar', false, this)">Classificar obra (abre PR)</button>
+            </div>
+            <div id="prod-perfil" style="font-size:13px;"></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+            <div>
+              <div style="font-weight:600;margin-bottom:6px;">Compor EPUB + PDF</div>
+              <div class="field-sub" style="margin-bottom:10px;">Confere os portões P1 e P2. "Só conferir" deixa os arquivos no GitHub por 14 dias; "Publicar" troca os arquivos que os compradores baixam.</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-s" onclick="producaoDisparar('compor', false, this)">Só conferir</button>
+                <button class="btn btn-p" onclick="producaoDisparar('compor', true, this)">Publicar na loja</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:600;margin-bottom:6px;">Narrar audiobook</div>
+              <div class="field" style="margin-bottom:10px;">
+                <label for="prod-capitulos">Só estes capítulos (opcional)</label>
+                <input type="text" id="prod-capitulos" class="input" maxlength="400" placeholder="Ex.: prefacio,cap1 — vazio narra todos">
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-s" onclick="producaoDisparar('narrar', false, this)">Só conferir</button>
+                <button class="btn btn-p" onclick="producaoDisparar('narrar', true, this)">Publicar áudio</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hdr">
+            <span class="card-titulo">Ilustrações (Nano Banana)</span>
+            <button class="btn-ghost" onclick="producaoGaleria()">Atualizar</button>
+          </div>
+          <div class="field-sub" style="margin-bottom:10px;">A quantidade vem do perfil da obra. Ordem: 1) planejar e gerar as folhas de personagem; 2) aprovar as folhas; 3) gerar as cenas; 4) aprovar as cenas. Só cena aprovada entra no livro.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <button class="btn btn-s" onclick="producaoIlustrar('folhas', this)">1. Planejar e gerar folhas</button>
+            <button class="btn btn-s" onclick="producaoIlustrar('cenas', this)">3. Gerar cenas</button>
+            <button class="btn-ghost" onclick="producaoIlustrar('cenas', this, true)">Refazer cenas rejeitadas</button>
+          </div>
+          <div id="prod-ilus-resumo" class="field-sub" style="margin-bottom:8px;"></div>
+          <div id="prod-galeria" style="font-size:13px;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-titulo">Execuções desta obra</span>
+            <button class="btn-ghost" onclick="producaoListar()">Atualizar</button>
+          </div>
+          <div id="prod-execucoes" style="font-size:13px;">Escolha a obra.</div>
         </div>
       </div>
 
@@ -1253,6 +1326,8 @@ async function fazerLogin() {
 document.getElementById('pin-field').addEventListener('keydown', e => { if(e.key==='Enter') fazerLogin(); });
 
 function logout() {
+  // Encerra a sessão também no servidor; sem isso o token seguia válido até expirar.
+  if (token) fetch(`${API}/api/admin/logout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, keepalive: true }).catch(() => {});
   sessionStorage.removeItem('tt_admin_token');
   location.reload();
 }
@@ -1271,10 +1346,11 @@ function irPara(panel, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('ativo'));
   document.getElementById('panel-' + panel).classList.add('ativo');
   if (btn) btn.classList.add('ativo');
-  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', forge:'Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
+  const titulos = { dashboard:'Dashboard', catalogo:'Catálogo', producao:'Produção', forge:'Forge', hero:'Hero', depoimentos:'Depoimentos', marketing:'Growth Engine', ia:'IA Studio', sorteio:'Sorteio', biblioteca:'Biblioteca TT', monitor:'Monitor do Sistema' };
   document.getElementById('main-titulo').textContent = titulos[panel] || panel;
   // Load lazy
   if (panel === 'catalogo') carregarCatalogo();
+  if (panel === 'producao') producaoAbrir();
   if (panel === 'forge') forgeAbrir();
   if (panel === 'hero') carregarHeroConfig();
   if (panel === 'depoimentos') carregarDepoimentos();
@@ -1557,6 +1633,11 @@ async function deletarLivro() {
 }
 
 // ── REVISAR FORGE ─────────────────────────────────────────────────────────────
+function urlDoForge(u) {
+  try { const p = new URL(u); return p.protocol === 'https:' && p.origin === new URL(FORGE_URL).origin; }
+  catch { return false; }
+}
+
 function slugify(s) {
   return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -1573,7 +1654,8 @@ async function carregarForgeProjeto() {
   document.getElementById('forge-decisao-status').textContent = '';
 
   try {
-    const r = await fetch(`${FORGE_URL}/project/${id}/status`);
+    // Pela ponte autenticada do worker: o navegador nunca chama o Forge direto.
+    const r = await api(`/api/admin/forge/resumo/${id}`);
     const d = await r.json();
     if (!r.ok) { document.getElementById('forge-status-body').textContent = d.error || 'Projeto não encontrado.'; return; }
 
@@ -1591,9 +1673,9 @@ async function carregarForgeProjeto() {
     const links = await rLinks.json();
     if (!links.ok) toast('Links do forge indisponíveis: ' + (links.erro || rLinks.status), 'err');
     forgeLinks = links.ok ? links : {};
-    document.getElementById('forge-link-html').href = links.html || '#';
-    document.getElementById('forge-link-epub').href = links.epub || '#';
-    document.getElementById('forge-link-pdf').href = links.pdf || '#';
+    document.getElementById('forge-link-html').href = urlDoForge(links.html) ? links.html : '#';
+    document.getElementById('forge-link-epub').href = urlDoForge(links.epub) ? links.epub : '#';
+    document.getElementById('forge-link-pdf').href = urlDoForge(links.pdf) ? links.pdf : '#';
     // Título e autor do brief do forge — o autor é o que está gravado no EPUB/PDF.
     if (d.titulo) document.getElementById('forge-titulo').value = d.titulo;
     document.getElementById('forge-autor').value = d.autor || '';
@@ -1607,9 +1689,10 @@ async function carregarForgeMarketing(id) {
   const el = document.getElementById('forge-marketing-list');
   el.textContent = 'Carregando…';
   try {
-    const r = await fetch(`${FORGE_URL}/project/${id}/marketing`);
+    const r = await api(`/api/admin/forge/marketing/${id}`);
     const d = await r.json();
-    forgeMarketingFiles = Array.isArray(d.files) ? d.files : [];
+    // Só aceita links https do próprio Forge: um href vindo de fora nunca vira javascript: no admin.
+    forgeMarketingFiles = (Array.isArray(d.files) ? d.files : []).filter(f => urlDoForge(f && f.url));
     if (!forgeMarketingFiles.length) { el.textContent = 'Nenhum arquivo de marketing encontrado.'; return; }
     const porLang = {};
     forgeMarketingFiles.forEach(f => { (porLang[f.lang] ||= []).push(f); });
@@ -1617,7 +1700,7 @@ async function carregarForgeMarketing(id) {
       <div style="margin-bottom:10px;">
         <div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:4px;">${escapeHtml(lang)}</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${files.map(f => `<a href="${f.url}" target="_blank" class="btn-ghost" style="font-size:12px;padding:4px 10px;">${escapeHtml(f.name)}</a>`).join('')}
+          ${files.map(f => `<a href="${escapeHtml(f.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="font-size:12px;padding:4px 10px;">${escapeHtml(f.name)}</a>`).join('')}
         </div>
       </div>`).join('');
   } catch(e) { el.textContent = 'Erro ao carregar marketing: ' + e.message; }
@@ -2604,5 +2687,6 @@ function sincronizarPreviewCapa(inputEl, previewId, bgColorId) {
 }
 </script>
 <script src="js/admin-forge.js?v=5130e8d8"></script>
+<script src="js/admin-producao.js?v=2c1d5104"></script>
 </body>
 </html>

@@ -99,7 +99,7 @@
 
     container.innerHTML = `<section class="mb">
       <div class="mb-boasvindas">
-        <p class="mb-rotulo">✦ ${T('js.membro.rotulo')}</p>
+        <p class="mb-rotulo">${T('js.membro.rotulo')}</p>
         <h3 class="mb-titulo">${T('js.membro.titulo')}</h3>
         <p class="mb-texto">${AMOSTRA ? T('js.membro.intro.pt') : T('js.membro.intro')}</p>
       </div>

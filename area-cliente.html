@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <script src="/js/consentimento.js?v=8ec92ecf" data-fb="PageView" defer></script>
+  <script src="/js/consentimento.js?v=31017ee2" data-fb="PageView" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -63,7 +63,7 @@ nav{
   color:var(--ouro-claro);text-decoration:none;letter-spacing:.3px;
   display:flex;align-items:center;gap:9px;
 }
-.nav-marca::before{content:'✦';font-size:13px;opacity:.75}
+.nav-marca::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .nav-right{display:flex;align-items:center;gap:16px}
 .nav-idiomas{display:flex;gap:2px;margin-left:auto;margin-right:12px}
 .nav-idiomas a{font-size:12px;letter-spacing:.06em;padding:8px 7px;color:rgba(255,255,255,.55);text-decoration:none}
@@ -99,7 +99,9 @@ nav{
 .login-logo{
   font-family:'Lora',serif;font-size:27px;font-weight:400;
   color:var(--verde-medio);margin-bottom:8px;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:.4em;
 }
+.login-logo::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .login-sub{font-size:13px;color:var(--t3);text-align:center;margin-bottom:36px;line-height:1.6}
 .campo-label{
   font-size:11px;letter-spacing:1.8px;text-transform:uppercase;
@@ -150,7 +152,6 @@ nav{
   font-size:11px;letter-spacing:3px;text-transform:uppercase;
   color:var(--ouro-escuro);margin-bottom:8px;display:flex;align-items:center;gap:8px;
 }
-.dash-saudacao::before{content:'✦';opacity:.7}
 .dash-titulo{font-family:'Lora',serif;font-size:32px;font-weight:400;line-height:1.15;color:var(--tinta)}
 .dash-titulo em{font-style:italic;color:var(--verde-medio)}
 
@@ -752,7 +753,7 @@ nav{
 }
 
 </style>
-<script id="tt-textos">window.TT_LANG="pt";window.TT_TEXTOS={"js.ac.baixar.epub":"Baixar arquivo EPUB","js.ac.baixar.pdf":"Baixar arquivo PDF","js.ac.compra.fechar":"Fechar","js.ac.compra.livro":"Seu livro","js.ac.compra.texto":"<strong>{titulo}</strong> já está liberado: ele aparece na sua biblioteca abaixo em instantes, e o PDF também chega por e-mail. Se não aparecer em alguns minutos, recarregue a página ou escreva para sac@3trevo.com.br (respondemos em até 48 horas).","js.ac.compra.titulo":"Obrigado! Seu pagamento foi aprovado.","js.ac.email.invalido":"Digite um e-mail válido.","js.ac.entrando":"Entrando…","js.ac.entrar":"Entrar","js.ac.enviando":"Enviando…","js.ac.erro.carregar":"Erro ao carregar","js.ac.erro.leitura":"Erro ao abrir a leitura.","js.ac.erro.link":"Não foi possível enviar o link agora. Tente de novo em instantes.","js.ac.erro.login":"Não foi possível entrar agora. Tente de novo.","js.ac.ler":"Ler agora","js.ac.link":"Receber link por e-mail","js.ac.link.ok":"Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style=\"opacity:.6\">Pode levar até 2 minutos. Cheque o spam.</small>","js.ac.nema":"Pontos Nema","js.ac.nema.pendente":"Pontos Nema · + {n} liberam em até 7 dias","js.ac.plano.ativa":"Ativa","js.ac.plano.membro":"Membro grátis","js.ac.plano.sem":"Sem plano","js.ac.recarregue":"Recarregue a página.","js.ac.remover":"Remover da biblioteca","js.ac.sem.acesso":"Este título não está na sua conta.","js.ac.sem.titulo":"Título indisponível","js.ac.senha.errada":"E-mail ou senha incorretos.","js.ac.senha.vazia":"Digite sua senha ou use o link por e-mail.","js.cad.botao":"Criar minha área grátis →","js.cad.criando":"Criando…","js.cad.email":"Seu melhor e-mail","js.cad.erro.conexao":"Sem conexão. Verifique a internet e tente de novo.","js.cad.erro.email":"Confira o e-mail digitado.","js.cad.erro.geral":"Não foi possível criar agora. Tente de novo em instantes.","js.cad.erro.tentativas":"Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.","js.cad.fechar":"Fechar","js.cad.fino":"Sem senha: enviamos um link de acesso para o seu e-mail. Novidades só se você marcar a opção acima, e você cancela quando quiser.","js.cad.fino.intl":"Sem senha: enviamos um link de acesso para o seu e-mail.","js.cad.kicker":"Grátis · sem cartão","js.cad.mala":"Quero receber lançamentos e novidades da editora por e-mail","js.cad.nome":"Seu nome","js.cad.ok":"Pronto! Enviamos o link de acesso para {email}.<br>Abra o e-mail e sua área de membro já estará criada. Confira o spam se não chegar em 2 minutos.","js.cad.sub":"Leia o 1º capítulo de <em>O Nascimento Silencioso da 3ª Guerra Mundial</em> e escolha um clássico da literatura brasileira para ler no leitor da editora.","js.cad.titulo":"Crie grátis sua área de membro","js.carregando":"Carregando","js.erro.conexao":"Sem conexão com o servidor. Verifique a internet e tente de novo.","js.erro.sessao":"Sua sessão expirou. Entre de novo para continuar lendo.","js.estante.dica":"Comece por um dos favoritos dos leitores: {titulos}.","js.estante.filtro":"Filtrar por gênero","js.estante.obra1":"1 obra","js.estante.obras":"{n} obras","js.estante.outros":"Outros","js.estante.paginas":"{n} páginas","js.estante.seculo":"século {n}","js.estante.sobre":"Sobre o livro","js.estante.todos":"Todos","js.estante.vazia":"A estante está sendo organizada. Volte em breve.","js.faq":[{"q":"Como recebo meu ebook?","r":"Logo após a confirmação do pagamento, você recebe o PDF por e-mail (sac@3trevo.com.br) e tem acesso permanente ao EPUB na sua área do cliente, com leitor integrado."},{"q":"O que é o Nema?","r":"É o ponto de fidelidade da editora: a nossa moeda de descontos. Você ganha Nema ao comprar e usa o saldo em novas compras. As regras de emissão e uso, inclusive de campanhas e promoções futuras, estão nas Regras do Nema."},{"q":"Quando posso usar meu Nema?","r":"Assim que o saldo for liberado, ele aparece no seu espaço de cliente. O prazo de liberação de cada Nema está nas Regras do Nema."},{"q":"Como uso o Nema?","r":"Entre no seu espaço de cliente e vá ao pagamento da próxima compra. Marque \"Usar meu saldo Nema\" e ganhe desconto. Também há campanhas de uso: acompanhe por aqui e pelas nossas redes."},{"q":"Posso trocar Nema por dinheiro?","r":"Não. Nema só vale como desconto em compras na editora e não pode ser transferido para outra pessoa."},{"q":"Posso pedir reembolso?","r":"Sim. Pelo art. 49 do CDC, você tem 7 dias corridos após a compra para pedir reembolso integral. Escreva para sac@3trevo.com.br. O Nema daquela compra é cancelado."}],"js.gratis.carregando":"Carregando… tente de novo em um instante.","js.leitor.abrindo":"Abrindo o livro…","js.leitor.abrir.pdf":"Abrir o PDF","js.leitor.ajustes":"Ajustes de leitura","js.leitor.ajustes.dica":"Tamanho do texto e modo noite","js.leitor.anterior":"Anterior","js.leitor.cap.anterior":"Capítulo anterior","js.leitor.cap.proximo":"Próximo capítulo","js.leitor.colofao":"Editora Três Trevo · edição digital<br>Obrigado por ler com a gente.","js.leitor.concluir":"Concluir","js.leitor.dia":"Dia","js.leitor.erro.ajuda":"Se continuar, escreva para sac@3trevo.com.br","js.leitor.erro.titulo":"Não foi possível abrir o livro","js.leitor.fechar":"Fechar","js.leitor.fechar.livro":"Fechar o livro","js.leitor.fim.conhecer":"Conhecer o livro","js.leitor.fim.mesmo.autor":"Do mesmo autor","js.leitor.fim.reler":"Reler do início","js.leitor.fim.sobre":"Você chegou ao fim de","js.leitor.fim.voltar":"Voltar à biblioteca","js.leitor.ilegivel":"O arquivo do livro não pôde ser lido.","js.leitor.lento":"O livro está demorando para carregar. A conexão pode estar lenta.","js.leitor.maior":"Aumentar texto","js.leitor.menor":"Diminuir texto","js.leitor.modo":"Modo","js.leitor.noite":"Noite","js.leitor.pdf.celular":"Este título está em PDF. Ele abre no leitor de PDF do seu aparelho.","js.leitor.proximo":"Próximo","js.leitor.sem.formato":"Nenhum formato disponível para leitura.","js.leitor.tentar":"Tentar de novo","js.leitor.texto":"Texto","js.leitor.trilha":"Ouvir a trilha do livro","js.marca":"Editora Três Trevo","js.membro.amostra.completo":"Livro completo · a compra rende Nema","js.membro.amostra.gostou":"Gostou do capítulo?","js.membro.amostra.ler":"Ler o capítulo 1","js.membro.amostra.ler.completo":"Ler o livro completo","js.membro.amostra.secao":"Amostra grátis","js.membro.amostra.selo":"Amostra grátis","js.membro.classico.secao":"Clássico grátis","js.membro.comecar":"Começar a ler","js.membro.continuar":"Continuar","js.membro.erro.abrir":"Não foi possível abrir o clássico agora. Tente de novo em instantes.","js.membro.erro.escolher":"Não foi possível escolher agora. Tente de novo.","js.membro.erro.liberar":"Não foi possível liberar agora. Tente de novo.","js.membro.escolha":"Escolha um clássico para o seu espaço de leitura. Você lê um de cada vez e pode trocar quando terminar.","js.membro.escolher":"Escolher este","js.membro.escolhido":"\"{titulo}\" está no seu espaço de leitura.","js.membro.espaco":"1 espaço de leitura","js.membro.fim.nema":"Sua primeira compra rende Nema","js.membro.fim.nema.intl":"Quando chegarem, cada compra rende Nema","js.membro.fim.rotulo":"Da Editora Três Trevo","js.membro.fim.titulo":"Conheça os livros da casa","js.membro.fim.titulo.intl":"Nossas edições estão a caminho","js.membro.intro":"Escolha um clássico e leia no leitor da editora, com o progresso salvo.","js.membro.intro.pt":"Comece pela amostra e escolha um clássico da literatura brasileira. Tudo no leitor da editora, com o progresso salvo.","js.membro.lido":"{n}% lido","js.membro.nota":"Membros grátis leem um clássico por vez. Quem compra qualquer livro da editora ganha três espaços na Biblioteca TT.","js.membro.nota.intl":"Membros grátis leem um clássico por vez e podem trocar quando terminarem.","js.membro.rotulo":"Membro grátis","js.membro.seu.classico":"Seu clássico","js.membro.titulo":"Sua área de leitura na Três Trevo","js.membro.trocar":"Concluir e trocar","js.membro.trocar.confirma":"Concluir este clássico e liberar o espaço para outro?","js.nema.aria":"Nema, o ponto de fidelidade da editora","js.nema.catalogo":"Ver o catálogo","js.nema.como":"Como o Nema funciona","js.nema.rotulo":"Nema · ponto de fidelidade","js.nema.texto":"10% do valor de cada e-book volta para você em Nema, e o saldo vira desconto na próxima leitura (até metade do preço). Liberado 7 dias depois da compra.","js.nema.titulo":"Sua primeira compra já rende Nema"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
+<script id="tt-textos">window.TT_LANG="pt";window.TT_TEXTOS={"js.ac.baixar.epub":"Baixar arquivo EPUB","js.ac.baixar.pdf":"Baixar arquivo PDF","js.ac.compra.fechar":"Fechar","js.ac.compra.livro":"Seu livro","js.ac.compra.texto":"<strong>{titulo}</strong> já está liberado: ele aparece na sua biblioteca abaixo em instantes, e o PDF também chega por e-mail. Se não aparecer em alguns minutos, recarregue a página ou escreva para sac@3trevo.com.br (respondemos em até 48 horas).","js.ac.compra.titulo":"Obrigado! Seu pagamento foi aprovado.","js.ac.email.invalido":"Digite um e-mail válido.","js.ac.entrando":"Entrando…","js.ac.entrar":"Entrar","js.ac.enviando":"Enviando…","js.ac.erro.carregar":"Erro ao carregar","js.ac.erro.leitura":"Erro ao abrir a leitura.","js.ac.erro.link":"Não foi possível enviar o link agora. Tente de novo em instantes.","js.ac.erro.login":"Não foi possível entrar agora. Tente de novo.","js.ac.ler":"Ler agora","js.ac.link":"Receber link por e-mail","js.ac.link.ok":"Link enviado! Verifique seu e-mail e clique no link para entrar.<br><small style=\"opacity:.6\">Pode levar até 2 minutos. Cheque o spam.</small>","js.ac.nema":"Pontos Nema","js.ac.nema.pendente":"Pontos Nema · + {n} liberam em até 7 dias","js.ac.plano.ativa":"Ativa","js.ac.plano.membro":"Membro grátis","js.ac.plano.sem":"Sem plano","js.ac.recarregue":"Recarregue a página.","js.ac.remover":"Remover da biblioteca","js.ac.sem.acesso":"Este título não está na sua conta.","js.ac.sem.titulo":"Título indisponível","js.ac.senha.errada":"E-mail ou senha incorretos.","js.ac.senha.vazia":"Digite sua senha ou use o link por e-mail.","js.cad.botao":"Criar minha área grátis →","js.cad.criando":"Criando…","js.cad.email":"Seu melhor e-mail","js.cad.erro.conexao":"Sem conexão. Verifique a internet e tente de novo.","js.cad.erro.email":"Confira o e-mail digitado.","js.cad.erro.geral":"Não foi possível criar agora. Tente de novo em instantes.","js.cad.erro.tentativas":"Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.","js.cad.fechar":"Fechar","js.cad.fino":"Sem senha: enviamos um link de acesso para o seu e-mail. Novidades só se você marcar a opção acima, e você cancela quando quiser.","js.cad.fino.intl":"Sem senha: enviamos um link de acesso para o seu e-mail.","js.cad.kicker":"Grátis · sem cartão","js.cad.mala":"Quero receber lançamentos e novidades da editora por e-mail","js.cad.nome":"Seu nome","js.cad.ok":"Pronto! Enviamos o link de acesso para {email}.<br>Abra o e-mail e sua área de membro já estará criada. Confira o spam se não chegar em 2 minutos.","js.cad.sub":"Leia o 1º capítulo de <em>O Nascimento Silencioso da 3ª Guerra Mundial</em> e escolha um clássico da literatura brasileira para ler no leitor da editora.","js.cad.titulo":"Crie grátis sua área de membro","js.carregando":"Carregando","js.erro.conexao":"Sem conexão com o servidor. Verifique a internet e tente de novo.","js.erro.sessao":"Sua sessão expirou. Entre de novo para continuar lendo.","js.estante.dica":"Comece por um dos favoritos dos leitores: {titulos}.","js.estante.filtro":"Filtrar por gênero","js.estante.obra1":"1 obra","js.estante.obras":"{n} obras","js.estante.outros":"Outros","js.estante.paginas":"{n} páginas","js.estante.seculo":"século {n}","js.estante.sobre":"Sobre o livro","js.estante.todos":"Todos","js.estante.vazia":"A estante está sendo organizada. Volte em breve.","js.faq":[{"q":"Como recebo meu ebook?","r":"Logo após a confirmação do pagamento, você recebe o PDF por e-mail (sac@3trevo.com.br) e tem acesso permanente ao EPUB na sua área do cliente, com leitor integrado."},{"q":"O que é o Nema?","r":"É o ponto de fidelidade da editora: a nossa moeda de descontos. Você ganha Nema ao comprar e usa o saldo em novas compras. As regras de emissão e uso, inclusive de campanhas e promoções futuras, estão nas Regras do Nema."},{"q":"Quando posso usar meu Nema?","r":"Assim que o saldo for liberado, ele aparece no seu espaço de cliente. O prazo de liberação de cada Nema está nas Regras do Nema."},{"q":"Como uso o Nema?","r":"Entre no seu espaço de cliente e vá ao pagamento da próxima compra. Marque \"Usar meu saldo Nema\" e ganhe desconto. Também há campanhas de uso: acompanhe por aqui e pelas nossas redes."},{"q":"Posso trocar Nema por dinheiro?","r":"Não. Nema só vale como desconto em compras na editora e não pode ser transferido para outra pessoa."},{"q":"Posso pedir reembolso?","r":"Sim. Você tem 7 dias para ler sem risco: se não gostar, devolvemos 100% do valor. É só escrever para sac@3trevo.com.br. O Nema daquela compra é cancelado."}],"js.gratis.carregando":"Carregando… tente de novo em um instante.","js.leitor.abrindo":"Abrindo o livro…","js.leitor.abrir.pdf":"Abrir o PDF","js.leitor.ajustes":"Ajustes de leitura","js.leitor.ajustes.dica":"Tamanho do texto e modo noite","js.leitor.anterior":"Anterior","js.leitor.cap.anterior":"Capítulo anterior","js.leitor.cap.proximo":"Próximo capítulo","js.leitor.colofao":"Editora Três Trevo · edição digital<br>Obrigado por ler com a gente.","js.leitor.concluir":"Concluir","js.leitor.dia":"Dia","js.leitor.erro.ajuda":"Se continuar, escreva para sac@3trevo.com.br","js.leitor.erro.titulo":"Não foi possível abrir o livro","js.leitor.fechar":"Fechar","js.leitor.fechar.livro":"Fechar o livro","js.leitor.fim.conhecer":"Conhecer o livro","js.leitor.fim.mesmo.autor":"Do mesmo autor","js.leitor.fim.reler":"Reler do início","js.leitor.fim.sobre":"Você chegou ao fim de","js.leitor.fim.voltar":"Voltar à biblioteca","js.leitor.ilegivel":"O arquivo do livro não pôde ser lido.","js.leitor.lento":"O livro está demorando para carregar. A conexão pode estar lenta.","js.leitor.maior":"Aumentar texto","js.leitor.menor":"Diminuir texto","js.leitor.modo":"Modo","js.leitor.noite":"Noite","js.leitor.pdf.celular":"Este título está em PDF. Ele abre no leitor de PDF do seu aparelho.","js.leitor.proximo":"Próximo","js.leitor.sem.formato":"Nenhum formato disponível para leitura.","js.leitor.tentar":"Tentar de novo","js.leitor.texto":"Texto","js.leitor.trilha":"Ouvir a trilha do livro","js.marca":"Editora Três Trevo","js.membro.amostra.completo":"Livro completo · a compra rende Nema","js.membro.amostra.gostou":"Gostou do capítulo?","js.membro.amostra.ler":"Ler o capítulo 1","js.membro.amostra.ler.completo":"Ler o livro completo","js.membro.amostra.secao":"Amostra grátis","js.membro.amostra.selo":"Amostra grátis","js.membro.classico.secao":"Clássico grátis","js.membro.comecar":"Começar a ler","js.membro.continuar":"Continuar","js.membro.erro.abrir":"Não foi possível abrir o clássico agora. Tente de novo em instantes.","js.membro.erro.escolher":"Não foi possível escolher agora. Tente de novo.","js.membro.erro.liberar":"Não foi possível liberar agora. Tente de novo.","js.membro.escolha":"Escolha um clássico para o seu espaço de leitura. Você lê um de cada vez e pode trocar quando terminar.","js.membro.escolher":"Escolher este","js.membro.escolhido":"\"{titulo}\" está no seu espaço de leitura.","js.membro.espaco":"1 espaço de leitura","js.membro.fim.nema":"Sua primeira compra rende Nema","js.membro.fim.nema.intl":"Quando chegarem, cada compra rende Nema","js.membro.fim.rotulo":"Da Editora Três Trevo","js.membro.fim.titulo":"Conheça os livros da casa","js.membro.fim.titulo.intl":"Nossas edições estão a caminho","js.membro.intro":"Escolha um clássico e leia no leitor da editora, com o progresso salvo.","js.membro.intro.pt":"Comece pela amostra e escolha um clássico da literatura brasileira. Tudo no leitor da editora, com o progresso salvo.","js.membro.lido":"{n}% lido","js.membro.nota":"Membros grátis leem um clássico por vez. Quem compra qualquer livro da editora ganha três espaços na Biblioteca TT.","js.membro.nota.intl":"Membros grátis leem um clássico por vez e podem trocar quando terminarem.","js.membro.rotulo":"Membro grátis","js.membro.seu.classico":"Seu clássico","js.membro.titulo":"Sua área de leitura na Três Trevo","js.membro.trocar":"Concluir e trocar","js.membro.trocar.confirma":"Concluir este clássico e liberar o espaço para outro?","js.nema.aria":"Nema, o ponto de fidelidade da editora","js.nema.catalogo":"Ver o catálogo","js.nema.como":"Como o Nema funciona","js.nema.rotulo":"Nema · ponto de fidelidade","js.nema.texto":"10% do valor de cada e-book volta para você em Nema, e o saldo vira desconto na próxima leitura (até metade do preço). Liberado 7 dias depois da compra.","js.nema.titulo":"Sua primeira compra já rende Nema"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
 <link rel="canonical" href="https://3trevo.com.br/area-cliente.html">
 <link rel="alternate" hreflang="pt-BR" href="https://3trevo.com.br/area-cliente.html">
 <link rel="alternate" hreflang="en" href="https://3trevo.com.br/en/area-cliente.html">
@@ -774,7 +775,7 @@ nav{
 <!-- ══ TELA: LOGIN ══ -->
 <div id="tela-login" class="tela ativa">
   <div class="login-box">
-    <div class="login-logo">✦ Três Trevo</div>
+    <div class="login-logo">Três Trevo</div>
     <p class="login-sub" data-i18n="ac.login.sub">Acesse sua biblioteca pessoal. Ainda não tem conta? Use “Receber link por e-mail”: a área de membro é criada na hora, de graça.</p>
     <label class="campo-label" for="emailLogin" data-i18n="ac.login.email">E-mail</label>
     <input type="email" id="emailLogin" class="campo-input" data-i18n-attr="placeholder:ac.login.email.ph" placeholder="seu@email.com"
@@ -838,11 +839,26 @@ nav{
       <div class="loading"><div class="loading-spinner"></div><span class="loading-txt" data-i18n="ac.carregando">Carregando</span></div>
     </div>
 
+    <!-- Cadastro opcional: pedido depois da compra. Nada aqui é obrigatório para acessar os ebooks. -->
+    <section id="cadastroOpcional" style="display:none;margin:0 0 24px;padding:20px;border:2px solid #1e5c3a;border-radius:8px;background:#fff;font-size:1rem;line-height:1.6;color:#1a1a1a">
+      <h2 style="margin:0 0 6px;font-size:1.25rem;color:#1e5c3a">Complete seu cadastro (opcional)</h2>
+      <p style="margin:0 0 14px">Seu CPF e telefone são usados para a nota fiscal e para avisos de novas obras. Você pode pular isto a qualquer momento.</p>
+      <form id="formCadastroOpcional" onsubmit="salvarCadastroOpcional(event)" style="display:grid;gap:12px">
+        <label>Nome completo<br><input name="nome" type="text" maxlength="120" style="width:100%;font-size:1rem;padding:8px"></label>
+        <label>CPF<br><input name="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" style="width:100%;font-size:1rem;padding:8px"></label>
+        <label>Telefone com DDD<br><input name="telefone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" style="width:100%;font-size:1rem;padding:8px"></label>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <button type="submit" style="font-size:1rem;padding:10px 18px;background:#1e5c3a;color:#fff;border:0;border-radius:6px;cursor:pointer">Salvar</button>
+          <span id="cadastroOpcionalMsg" role="status" style="font-size:1rem"></span>
+        </div>
+      </form>
+    </section>
+
     <!-- Biblioteca Clássica TT — exibido por carregarBiblioteca() só quando há ebook na conta -->
     <div id="bannerClassicos" class="banner-classicos" hidden data-so-pt style="margin-top:36px;padding:28px 32px;background:linear-gradient(135deg,#0f2d1a 0%,#1e5c3a 100%);border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
       <div>
         <p style="color:var(--ouro);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin:0 0 8px;">Incluído na sua compra</p>
-        <h3 style="font-family:'Lora',serif;font-weight:400;font-size:20px;color:#fff;margin:0 0 10px;"><span style="color:var(--ouro)">✦</span> Biblioteca Clássica TT</h3>
+        <h3 style="font-family:'Lora',serif;font-weight:400;font-size:20px;color:#fff;margin:0 0 10px;">Biblioteca Clássica TT</h3>
         <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.6;margin:0;">Clássicos da literatura brasileira em domínio público, no mesmo leitor da editora. Leia até 3 obras ao mesmo tempo, com o progresso salvo.</p>
       </div>
       <a id="link-bib-classica" href="/minha-biblioteca.html" style="flex-shrink:0;display:inline-block;background:var(--ouro);color:#0f2d1a;text-decoration:none;padding:13px 28px;border-radius:3px;font-size:14px;font-weight:600;white-space:nowrap;">Acessar biblioteca →</a>
@@ -888,11 +904,11 @@ nav{
 
 <!-- Leitor: js/leitor.js monta o próprio #tela-leitura ao abrir um livro -->
 
-<script src="/js/supabase-client.js?v=33db0afb"></script>
+<script src="/js/supabase-client.js?v=bace3c9d"></script>
 <script data-so-pt src="/js/player.js?v=1228b01f"></script>
 <script src="/js/leitor.js?v=56ae9591"></script>
 <script src="/js/estante.js?v=fc77c52c"></script>
-<script src="/js/membro.js?v=720de1fb"></script>
+<script src="/js/membro.js?v=8df4bfab"></script>
 <script>
 // ============================================================
 // ÁREA DO CLIENTE — Editora Três Trevo
@@ -995,7 +1011,7 @@ async function enviarMagicLink() {
     msg.textContent = /rate|limit|429/i.test(error.message) ? T('js.cad.erro.tentativas') : T('js.ac.erro.link');
     msg.className = 'login-msg erro';
   } else {
-    msg.innerHTML = '✦ ' + T('js.ac.link.ok');
+    msg.innerHTML = T('js.ac.link.ok');
     msg.className = 'login-msg sucesso';
   }
 }
@@ -1023,6 +1039,7 @@ function mostrarDashboard() {
   document.getElementById('navRight').style.display = 'flex';
   document.getElementById('navEmail').textContent = usuarioAtual.email;
   carregarBiblioteca();
+  carregarCadastroOpcional();
   carregarStats();
 }
 
@@ -1117,6 +1134,50 @@ function animarNum(id, target) {
 // ══════════════════════════════════════════════════════════
 // BIBLIOTECA (EBOOKS)
 // ══════════════════════════════════════════════════════════
+// Cadastro opcional (nome, CPF, telefone): pedido depois da compra. Não bloqueia nada.
+async function carregarCadastroOpcional() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/cliente/perfil', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+    });
+    const d = await r.json();
+    if (!d.ok || (d.perfil && d.perfil.cpf)) return;
+    document.getElementById('cadastroOpcional').style.display = 'block';
+  } catch (e) { /* sem o cartão, a área segue normal */ }
+}
+
+async function salvarCadastroOpcional(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const msg = document.getElementById('cadastroOpcionalMsg');
+  const dados = {};
+  ['nome', 'cpf', 'telefone'].forEach(function (c) {
+    const v = form.elements[c].value.trim();
+    if (v) dados[c] = v;
+  });
+  if (Object.keys(dados).length === 0) { msg.textContent = 'Preencha ao menos um campo.'; return; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('https://tres-trevo-api.al-kbhal.workers.dev/api/cliente/perfil', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body: JSON.stringify(dados),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      msg.textContent = 'Cadastro salvo. Obrigado!';
+      if (dados.cpf) document.getElementById('cadastroOpcional').style.display = 'none';
+      return;
+    }
+    const motivos = { cpf_invalido: 'CPF inválido. Confira os números.', telefone_invalido: 'Telefone inválido.', nome_invalido: 'Nome inválido.' };
+    msg.textContent = motivos[d.erro] || 'Não foi possível salvar agora. Tente de novo em alguns minutos.';
+  } catch (e) {
+    msg.textContent = 'Erro de conexão. Tente de novo.';
+  }
+}
+
 async function carregarBiblioteca() {
   const cont = document.getElementById('listaEbooks');
   cont.innerHTML = skeletonCards(4);
@@ -1253,7 +1314,7 @@ function capaTipografica(titulo, autor, slug) {
   return `<div class="capa-tipo" style="--capa-a:${a};--capa-b:${b}">
     <span><span class="capa-tipo-titulo">${escHtml(titulo)}</span><span class="capa-tipo-filete"></span>
     <span class="capa-tipo-autor">${escHtml(autor)}</span></span>
-    <span class="capa-tipo-selo">✦ Três Trevo</span>
+    <span class="capa-tipo-selo">Três Trevo</span>
   </div>`;
 }
 
@@ -1318,7 +1379,7 @@ async function baixar(productId, titulo, formato) {
       toast(`Formato ${rotulo} não disponível para este título.`, 'erro');
     } else {
       window.open(item.download_url, '_blank');
-      toast(`✦ Arquivo ${rotulo} de "${titulo}" baixado.`);
+      toast(`Arquivo ${rotulo} de "${titulo}" baixado.`);
     }
   } catch {
     toast(T('js.erro.conexao'), 'erro');
@@ -1574,7 +1635,7 @@ async function carregarSorteios() {
                 <button class="rede-btn" onclick="toggleRede(this,'${p.id}','tiktok')">TikTok</button>
                 <button class="rede-btn" onclick="toggleRede(this,'${p.id}','youtube')">YouTube</button>
               </div>
-              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participação ✦</button>
+              <button class="btn-validar" onclick="enviarValidacao('${draw.id}','${p.id}')">Confirmar participação</button>
             </div>
           </div>`;
         }).join('')}
@@ -1693,7 +1754,7 @@ async function enviarValidacao(drawId, purchaseId) {
       toast(data.error || 'Erro ao validar participação.', 'erro');
       return;
     }
-    toast(`✦ Participação confirmada! ${data.cotas_total} cotas (${data.multiplicador}×)`);
+    toast(`Participação confirmada! ${data.cotas_total} cotas (${data.multiplicador}×)`);
     abasCarregadas['sorteios'] = false;
     setTimeout(() => { abasCarregadas['sorteios'] = false; carregarSorteios(); }, 1200);
   } catch {

@@ -22,14 +22,15 @@ DECLARE
   v_product_id   uuid;
   v_product_titulo text;
   v_product_cotas  int;
+  v_product_tipo   text;
   v_payment_id   uuid;
   v_purchase_id  uuid;
   v_dl_token     uuid;
   v_novo         boolean := false;
 BEGIN
   -- Buscar produto por slug
-  SELECT id, titulo, cotas
-  INTO v_product_id, v_product_titulo, v_product_cotas
+  SELECT id, titulo, cotas, tipo
+  INTO v_product_id, v_product_titulo, v_product_cotas, v_product_tipo
   FROM products
   WHERE slug = p_product_slug AND ativo = true;
 
@@ -59,6 +60,7 @@ BEGIN
       'download_token', v_dl_token,
       'ebook_titulo',  v_product_titulo,
       'cotas_base',    v_product_cotas,
+      'tipo',          v_product_tipo,
       'novo',          false
     );
   END IF;
@@ -90,16 +92,20 @@ BEGIN
   VALUES (p_user_id, v_product_id, 'purchase', v_purchase_id)
   ON CONFLICT (user_id, product_id) DO NOTHING;
 
-  -- Criar token de download (UUID, 72h)
-  INSERT INTO downloads (
-    user_id, product_id,
-    expira_em
-  )
-  VALUES (
-    p_user_id, v_product_id,
-    now() + interval '72 hours'
-  )
-  RETURNING token INTO v_dl_token;
+  -- Token de download (UUID, 72h). Produto acesso_app não tem arquivo: sem token.
+  IF v_product_tipo = 'acesso_app' THEN
+    v_dl_token := NULL;
+  ELSE
+    INSERT INTO downloads (
+      user_id, product_id,
+      expira_em
+    )
+    VALUES (
+      p_user_id, v_product_id,
+      now() + interval '72 hours'
+    )
+    RETURNING token INTO v_dl_token;
+  END IF;
 
   v_novo := true;
 
@@ -110,6 +116,7 @@ BEGIN
     'download_token', v_dl_token,
     'ebook_titulo',  v_product_titulo,
     'cotas_base',    v_product_cotas,
+    'tipo',          v_product_tipo,
     'novo',          true
   );
 

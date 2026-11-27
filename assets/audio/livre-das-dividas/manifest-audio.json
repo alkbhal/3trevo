@@ -1,0 +1,41 @@
+{
+  "slug": "livre-das-dividas",
+  "titulo": "Livre das Dívidas",
+  "autor": "Said Anes",
+  "versao_texto": "150d345ba6",
+  "voz": "pt_BR-faber-medium",
+  "faixas": [
+    {
+      "ordem": 1,
+      "id": "prefacio",
+      "titulo": "Prefácio — A culpa não é (só) sua",
+      "arquivo": "01-prefacio.mp3",
+      "segundos": 185,
+      "bytes": 1111005,
+      "sha256": "39adee6fb14002298e4e979109d68f97163a63fa91175caa7fa02a98663dfc33"
+    },
+    {
+      "ordem": 2,
+      "id": "cap1",
+      "titulo": "Capítulo 1 — A armadilha invisível",
+      "arquivo": "02-cap1.mp3",
+      "segundos": 343,
+      "bytes": 2057839,
+      "sha256": "1aa30a4a621faaf826629ec90f581cd123c15467338ca617a45e4b7dc40973ad"
+    },
+    {
+      "ordem": 3,
+      "id": "cap2",
+      "titulo": "Capítulo 2 — A psicologia do endividamento",
+      "arquivo": "03-cap2.mp3",
+      "segundos": 275,
+      "bytes": 1650956,
+      "sha256": "aee6b88c12bb3080650ab71f6ab3c2de9f700169bce4bd4987b8fbf3b3d51f99"
+    }
+  ],
+  "minutos": 13.4,
+  "portoes": {
+    "A1_duracao": "ok",
+    "A2_termos_vetados_conferidos": 0
+  }
+}

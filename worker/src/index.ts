@@ -39,7 +39,11 @@ import {
 } from './routes/admin-hero';
 import { handleAiStudio } from './routes/admin-ai-studio';
 import { handleNemaSaldo } from './routes/nema';
-import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha } from './routes/admin-auth';
+import { handleAticoAcesso } from './routes/atico';
+import { handleClientePerfil } from './routes/perfil';
+import { handleLeitura, handleLeituraAudio } from './routes/leitura';
+import { handleAdminLogin, handleAdminStats, handleAdminDefinirSenha, handleAdminLogout } from './routes/admin-auth';
+import { handleAdminProducao } from './routes/admin-producao';
 import { handleAdminForge } from './routes/admin-forge';
 import { handleTrack, handleMetaCapi } from './routes/track';
 import { handleLeadCapture, handleUnsubscribe } from './routes/leads';
@@ -50,6 +54,7 @@ import { handleDrawProgress } from './routes/admin-draw';
 import { handleBudgetController } from './cron/budget-controller';
 import { handleEmailEngine } from './cron/email-engine';
 import { handleCartRecovery } from './cron/cart-recovery';
+import { handleConciliacao } from './cron/conciliacao';
 import {
   handleAdminDepoimentosList,
   handleAdminDepoimentoUpdate,
@@ -105,6 +110,8 @@ function corsHeaders(origin: string | null): HeadersInit {
   };
 }
 
+const ADMIN_SEM_SESSAO = new Set(['/api/admin/login', '/api/admin/definir-senha']);
+
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
@@ -155,6 +162,7 @@ export default {
       ctx.waitUntil(handleEmailEngine(env));
       ctx.waitUntil(handleBudgetController(env));
       ctx.waitUntil(handleCartRecovery(env));
+      ctx.waitUntil(handleConciliacao(env));
     }
   },
 };
@@ -254,6 +262,20 @@ async function dispatch(request: Request, env: Env, path: string, method: string
       return handleNemaSaldo(request, env);
     }
 
+    if (path === '/api/cliente/perfil' && (method === 'GET' || method === 'POST')) {
+      return handleClientePerfil(request, env);
+    }
+    if (path === '/api/atico/acesso' && method === 'GET') {
+      return handleAticoAcesso(request, env);
+    }
+
+    if (path.startsWith('/api/leitura/') && path.endsWith('/audio') && method === 'GET') {
+      return handleLeituraAudio(request, env, path.slice('/api/leitura/'.length, -'/audio'.length));
+    }
+    if (path.startsWith('/api/leitura/') && method === 'GET') {
+      return handleLeitura(request, env, path.slice('/api/leitura/'.length));
+    }
+
     if (path === '/api/webhook/pagamento' && (method === 'POST' || method === 'GET')) {
       return handleWebhookPagamento(request, env);
     }
@@ -269,6 +291,20 @@ async function dispatch(request: Request, env: Env, path: string, method: string
     }
 
     // ── Admin ──────────────────────────────────────────────────────────────
+    // Portão único: toda rota /api/admin/* exige sessão válida, exceto as que criam a sessão.
+    // Os handlers continuam conferindo (a consulta é feita uma vez por requisição); uma rota
+    // nova que esqueça a checagem não fica aberta.
+    if (path.startsWith('/api/admin/') && !ADMIN_SEM_SESSAO.has(path) && !(await verificarToken(request, env))) {
+      return json({ ok: false, erro: 'unauthorized' }, 401);
+    }
+
+    if (path === '/api/admin/logout' && method === 'POST') {
+      return handleAdminLogout(request, env);
+    }
+    if (path.startsWith('/api/admin/producao/')) {
+      return handleAdminProducao(request, env, path);
+    }
+
     if (path === '/api/admin/sorteio' && method === 'POST') {
       return handleSorteio(request, env);
     }

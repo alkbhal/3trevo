@@ -30,7 +30,7 @@ const CATALOGO = {
   'caminho-rubro-vol2': { titulo: 'Caminho Rubro — Vol. 2: As 7 Leis',           autor: 'Said Anes', genero: 'Ensaio Político',   cotas: 3,  preco: 29.90 },
   'caminho-rubro-vol3': { titulo: 'Caminho Rubro — Vol. 3: Tiranos São Construídos', autor: 'Said Anes', genero: 'Ensaio Político', cotas: 3, preco: 29.90 },
   justicamento:         { titulo: 'Justiça(mento) para Orelha',                   autor: 'Said Anes', genero: 'Ensaio',            cotas: 1,  preco: 10.00 },
-  antifalencia:         { titulo: 'O Guia Antifalência do Empreendedor Iniciante', autor: 'Said Anes', genero: 'Manual',          cotas: 3,  preco: 29.90 },
+  antifalencia:         { titulo: 'O Guia Antifalência do Empreendedor Iniciante', autor: 'Said Anes', genero: 'Manual',          cotas: 1,  preco: 19.90 },
   'livre-das-dividas':  { titulo: 'Livre das Dívidas',                            autor: 'Said Anes', genero: 'Finanças Pessoais', cotas: 1,  preco: 15.35 },
   'isa-isma-tintim':    { titulo: 'Isa, Isma e Tintim',                           autor: 'Said Anes', genero: 'Infantojuvenil',   cotas: 1,  preco: 19.90 },
   'antes-do-app':       { titulo: 'Antes do App, o Método',                       autor: 'Said Anes', genero: 'Finanças / Método', cotas: 3,  preco: 29.90 },

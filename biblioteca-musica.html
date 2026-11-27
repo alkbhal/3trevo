@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <script src="/js/consentimento.js?v=8ec92ecf" data-fb="PageView" defer></script>
+  <script src="/js/consentimento.js?v=31017ee2" data-fb="PageView" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Biblioteca Musical — Editora Três Trevo</title>
@@ -37,7 +37,7 @@ a{text-decoration:none;color:inherit}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:100;background:var(--verde-nav);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px}
-.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ouro);letter-spacing:.5px}
+.nav-marca{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ouro);letter-spacing:.5px;display:inline-flex;align-items:center;gap:10px}.nav-marca::before{content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em}
 .nav-links{display:flex;gap:28px;list-style:none}
 .nav-links a{font-size:13px;color:rgba(255,255,255,.6);letter-spacing:.3px;transition:color .2s}
 .nav-links a:hover,.nav-links a.ativo{color:var(--ouro)}
@@ -46,7 +46,6 @@ nav{position:sticky;top:0;z-index:100;background:var(--verde-nav);display:flex;a
 
 /* HERO */
 .lib-hero{background:var(--verde-nav);padding:64px 32px 48px;text-align:center;position:relative;overflow:hidden}
-.lib-hero::before{content:'✦';font-size:200px;position:absolute;top:-40px;left:50%;transform:translateX(-50%);color:rgba(200,168,75,.04);pointer-events:none;font-family:'Cormorant Garamond',serif}
 .lib-hero-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(200,168,75,.6);margin-bottom:16px}
 .lib-hero-titulo{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,52px);font-weight:300;color:#f4efe5;line-height:1.2;margin-bottom:16px}
 .lib-hero-titulo em{color:var(--ouro);font-style:italic}
@@ -130,7 +129,7 @@ footer.lib-footer a{color:rgba(200,168,75,.5);text-decoration:none}
 <body>
 
 <nav>
-  <a href="/" class="nav-marca">✦ Editora Três Trevo</a>
+  <a href="/" class="nav-marca">Editora Três Trevo</a>
   <ul class="nav-links">
     <li><a href="/#catalogo">Catálogo</a></li>
     <li><a href="/#nema">Nema</a></li>
@@ -259,7 +258,7 @@ function renderizar() {
       ? `<div class="musica-universo${m.produto_id?' com-link':''}" onclick="event.stopPropagation();${m.produto_id?`irParaLivro('${m.universo_slug}')`:''}">${escHtml(m.universo_slug)}</div>`
       : '';
     const footerHtml = temAcesso
-      ? `<span class="musica-badge-gratis">${m.gratuita ? '✦ Gratuita' : '✦ Desbloqueada'}</span><span></span>`
+      ? `<span class="musica-badge-gratis">${m.gratuita ? 'Gratuita' : 'Desbloqueada'}</span><span></span>`
       : `<span class="musica-badge-lock">🔒 Exclusivo</span><a class="musica-adquirir" href="/checkout.html?slug=${m.universo_slug||''}" onclick="event.stopPropagation()">Adquirir livro →</a>`;
 
     return `<div class="musica-card" onclick="tocarMusica('${m.id}',${temAcesso})">

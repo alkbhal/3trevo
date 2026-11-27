@@ -1,5 +1,5 @@
 // js/consentimento.js — aviso de cookies (LGPD).
-// Google Analytics e Meta Pixel só carregam depois que o visitante clica em "Aceitar".
+// Google Analytics, Meta Pixel e a medição própria (js/beacon.js) só começam depois que o visitante clica em "Aceitar".
 // A escolha fica no localStorage ('tt-consentimento' = 'aceito' | 'recusado').
 // Evento extra do pixel por página: <script src="/js/consentimento.js" data-fb="ViewContent">.
 // Eventos de conversão: TTConsent.evento('purchase', {...}) — ignorado sem consentimento.
@@ -11,11 +11,11 @@
   var fbEvento = tag && tag.getAttribute('data-fb');
   var lang = (document.documentElement.lang || 'pt').slice(0, 2);
   var TXT = {
-    pt: { msg: 'Usamos cookies de medição (Google Analytics e Meta) para entender as visitas e melhorar o site. Eles só são ativados se você aceitar.',
+    pt: { msg: 'Usamos medição de visitas (Google Analytics, Meta e a do próprio site) para entender como o site é usado e melhorá-lo. Ela só é ativada se você aceitar.',
           aceitar: 'Aceitar', recusar: 'Recusar', mais: 'Política de privacidade', link: '/privacidade.html' },
-    en: { msg: 'We use measurement cookies (Google Analytics and Meta) to understand visits and improve the site. They are only turned on if you accept.',
+    en: { msg: 'We measure visits (Google Analytics, Meta and our own measurement) to understand how the site is used and improve it. It is only turned on if you accept.',
           aceitar: 'Accept', recusar: 'Decline', mais: 'Privacy policy', link: '/en/privacidade.html' },
-    es: { msg: 'Usamos cookies de medición (Google Analytics y Meta) para entender las visitas y mejorar el sitio. Solo se activan si aceptas.',
+    es: { msg: 'Medimos las visitas (Google Analytics, Meta y la medición propia del sitio) para entender cómo se usa y mejorarlo. Solo se activa si aceptas.',
           aceitar: 'Aceptar', recusar: 'Rechazar', mais: 'Política de privacidad', link: '/es/privacidade.html' }
   };
   var t = TXT[lang] || TXT.pt;
@@ -67,6 +67,7 @@
       box.remove();
       document.documentElement.classList.remove('tt-com-aviso');
       if (v === 'aceito') carregar();
+      try { document.dispatchEvent(new CustomEvent('tt:consentimento', { detail: v })); } catch (err) { /* navegador antigo */ }
     });
     document.body.appendChild(box);
     document.documentElement.classList.add('tt-com-aviso');

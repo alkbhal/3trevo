@@ -1,7 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" data-lang="en">
 <head>
-  <script src="/js/consentimento.js?v=8ec92ecf" data-fb="PageView" defer></script>
+  <script src="/js/consentimento.js?v=31017ee2" data-fb="PageView" defer></script>
+  <script src="/js/vinheta.js?v=3e6e2e43" defer></script>
+  <style>
+    /* vinheta de abertura (js/vinheta.js) */
+    #tt-vinheta { position: fixed; inset: 0; z-index: 2147483000; background: #0f2d1a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease; }
+    #tt-vinheta[hidden] { display: none; }
+    #tt-vinheta .vt-palco svg { width: min(46vw, 260px); height: auto; display: block; }
+    #tt-vinheta .vt-marca { text-align: center; color: #f4efe5; opacity: 0; transform: translateY(6px); transition: opacity .5s ease, transform .5s ease; }
+    #tt-vinheta.vt-nome .vt-marca { opacity: 1; transform: none; }
+    #tt-vinheta .vt-nome-t { font-family: var(--serif); font-size: clamp(30px, 6vw, 46px); font-weight: 400; letter-spacing: -.01em; }
+    #tt-vinheta .vt-desc { display: block; margin-top: 10px; font-size: 12px; letter-spacing: .32em; text-transform: uppercase; color: #c9a84c; }
+    #tt-vinheta .vt-btns { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; }
+    #tt-vinheta .vt-btns button { background: transparent; border: 1px solid rgba(244,239,229,.35); color: rgba(244,239,229,.85); font: inherit; font-size: 13px; padding: 9px 16px; border-radius: 999px; cursor: pointer; }
+    #tt-vinheta .vt-btns .vt-ouvir { border-color: #c9a84c; color: #c9a84c; }
+    #tt-vinheta .vt-btns button:focus-visible { outline: 2px solid #c9a84c; outline-offset: 2px; }
+    #tt-vinheta.vt-sai { opacity: 0; pointer-events: none; }
+    html.tt-vinheta, html.tt-vinheta body { overflow: hidden; }
+  </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" data-i18n-attr="content:meta.inicio.desc" content="Três Trevo is an independent digital publisher from Brazil. Read public-domain classics for free in our reader while our English editions are on their way.">
@@ -53,7 +70,9 @@
       max-width: var(--max); margin: 0 auto; padding: 0 24px;
       height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
-    .logo { font-family: var(--serif); font-weight: 400; font-size: 16px; color: rgba(255,255,255,.92); letter-spacing: .02em; }
+    .logo { font-family: var(--serif); font-weight: 400; font-size: 16px; color: rgba(255,255,255,.92); letter-spacing: .02em; white-space: nowrap; }
+    .logo::before { margin-right: .45em; }
+    .logo::before, .ft-logo::before { content:'';display:inline-block;flex-shrink:0;width:1.3em;height:1.3em;background:currentColor;-webkit-mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;mask:url(/assets/marca/simbolo-medio-mascara.svg) center/contain no-repeat;vertical-align:-.3em; color: var(--v6); }
     .logo span { color: var(--v6); }
     nav { display: flex; align-items: center; gap: 24px; }
     nav a { font-size: 13px; color: rgba(255,255,255,.5); transition: color .2s; }
@@ -319,7 +338,6 @@
     .btn-adq { background: var(--v2); color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: background .2s, transform .15s; white-space: nowrap; box-shadow: 0 2px 8px rgba(26,92,56,.25); }
     .btn-adq:hover { background: var(--v3); transform: scale(1.04); }
     .pcard-pc { font-size: 11px; color: var(--v4); padding: 8px 20px; background: var(--v8); border-top: 1px solid rgba(30,92,58,.08); display: flex; align-items: center; gap: 6px; }
-    .pcard-pc::before { content: '✦'; font-size: 9px; }
 
     /* Garantia */
     .garantia { background: var(--branco); border: 1px solid var(--borda); border-radius: 3px; padding: 20px 28px; display: flex; align-items: center; gap: 16px; margin-top: 28px; }
@@ -492,7 +510,7 @@
     footer { background: var(--v0); padding: 56px 24px 36px; }
     .ft-in { max-width: var(--max); margin: 0 auto; }
     .ft-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 44px; }
-    .ft-logo { font-family: var(--serif); font-size: 19px; font-weight: 300; color: rgba(255,255,255,.8); margin-bottom: 10px; }
+    .ft-logo { font-family: var(--serif); font-size: 19px; font-weight: 300; color: rgba(255,255,255,.8); margin-bottom: 10px; display: flex; align-items: center; gap: .55em; }
     .ft-tag { font-size: 13px; color: rgba(255,255,255,.3); line-height: 1.65; max-width: 260px; margin-bottom: 16px; }
     #membros { padding: 96px 24px; background: var(--bg2, #0d1a12); }
     #membros .sec-in { max-width: 920px; margin: 0 auto; }
@@ -553,8 +571,8 @@
       .faixa-sep { display: none; }
     }
   </style>
-  <script>window.addEventListener('load',function(){var v=document.getElementById('hero-video');if(v){v.load();v.play();}});</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "@id": "https://3trevo.com.br/#editora", "name": "Editora Três Trevo", "url": "https://3trevo.com.br/", "logo": "https://3trevo.com.br/android-chrome-512x512.png", "image": "https://3trevo.com.br/og-image.png", "email": "sac@3trevo.com.br", "telephone": "+55-54-99946-7085", "taxID": "18.928.966/0001-59", "address": {"@type": "PostalAddress", "addressLocality": "Montauri", "addressRegion": "RS", "addressCountry": "BR"}, "areaServed": "BR", "sameAs": ["https://www.instagram.com/3trevo"], "contactPoint": {"@type": "ContactPoint", "contactType": "customer service", "email": "sac@3trevo.com.br", "telephone": "+55-54-99946-7085", "availableLanguage": ["pt-BR", "en", "es"]}}</script>
+  <script>/* Vídeo do topo: só toca se o visitante não pediu menos movimento nem economia de dados; senão fica a imagem parada (poster). */window.TT_SEM_VIDEO=!!((window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)||(navigator.connection&&navigator.connection.saveData));window.addEventListener('load',function(){var v=document.getElementById('hero-video');if(v&&!window.TT_SEM_VIDEO){v.load();v.play();}});</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "@id": "https://3trevo.com.br/#editora", "name": "Editora Três Trevo", "legalName": "RDS Anúncios Ltda", "url": "https://3trevo.com.br/", "logo": "https://3trevo.com.br/android-chrome-512x512.png", "image": "https://3trevo.com.br/og-image.png", "email": "sac@3trevo.com.br", "telephone": "+55-54-99946-7085", "taxID": "18.928.966/0001-59", "address": {"@type": "PostalAddress", "addressLocality": "Montauri", "addressRegion": "RS", "addressCountry": "BR"}, "areaServed": "BR", "sameAs": ["https://www.instagram.com/3trevo"], "contactPoint": {"@type": "ContactPoint", "contactType": "customer service", "email": "sac@3trevo.com.br", "telephone": "+55-54-99946-7085", "availableLanguage": ["pt-BR", "en", "es"]}}</script>
 <script type="application/ld+json" id="ld-faq">{"@context":"https://schema.org","@type":"FAQPage","inLanguage":"en","mainEntity":[{"@type":"Question","name":"What is the free member area?","acceptedAnswer":{"@type":"Answer","text":"It’s your personal space at Três Trevo. You create it with just your email — no password and no card — and use it to read a public-domain classic in our reader."}},{"@type":"Question","name":"Which books can I read?","acceptedAnswer":{"@type":"Answer","text":"Great classics of English literature that are in the public domain. You choose one from the shelf in your member area."}},{"@type":"Question","name":"Why one classic at a time?","acceptedAnswer":{"@type":"Answer","text":"Your free membership includes one reading space. When you finish a book, tap “Finish and switch” and choose the next one."}},{"@type":"Question","name":"Does it work on my phone?","acceptedAnswer":{"@type":"Answer","text":"Yes. The reader adapts to any screen, with large type, night mode and your place saved wherever you stop."}},{"@type":"Question","name":"Are your own books available in English?","acceptedAnswer":{"@type":"Answer","text":"Not yet. Our English editions are on their way, and they will appear in your member area as soon as they are published."}},{"@type":"Question","name":"What is Nema?","acceptedAnswer":{"@type":"Answer","text":"Our loyalty program. Once our English editions arrive, 10% of every purchase comes back as Nema, which becomes a discount on your next book. The full rules are on the Nema page."}}]}</script>
 <script id="tt-textos">window.TT_LANG="en";window.TT_TEXTOS={"js.ac.baixar.epub":"Download the EPUB file","js.ac.baixar.pdf":"Download the PDF file","js.ac.compra.fechar":"Close","js.ac.compra.livro":"Your book","js.ac.compra.texto":"<strong>{titulo}</strong> is unlocked: it will show up in your library below in a moment, and the PDF is also on its way by email. If it doesn't appear within a few minutes, reload the page or write to sac@3trevo.com.br (we reply within 48 hours).","js.ac.compra.titulo":"Thank you! Your payment was approved.","js.ac.email.invalido":"Please enter a valid email address.","js.ac.entrando":"Signing in…","js.ac.entrar":"Sign in","js.ac.enviando":"Sending…","js.ac.erro.carregar":"Couldn’t load","js.ac.erro.leitura":"Couldn’t open this book.","js.ac.erro.link":"We couldn’t send the link right now. Please try again in a moment.","js.ac.erro.login":"We couldn’t sign you in right now. Please try again.","js.ac.ler":"Read now","js.ac.link":"Email me a sign-in link","js.ac.link.ok":"Link sent! Check your email and click the link to sign in.<br><small style=\"opacity:.6\">It can take up to 2 minutes. Check your spam folder.</small>","js.ac.nema":"Nema points","js.ac.nema.pendente":"Nema points · + {n} released within 7 days","js.ac.plano.ativa":"Active","js.ac.plano.membro":"Free member","js.ac.plano.sem":"No plan","js.ac.recarregue":"Please reload the page.","js.ac.remover":"Remove from library","js.ac.sem.acesso":"This title isn’t in your account.","js.ac.sem.titulo":"Title unavailable","js.ac.senha.errada":"Wrong email or password.","js.ac.senha.vazia":"Enter your password, or get a sign-in link by email.","js.cad.botao":"Create my free member area →","js.cad.criando":"Creating…","js.cad.email":"Your best email","js.cad.erro.conexao":"No connection. Check your internet and try again.","js.cad.erro.email":"Please check the email address.","js.cad.erro.geral":"We couldn’t create it right now. Please try again in a moment.","js.cad.erro.tentativas":"Too many attempts in a row. Please wait a few minutes and try again.","js.cad.fechar":"Close","js.cad.fino":"No password: we email you a sign-in link.","js.cad.fino.intl":"No password: we email you a sign-in link. We never share your email.","js.cad.kicker":"Free · no card needed","js.cad.mala":"Send me new releases and news by email","js.cad.nome":"Your name","js.cad.ok":"Done! We sent the sign-in link to {email}.<br>Open the email and your member area will be ready. Check your spam folder if it doesn’t arrive within 2 minutes.","js.cad.sub":"Choose a public-domain classic of English literature and read it in our reader, with your place always saved.","js.cad.titulo":"Create your free member area","js.carregando":"Loading","js.erro.conexao":"Can’t reach the server. Check your internet and try again.","js.erro.sessao":"Your session has expired. Please sign in again to keep reading.","js.estante.dica":"Start with one of our readers’ favorites: {titulos}.","js.estante.filtro":"Filter by genre","js.estante.obra1":"1 book","js.estante.obras":"{n} books","js.estante.outros":"Other","js.estante.paginas":"{n} pages","js.estante.seculo":"{n} century","js.estante.sobre":"About the book","js.estante.todos":"All","js.estante.vazia":"We’re still arranging this shelf. Please come back soon.","js.faq":[{"q":"What is the free member area?","r":"It’s your personal space at Três Trevo. You create it with just your email — no password and no card — and use it to read a public-domain classic in our reader."},{"q":"Which books can I read?","r":"Great classics of English literature that are in the public domain. You choose one from the shelf in your member area."},{"q":"Why one classic at a time?","r":"Your free membership includes one reading space. When you finish a book, tap “Finish and switch” and choose the next one."},{"q":"Does it work on my phone?","r":"Yes. The reader adapts to any screen, with large type, night mode and your place saved wherever you stop."},{"q":"Are your own books available in English?","r":"Not yet. Our English editions are on their way, and they will appear in your member area as soon as they are published."},{"q":"What is Nema?","r":"Our loyalty program. Once our English editions arrive, 10% of every purchase comes back as Nema, which becomes a discount on your next book. The full rules are on the Nema page."}],"js.gratis.carregando":"Loading… please try again in a moment.","js.leitor.abrindo":"Opening the book…","js.leitor.abrir.pdf":"Open the PDF","js.leitor.ajustes":"Reading settings","js.leitor.ajustes.dica":"Text size and night mode","js.leitor.anterior":"Previous","js.leitor.cap.anterior":"Previous chapter","js.leitor.cap.proximo":"Next chapter","js.leitor.colofao":"Três Trevo · digital edition<br>Thank you for reading with us.","js.leitor.concluir":"Finish","js.leitor.dia":"Day","js.leitor.erro.ajuda":"If it keeps happening, write to sac@3trevo.com.br","js.leitor.erro.titulo":"We couldn’t open the book","js.leitor.fechar":"Close","js.leitor.fechar.livro":"Close the book","js.leitor.fim.conhecer":"Learn more","js.leitor.fim.mesmo.autor":"By the same author","js.leitor.fim.reler":"Read again from the start","js.leitor.fim.sobre":"You’ve reached the end of","js.leitor.fim.voltar":"Back to the library","js.leitor.ilegivel":"The book file couldn’t be read.","js.leitor.lento":"The book is taking a while to load. Your connection may be slow.","js.leitor.maior":"Larger text","js.leitor.menor":"Smaller text","js.leitor.modo":"Mode","js.leitor.noite":"Night","js.leitor.pdf.celular":"This title is a PDF. It opens in your device’s PDF viewer.","js.leitor.proximo":"Next","js.leitor.sem.formato":"No readable format is available.","js.leitor.tentar":"Try again","js.leitor.texto":"Text","js.leitor.trilha":"Listen to the book’s soundtrack","js.marca":"Três Trevo","js.membro.amostra.completo":"Full book · your purchase earns Nema","js.membro.amostra.gostou":"Enjoyed the chapter?","js.membro.amostra.ler":"Read chapter 1","js.membro.amostra.ler.completo":"Read the full book","js.membro.amostra.secao":"Free sample","js.membro.amostra.selo":"Free sample","js.membro.classico.secao":"Your free classic","js.membro.comecar":"Start reading","js.membro.continuar":"Continue","js.membro.erro.abrir":"We couldn’t open the classic right now. Please try again in a moment.","js.membro.erro.escolher":"We couldn’t save your choice. Please try again.","js.membro.erro.liberar":"We couldn’t free the space right now. Please try again.","js.membro.escolha":"Choose a classic for your reading space. You read one at a time and can switch when you finish.","js.membro.escolher":"Choose this one","js.membro.escolhido":"“{titulo}” is now in your reading space.","js.membro.espaco":"1 reading space","js.membro.fim.nema":"Your first purchase earns Nema","js.membro.fim.nema.intl":"When they arrive, every purchase earns Nema","js.membro.fim.rotulo":"From Três Trevo","js.membro.fim.titulo":"Discover our books","js.membro.fim.titulo.intl":"Our English editions are on their way","js.membro.intro":"Choose a classic and read it in our reader, with your place always saved.","js.membro.intro.pt":"Choose a classic and read it in our reader, with your place always saved.","js.membro.lido":"{n}% read","js.membro.nota":"Free members read one classic at a time.","js.membro.nota.intl":"Free members read one classic at a time and can switch when they finish.","js.membro.rotulo":"Free member","js.membro.seu.classico":"Your classic","js.membro.titulo":"Your reading room at Três Trevo","js.membro.trocar":"Finish and switch","js.membro.trocar.confirma":"Finish this classic and free the space for another one?","js.nema.aria":"Nema, the Três Trevo loyalty program","js.nema.catalogo":"See the catalog","js.nema.como":"How Nema works","js.nema.rotulo":"Nema · loyalty points","js.nema.texto":"Once our English editions arrive, 10% of every e-book you buy comes back to you as Nema, and your balance becomes a discount on your next book (up to half the price), released 7 days after the purchase.","js.nema.titulo":"Nema: your reading pays you back"};window.T=function(k,v){var s=window.TT_TEXTOS[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:''}):s};</script>
 <link rel="canonical" href="https://3trevo.com.br/en/">
@@ -564,6 +582,8 @@
 <link rel="alternate" hreflang="x-default" href="https://3trevo.com.br/">
 </head>
 <body>
+<div id="tt-vinheta" hidden><div class="vt-palco" aria-hidden="true"></div><div class="vt-marca"><span class="vt-nome-t">Três Trevo</span><span class="vt-desc"></span></div><audio preload="none" src="/assets/marca/trilha.wav"></audio><div class="vt-btns"><button type="button" class="vt-ouvir"></button><button type="button" class="vt-pular"></button></div></div>
+<script>try{if(!sessionStorage.getItem('tt-vinheta')&&!location.hash&&scrollY<10&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.getElementById('tt-vinheta').hidden=false;document.documentElement.classList.add('tt-vinheta')}}catch(e){}</script>
 
 <!-- ── HEADER ───────────────────────────────────────────────────────────────── -->
 <header id="hdr">
@@ -594,7 +614,7 @@
   <!-- Vídeo de fundo — substituir src pelo arquivo produzido -->
   <!-- Recomendado: 1920×1080, H.264, ~15s loop, sem áudio -->
   <div class="hero-video-bg">
-    <video muted loop playsinline preload="none" id="hero-video">
+    <video muted loop playsinline preload="none" poster="assets/hero-reel-poster.jpg" id="hero-video">
       <source src="/assets/hero-reel.mp4" type="video/mp4">
     </video>
     <div class="hero-video-overlay"></div>
@@ -717,7 +737,7 @@
     </div>
     <div data-ent="r">
       <div class="autor-bloco">
-        <p class="lbl autor-l" data-i18n="autor.label">✦ Pen name</p>
+        <p class="lbl autor-l" data-i18n="autor.label">Pen name</p>
         <h3 class="autor-nome">Said Anes</h3>
         <p class="autor-sub" data-i18n="autor.sub">The editorial voice of Três Trevo</p>
         <p class="autor-bio" data-i18n="autor.bio">Said Anes is the pen name under which Três Trevo publishes its books. A space where writing meets clarity — free from the weight of a name, carried only by the strength of ideas. The titles move between political essay, literary fiction and documentary narrative, always precise and always restless.</p>
@@ -733,7 +753,7 @@
       <div>
         <div class="ft-logo" data-i18n="ft.logo">Três Trevo Publishing</div>
         <p class="ft-tag" data-i18n="ft.tag">Literature and applied knowledge. We publish what matters, for people who truly read.</p>
-        <p class="ft-cnpj" data-i18n-html="ft.cnpj">Brazilian company ID (CNPJ) 18.928.966/0001-59<br>Montauri, RS · Brazil</p>
+        <p class="ft-cnpj" data-i18n-html="ft.cnpj">A company of RDS Anúncios Ltda<br>Brazilian company ID (CNPJ) 18.928.966/0001-59<br>Montauri, RS · Brazil</p>
       </div>
       <div class="ft-col">
         <h5 data-i18n="ft.nav">Explore</h5>
@@ -1077,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(function(cfg){
       if (!cfg) return;
       // Vídeo
-      if (cfg.video_url && v) {
+      if (cfg.video_url && v && !window.TT_SEM_VIDEO) {
         v.querySelector('source').src = cfg.video_url;
         v.load();
       }
@@ -1100,16 +1120,13 @@ document.addEventListener('DOMContentLoaded', () => {
         var b = document.getElementById('heb-badge');
         if (b) b.textContent = cfg.destaque_badge;
       }
-      // CTA → scroll ao card do slug destaque
+      // CTA → página da obra em destaque (ou o checkout, se o livro ainda não tem página).
+      // Mesma lista de PAGINAS_OBRA do catalogo.html.
       var slug = cfg.destaque_slug;
-      if (slug) {
+      var PAGINAS_OBRA = {'antifalencia':1,'justicamento':1,'isa-isma-tintim':1,'livre-das-dividas':1};
+      if (slug && /^[a-z0-9-]+$/.test(slug)) {
         var cta = document.getElementById('heb-cta-link');
-        if (cta) cta.onclick = function(e){
-          e.preventDefault();
-          var c = document.querySelector('[data-slug=' + slug + ']');
-          if (c) { c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.transition='box-shadow .3s'; c.style.boxShadow='0 0 0 3px #ffa028'; setTimeout(function(){c.style.boxShadow=''},2000); }
-          else { document.getElementById('catalogo').scrollIntoView({behavior:'smooth'}); }
-        };
+        if (cta) cta.href = PAGINAS_OBRA[slug] ? '/obra/' + slug + '.html' : '/checkout.html?slug=' + slug;
       }
     })
     .catch(function(){});
@@ -1245,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   medir(); lerAlvo(); atual = alvo; desenhar(atual);
 })();
 </script>
-<script src="/js/beacon.js?v=a4453a06" defer></script>
+<script src="/js/beacon.js?v=14074ec7" defer></script>
 <script>
 /* Rolagem guiada: o progresso (0 a 1) de cada bloco acompanha a rolagem, suavizado no tempo.
    No Nema os blocos entram em sequência: cada um começa quando o anterior chegou a 70%. */

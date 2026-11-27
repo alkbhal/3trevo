@@ -47,7 +47,20 @@ function erroValidacao(issues: z.ZodIssue[]): Response {
 }
 
 // ─── Auth helper ─────────────────────────────────────────────────────────────
-export async function verificarToken(request: Request, env: Env): Promise<boolean> {
+// O roteador confere a sessão antes de qualquer /api/admin/* e o handler confere de novo:
+// a resposta fica guardada por requisição para não consultar o Supabase duas vezes.
+const sessaoPorRequisicao = new WeakMap<Request, Promise<boolean>>();
+
+export function verificarToken(request: Request, env: Env): Promise<boolean> {
+  let p = sessaoPorRequisicao.get(request);
+  if (!p) {
+    p = consultarSessao(request, env);
+    sessaoPorRequisicao.set(request, p);
+  }
+  return p;
+}
+
+async function consultarSessao(request: Request, env: Env): Promise<boolean> {
   const auth = request.headers.get('Authorization') ?? '';
   const token = auth.replace('Bearer ', '').trim();
   if (!token) return false;

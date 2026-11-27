@@ -1,5 +1,9 @@
 # Ruflo — Claude Code Configuration
 
+## Retomada
+
+Ao começar uma sessão, ler `docs/producao/checkpoint.md` e `docs/producao/plano.md`, apresentar ao dono o plano e seguir da próxima ação registrada. Ao pausar, atualizar o checkpoint.
+
 ## Rules
 
 - Do what has been asked; nothing more, nothing less

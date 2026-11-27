@@ -1,0 +1,250 @@
+/**
+ * admin-producao.ts — o admin comanda a esteira de produção (scripts Python no GitHub Actions
+ * do tr3vo-forge: "Compor obra" e "Narrar obra").
+ *
+ * GET  /api/admin/producao/obras               — obras cadastradas em scripts/obras/obras.json
+ * GET  /api/admin/producao/execucoes?slug=X    — últimas execuções dos dois workflows
+ * POST /api/admin/producao/disparar            — { slug, etapa: compor|narrar|ilustrar, publicar, capitulos?, fase?, itens? }
+ * GET  /api/admin/producao/ilustracoes?slug=X  — galeria para aprovar (admin-ilustracoes.ts)
+ * POST /api/admin/producao/ilustracoes/decidir — aprova ou rejeita uma imagem
+ *
+ * O token do GitHub (GH_PRODUCAO_TOKEN) fica só no worker. Ele deve ser fine-grained, restrito ao
+ * tr3vo-forge, com Actions read/write e Contents read: o pior que vaza é disparar uma composição.
+ * A sessão de admin já foi conferida pelo portão do roteador; o handler confere de novo.
+ */
+
+import { z } from 'zod';
+import type { Env } from '../types';
+import { verificarToken } from './admin-catalog';
+import { handleIlustracoes } from './admin-ilustracoes';
+
+const REPO_PADRAO = 'alkbhal/tr3vo-forge';
+const PREFIXO = '/api/admin/producao/';
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+// Etapa → arquivo do workflow. Lista fechada: só estes podem ser disparados daqui.
+export const WORKFLOWS = {
+  compor: 'compor-obra.yml',
+  narrar: 'narrar-obra.yml',
+  ilustrar: 'ilustrar-obra.yml',
+  classificar: 'classificar-obra.yml',
+} as const;
+type Etapa = keyof typeof WORKFLOWS;
+
+const dispararSchema = z.object({
+  slug: z.string().regex(SLUG).max(80),
+  etapa: z.enum(['compor', 'narrar', 'ilustrar', 'classificar']),
+  publicar: z.boolean().default(false),
+  // Só o narrar aceita: "prefacio,cap1" (vazio = todos)
+  capitulos: z.string().regex(/^[a-z0-9-]+(,[a-z0-9-]+)*$/).max(400).optional(),
+  // Só o ilustrar: "folhas" (plano + folhas de personagem) ou "cenas"; itens refaz só algumas cenas
+  fase: z.enum(['folhas', 'cenas']).optional(),
+  itens: z.string().regex(/^[a-z0-9-]+(,[a-z0-9-]+)*$/).max(800).optional(),
+});
+
+function json(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  });
+}
+
+// Leitura (GET) tenta de novo em falha passageira (rede, 429, 5xx) com espera crescente.
+// Disparo (POST) nunca repete sozinho: repetir criaria uma execução em dobro.
+export const ESPERAS_MS = [400, 1200];
+const passageira = (r: Response) => r.status === 429 || r.status >= 500;
+
+async function github(env: Env, caminho: string, init: RequestInit = {}): Promise<Response> {
+  const leitura = (init.method ?? 'GET') === 'GET';
+  for (let tentativa = 0; ; tentativa++) {
+    const ultima = !leitura || tentativa >= ESPERAS_MS.length;
+    try {
+      const r = await githubUmaVez(env, caminho, init);
+      if (ultima || !passageira(r)) return r;
+    } catch (e) {
+      if (ultima) throw e;
+    }
+    await new Promise((ok) => setTimeout(ok, ESPERAS_MS[tentativa]));
+  }
+}
+
+function githubUmaVez(env: Env, caminho: string, init: RequestInit): Promise<Response> {
+  return fetch(`https://api.github.com/repos/${env.GH_PRODUCAO_REPO ?? REPO_PADRAO}${caminho}`, {
+    ...init,
+    signal: AbortSignal.timeout(15_000),
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${env.GH_PRODUCAO_TOKEN}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': '3trevo-admin',
+      ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+    },
+  });
+}
+
+// Erro do GitHub vira código curto; a mensagem dele não chega ao navegador.
+function erroGithub(r: Response): Response {
+  const erro =
+    r.status === 401 ? 'github_token_invalido'
+    : r.status === 403 ? 'github_sem_permissao'
+    : r.status === 404 ? 'github_workflow_ou_repo_nao_encontrado'
+    : r.status === 422 ? 'github_entrada_recusada'
+    : 'github_indisponivel';
+  return json({ ok: false, erro }, 502);
+}
+
+type Classificacao = {
+  forma?: string; registro?: string; nivel_leitor?: string; cdd?: string; thema?: string[]; bisac?: string[];
+  justificativa?: string; origem?: string;
+};
+type ObraJson = {
+  tipo?: string;
+  classificacao?: Classificacao;
+  perfil_ajustes?: Record<string, unknown>;
+  ficha?: { titulo?: string; autor?: string; edicao?: string };
+};
+type Taxonomia = {
+  formas?: Record<string, { rotulo: string; perfil?: string; perfil_por_registro?: Record<string, string> }>;
+  niveis_leitor?: Record<string, { rotulo: string }>;
+};
+
+const lerArquivo = (env: Env, nome: string) =>
+  github(env, `/contents/scripts/obras/${nome}?ref=main`, { headers: { Accept: 'application/vnd.github.raw+json' } });
+
+// Mesmo caminho do perfil.py: a forma (e o registro, quando a forma pede) aponta o tipo de perfil.
+// Classificação que não fecha com a taxonomia vira "sem tipo": o painel avisa e o P0 do Forge reprova.
+export function tipoDaClassificacao(c: Classificacao | undefined, tax: Taxonomia): string | null {
+  const forma = c?.forma ? tax.formas?.[c.forma] : undefined;
+  if (!forma) return null;
+  if (forma.perfil_por_registro) return (c?.registro && forma.perfil_por_registro[c.registro]) || null;
+  return forma.perfil ?? null;
+}
+
+// O perfil de produção mora em scripts/obras/perfis.json e a taxonomia em classificacao.json
+// (validados lá por perfil.py, que também aplica nível de leitor e perfil_ajustes). Aqui só se mostra.
+async function listarObras(env: Env): Promise<Response> {
+  const [rObras, rPerfis, rTax] = await Promise.all([
+    lerArquivo(env, 'obras.json'), lerArquivo(env, 'perfis.json'), lerArquivo(env, 'classificacao.json'),
+  ]);
+  if (!rObras.ok) return erroGithub(rObras);
+  const dados = (await rObras.json()) as Record<string, ObraJson>;
+  // Sem perfis.json ou classificacao.json (repositório antigo) a lista de obras continua funcionando.
+  const tipos = rPerfis.ok
+    ? (((await rPerfis.json()) as { tipos?: Record<string, unknown> }).tipos ?? {})
+    : {};
+  const tax: Taxonomia = rTax.ok ? ((await rTax.json()) as Taxonomia) : {};
+  const obras = Object.entries(dados)
+    .filter(([slug]) => SLUG.test(slug))
+    .map(([slug, o]) => {
+      const tipo = o.classificacao ? tipoDaClassificacao(o.classificacao, tax) : (o.tipo ?? null);
+      const c = o.classificacao;
+      return {
+      slug,
+      titulo: o.ficha?.titulo ?? slug,
+      autor: o.ficha?.autor ?? null,
+      edicao: o.ficha?.edicao ?? null,
+      tipo,
+      classificacao: c ? {
+        forma: c.forma ?? null, forma_rotulo: (c.forma && tax.formas?.[c.forma]?.rotulo) || c.forma || null,
+        registro: c.registro ?? null,
+        nivel_leitor: c.nivel_leitor ?? null,
+        nivel_rotulo: (c.nivel_leitor && tax.niveis_leitor?.[c.nivel_leitor]?.rotulo) || c.nivel_leitor || null,
+        cdd: c.cdd ?? null, thema: c.thema ?? [], bisac: c.bisac ?? [],
+        justificativa: c.justificativa ?? null, origem: c.origem ?? null,
+      } : null,
+      perfil: (tipo && tipos[tipo]) || null,
+      ajustes: o.perfil_ajustes ?? null,
+      };
+    });
+  return json({ ok: true, obras });
+}
+
+type Run = {
+  id: number; name: string; display_title: string; status: string; conclusion: string | null;
+  html_url: string; created_at: string; updated_at: string; path: string;
+};
+
+// O título de cada execução é "Compor · <slug>[ · publicar]" ou "Ilustrar · <slug> · <fase>"
+// (run-name nos workflows).
+export function resumirExecucao(run: Run) {
+  const etapa = (Object.keys(WORKFLOWS) as Etapa[]).find((e) => run.path.endsWith(WORKFLOWS[e])) ?? null;
+  const [, slug = null, extra = null] = run.display_title.split(' · ');
+  return {
+    id: run.id,
+    etapa,
+    slug,
+    fase: etapa === 'ilustrar' ? extra : null,
+    publicar: run.display_title.endsWith(' · publicar'),
+    titulo: run.display_title,
+    status: run.status,          // queued | in_progress | completed
+    conclusao: run.conclusion,   // success | failure | cancelled | null
+    url: run.html_url,
+    criado: run.created_at,
+    atualizado: run.updated_at,
+  };
+}
+
+async function listarExecucoes(env: Env, slug: string | null): Promise<Response> {
+  if (slug !== null && !SLUG.test(slug)) return json({ ok: false, erro: 'slug_invalido' }, 400);
+  const respostas = await Promise.all(
+    Object.values(WORKFLOWS).map((arq) => github(env, `/actions/workflows/${arq}/runs?per_page=15`)),
+  );
+  const falha = respostas.find((r) => !r.ok);
+  if (falha) return erroGithub(falha);
+  const runs = (await Promise.all(respostas.map((r) => r.json() as Promise<{ workflow_runs: Run[] }>)))
+    .flatMap((d) => d.workflow_runs ?? [])
+    .map(resumirExecucao)
+    .filter((e) => e.etapa && (slug === null || e.slug === slug))
+    .sort((a, b) => b.criado.localeCompare(a.criado))
+    .slice(0, 20);
+  return json({ ok: true, execucoes: runs });
+}
+
+async function disparar(request: Request, env: Env): Promise<Response> {
+  const bruto = await request.json().catch(() => null);
+  const v = dispararSchema.safeParse(bruto);
+  if (!v.success) return json({ ok: false, erro: 'corpo_invalido', detalhe: v.error.issues[0]?.message }, 400);
+  const { slug, etapa, publicar, capitulos, fase, itens } = v.data;
+  if (capitulos && etapa !== 'narrar') return json({ ok: false, erro: 'capitulos_so_no_narrar' }, 400);
+  if ((fase || itens) && etapa !== 'ilustrar') return json({ ok: false, erro: 'fase_so_no_ilustrar' }, 400);
+  if (etapa === 'ilustrar' && (!fase || publicar)) return json({ ok: false, erro: 'ilustrar_precisa_de_fase' }, 400);
+  if (itens && fase !== 'cenas') return json({ ok: false, erro: 'itens_so_nas_cenas' }, 400);
+  if (etapa === 'classificar' && publicar) return json({ ok: false, erro: 'classificar_nao_publica' }, 400);
+
+  // Ilustrar não publica nada: o resultado vai para aprovação no admin.
+  // Classificar abre um PR no tr3vo-forge: aprovar = merge.
+  const inputs: Record<string, string> = etapa === 'ilustrar'
+    ? { slug, etapa: fase!, itens: itens ?? '' }
+    : etapa === 'classificar'
+      ? { slug }
+      : { slug, publicar: publicar ? 'PUBLICAR' : '' };
+  if (etapa === 'narrar') inputs.capitulos = capitulos ?? '';
+
+  const r = await github(env, `/actions/workflows/${WORKFLOWS[etapa]}/dispatches`, {
+    method: 'POST',
+    body: JSON.stringify({ ref: 'main', inputs }),
+  });
+  if (!r.ok) return erroGithub(r); // 204 (ou 200, quando o GitHub devolve detalhes da execução)
+  console.log(`[producao] disparado ${etapa} ${slug}${fase ? ' ' + fase : ''}${publicar ? ' (publicar)' : ''}`);
+  return json({ ok: true, etapa, slug, publicar, fase: fase ?? null }, 202);
+}
+
+export async function handleAdminProducao(request: Request, env: Env, path: string): Promise<Response> {
+  if (!(await verificarToken(request, env))) return json({ ok: false, erro: 'unauthorized' }, 401);
+  const acao = path.slice(PREFIXO.length);
+  // A galeria lê e grava no Storage do Supabase; não depende do token do GitHub.
+  if (acao === 'ilustracoes' || acao.startsWith('ilustracoes/')) return handleIlustracoes(request, env, acao);
+  if (!env.GH_PRODUCAO_TOKEN) return json({ ok: false, erro: 'github_token_ausente' }, 503);
+
+  try {
+    if (acao === 'obras' && request.method === 'GET') return await listarObras(env);
+    if (acao === 'execucoes' && request.method === 'GET') {
+      return await listarExecucoes(env, new URL(request.url).searchParams.get('slug'));
+    }
+    if (acao === 'disparar' && request.method === 'POST') return await disparar(request, env);
+  } catch (e) {
+    console.error('[producao] falha ao falar com o GitHub:', e);
+    return json({ ok: false, erro: 'github_indisponivel' }, 502);
+  }
+  return json({ ok: false, erro: 'rota_producao_desconhecida' }, 404);
+}

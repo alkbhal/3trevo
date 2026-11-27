@@ -13,6 +13,7 @@
 
 import type { Env } from '../types';
 import { sb } from '../sb';
+import { notify } from '../notify';
 import { arquivoForge, resolverUrlExterna } from '../forge-download';
 import { verificarToken } from './admin-catalog';
 import {
@@ -51,7 +52,6 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   if (!nf) {
     return Response.json({ ok: false, erro: 'dados_fiscais_invalidos' }, { status: 400 });
   }
-  const nome = typeof body?.nome === 'string' ? body.nome.trim().slice(0, 150) : '';
 
   // Buscar produto no Supabase (catalogo é a fonte de verdade com 11 slugs)
   const prodResp = await fetch(
@@ -65,7 +65,8 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
 
   // Instrumentação de funil (Fase 1 recuperação de carrinho): registra o início do checkout
   // sem bloquear nem atrasar o pagamento — mesmo padrão fire-and-forget de leads.ts/track.ts.
-  registrarInicioCheckout(env, email, slug).catch((e) =>
+  const nome = typeof body?.nome === 'string' ? body.nome.trim().slice(0, 120) : '';
+  registrarInicioCheckout(env, email, slug, nome).catch((e) =>
     console.error('[checkout] registrarInicioCheckout falhou:', e)
   );
 
@@ -75,17 +76,24 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   let desconto = 0;
   let nemaUsado = 0;
   let reservaRef: string | null = null;
-  if (body?.usar_nema === true) {
-    const user = await usuarioDoToken(request, env);
-    if (!user) return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
-    email = user.email; // o pagamento fica no nome de quem é dono do saldo
-    const reserva = await reservarNema(env, user.id, preco);
+  // Cliente logado: a compra fica na conta dele, independente do e-mail digitado no checkout.
+  const logado = await usuarioDoToken(request, env);
+  if (body?.usar_nema === true && !logado) {
+    return Response.json({ ok: false, erro: 'login_necessario' }, { status: 401 });
+  }
+  if (logado) email = logado.email;
+  if (body?.usar_nema === true && logado) {
+    const reserva = await reservarNema(env, logado.id, preco);
     if (reserva && reserva.quantidade > 0 && reserva.reserva_ref) {
       desconto = reserva.desconto;
       nemaUsado = reserva.quantidade;
       reservaRef = reserva.reserva_ref;
     }
   }
+
+  // Conta do comprador nasce já no checkout, sem depender do pagamento. O id segue no metadata da
+  // preferência e volta no webhook: quem pagou é identificado por ele, não pelo e-mail devolvido pelo MP.
+  const compradorId = logado?.id ?? (await garantirContaComprador(env, String(email).trim().toLowerCase(), nome));
 
   // Criar preferência no MP
   const prefBody = {
@@ -98,8 +106,12 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
     }],
     payer: { email, ...payerMP(nf, nome) },
     external_reference: slug,
+    // O e-mail do comprador vai no metadata da preferência: o Mercado Pago devolve o pagador
+    // mascarado em pagamentos PIX (ex.: "XXXXXXXXXXX"), e sem e-mail válido não há conta nem entrega.
     metadata: {
       nf,
+      comprador_email: String(email).trim().toLowerCase(),
+      ...(compradorId ? { comprador_user_id: compradorId } : {}),
       ...(reservaRef ? { nema_reserva: reservaRef, nema_quantidade: nemaUsado } : {}),
     },
     notification_url: `${WORKER_URL}/api/webhook/pagamento`,
@@ -156,7 +168,12 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
     return new Response('Service Unavailable', { status: 503 });
   }
   const valido = await verificarAssinaturaMP(request.clone(), env.WEBHOOK_HMAC_SECRET);
-  if (!valido) return new Response('Unauthorized', { status: 401 });
+  if (!valido) {
+    // Antes a rejeição não deixava rastro: um segredo errado fazia o pagamento sumir sem registro.
+    console.error('[webhook] assinatura inválida');
+    await registrarAuditoria(env, 'webhook_assinatura_invalida', { headers: 'x-signature-presente' });
+    return new Response('Unauthorized', { status: 401 });
+  }
 
   let body: any;
   try { body = await request.clone().json(); } catch {
@@ -176,8 +193,10 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   // Buscar pagamento completo na API MP
   const mpPayment = await buscarPagamentoMP(String(mpPaymentId), env.MP_ACCESS_TOKEN ?? '');
   if (!mpPayment) {
+    // 5xx de propósito: o MP reenvia a notificação. Com 200 a falha some sem registro.
     console.error('[webhook] falha ao buscar pagamento MP:', mpPaymentId);
-    return new Response('mp_error', { status: 200 });
+    await registrarAuditoria(env, 'webhook_erro', { mpPaymentId, erro: 'mp_fetch_falhou' });
+    return new Response('mp_error', { status: 500 });
   }
 
   // Só processar aprovados
@@ -186,27 +205,53 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
     return new Response('not_approved', { status: 200 });
   }
 
+  return processarPagamentoAprovado(env, mpPayment, String(mpPaymentId));
+}
+
+// Processa um pagamento já confirmado como aprovado no MP. Usado pelo webhook e pela conciliação.
+// Idempotente: registrarCompraMp só marca 'novo' na primeira gravação, então reprocessar não duplica nada.
+export async function processarPagamentoAprovado(env: Env, mpPayment: any, mpPaymentId: string): Promise<Response> {
   const productSlug = mpPayment.external_reference ?? '';
-  const emailPagador = mpPayment.payer?.email ?? '';
+  // Prioridade: e-mail do checkout (metadata, gravado por nós) > e-mail do pagador no MP.
+  // O MP pode devolver o e-mail mascarado; só aceitamos um endereço com formato válido.
+  const emailPagador = emailValido(mpPayment.metadata?.comprador_email) ?? emailValido(mpPayment.payer?.email) ?? '';
   const nomePagador = mpPayment.payer?.first_name
     ? `${mpPayment.payer.first_name} ${mpPayment.payer.last_name ?? ''}`.trim()
     : emailPagador.split('@')[0];
   const valor = Number(mpPayment.transaction_amount ?? 0);
   const metodo = mpPayment.payment_type_id ?? 'unknown';
 
-  if (!emailPagador || !productSlug) {
-    console.error('[webhook] dados ausentes:', { emailPagador, productSlug });
-    return new Response('dados_ausentes', { status: 200 });
+  if (await pagamentoJaVinculado(env, mpPaymentId)) {
+    return Response.json({ ok: true, ja_processado: true });
   }
 
-  // Encontrar ou criar usuário em auth.users
-  const userId = await buscarOuCriarUsuario(emailPagador, nomePagador, env);
+  if (!productSlug) {
+    console.error('[webhook] dados ausentes:', { mpPaymentId });
+    return new Response('dados_ausentes', { status: 200 });
+  }
+  if (!emailPagador) {
+    // Pagamento aprovado sem nenhum e-mail utilizável: 5xx e auditoria, nunca um 200 silencioso.
+    console.error('[webhook] e-mail do comprador indisponível:', { mpPaymentId, productSlug });
+    await registrarAuditoria(env, 'webhook_usuario_indisponivel', { mpPaymentId, productSlug, motivo: 'sem_email_valido' });
+    return new Response('usuario_indisponivel', { status: 500 });
+  }
+
+  // Quem pagou: a conta criada no checkout (metadata, id); sem ela, achamos/criamos pelo e-mail.
+  const compradorId = uuidValido(mpPayment.metadata?.comprador_user_id);
+  const userId = compradorId ?? (await buscarOuCriarUsuario(emailPagador, nomePagador, env));
+  if (!userId) {
+    // Sem comprador não há compra nem entrega. Não gravamos compra órfã: 5xx faz o MP reenviar
+    // e a conciliação horária tenta de novo. A falha fica na auditoria, não some em silêncio.
+    console.error('[webhook] usuário não resolvido:', { mpPaymentId, productSlug });
+    await registrarAuditoria(env, 'webhook_usuario_indisponivel', { mpPaymentId, productSlug });
+    return new Response('usuario_indisponivel', { status: 500 });
+  }
 
   // Registrar compra via RPC
   const rpc = await registrarCompraMp({
     env,
-    userId: userId ?? null,
-    mpPaymentId: String(mpPaymentId),
+    userId,
+    mpPaymentId: mpPaymentId,
     productSlug,
     valor,
     metodo,
@@ -216,8 +261,19 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   if (!rpc.ok) {
     console.error('[webhook] rpc falhou:', rpc.erro);
     await registrarAuditoria(env, 'webhook_erro', { mpPaymentId, erro: rpc.erro });
-    return new Response('rpc_error', { status: 200 });
+    // 5xx: o MP reenvia; a gravação é idempotente por mp_payment_id, então o reenvio é seguro.
+    return new Response('rpc_error', { status: 500 });
   }
+
+  // Compra já registrada sem comprador (falha antiga): vincula agora e segue a entrega normal.
+  // Só age se a compra ainda não tem dono, então um reenvio do MP não repete nada.
+  const reatribuida = !rpc.novo && rpc.purchase_id
+    ? await vincularCompraOrfa(env, { purchaseId: rpc.purchase_id, userId, tipo: rpc.tipo ?? 'ebook' })
+    : null;
+  const entregar = rpc.novo || reatribuida !== null;
+
+  // Rede de proteção (não bloqueia: o cliente já pagou). Só na 1ª vez que o pagamento é registrado.
+  if (rpc.novo) await alertarValorDivergente(env, productSlug, valor, mpPaymentId);
 
   // Nota fiscal: grava CPF/CNPJ e endereço informados no checkout (idempotente).
   await salvarDadosFiscais(env, {
@@ -229,17 +285,18 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
   // As duas funções são idempotentes, então rodam também quando o MP reenvia o aviso.
   // O sorteio está parado até a autorização legal: a compra não distribui números.
   const reservaRef = reservaDoMetadata(mpPayment.metadata);
-  if (reservaRef) await confirmarResgateNema(env, reservaRef, String(mpPaymentId), rpc.purchase_id ?? null);
+  if (reservaRef) await confirmarResgateNema(env, reservaRef, mpPaymentId, rpc.purchase_id ?? null);
   let nemaGanho = 0;
-  if (userId && rpc.purchase_id) nemaGanho = await creditarCompraNema(env, userId, rpc.purchase_id, valor);
+  if (rpc.purchase_id) nemaGanho = await creditarCompraNema(env, userId, rpc.purchase_id, valor);
 
-  if (rpc.novo) {
+  if (entregar) {
     if (env.RESEND_API_KEY) {
       await enviarEmailCompra(env, {
         email: emailPagador,
         nome: nomePagador,
         ebookTitulo: rpc.ebook_titulo ?? productSlug,
-        downloadToken: rpc.download_token,
+        downloadToken: reatribuida?.downloadToken ?? rpc.download_token,
+        tipo: rpc.tipo ?? 'ebook',
         productSlug,
         nema: nemaGanho,
         valorNema: nemaGanho > 0 ? await valorNemaReais(env) : 0,
@@ -256,6 +313,8 @@ export async function handleWebhookPagamento(request: Request, env: Env): Promis
 
   return Response.json({ ok: true });
 }
+
+
 
 // ─── 3. Download (UUID token) ─────────────────────────────────────────────────
 export async function handleDownload(request: Request, env: Env): Promise<Response> {
@@ -405,7 +464,7 @@ async function buscarPagamentoMP(paymentId: string, accessToken: string): Promis
 }
 
 // Verifica assinatura MP x-signature: ts=...,v1=...
-async function verificarAssinaturaMP(request: Request, secret: string): Promise<boolean> {
+export async function verificarAssinaturaMP(request: Request, secret: string): Promise<boolean> {
   const xSig = request.headers.get('x-signature') ?? '';
   const xReqId = request.headers.get('x-request-id') ?? '';
   const body = await request.clone().json() as any;
@@ -415,11 +474,10 @@ async function verificarAssinaturaMP(request: Request, secret: string): Promise<
   const ts = xSig.match(/ts=([^,]+)/)?.[1] ?? '';
   const v1 = xSig.match(/v1=([^,]+)/)?.[1] ?? '';
 
-  const tsNum = parseInt(ts, 10);
-  const agora = Math.floor(Date.now() / 1000);
-  if (isNaN(tsNum) || Math.abs(agora - tsNum) > 300) {
-    return false; // timestamp ausente ou fora da janela de 5 minutos
-  }
+  // Sem janela de tempo: o MP reenvia a notificação depois, com a assinatura original, e uma
+  // janela de 5 minutos derrubava todo reenvio com 401. A assinatura cobre o ts; a segurança
+  // contra aviso falso vem de buscar o pagamento na API do MP antes de gravar qualquer coisa.
+  if (!ts) return false;
 
   if (!ts || !v1 || !mpId) {
     // Fallback: aceitar se secret não está configurado (dev)
@@ -447,6 +505,42 @@ function timingSafeEqualHex(a: string, b: string): boolean {
   return diff === 0;
 }
 
+// Aceita só e-mail com formato básico válido (rejeita valores mascarados como "XXXXXXXXXXX").
+function emailValido(valor: unknown): string | null {
+  if (typeof valor !== 'string') return null;
+  const e = valor.trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) ? e : null;
+}
+
+function uuidValido(valor: unknown): string | null {
+  return typeof valor === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(valor) ? valor : null;
+}
+
+// Conta do comprador criada no checkout. Falha aqui não bloqueia o pagamento: o webhook tenta de novo pelo e-mail.
+async function garantirContaComprador(env: Env, email: string, nome: string): Promise<string | null> {
+  try {
+    return await buscarOuCriarUsuario(email, nome, env);
+  } catch (e) {
+    console.error('[checkout] conta do comprador não criada:', e);
+    return null;
+  }
+}
+
+// Pagamento que já tem comprador gravado (reprocessamento da conciliação): não há o que refazer.
+async function pagamentoJaVinculado(env: Env, mpPaymentId: string): Promise<boolean> {
+  try {
+    const r = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/payments?id_externo=eq.${encodeURIComponent(mpPaymentId)}&user_id=not.is.null&select=id&limit=1`,
+      { headers: supabaseHeaders(env) }
+    );
+    if (!r.ok) return false;
+    const rows = (await r.json()) as any[];
+    return rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 // ─── Helpers: Supabase Auth ───────────────────────────────────────────────────
 async function buscarOuCriarUsuario(email: string, nome: string, env: Env): Promise<string | null> {
   const authUrl = `${env.SUPABASE_URL}/auth/v1/admin/users`;
@@ -467,6 +561,11 @@ async function buscarOuCriarUsuario(email: string, nome: string, env: Env): Prom
     }),
   });
 
+  if (!createResp.ok && createResp.status !== 422) {
+    // Causa registrada: a falha de criação chegava só como "null" e sumia no fluxo.
+    console.error('[auth] criar usuário falhou:', createResp.status, (await createResp.text()).slice(0, 300));
+  }
+
   if (createResp.ok) {
     const user = (await createResp.json()) as any;
     return user.id;
@@ -482,6 +581,34 @@ async function buscarOuCriarUsuario(email: string, nome: string, env: Env): Prom
   const users: any[] = data.users ?? (Array.isArray(data) ? data : []);
   const found = users.find((u: any) => u.email === email);
   return found?.id ?? null;
+}
+
+// ─── Conferência do valor pago ───────────────────────────────────────────────
+// O servidor cria a cobrança com o preço do catálogo menos o desconto do Nema (no máximo metade do
+// preço). Logo o valor aprovado no MP deve ficar entre 50% do preço e o preço cheio. Fora disso é
+// anômalo: só avisamos, pois recusar um pagamento já aprovado deixaria o cliente sem o ebook.
+export function valorDivergente(valor: number, preco: number): boolean {
+  if (!Number.isFinite(valor) || !Number.isFinite(preco) || preco <= 0) return false; // sem referência: não opina
+  return valor < preco * 0.5 - 0.01 || valor > preco + 0.01;
+}
+
+async function alertarValorDivergente(env: Env, slug: string, valor: number, mpPaymentId: string): Promise<void> {
+  try {
+    const r = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/catalogo?slug=eq.${encodeURIComponent(slug)}&select=preco`,
+      { headers: supabaseHeaders(env) }
+    );
+    const [row] = (await r.json()) as Array<{ preco: number | string }>;
+    const preco = Number(row?.preco);
+    if (!valorDivergente(valor, preco)) return;
+    await registrarAuditoria(env, 'webhook_valor_divergente', { mpPaymentId, slug, valor, preco });
+    await notify(
+      env,
+      `⚠️ Pagamento ${mpPaymentId} (${slug}): valor R$ ${valor.toFixed(2)} fora da faixa do catálogo (R$ ${preco.toFixed(2)}). Conferir no Mercado Pago.`
+    );
+  } catch (e) {
+    console.error('[webhook] conferência de valor falhou:', e);
+  }
 }
 
 // ─── Helpers: RPC registrar_compra_mp ────────────────────────────────────────
@@ -508,6 +635,73 @@ async function registrarCompraMp(opts: {
     }),
   });
   return (await resp.json()) as any;
+}
+
+// Vincula ao comprador uma compra registrada sem dono (falha antiga). Só age se a compra ainda
+// não tem user_id, então reenvios não repetem nada. Ordem: acesso e token primeiro, vínculo da
+// compra por último; se algo falhar no meio, o vínculo não existe e a próxima tentativa refaz
+// a entrega. Devolve o token de download, ou null se a compra já tinha dono.
+async function vincularCompraOrfa(
+  env: Env,
+  opts: { purchaseId: string; userId: string; tipo: string }
+): Promise<{ downloadToken: string | null } | null> {
+  const base = env.SUPABASE_URL;
+  const jsonHeaders = { ...supabaseHeaders(env), 'Content-Type': 'application/json' };
+
+  const cResp = await fetch(`${base}/rest/v1/purchases?id=eq.${opts.purchaseId}&select=id,user_id,payment_id,product_id`, {
+    headers: supabaseHeaders(env),
+  });
+  if (!cResp.ok) throw new Error(`vincular: leitura da compra falhou (${cResp.status})`);
+  const [compra] = (await cResp.json()) as any[];
+  if (!compra || compra.user_id) return null;
+
+  const falha = async (resp: Response, passo: string) => {
+    if (!resp.ok) throw new Error(`vincular: ${passo} falhou (${resp.status}): ${(await resp.text()).slice(0, 200)}`);
+  };
+
+  const lib = await fetch(`${base}/rest/v1/user_library?on_conflict=user_id,product_id`, {
+    method: 'POST',
+    headers: { ...jsonHeaders, Prefer: 'resolution=ignore-duplicates' },
+    body: JSON.stringify({ user_id: opts.userId, product_id: compra.product_id, origem: 'purchase', origem_id: compra.id }),
+  });
+  await falha(lib, 'biblioteca');
+
+  let downloadToken: string | null = null;
+  if (opts.tipo !== 'acesso_app') {
+    const dl = await fetch(`${base}/rest/v1/downloads`, {
+      method: 'POST',
+      headers: { ...jsonHeaders, Prefer: 'return=representation' },
+      body: JSON.stringify({
+        user_id: opts.userId,
+        product_id: compra.product_id,
+        expira_em: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+      }),
+    });
+    await falha(dl, 'download');
+    const [linha] = (await dl.json()) as any[];
+    downloadToken = linha?.token ?? null;
+  }
+
+  if (compra.payment_id) {
+    const pay = await fetch(`${base}/rest/v1/payments?id=eq.${compra.payment_id}&user_id=is.null`, {
+      method: 'PATCH',
+      headers: jsonHeaders,
+      body: JSON.stringify({ user_id: opts.userId }),
+    });
+    await falha(pay, 'pagamento');
+  }
+
+  // Gate: só grava o vínculo se ainda não houver dono. Se outro processo venceu, nada muda.
+  const gate = await fetch(`${base}/rest/v1/purchases?id=eq.${compra.id}&user_id=is.null&select=id`, {
+    method: 'PATCH',
+    headers: { ...jsonHeaders, Prefer: 'return=representation' },
+    body: JSON.stringify({ user_id: opts.userId }),
+  });
+  await falha(gate, 'vínculo da compra');
+  const vinculadas = (await gate.json()) as any[];
+  if (!Array.isArray(vinculadas) || vinculadas.length === 0) return null;
+
+  return { downloadToken };
 }
 
 // ─── Helpers: Draw numbers ────────────────────────────────────────────────────
@@ -591,19 +785,22 @@ async function enviarEmailCompra(
     nome: string;
     ebookTitulo: string;
     downloadToken: string;
+    tipo?: string;
     productSlug: string;
     nema: number;
     valorNema: number;
     valor: number;
   }
 ): Promise<void> {
-  const downloadUrl = `${WORKER_URL}/api/download?token=${opts.downloadToken}`;
+  // acesso_app (plano do Ático): não há arquivo; o botão leva à área do cliente.
+  const acessoApp = opts.tipo === 'acesso_app';
+  const downloadUrl = acessoApp ? `${SITE_URL}/area-cliente.html` : `${WORKER_URL}/api/download?token=${opts.downloadToken}`;
   const areaClienteUrl = `${SITE_URL}/area-cliente.html`;
   // Anexa o arquivo (normalmente PDF) direto no e-mail, além do link de 72h -- pedido
   // explícito do usuário. Se qualquer coisa falhar, o e-mail ainda sai sem anexo -- o
   // link de download continua sendo o caminho garantido, nunca bloqueia a entrega.
   let attachment: { filename: string; content: string } | null = null;
-  try {
+  if (!acessoApp) try {
     const prodResp = await fetch(`${env.SUPABASE_URL}/rest/v1/products?slug=eq.${opts.productSlug}&select=arquivo_url,epub_url`, { headers: supabaseHeaders(env) });
     const [produto] = (await prodResp.json()) as any[];
     const arquivo: string | undefined = produto?.arquivo_url || produto?.epub_url;
@@ -642,7 +839,7 @@ async function enviarEmailCompra(
       Olá, <em style="font-style:italic;color:#1a4a2e">${escapeHtml(opts.nome.split(' ')[0])}</em> —
     </h1>
     <p style="margin:0 0 24px;font-size:15px;color:#555;line-height:1.7">
-      Seu pagamento foi aprovado. <strong>${escapeHtml(opts.ebookTitulo)}</strong> está pronto para leitura.
+      Seu pagamento foi aprovado. <strong>${escapeHtml(opts.ebookTitulo)}</strong> ${acessoApp ? 'está liberado.' : 'está pronto para leitura.'}
     </p>
     <p style="margin:0 0 8px;font-size:13px;color:#888">
       Valor pago: <strong style="color:#1a4a2e">${valorFmt}</strong>
@@ -651,11 +848,11 @@ async function enviarEmailCompra(
 
   <!-- Download CTA -->
   <tr><td style="padding:28px 48px">
-    <p style="margin:0 0 12px;font-size:12px;color:#888">Link válido por 72 horas:</p>
+    <p style="margin:0 0 12px;font-size:12px;color:#888">${acessoApp ? 'Acesso permanente, sem prazo:' : 'Link válido por 72 horas:'}</p>
     <a href="${downloadUrl}"
        style="display:block;padding:18px;background:#1a4a2e;color:#f0ebe0;text-decoration:none;
               text-align:center;font-size:15px;font-weight:500">
-      Baixar ${escapeHtml(opts.ebookTitulo)} →
+      ${acessoApp ? `Abrir ${escapeHtml(opts.ebookTitulo)} →` : `Baixar ${escapeHtml(opts.ebookTitulo)} →`}
     </a>
     <p style="margin:12px 0 0;font-size:12px;color:#888;text-align:center">
       Prefere ler o EPUB no leitor do site?
@@ -663,7 +860,7 @@ async function enviarEmailCompra(
     </p>
   </td></tr>
 
-  <!-- Biblioteca TT -->
+  ${acessoApp ? '' : `<!-- Biblioteca TT -->
   <tr><td style="padding:0 48px 24px">
     <table width="100%" cellpadding="0" cellspacing="0"
            style="background:#f5f0e8;border:1px solid rgba(26,74,46,.1);border-left:3px solid #c8a84b">
@@ -679,7 +876,7 @@ async function enviarEmailCompra(
       </a>
     </td></tr>
     </table>
-  </td></tr>
+  </td></tr>`}
 
   <!-- Nema -->
   ${opts.nema > 0 ? `<tr><td style="padding:0 48px 28px">
@@ -732,7 +929,7 @@ async function enviarEmailCompra(
 // a coluna `email` vai no payload, igual ao padrão de leads.ts) + evento
 // `checkout_start` em `lead_events`, consumido pelo cron de recuperação
 // (worker/src/cron/cart-recovery.ts).
-async function registrarInicioCheckout(env: Env, email: string, slug: string): Promise<void> {
+async function registrarInicioCheckout(env: Env, email: string, slug: string, nome = ''): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
   const upsertResp = await sb(env, 'leads?on_conflict=email', {
     method: 'POST',
@@ -745,6 +942,14 @@ async function registrarInicioCheckout(env: Env, email: string, slug: string): P
   }
   const [lead] = (await upsertResp.json()) as any[];
   if (!lead) return;
+  if (nome.length >= 2 && !lead.nome) {
+    // Nome só preenche lead sem nome — nunca sobrescreve o que já existe.
+    await sb(env, `leads?id=eq.${lead.id}&nome=is.null`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' } as any,
+      body: JSON.stringify({ nome }),
+    }).catch(() => {});
+  }
 
   const eventResp = await sb(env, 'lead_events', {
     method: 'POST',

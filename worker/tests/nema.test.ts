@@ -99,7 +99,7 @@ describe('POST /api/checkout/preferencia com Nema', () => {
     const pref = JSON.parse(String(mp.init!.body));
     expect(pref.items[0].unit_price).toBe(41.04);
     expect(pref.payer.email).toBe('dono@x.com');
-    expect(pref.metadata).toMatchObject({ nema_reserva: REF, nema_quantidade: 10 });
+    expect(pref.metadata).toMatchObject({ comprador_email: 'dono@x.com', comprador_user_id: 'u1', nema_reserva: REF, nema_quantidade: 10 });
   });
 
   it('sem login não usa Nema', async () => {
@@ -147,7 +147,7 @@ describe('POST /api/checkout/preferencia com Nema', () => {
     await handleCriarPreferencia(req, env);
     const pref = JSON.parse(String(chamadas.find((c) => c.url.includes('/checkout/preferences'))!.init!.body));
     expect(pref.items[0].unit_price).toBe(46.04);
-    expect(pref.metadata).not.toHaveProperty('nema_reserva');
+    expect(pref.metadata.nema_reserva).toBeUndefined();
     expect(chamadas.some((c) => c.url.includes('nema_reservar'))).toBe(false);
   });
 

@@ -87,6 +87,19 @@ describe('ponte admin → forge', () => {
     expect(JSON.parse(init.body as string)).toMatchObject({ tema: 'Endividamento das famílias', formato: 'artigo-academico' });
   });
 
+  it('GET resumo e marketing: vão a /project/{id}/… com o segredo (o navegador não chama mais o Forge)', async () => {
+    const f = mockFetch(() => new Response(JSON.stringify({ ok: true })));
+    expect((await chamar(req('GET', `resumo/${ID}`))).status).toBe(200);
+    expect((await chamar(req('GET', `marketing/${ID}`))).status).toBe(200);
+    const urls = f.mock.calls.map((c) => (c as [string])[0]).filter((u) => !u.includes('admin_sessoes'));
+    expect(urls).toEqual([
+      `https://tr3vo-forge.al-kbhal.workers.dev/project/${ID}/status`,
+      `https://tr3vo-forge.al-kbhal.workers.dev/project/${ID}/marketing`,
+    ]);
+    const init = f.mock.calls.find((c) => (c as [string])[0].includes('/marketing'))![1] as RequestInit;
+    expect((init.headers as Record<string, string>)['X-Forge-Secret']).toBe('segredo-forge');
+  });
+
   it('GET formatos: repassa ao Forge, que é a fonte única da tabela', async () => {
     const lista = [{ id: 'novela', descricao: 'Novela · …' }];
     const f = mockFetch(() => new Response(JSON.stringify(lista)));
