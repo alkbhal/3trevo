@@ -20,6 +20,7 @@ import {
   usuarioDoToken, reservarNema, cancelarReservaNema, confirmarResgateNema,
   creditarCompraNema, estornarCompraNema, reservaDoMetadata, valorNemaReais,
 } from './nema';
+import { validarDadosNF, payerMP, salvarDadosFiscais } from '../fiscal';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -45,6 +46,11 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
   }
   if (typeof slug !== 'string' || !/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug) || slug.length > 80) {
     return Response.json({ ok: false, erro: 'slug inválido' }, { status: 400 });
+  }
+  // Nota fiscal: CPF/CNPJ e endereço obrigatórios (validados de novo aqui).
+  const nf = validarDadosNF(body?.nf);
+  if (!nf) {
+    return Response.json({ ok: false, erro: 'dados_fiscais_invalidos' }, { status: 400 });
   }
 
   // Buscar produto no Supabase (catalogo é a fonte de verdade com 11 slugs)
@@ -98,11 +104,12 @@ export async function handleCriarPreferencia(request: Request, env: Env): Promis
       unit_price: Math.round((preco - desconto) * 100) / 100,
       currency_id: 'BRL',
     }],
-    payer: { email },
+    payer: { email, ...payerMP(nf, nome) },
     external_reference: slug,
     // O e-mail do comprador vai no metadata da preferência: o Mercado Pago devolve o pagador
     // mascarado em pagamentos PIX (ex.: "XXXXXXXXXXX"), e sem e-mail válido não há conta nem entrega.
     metadata: {
+      nf,
       comprador_email: String(email).trim().toLowerCase(),
       ...(compradorId ? { comprador_user_id: compradorId } : {}),
       ...(reservaRef ? { nema_reserva: reservaRef, nema_quantidade: nemaUsado } : {}),
@@ -267,6 +274,12 @@ export async function processarPagamentoAprovado(env: Env, mpPayment: any, mpPay
 
   // Rede de proteção (não bloqueia: o cliente já pagou). Só na 1ª vez que o pagamento é registrado.
   if (rpc.novo) await alertarValorDivergente(env, productSlug, valor, mpPaymentId);
+
+  // Nota fiscal: grava CPF/CNPJ e endereço informados no checkout (idempotente).
+  await salvarDadosFiscais(env, {
+    mpPaymentId: String(mpPaymentId), purchaseId: rpc.purchase_id ?? null,
+    email: emailPagador, nome: nomePagador, valor, metadata: mpPayment.metadata,
+  }).catch((e) => console.error('[webhook] salvarDadosFiscais falhou:', e));
 
   // Nema: confirma o saldo usado nesta compra e credita o Nema que ela gera.
   // As duas funções são idempotentes, então rodam também quando o MP reenvia o aviso.
